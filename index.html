@@ -3,133 +3,590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Luban Workshop - A culinary experience featuring exquisite dishes, table reservations, and exceptional service.">
-    <title>Luban Workshop - Restaurant & Culinary Services</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Luban Workshop Restaurant</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+        }
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        /* Custom Scrollbar for the menu */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <h1>Luban Workshop</h1>
+<body class="bg-stone-50 text-stone-800 scroll-smooth antialiased">
+
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span class="text-red-700">Workshop</span></span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
+                    <a href="#about" class="text-stone-600 hover:text-red-700 transition-colors font-medium">About</a>
+                    <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate Us</a>
+                    <button onclick="toggleCart()" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
+                        <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                        <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center md:hidden gap-4">
+                    <button onclick="toggleCart()" class="relative p-2 text-stone-600">
+                        <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                        <span id="cart-badge-mobile" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
+                    </button>
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-stone-600 hover:text-red-700 p-2">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
             </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="#menu" class="nav-link">Menu</a></li>
-                <li class="nav-item"><a href="#reservations" class="nav-link">Reservations</a></li>
-                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#menu" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">About</a>
+                <a href="#location" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h2 class="hero-title">Welcome to Luban Workshop</h2>
-            <p class="hero-subtitle">Experience the Art of Fine Dining</p>
-            <p class="hero-description">
-                Discover an unforgettable culinary journey where tradition meets innovation. 
-                Our master chefs craft each dish with passion and precision, using only the finest ingredients.
+    <header class="relative pt-24 pb-12 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
+        <div class="absolute inset-0 opacity-40">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" alt="Restaurant interior" class="w-full h-full object-cover">
+        </div>
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                Craftsmanship in <br/>Every Bite
+            </h1>
+            <p class="mt-4 text-xl text-stone-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
+                Experience the culinary excellence of the Luban Workshop. Where technical precision meets traditional flavor.
             </p>
-            <a href="#menu" class="cta-button">Explore Our Menu</a>
+            <div class="flex justify-center gap-4">
+                <a href="#menu" class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-stone-900 bg-white hover:bg-stone-100 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
+                    Order Now
+                </a>
+                <a href="#location" class="px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
+                    Find Us
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="menu" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Discover Our Menu</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
+                    Signature Dishes
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-stone-500 mx-auto">
+                    A fusion of local ingredients and global techniques.
+                </p>
+            </div>
+
+            <div class="flex justify-center space-x-2 mb-10 overflow-x-auto pb-4" id="category-filters">
+                <button onclick="filterMenu('all')" class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
+                <button onclick="filterMenu('mains')" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Mains</button>
+                <button onclick="filterMenu('appetizers')" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Appetizers & Soups</button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
+                </div>
         </div>
     </section>
 
-    <!-- Featured Menu Preview Section -->
-    <section id="menu" class="featured-menu">
-        <div class="container">
-            <h2 class="section-title">Featured Menu</h2>
-            <p class="section-subtitle">A taste of our signature dishes</p>
-            
-            <div class="menu-grid">
-                <div class="menu-card">
-                    <div class="menu-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-                    <div class="menu-content">
-                        <h3>Signature Steak</h3>
-                        <p>Premium aged beef, perfectly grilled to your preference, served with seasonal vegetables</p>
-                        <span class="price">$45</span>
+    <section id="location" class="py-16 bg-stone-50 border-t border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <h2 class="text-3xl font-extrabold text-stone-900 mb-6 serif">Visit Our Restaurant</h2>
+                    <p class="text-stone-600 mb-8 text-lg">
+                        Located in the heart of the UCC, our restaurant serves as both a training ground for excellence and a destination for fine dining.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i data-lucide="map-pin" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-bold text-stone-900">Address</h4>
+                                <p class="text-stone-600">Cafe Roof Top<br>Casford Street, UCC</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-lucide="clock" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-bold text-stone-900">Opening Hours</h4>
+                                <p class="text-stone-600">Mon - Fri: 11:00 AM - 5:30 PM<br>Sat - Sun: 12:00 PM - 5:00 PM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-lucide="phone" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="font-bold text-stone-900">Contact</h4>
+                                <p class="text-stone-600">020 543 8455<br>reservations@lubanworkshop.com</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="menu-card">
-                    <div class="menu-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
-                    <div class="menu-content">
-                        <h3>Fresh Seafood Platter</h3>
-                        <p>A selection of the day's finest catch, prepared with Mediterranean flavors</p>
-                        <span class="price">$52</span>
+
+                <div class="order-1 md:order-2 h-96 bg-stone-200 rounded-2xl overflow-hidden shadow-xl relative">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.0!2d-1.29!3d5.10!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMDYnMDAuMCJOIDHCsDE3JzI0LjAiVw!5e0!3m2!1sen!2sgh!4v1600000000000!5m2!1sen!2sgh" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                    <div class="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-md flex items-center gap-2">
+                         <i data-lucide="navigation" class="w-4 h-4 text-blue-600"></i>
+                         <a href="https://goo.gl/maps/placeholder" target="_blank" class="text-sm font-bold text-stone-800 hover:text-blue-600">Get Directions</a>
                     </div>
                 </div>
-                
-                <div class="menu-card">
-                    <div class="menu-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
-                    <div class="menu-content">
-                        <h3>Artisan Pasta</h3>
-                        <p>Handmade pasta with truffle cream sauce and wild mushrooms</p>
-                        <span class="price">$38</span>
-                    </div>
-                </div>
-                
-                <div class="menu-card">
-                    <div class="menu-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
-                    <div class="menu-content">
-                        <h3>Chef's Dessert</h3>
-                        <p>Daily creation featuring seasonal fruits and house-made gelato</p>
-                        <span class="price">$18</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="menu-cta">
-                <a href="#reservations" class="cta-button secondary">Make a Reservation</a>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Luban Workshop</h3>
-                    <p>Crafting culinary excellence since 2024</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Hours</h4>
-                    <p>Monday - Friday: 11:00 AM - 10:00 PM</p>
-                    <p>Saturday - Sunday: 10:00 AM - 11:00 PM</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <p>123 Culinary Street</p>
-                    <p>Phone: (555) 123-4567</p>
-                    <p>Email: info@lubanworkshop.com</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Follow Us</h4>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">Twitter</a>
-                    </div>
-                </div>
+    <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex justify-center items-center mb-6">
+                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
+                <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
             </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Luban Workshop. All rights reserved.</p>
+            <p class="mb-6">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
+            <p class="mb-6 text-sm">For reservations: 020 543 8455</p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="facebook" class="h-5 w-5"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram" class="h-5 w-5"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="twitter" class="h-5 w-5"></i></a>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <div id="cart-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-50 z-[60] hidden transition-opacity opacity-0" onclick="toggleCart()"></div>
+    
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-full flex z-[70] pointer-events-none">
+        <div class="w-screen max-w-md pointer-events-auto transform transition ease-in-out duration-300 translate-x-full bg-white shadow-xl flex flex-col h-full" id="cart-panel">
+            <div class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
+                <div class="flex items-start justify-between">
+                    <h2 class="text-lg font-medium text-stone-900 serif">Your Order</h2>
+                    <div class="ml-3 h-7 flex items-center">
+                        <button onclick="toggleCart()" class="-m-2 p-2 text-stone-400 hover:text-stone-500">
+                            <span class="sr-only">Close panel</span>
+                            <i data-lucide="x" class="h-6 w-6"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <div class="flow-root">
+                        <ul id="cart-items" role="list" class="-my-6 divide-y divide-stone-200">
+                            <li id="empty-cart-msg" class="py-6 text-center text-stone-500 italic">
+                                Your cart is empty. <br> Start adding some delicious dishes!
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-stone-200 py-6 px-4 sm:px-6 bg-stone-50">
+                <div class="flex justify-between text-base font-medium text-stone-900 mb-4">
+                    <p>Subtotal</p>
+                    <p id="cart-total">₵0.00</p>
+                </div>
+                <p class="mt-0.5 text-sm text-stone-500 mb-6">Pay at counter upon pickup.</p>
+                <div class="space-y-3">
+                    <button onclick="checkout()" id="checkout-btn" class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        Place Order
+                    </button>
+                    <button onclick="toggleCart()" class="w-full flex justify-center items-center px-6 py-3 border border-stone-300 rounded-md shadow-sm text-base font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors">
+                        Continue Ordering
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i data-lucide="check" class="h-6 w-6 text-green-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="modal-title">Order Received!</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-stone-500">
+                                    Your order has been sent to the kitchen. Please proceed to the counter for payment.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeSuccessModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- Data: Actual Luban Workshop Menu ---
+        const menuItems = [
+            // --- APPETIZERS & SOUPS ---
+            {
+                id: 101,
+                name: "Chicken and Sweet Corn Soup",
+                category: "appetizers",
+                price: 40.00,
+                description: "Classic comfort soup with sweet corn and tender chicken.",
+                image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 102,
+                name: "Hot and Sour Soup",
+                category: "appetizers",
+                price: 40.00,
+                description: "Spicy and tangy soup with tofu, bamboo shoots, and mushrooms.",
+                image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 201,
+                name: "Beef Spring Rolls (3 pcs)",
+                category: "appetizers",
+                price: 30.00,
+                description: "Crispy rolls filled with seasoned beef and vegetables.",
+                image: "https://images.unsplash.com/photo-1544510806-e28d3cd4d4e6?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 202,
+                name: "Golden Fried Prawns",
+                category: "appetizers",
+                price: 90.00,
+                description: "Crispy deep-fried prawns served with a dipping sauce.",
+                image: "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 203,
+                name: "Steamed Dumplings (Beef/Pork)",
+                category: "appetizers",
+                price: 30.00,
+                description: "Hand-made dumplings served with soy-vinegar dipping sauce.",
+                image: "https://images.unsplash.com/photo-1496116218417-1a781b1c423c?auto=format&fit=crop&w=800&q=80"
+            },
+            
+            // --- MAINS (Beef, Chicken, Pork, Seafood, Rice, Noodles) ---
+            {
+                id: 301,
+                name: "Shredded Beef Sauce",
+                category: "mains",
+                price: 110.00,
+                description: "Tender shredded beef stir-fried with green peppers and onions.",
+                image: "https://images.unsplash.com/photo-1617622141675-d227c19cb3bb?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 302,
+                name: "Sweet & Sour Chicken",
+                category: "mains",
+                price: 100.00,
+                description: "Battered chicken tossed in a classic tangy sweet and sour sauce.",
+                image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 303,
+                name: "Fried Pork Ribs",
+                category: "mains",
+                price: 75.00,
+                description: "Seasoned pork ribs fried to golden perfection.",
+                image: "https://images.unsplash.com/photo-1544025162-d76690b67f61?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 304,
+                name: "Fish Fillet in Sichuan Sauce",
+                category: "mains",
+                price: 115.00,
+                description: "Tender fish fillets poached in a spicy Sichuan broth.",
+                image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 305,
+                name: "Squid in Luban Chilli Sauce",
+                category: "mains",
+                price: 120.00,
+                description: "Fresh squid cooked in our signature hot chilli sauce.",
+                image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 401,
+                name: "Special Jollof Rice",
+                category: "mains",
+                price: 50.00,
+                description: "Our signature Jollof rice prepared with special house spices.",
+                image: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f1a?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 402,
+                name: "Special Noodles",
+                category: "mains",
+                price: 80.00,
+                description: "Wok-fried noodles with a mix of meat and fresh vegetables.",
+                image: "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=800&q=80"
+            },
+             {
+                id: 403,
+                name: "Singapore Noodles",
+                category: "mains",
+                price: 80.00,
+                description: "Stir-fried vermicelli with curry powder, vegetables and meat.",
+                image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        let cart = [];
+
+        // --- Render Menu ---
+        function renderMenu(filter = 'all') {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+
+            const items = filter === 'all' ? menuItems : menuItems.filter(item => item.category === filter);
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
+                card.innerHTML = `
+                    <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
+                        <img src="${item.image}" 
+                             alt="${item.name}" 
+                             onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'"
+                             class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">
+                            ₵${item.price.toFixed(2)}
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
+                        <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
+                        <div class="mt-6">
+                            <button onclick="addToCart(${item.id})" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            // Re-init icons for dynamic content
+            lucide.createIcons();
+        }
+
+        // --- Filter Functionality ---
+        function filterMenu(category) {
+            // Update active button styles
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                const btnText = btn.textContent.toLowerCase();
+                if((category === 'all' && btnText === 'all') || btnText.includes(category)) {
+                    btn.classList.remove('bg-stone-100', 'text-stone-600');
+                    btn.classList.add('bg-stone-900', 'text-white');
+                } else {
+                    btn.classList.remove('bg-stone-900', 'text-white');
+                    btn.classList.add('bg-stone-100', 'text-stone-600');
+                }
+            });
+            renderMenu(category);
+        }
+
+        // --- Cart Logic ---
+        function addToCart(id) {
+            const item = menuItems.find(i => i.id === id);
+            const existingItem = cart.find(i => i.id === id);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+
+            updateCartUI();
+            
+            // Temporary feedback on button could be added here
+            const badgeDesktop = document.getElementById('cart-badge-desktop');
+            const badgeMobile = document.getElementById('cart-badge-mobile');
+            
+            // Animate badges
+            [badgeDesktop, badgeMobile].forEach(el => {
+                el.classList.add('scale-125');
+                setTimeout(() => el.classList.remove('scale-125'), 200);
+            });
+
+            // Auto open cart on first add could be annoying on mobile, so we skip it.
+        }
+
+        function removeFromCart(id) {
+            const index = cart.findIndex(i => i.id === id);
+            if (index > -1) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartList = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const badgeDesktop = document.getElementById('cart-badge-desktop');
+            const badgeMobile = document.getElementById('cart-badge-mobile');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            // Update badges
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badgeDesktop.innerText = count;
+            badgeMobile.innerText = count;
+            
+            if (count > 0) {
+                badgeDesktop.classList.remove('hidden');
+                badgeMobile.classList.remove('hidden');
+                checkoutBtn.disabled = false;
+            } else {
+                badgeDesktop.classList.add('hidden');
+                badgeMobile.classList.add('hidden');
+                checkoutBtn.disabled = true;
+            }
+
+            // Update List
+            cartList.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartList.innerHTML = `<li class="py-12 text-center flex flex-col items-center text-stone-500">
+                    <i data-lucide="shopping-basket" class="w-12 h-12 mb-4 text-stone-300"></i>
+                    <p class="text-lg font-medium">Your cart is empty</p>
+                    <p class="text-sm">Explore our menu to add items.</p>
+                </li>`;
+            } else {
+                let subtotal = 0;
+                cart.forEach(item => {
+                    subtotal += item.price * item.quantity;
+                    const li = document.createElement('li');
+                    li.className = 'py-6 flex';
+                    li.innerHTML = `
+                        <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-center object-cover">
+                        </div>
+                        <div class="ml-4 flex-1 flex flex-col">
+                            <div>
+                                <div class="flex justify-between text-base font-medium text-stone-900">
+                                    <h3>${item.name}</h3>
+                                    <p class="ml-4">₵${(item.price * item.quantity).toFixed(2)}</p>
+                                </div>
+                                <p class="mt-1 text-sm text-stone-500">₵${item.price.toFixed(2)} each</p>
+                            </div>
+                            <div class="flex-1 flex items-end justify-between text-sm">
+                                <div class="flex items-center border border-stone-300 rounded-md">
+                                    <button onclick="removeFromCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
+                                    <span class="px-2 font-medium text-stone-900">${item.quantity}</span>
+                                    <button onclick="addToCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
+                                </div>
+                                <div class="flex">
+                                    <button type="button" onclick="cart = cart.filter(i => i.id !== ${item.id}); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    cartList.appendChild(li);
+                });
+                totalEl.innerText = '₵' + subtotal.toFixed(2);
+            }
+            lucide.createIcons();
+        }
+
+        // --- Toggle Cart Drawer ---
+        function toggleCart() {
+            const overlay = document.getElementById('cart-overlay');
+            const drawer = document.getElementById('cart-panel');
+            const isHidden = overlay.classList.contains('hidden');
+
+            if (isHidden) {
+                overlay.classList.remove('hidden');
+                // Small delay to allow display block to apply before opacity transition
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                drawer.classList.remove('translate-x-full');
+            } else {
+                overlay.classList.add('opacity-0');
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        // --- Checkout Simulation ---
+        function checkout() {
+            toggleCart();
+            // Simulate API call
+            setTimeout(() => {
+                cart = [];
+                updateCartUI();
+                const modal = document.getElementById('success-modal');
+                modal.classList.remove('hidden');
+            }, 500);
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        // --- Init ---
+        renderMenu();
+        updateCartUI();
+
+    </script>
 </body>
 </html>
