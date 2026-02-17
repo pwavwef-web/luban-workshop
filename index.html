@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luban Workshop - Fine Dining Experience</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">Luban Workshop</div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#menu" class="nav-link">Menu</a></li>
+                <li><a href="#reservation" class="nav-link">Reservations</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Luban Workshop</h1>
+            <p class="hero-subtitle">Where Craftsmanship Meets Culinary Excellence</p>
+            <a href="#reservation" class="btn btn-primary">Reserve a Table</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-content">
+                <p>
+                    At Luban Workshop, we blend traditional craftsmanship with modern culinary innovation. 
+                    Named after the legendary Chinese master carpenter Lu Ban, our restaurant embodies the 
+                    same dedication to precision, quality, and artistry.
+                </p>
+                <p>
+                    Our chefs meticulously craft each dish using locally sourced ingredients and time-honored 
+                    techniques, creating an unforgettable dining experience that celebrates both tradition and 
+                    innovation.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu">
+        <div class="container">
+            <h2 class="section-title">Our Menu</h2>
+            
+            <!-- Appetizers -->
+            <div class="menu-category">
+                <h3 class="category-title">Appetizers</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Spring Rolls</h4>
+                            <span class="item-price">$8.99</span>
+                        </div>
+                        <p class="item-description">Crispy vegetable spring rolls served with sweet chili sauce</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Dumpling Sampler</h4>
+                            <span class="item-price">$12.99</span>
+                        </div>
+                        <p class="item-description">Assorted steamed dumplings with soy-ginger dipping sauce</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Crispy Calamari</h4>
+                            <span class="item-price">$11.99</span>
+                        </div>
+                        <p class="item-description">Lightly fried calamari with lemon aioli</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Edamame</h4>
+                            <span class="item-price">$6.99</span>
+                        </div>
+                        <p class="item-description">Steamed soybeans with sea salt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Courses -->
+            <div class="menu-category">
+                <h3 class="category-title">Main Courses</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Peking Duck</h4>
+                            <span class="item-price">$28.99</span>
+                        </div>
+                        <p class="item-description">Roasted duck served with pancakes, scallions, and hoisin sauce</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Kung Pao Chicken</h4>
+                            <span class="item-price">$18.99</span>
+                        </div>
+                        <p class="item-description">Stir-fried chicken with peanuts, vegetables, and chili peppers</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Braised Pork Belly</h4>
+                            <span class="item-price">$24.99</span>
+                        </div>
+                        <p class="item-description">Slow-braised pork belly in soy sauce with steamed buns</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Vegetable Stir-Fry</h4>
+                            <span class="item-price">$16.99</span>
+                        </div>
+                        <p class="item-description">Seasonal vegetables wok-tossed in garlic sauce</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Grilled Salmon</h4>
+                            <span class="item-price">$26.99</span>
+                        </div>
+                        <p class="item-description">Fresh Atlantic salmon with teriyaki glaze and seasonal vegetables</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Beef with Broccoli</h4>
+                            <span class="item-price">$19.99</span>
+                        </div>
+                        <p class="item-description">Tender beef and broccoli in brown sauce</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desserts -->
+            <div class="menu-category">
+                <h3 class="category-title">Desserts</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Mango Sticky Rice</h4>
+                            <span class="item-price">$7.99</span>
+                        </div>
+                        <p class="item-description">Sweet sticky rice with fresh mango and coconut cream</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Green Tea Ice Cream</h4>
+                            <span class="item-price">$6.99</span>
+                        </div>
+                        <p class="item-description">House-made matcha ice cream</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Sesame Balls</h4>
+                            <span class="item-price">$5.99</span>
+                        </div>
+                        <p class="item-description">Deep-fried glutinous rice balls filled with red bean paste</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Chocolate Lava Cake</h4>
+                            <span class="item-price">$8.99</span>
+                        </div>
+                        <p class="item-description">Warm chocolate cake with molten center, served with vanilla ice cream</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drinks -->
+            <div class="menu-category">
+                <h3 class="category-title">Drinks</h3>
+                <div class="menu-grid">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Jasmine Tea</h4>
+                            <span class="item-price">$3.99</span>
+                        </div>
+                        <p class="item-description">Traditional Chinese jasmine green tea</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Lychee Mocktail</h4>
+                            <span class="item-price">$6.99</span>
+                        </div>
+                        <p class="item-description">Refreshing lychee juice with sparkling water and lime</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Sake</h4>
+                            <span class="item-price">$9.99</span>
+                        </div>
+                        <p class="item-description">Premium Japanese rice wine, served warm or cold</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Fresh Fruit Smoothie</h4>
+                            <span class="item-price">$7.99</span>
+                        </div>
+                        <p class="item-description">Blended seasonal fruits with honey</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4 class="item-name">Oolong Tea</h4>
+                            <span class="item-price">$4.99</span>
+                        </div>
+                        <p class="item-description">Premium semi-oxidized Chinese tea</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation Section -->
+    <section id="reservation" class="reservation">
+        <div class="container">
+            <h2 class="section-title">Make a Reservation</h2>
+            <form id="reservationForm" class="reservation-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date *</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Time *</label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="partySize">Party Size *</label>
+                        <select id="partySize" name="partySize" required>
+                            <option value="">Select number of guests</option>
+                            <option value="1">1 person</option>
+                            <option value="2">2 people</option>
+                            <option value="3">3 people</option>
+                            <option value="4">4 people</option>
+                            <option value="5">5 people</option>
+                            <option value="6">6 people</option>
+                            <option value="7">7 people</option>
+                            <option value="8">8 people</option>
+                            <option value="more">More than 8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="specialRequests">Special Requests</label>
+                    <textarea id="specialRequests" name="specialRequests" rows="3" placeholder="Any special requests or dietary restrictions?"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+            <div id="confirmationMessage" class="confirmation-message hidden">
+                <p>Thank you! Your reservation has been received. We'll contact you shortly to confirm.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="info-item">
+                        <h3>Opening Hours</h3>
+                        <p><strong>Monday - Thursday:</strong> 11:00 AM - 10:00 PM</p>
+                        <p><strong>Friday - Saturday:</strong> 11:00 AM - 11:00 PM</p>
+                        <p><strong>Sunday:</strong> 12:00 PM - 9:00 PM</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Location</h3>
+                        <p>123 Culinary Street</p>
+                        <p>Food District, City 12345</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Contact Information</h3>
+                        <p><strong>Phone:</strong> (555) 123-4567</p>
+                        <p><strong>Email:</strong> info@lubanworkshop.com</p>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <p>📍 Map Location</p>
+                        <p class="map-text">Interactive map will be displayed here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Luban Workshop. All rights reserved.</p>
+            <p>Crafted with passion and precision</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
