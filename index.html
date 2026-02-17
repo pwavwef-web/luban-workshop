@@ -524,6 +524,13 @@
         let cart = [];
         let currentUser = null;
 
+        // Helper function to escape HTML and prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Set minimum date for reservation form to today
         const today = new Date().toISOString().split('T')[0];
         document.addEventListener('DOMContentLoaded', () => {
@@ -648,10 +655,14 @@
                 const snapshot = await db.collection('menuItems').get();
                 menuItems = [];
                 snapshot.forEach(doc => {
-                    menuItems.push({ 
-                        id: doc.id, 
-                        ...doc.data() 
-                    });
+                    const data = doc.data();
+                    // Basic validation of menu item data
+                    if (data && data.name && typeof data.price !== 'undefined' && data.category) {
+                        menuItems.push({ 
+                            id: doc.id, 
+                            ...data 
+                        });
+                    }
                 });
                 renderMenu();
             } catch (error) {
@@ -672,12 +683,43 @@
             errorDiv.classList.add('hidden');
             successDiv.classList.add('hidden');
             
+            // Basic client-side validation
+            const email = document.getElementById('res-email').value;
+            const phone = document.getElementById('res-phone').value;
+            const selectedDate = document.getElementById('res-date').value;
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorDiv.textContent = 'Please enter a valid email address.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate phone number (basic check)
+            const phoneRegex = /^[0-9\s\-\+\(\)]+$/;
+            if (!phoneRegex.test(phone) || phone.length < 8) {
+                errorDiv.textContent = 'Please enter a valid phone number.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate date is not in the past
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const reservationDate = new Date(selectedDate);
+            if (reservationDate < today) {
+                errorDiv.textContent = 'Reservation date cannot be in the past.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
             const reservationData = {
                 name: document.getElementById('res-name').value,
-                email: document.getElementById('res-email').value,
-                phone: document.getElementById('res-phone').value,
+                email: email,
+                phone: phone,
                 guests: document.getElementById('res-guests').value,
-                date: document.getElementById('res-date').value,
+                date: selectedDate,
                 time: document.getElementById('res-time').value,
                 notes: document.getElementById('res-notes').value || '',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -687,10 +729,14 @@
                 await db.collection('reservations').add(reservationData);
                 successDiv.textContent = 'Reservation submitted successfully! We will contact you shortly to confirm.';
                 successDiv.classList.remove('hidden');
+                successDiv.setAttribute('tabindex', '-1');
+                successDiv.focus();
                 document.getElementById('reservation-form').reset();
                 
-                // Scroll to success message
-                successDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Reset the min date attribute
+                const dateInput = document.getElementById('res-date');
+                const todayStr = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', todayStr);
             } catch (error) {
                 console.error('Error submitting reservation:', error);
                 errorDiv.textContent = 'Failed to submit reservation. Please try again or call us directly.';
@@ -714,21 +760,28 @@
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
+                
+                // Escape user-controlled data to prevent XSS
+                const safeName = escapeHtml(item.name || 'Unnamed Item');
+                const safeDescription = escapeHtml(item.description || '');
+                const safeImage = item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image';
+                const safePrice = (parseFloat(item.price) || 0).toFixed(2);
+                
                 card.innerHTML = `
                     <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
-                        <img src="${item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'}" 
-                             alt="${item.name}" 
+                        <img src="${safeImage}" 
+                             alt="${safeName}" 
                              onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'"
                              class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">
-                            ₵${(parseFloat(item.price) || 0).toFixed(2)}
+                            ₵${safePrice}
                         </div>
                     </div>
                     <div class="p-6 flex flex-col flex-1">
-                        <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
-                        <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
+                        <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${safeName}</h3>
+                        <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${safeDescription}</p>
                         <div class="mt-6">
-                            <button onclick="addToCart('${item.id}')" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
+                            <button onclick="addToCart('${escapeHtml(item.id)}')" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
                                 <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
                             </button>
                         </div>
@@ -834,28 +887,34 @@
                     const price = parseFloat(item.price) || 0;
                     const quantity = parseInt(item.quantity) || 0;
                     subtotal += price * quantity;
+                    
+                    // Escape user-controlled data to prevent XSS
+                    const safeName = escapeHtml(item.name || 'Unnamed Item');
+                    const safeImage = item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image';
+                    const safeId = escapeHtml(item.id);
+                    
                     const li = document.createElement('li');
                     li.className = 'py-6 flex';
                     li.innerHTML = `
                         <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
-                            <img src="${item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'}" alt="${item.name}" class="w-full h-full object-center object-cover">
+                            <img src="${safeImage}" alt="${safeName}" class="w-full h-full object-center object-cover">
                         </div>
                         <div class="ml-4 flex-1 flex flex-col">
                             <div>
                                 <div class="flex justify-between text-base font-medium text-stone-900">
-                                    <h3>${item.name}</h3>
+                                    <h3>${safeName}</h3>
                                     <p class="ml-4">₵${(price * quantity).toFixed(2)}</p>
                                 </div>
                                 <p class="mt-1 text-sm text-stone-500">₵${price.toFixed(2)} each</p>
                             </div>
                             <div class="flex-1 flex items-end justify-between text-sm">
                                 <div class="flex items-center border border-stone-300 rounded-md">
-                                    <button onclick="removeFromCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
+                                    <button onclick="removeFromCart('${safeId}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
                                     <span class="px-2 font-medium text-stone-900">${quantity}</span>
-                                    <button onclick="addToCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
+                                    <button onclick="addToCart('${safeId}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
                                 </div>
                                 <div class="flex">
-                                    <button type="button" onclick="cart = cart.filter(i => i.id !== '${item.id}'); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
+                                    <button type="button" onclick="cart = cart.filter(i => i.id !== '${safeId}'); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
                                 </div>
                             </div>
                         </div>
