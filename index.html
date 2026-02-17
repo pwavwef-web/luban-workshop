@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luban Workshop Restaurant</title>
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -21,37 +24,54 @@
         body {
             font-family: 'Lato', sans-serif;
         }
-        h1, h2, h3, .serif {
+
+        h1,
+        h2,
+        h3,
+        .serif {
             font-family: 'Playfair Display', serif;
         }
+
         .scroll-smooth {
             scroll-behavior: smooth;
         }
+
         /* Custom Scrollbar for the menu */
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
+            background: #f1f1f1;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: #888; 
+            background: #888;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #555; 
+            background: #555;
         }
-        
+
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body class="bg-stone-50 text-stone-800 scroll-smooth antialiased">
 
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
@@ -59,21 +79,28 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
                     <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
-                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span class="text-red-700">Workshop</span></span>
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
+                            class="text-red-700">Workshop</span></span>
                 </div>
-                
+
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
-                    <a href="#reservation" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
-                    <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate Us</a>
-                    <button onclick="toggleCart()" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
+                    <a href="#reservation"
+                        class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
+                    <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate
+                        Us</a>
+                    <button onclick="toggleCart()"
+                        class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
                         <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                        <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
+                        <span id="cart-badge-desktop"
+                            class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
                     </button>
-                    <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
+                    <button id="auth-btn-desktop" onclick="toggleAuthModal()"
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
                         Sign Up / Login
                     </button>
-                    <button id="user-info-desktop" onclick="logout()" class="hidden items-center gap-2 px-4 py-2 text-sm font-medium text-stone-600 hover:text-red-700 transition-colors">
+                    <button id="user-info-desktop" onclick="logout()"
+                        class="hidden items-center gap-2 px-4 py-2 text-sm font-medium text-stone-600 hover:text-red-700 transition-colors">
                         <i data-lucide="user" class="h-4 w-4"></i>
                         <span id="user-email-desktop"></span>
                     </button>
@@ -82,22 +109,30 @@
                 <div class="flex items-center md:hidden gap-4">
                     <button onclick="toggleCart()" class="relative p-2 text-stone-600">
                         <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                        <span id="cart-badge-mobile" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
+                        <span id="cart-badge-mobile"
+                            class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
                     </button>
-                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-stone-600 hover:text-red-700 p-2">
+                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
+                        class="text-stone-600 hover:text-red-700 p-2">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#menu" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
-                <a href="#reservation" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
-                <a href="#location" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
-                <button id="auth-btn-mobile" onclick="toggleAuthModal()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-700 hover:bg-red-800">Sign Up / Login</button>
-                <button id="user-info-mobile" onclick="logout()" class="hidden w-full text-left px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">
+                <a href="#menu"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
+                <a href="#reservation"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
+                <a href="#location"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
+                <button id="auth-btn-mobile" onclick="toggleAuthModal()"
+                    class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-700 hover:bg-red-800">Sign
+                    Up / Login</button>
+                <button id="user-info-mobile" onclick="logout()"
+                    class="hidden w-full text-left px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">
                     <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
                     <span id="user-email-mobile"></span>
                 </button>
@@ -107,20 +142,24 @@
 
     <header class="relative pt-24 pb-12 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
         <div class="absolute inset-0 opacity-40">
-            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" alt="Restaurant interior" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
+                alt="Restaurant interior" class="w-full h-full object-cover">
         </div>
         <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-                Craftsmanship in <br/>Every Bite
+                Craftsmanship in <br />Every Bite
             </h1>
             <p class="mt-4 text-xl text-stone-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
-                Experience the culinary excellence of the Luban Workshop. Where technical precision meets traditional flavor.
+                Experience the culinary excellence of the Luban Workshop. Where technical precision meets traditional
+                flavor.
             </p>
             <div class="flex justify-center gap-4">
-                <a href="#menu" class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-stone-900 bg-white hover:bg-stone-100 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
+                <a href="#menu"
+                    class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-stone-900 bg-white hover:bg-stone-100 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
                     Order Now
                 </a>
-                <a href="#location" class="px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
+                <a href="#location"
+                    class="px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
                     Find Us
                 </a>
             </div>
@@ -140,13 +179,17 @@
             </div>
 
             <div class="flex justify-center space-x-2 mb-10 overflow-x-auto pb-4" id="category-filters">
-                <button onclick="filterMenu('all')" class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
-                <button onclick="filterMenu('mains')" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Mains</button>
-                <button onclick="filterMenu('appetizers')" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Appetizers & Soups</button>
+                <button onclick="filterMenu('all')"
+                    class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
+                <button onclick="filterMenu('mains')"
+                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Mains</button>
+                <button onclick="filterMenu('appetizers')"
+                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Appetizers
+                    & Soups</button>
             </div>
 
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
-                </div>
+            </div>
         </div>
     </section>
 
@@ -167,39 +210,41 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="res-name" class="block text-sm font-medium text-stone-700 mb-2">Full Name *</label>
-                        <input type="text" id="res-name" required 
-                               class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <input type="text" id="res-name" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                     </div>
                     <div>
-                        <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">Phone Number *</label>
-                        <input type="tel" id="res-phone" required 
-                               class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">Phone Number
+                            *</label>
+                        <input type="tel" id="res-phone" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                     </div>
                 </div>
 
                 <div>
                     <label for="res-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                    <input type="email" id="res-email" 
-                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    <input type="email" id="res-email"
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="res-date" class="block text-sm font-medium text-stone-700 mb-2">Date *</label>
-                        <input type="date" id="res-date" required 
-                               class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <input type="date" id="res-date" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                     </div>
                     <div>
                         <label for="res-time" class="block text-sm font-medium text-stone-700 mb-2">Time *</label>
-                        <input type="time" id="res-time" required 
-                               class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <input type="time" id="res-time" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                     </div>
                 </div>
 
                 <div>
-                    <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests *</label>
-                    <select id="res-guests" required 
-                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests
+                        *</label>
+                    <select id="res-guests" required
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         <option value="" disabled selected>Select number of guests</option>
                         <option value="1">1 Guest</option>
                         <option value="2">2 Guests</option>
@@ -213,16 +258,18 @@
                 </div>
 
                 <div>
-                    <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">Special Requests</label>
-                    <textarea id="res-notes" rows="3" 
-                              class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent" 
-                              placeholder="Any dietary restrictions or special occasions..."></textarea>
+                    <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">Special
+                        Requests</label>
+                    <textarea id="res-notes" rows="3"
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        placeholder="Any dietary restrictions or special occasions..."></textarea>
                 </div>
 
-                <div id="reservation-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md"></div>
+                <div id="reservation-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md">
+                </div>
 
-                <button type="submit" 
-                        class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
+                <button type="submit"
+                    class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
                     Submit Reservation
                 </button>
             </form>
@@ -235,9 +282,10 @@
                 <div class="order-2 md:order-1">
                     <h2 class="text-3xl font-extrabold text-stone-900 mb-6 serif">Visit Our Restaurant</h2>
                     <p class="text-stone-600 mb-8 text-lg">
-                        Located in the heart of the UCC, our restaurant serves as both a training ground for excellence and a destination for fine dining.
+                        Located in the heart of the UCC, our restaurant serves as both a training ground for excellence
+                        and a destination for fine dining.
                     </p>
-                    
+
                     <div class="space-y-4">
                         <div class="flex items-start">
                             <i data-lucide="map-pin" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
@@ -250,7 +298,8 @@
                             <i data-lucide="clock" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
                             <div>
                                 <h4 class="font-bold text-stone-900">Opening Hours</h4>
-                                <p class="text-stone-600">Mon - Fri: 11:00 AM - 5:30 PM<br>Sat - Sun: 12:00 PM - 5:00 PM</p>
+                                <p class="text-stone-600">Mon - Fri: 11:00 AM - 5:30 PM<br>Sat - Sun: 12:00 PM - 5:00 PM
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-start">
@@ -264,17 +313,14 @@
                 </div>
 
                 <div class="order-1 md:order-2 h-96 bg-stone-200 rounded-2xl overflow-hidden shadow-xl relative">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.0!2d-1.29!3d5.10!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMDYnMDAuMCJOIDHCsDE3JzI0LjAiVw!5e0!3m2!1sen!2sgh!4v1600000000000!5m2!1sen!2sgh" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.0!2d-1.29!3d5.10!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMDYnMDAuMCJOIDHCsDE3JzI0LjAiVw!5e0!3m2!1sen!2sgh!4v1600000000000!5m2!1sen!2sgh"
+                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
                     </iframe>
                     <div class="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-md flex items-center gap-2">
-                         <i data-lucide="navigation" class="w-4 h-4 text-blue-600"></i>
-                         <a href="https://goo.gl/maps/placeholder" target="_blank" class="text-sm font-bold text-stone-800 hover:text-blue-600">Get Directions</a>
+                        <i data-lucide="navigation" class="w-4 h-4 text-blue-600"></i>
+                        <a href="https://goo.gl/maps/placeholder" target="_blank"
+                            class="text-sm font-bold text-stone-800 hover:text-blue-600">Get Directions</a>
                     </div>
                 </div>
             </div>
@@ -290,17 +336,21 @@
             <p class="mb-6">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
             <p class="mb-6 text-sm">For reservations: 020 543 8455</p>
             <div class="flex justify-center space-x-6">
-                <a href="#" class="hover:text-white transition-colors"><i data-lucide="facebook" class="h-5 w-5"></i></a>
-                <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram" class="h-5 w-5"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="facebook"
+                        class="h-5 w-5"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram"
+                        class="h-5 w-5"></i></a>
                 <a href="#" class="hover:text-white transition-colors"><i data-lucide="twitter" class="h-5 w-5"></i></a>
             </div>
         </div>
     </footer>
 
-    <div id="cart-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-50 z-[60] hidden transition-opacity opacity-0" onclick="toggleCart()"></div>
-    
+    <div id="cart-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-50 z-[60] hidden transition-opacity opacity-0"
+        onclick="toggleCart()"></div>
+
     <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-full flex z-[70] pointer-events-none">
-        <div class="w-screen max-w-md pointer-events-auto transform transition ease-in-out duration-300 translate-x-full bg-white shadow-xl flex flex-col h-full" id="cart-panel">
+        <div class="w-screen max-w-md pointer-events-auto transform transition ease-in-out duration-300 translate-x-full bg-white shadow-xl flex flex-col h-full"
+            id="cart-panel">
             <div class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
                 <div class="flex items-start justify-between">
                     <h2 class="text-lg font-medium text-stone-900 serif">Your Order</h2>
@@ -330,10 +380,12 @@
                 </div>
                 <p class="mt-0.5 text-sm text-stone-500 mb-6">Pay at counter upon pickup.</p>
                 <div class="space-y-3">
-                    <button onclick="checkout()" id="checkout-btn" class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    <button onclick="checkout()" id="checkout-btn"
+                        class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                         Place Order
                     </button>
-                    <button onclick="toggleCart()" class="w-full flex justify-center items-center px-6 py-3 border border-stone-300 rounded-md shadow-sm text-base font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors">
+                    <button onclick="toggleCart()"
+                        class="w-full flex justify-center items-center px-6 py-3 border border-stone-300 rounded-md shadow-sm text-base font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors">
                         Continue Ordering
                     </button>
                 </div>
@@ -341,18 +393,22 @@
         </div>
     </div>
 
-    <div id="success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div id="success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                             <i data-lucide="check" class="h-6 w-6 text-green-600"></i>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="modal-title">Order Received!</h3>
+                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="modal-title">Order Received!
+                            </h3>
                             <div class="mt-2">
                                 <p class="text-sm text-stone-500">
                                     Your order has been sent to the kitchen. Please proceed to the counter for payment.
@@ -362,7 +418,8 @@
                     </div>
                 </div>
                 <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeSuccessModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onclick="closeSuccessModal()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                         Got it
                     </button>
                 </div>
@@ -371,11 +428,14 @@
     </div>
 
     <!-- Auth Modal -->
-    <div id="auth-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+    <div id="auth-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="auth-modal-title"
+        role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="toggleAuthModal()"></div>
+            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+                onclick="toggleAuthModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-stone-900 serif" id="auth-modal-title">Sign Up / Login</h3>
@@ -386,10 +446,12 @@
 
                     <!-- Tab Navigation -->
                     <div class="flex border-b border-stone-200 mb-6">
-                        <button id="login-tab" onclick="switchAuthTab('login')" class="flex-1 py-2 text-center font-medium border-b-2 border-red-700 text-red-700">
+                        <button id="login-tab" onclick="switchAuthTab('login')"
+                            class="flex-1 py-2 text-center font-medium border-b-2 border-red-700 text-red-700">
                             Login
                         </button>
-                        <button id="signup-tab" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-center font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700">
+                        <button id="signup-tab" onclick="switchAuthTab('signup')"
+                            class="flex-1 py-2 text-center font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700">
                             Sign Up
                         </button>
                     </div>
@@ -398,17 +460,18 @@
                     <form id="login-form-modal" class="space-y-4">
                         <div>
                             <label for="login-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                            <input type="email" id="login-email" required 
-                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <input type="email" id="login-email" required
+                                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div>
-                            <label for="login-password" class="block text-sm font-medium text-stone-700 mb-2">Password</label>
-                            <input type="password" id="login-password" required 
-                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <label for="login-password"
+                                class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                            <input type="password" id="login-password" required
+                                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div id="login-error-modal" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
-                        <button type="submit" 
-                                class="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800 transition-colors font-medium">
+                        <button type="submit"
+                            class="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800 transition-colors font-medium">
                             Login
                         </button>
                     </form>
@@ -416,24 +479,27 @@
                     <!-- Signup Form -->
                     <form id="signup-form-modal" class="space-y-4 hidden">
                         <div>
-                            <label for="signup-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                            <input type="email" id="signup-email" required 
-                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <label for="signup-email"
+                                class="block text-sm font-medium text-stone-700 mb-2">Email</label>
+                            <input type="email" id="signup-email" required
+                                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div>
-                            <label for="signup-password" class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                            <label for="signup-password"
+                                class="block text-sm font-medium text-stone-700 mb-2">Password</label>
                             <input type="password" id="signup-password" required minlength="6"
-                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                             <p class="text-xs text-stone-500 mt-1">At least 6 characters</p>
                         </div>
                         <div>
-                            <label for="signup-password-confirm" class="block text-sm font-medium text-stone-700 mb-2">Confirm Password</label>
+                            <label for="signup-password-confirm"
+                                class="block text-sm font-medium text-stone-700 mb-2">Confirm Password</label>
                             <input type="password" id="signup-password-confirm" required minlength="6"
-                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div id="signup-error-modal" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
-                        <button type="submit" 
-                                class="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800 transition-colors font-medium">
+                        <button type="submit"
+                            class="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800 transition-colors font-medium">
                             Sign Up
                         </button>
                     </form>
@@ -443,18 +509,22 @@
     </div>
 
     <!-- Reservation Success Modal -->
-    <div id="reservation-success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="res-modal-title" role="dialog" aria-modal="true">
+    <div id="reservation-success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden"
+        aria-labelledby="res-modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                             <i data-lucide="check" class="h-6 w-6 text-green-600"></i>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="res-modal-title">Reservation Confirmed!</h3>
+                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="res-modal-title">Reservation
+                                Confirmed!</h3>
                             <div class="mt-2">
                                 <p class="text-sm text-stone-500">
                                     Your table has been reserved. We'll send you a confirmation email shortly.
@@ -464,7 +534,8 @@
                     </div>
                 </div>
                 <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeReservationModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" onclick="closeReservationModal()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                         Got it
                     </button>
                 </div>
@@ -505,7 +576,7 @@
             const authBtnMobile = document.getElementById('auth-btn-mobile');
             const userInfoDesktop = document.getElementById('user-info-desktop');
             const userInfoMobile = document.getElementById('user-info-mobile');
-            
+
             if (user) {
                 // User is signed in
                 authBtnDesktop.classList.add('hidden');
@@ -513,7 +584,7 @@
                 userInfoDesktop.classList.remove('hidden');
                 userInfoDesktop.classList.add('flex');
                 userInfoMobile.classList.remove('hidden');
-                
+
                 const emailPrefix = user.email.split('@')[0];
                 document.getElementById('user-email-desktop').textContent = emailPrefix;
                 document.getElementById('user-email-mobile').textContent = emailPrefix;
@@ -528,17 +599,23 @@
         });
 
         // --- Fetch Menu from Firestore ---
+        // --- Fetch Menu from Firestore ---
         async function fetchMenu() {
             try {
-                const snapshot = await db.collection('menuItems').orderBy('id').get();
+                // CHANGED: Removed .orderBy('id') and changed to .orderBy('name') 
+                // ensuring it sorts by a field that actually exists.
+                const snapshot = await db.collection('menuItems').orderBy('name').get();
+
                 menuItems = [];
                 snapshot.forEach(doc => {
-                    menuItems.push({ ...doc.data(), docId: doc.id });
+                    // CHANGED: key is now 'id' instead of 'docId' so it matches your other functions
+                    menuItems.push({ ...doc.data(), id: doc.id });
                 });
+
+                console.log("Menu items loaded:", menuItems); // Added for debugging
                 renderMenu();
             } catch (error) {
                 console.error('Error fetching menu:', error);
-                // Fallback to empty menu if fetch fails
                 renderMenu();
             }
         }
@@ -555,7 +632,7 @@
             const signupTab = document.getElementById('signup-tab');
             const loginForm = document.getElementById('login-form-modal');
             const signupForm = document.getElementById('signup-form-modal');
-            
+
             if (tab === 'login') {
                 loginTab.classList.add('border-red-700', 'text-red-700');
                 loginTab.classList.remove('border-transparent', 'text-stone-500');
@@ -579,7 +656,7 @@
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const errorDiv = document.getElementById('login-error-modal');
-            
+
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 toggleAuthModal();
@@ -599,13 +676,13 @@
             const password = document.getElementById('signup-password').value;
             const confirmPassword = document.getElementById('signup-password-confirm').value;
             const errorDiv = document.getElementById('signup-error-modal');
-            
+
             if (password !== confirmPassword) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            
+
             try {
                 await auth.createUserWithEmailAndPassword(email, password);
                 toggleAuthModal();
@@ -627,18 +704,18 @@
         document.getElementById('reservation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorDiv = document.getElementById('reservation-error');
-            
+
             // Validate date is in the future
             const selectedDate = new Date(document.getElementById('res-date').value);
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Reset time to start of day
-            
+
             if (selectedDate < today) {
                 errorDiv.textContent = 'Please select a date in the future.';
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            
+
             // Validate date is within reasonable range (3 months)
             const threeMonthsFromNow = new Date();
             threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
@@ -647,7 +724,7 @@
                 errorDiv.classList.remove('hidden');
                 return;
             }
-            
+
             const reservationData = {
                 name: document.getElementById('res-name').value,
                 phone: document.getElementById('res-phone').value,
@@ -659,7 +736,7 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 status: 'pending'
             };
-            
+
             try {
                 await db.collection('reservations').add(reservationData);
                 // Show success modal
@@ -711,7 +788,7 @@
                 `;
                 container.appendChild(card);
             });
-            
+
             // Re-init icons for dynamic content
             lucide.createIcons();
         }
@@ -721,7 +798,7 @@
             // Update active button styles
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const btnText = btn.textContent.toLowerCase();
-                if((category === 'all' && btnText === 'all') || btnText.includes(category)) {
+                if ((category === 'all' && btnText === 'all') || btnText.includes(category)) {
                     btn.classList.remove('bg-stone-100', 'text-stone-600');
                     btn.classList.add('bg-stone-900', 'text-white');
                 } else {
@@ -744,11 +821,11 @@
             }
 
             updateCartUI();
-            
+
             // Temporary feedback on button could be added here
             const badgeDesktop = document.getElementById('cart-badge-desktop');
             const badgeMobile = document.getElementById('cart-badge-mobile');
-            
+
             // Animate badges
             [badgeDesktop, badgeMobile].forEach(el => {
                 el.classList.add('scale-125');
@@ -776,12 +853,12 @@
             const badgeDesktop = document.getElementById('cart-badge-desktop');
             const badgeMobile = document.getElementById('cart-badge-mobile');
             const checkoutBtn = document.getElementById('checkout-btn');
-            
+
             // Update badges
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             badgeDesktop.innerText = count;
             badgeMobile.innerText = count;
-            
+
             if (count > 0) {
                 badgeDesktop.classList.remove('hidden');
                 badgeMobile.classList.remove('hidden');
@@ -794,7 +871,7 @@
 
             // Update List
             cartList.innerHTML = '';
-            
+
             if (cart.length === 0) {
                 cartList.innerHTML = `<li class="py-12 text-center flex flex-col items-center text-stone-500">
                     <i data-lucide="shopping-basket" class="w-12 h-12 mb-4 text-stone-300"></i>
@@ -875,11 +952,11 @@
         // --- Init ---
         fetchMenu();
         updateCartUI();
-        
+
         // Set minimum date for reservation to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('res-date').setAttribute('min', today);
-        
+
         // Set maximum date for reservation to 3 months from now
         const maxDate = new Date();
         maxDate.setMonth(maxDate.getMonth() + 3);
@@ -887,4 +964,5 @@
 
     </script>
 </body>
+
 </html>
