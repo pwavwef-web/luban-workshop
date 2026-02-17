@@ -12,6 +12,11 @@
     
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
         body {
             font-family: 'Lato', sans-serif;
@@ -65,6 +70,10 @@
                         <i data-lucide="shopping-bag" class="h-6 w-6"></i>
                         <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
                     </button>
+                    <button onclick="toggleAuthModal()" id="auth-btn-desktop" class="px-4 py-2 text-stone-600 hover:text-red-700 transition-colors font-medium">
+                        <i data-lucide="user" class="h-4 w-4 inline mr-1"></i>
+                        <span id="auth-text-desktop">Sign Up / Login</span>
+                    </button>
                 </div>
 
                 <div class="flex items-center md:hidden gap-4">
@@ -84,6 +93,10 @@
                 <a href="#menu" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
                 <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">About</a>
                 <a href="#location" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
+                <button onclick="toggleAuthModal()" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">
+                    <i data-lucide="user" class="h-4 w-4 inline mr-1"></i>
+                    <span id="auth-text-mobile">Sign Up / Login</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -130,6 +143,139 @@
 
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
                 </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-16 bg-stone-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Our Story</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
+                    About Luban Workshop
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <p class="text-lg text-stone-600 mb-6">
+                        At Luban Workshop, we believe that great food is a combination of technical precision and culinary artistry. 
+                        Our restaurant serves as both a training ground for the next generation of chefs and a destination for 
+                        exceptional dining experiences.
+                    </p>
+                    <p class="text-lg text-stone-600 mb-6">
+                        Named after Lu Ban, the legendary Chinese craftsman known for his attention to detail and innovation, 
+                        we apply the same principles to every dish we create. Each plate that leaves our kitchen represents 
+                        hours of practice, refinement, and dedication to the craft.
+                    </p>
+                    <p class="text-lg text-stone-600">
+                        Located in the heart of UCC, we invite you to experience cuisine that honors tradition while embracing 
+                        modern techniques and flavors.
+                    </p>
+                </div>
+                <div class="h-96 bg-stone-200 rounded-2xl overflow-hidden shadow-xl">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80" 
+                         alt="Restaurant interior" 
+                         class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="reservation" class="py-16 bg-white border-t border-stone-200">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Reserve Your Table</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
+                    Make a Reservation
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-stone-500 mx-auto">
+                    Secure your spot for an unforgettable dining experience.
+                </p>
+            </div>
+
+            <div class="bg-stone-50 rounded-xl shadow-md p-8">
+                <form id="reservation-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="res-name" class="block text-sm font-medium text-stone-700 mb-2">Full Name *</label>
+                            <input type="text" id="res-name" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="res-email" class="block text-sm font-medium text-stone-700 mb-2">Email Address *</label>
+                            <input type="email" id="res-email" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">Phone Number *</label>
+                            <input type="tel" id="res-phone" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests *</label>
+                            <select id="res-guests" required 
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                                <option value="">Select guests</option>
+                                <option value="1">1 Guest</option>
+                                <option value="2">2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5">5 Guests</option>
+                                <option value="6">6 Guests</option>
+                                <option value="7">7 Guests</option>
+                                <option value="8">8 Guests</option>
+                                <option value="9+">9+ Guests</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="res-date" class="block text-sm font-medium text-stone-700 mb-2">Date *</label>
+                            <input type="date" id="res-date" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="res-time" class="block text-sm font-medium text-stone-700 mb-2">Time *</label>
+                            <select id="res-time" required 
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                                <option value="">Select time</option>
+                                <option value="11:00 AM">11:00 AM</option>
+                                <option value="11:30 AM">11:30 AM</option>
+                                <option value="12:00 PM">12:00 PM</option>
+                                <option value="12:30 PM">12:30 PM</option>
+                                <option value="1:00 PM">1:00 PM</option>
+                                <option value="1:30 PM">1:30 PM</option>
+                                <option value="2:00 PM">2:00 PM</option>
+                                <option value="2:30 PM">2:30 PM</option>
+                                <option value="3:00 PM">3:00 PM</option>
+                                <option value="3:30 PM">3:30 PM</option>
+                                <option value="4:00 PM">4:00 PM</option>
+                                <option value="4:30 PM">4:30 PM</option>
+                                <option value="5:00 PM">5:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">Special Requests (Optional)</label>
+                        <textarea id="res-notes" rows="3" 
+                                  class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent" 
+                                  placeholder="Any dietary restrictions or special occasions?"></textarea>
+                    </div>
+
+                    <div id="reservation-error" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
+                    <div id="reservation-success" class="hidden text-green-700 text-sm p-3 bg-green-50 rounded-md"></div>
+
+                    <button type="submit" 
+                            class="w-full bg-red-700 text-white py-3 px-6 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
+                        <i data-lucide="calendar-check" class="h-5 w-5 inline mr-2"></i>
+                        Reserve Table
+                    </button>
+                </form>
+            </div>
         </div>
     </section>
 
@@ -274,122 +420,269 @@
         </div>
     </div>
 
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="auth-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="toggleAuthModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold text-stone-900 serif" id="auth-modal-title">Sign Up / Login</h3>
+                        <button onclick="toggleAuthModal()" class="text-stone-400 hover:text-stone-600">
+                            <i data-lucide="x" class="h-6 w-6"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Tab Switcher -->
+                    <div class="flex border-b border-stone-200 mb-6">
+                        <button id="tab-login" onclick="switchAuthTab('login')" 
+                                class="flex-1 py-3 text-center font-medium border-b-2 border-red-700 text-red-700 transition-colors">
+                            Login
+                        </button>
+                        <button id="tab-signup" onclick="switchAuthTab('signup')" 
+                                class="flex-1 py-3 text-center font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors">
+                            Sign Up
+                        </button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="login-form-user" class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
+                            <input type="email" id="login-email" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                            <input type="password" id="login-password" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div id="login-error-user" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
+                        <button type="submit" 
+                                class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium">
+                            Login
+                        </button>
+                    </form>
+
+                    <!-- Sign Up Form -->
+                    <form id="signup-form-user" class="space-y-4 hidden">
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
+                            <input type="email" id="signup-email" required 
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                            <input type="password" id="signup-password" required minlength="6"
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <p class="text-xs text-stone-500 mt-1">Must be at least 6 characters</p>
+                        </div>
+                        <div>
+                            <label for="signup-password-confirm" class="block text-sm font-medium text-stone-700 mb-2">Confirm Password</label>
+                            <input type="password" id="signup-password-confirm" required minlength="6"
+                                   class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        </div>
+                        <div id="signup-error-user" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
+                        <button type="submit" 
+                                class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium">
+                            Sign Up
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialize Icons
         lucide.createIcons();
 
-        // --- Data: Actual Luban Workshop Menu ---
-        const menuItems = [
-            // --- APPETIZERS & SOUPS ---
-            {
-                id: 101,
-                name: "Chicken and Sweet Corn Soup",
-                category: "appetizers",
-                price: 40.00,
-                description: "Classic comfort soup with sweet corn and tender chicken.",
-                image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 102,
-                name: "Hot and Sour Soup",
-                category: "appetizers",
-                price: 40.00,
-                description: "Spicy and tangy soup with tofu, bamboo shoots, and mushrooms.",
-                image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 201,
-                name: "Beef Spring Rolls (3 pcs)",
-                category: "appetizers",
-                price: 30.00,
-                description: "Crispy rolls filled with seasoned beef and vegetables.",
-                image: "https://images.unsplash.com/photo-1544510806-e28d3cd4d4e6?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 202,
-                name: "Golden Fried Prawns",
-                category: "appetizers",
-                price: 90.00,
-                description: "Crispy deep-fried prawns served with a dipping sauce.",
-                image: "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 203,
-                name: "Steamed Dumplings (Beef/Pork)",
-                category: "appetizers",
-                price: 30.00,
-                description: "Hand-made dumplings served with soy-vinegar dipping sauce.",
-                image: "https://images.unsplash.com/photo-1496116218417-1a781b1c423c?auto=format&fit=crop&w=800&q=80"
-            },
-            
-            // --- MAINS (Beef, Chicken, Pork, Seafood, Rice, Noodles) ---
-            {
-                id: 301,
-                name: "Shredded Beef Sauce",
-                category: "mains",
-                price: 110.00,
-                description: "Tender shredded beef stir-fried with green peppers and onions.",
-                image: "https://images.unsplash.com/photo-1617622141675-d227c19cb3bb?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 302,
-                name: "Sweet & Sour Chicken",
-                category: "mains",
-                price: 100.00,
-                description: "Battered chicken tossed in a classic tangy sweet and sour sauce.",
-                image: "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 303,
-                name: "Fried Pork Ribs",
-                category: "mains",
-                price: 75.00,
-                description: "Seasoned pork ribs fried to golden perfection.",
-                image: "https://images.unsplash.com/photo-1544025162-d76690b67f61?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 304,
-                name: "Fish Fillet in Sichuan Sauce",
-                category: "mains",
-                price: 115.00,
-                description: "Tender fish fillets poached in a spicy Sichuan broth.",
-                image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 305,
-                name: "Squid in Luban Chilli Sauce",
-                category: "mains",
-                price: 120.00,
-                description: "Fresh squid cooked in our signature hot chilli sauce.",
-                image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 401,
-                name: "Special Jollof Rice",
-                category: "mains",
-                price: 50.00,
-                description: "Our signature Jollof rice prepared with special house spices.",
-                image: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f1a?auto=format&fit=crop&w=800&q=80"
-            },
-            {
-                id: 402,
-                name: "Special Noodles",
-                category: "mains",
-                price: 80.00,
-                description: "Wok-fried noodles with a mix of meat and fresh vegetables.",
-                image: "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=800&q=80"
-            },
-             {
-                id: 403,
-                name: "Singapore Noodles",
-                category: "mains",
-                price: 80.00,
-                description: "Stir-fried vermicelli with curry powder, vegetables and meat.",
-                image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=800&q=80"
-            }
-        ];
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
+            measurementId: "G-PZQ13BWZB3"
+        };
 
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let menuItems = [];
         let cart = [];
+        let currentUser = null;
+
+        // Auth State Observer
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            updateAuthUI();
+        });
+
+        // Update Auth UI based on user state
+        function updateAuthUI() {
+            const authTextDesktop = document.getElementById('auth-text-desktop');
+            const authTextMobile = document.getElementById('auth-text-mobile');
+            const authBtnDesktop = document.getElementById('auth-btn-desktop');
+            
+            if (currentUser) {
+                const email = currentUser.email;
+                const displayName = email.split('@')[0];
+                authTextDesktop.textContent = displayName;
+                authTextMobile.textContent = displayName;
+                
+                // Change click handler to show logout option
+                authBtnDesktop.onclick = () => {
+                    if (confirm('Do you want to log out?')) {
+                        auth.signOut();
+                    }
+                };
+            } else {
+                authTextDesktop.textContent = 'Sign Up / Login';
+                authTextMobile.textContent = 'Sign Up / Login';
+                authBtnDesktop.onclick = toggleAuthModal;
+            }
+        }
+
+        // Toggle Auth Modal
+        function toggleAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                // Reset forms when opening
+                document.getElementById('login-form-user').reset();
+                document.getElementById('signup-form-user').reset();
+                document.getElementById('login-error-user').classList.add('hidden');
+                document.getElementById('signup-error-user').classList.add('hidden');
+                switchAuthTab('login');
+                lucide.createIcons();
+            }
+        }
+
+        // Switch Auth Tab
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form-user');
+            const signupForm = document.getElementById('signup-form-user');
+            const loginTab = document.getElementById('tab-login');
+            const signupTab = document.getElementById('tab-signup');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                loginTab.classList.add('border-red-700', 'text-red-700');
+                loginTab.classList.remove('border-transparent', 'text-stone-500');
+                signupTab.classList.remove('border-red-700', 'text-red-700');
+                signupTab.classList.add('border-transparent', 'text-stone-500');
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                signupTab.classList.add('border-red-700', 'text-red-700');
+                signupTab.classList.remove('border-transparent', 'text-stone-500');
+                loginTab.classList.remove('border-red-700', 'text-red-700');
+                loginTab.classList.add('border-transparent', 'text-stone-500');
+            }
+        }
+
+        // Login Form Handler
+        document.getElementById('login-form-user').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error-user');
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                toggleAuthModal();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Sign Up Form Handler
+        document.getElementById('signup-form-user').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const passwordConfirm = document.getElementById('signup-password-confirm').value;
+            const errorDiv = document.getElementById('signup-error-user');
+            
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                toggleAuthModal();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Fetch Menu from Firestore
+        async function fetchMenu() {
+            try {
+                const snapshot = await db.collection('menuItems').get();
+                menuItems = [];
+                snapshot.forEach(doc => {
+                    menuItems.push({ 
+                        id: doc.id, 
+                        ...doc.data() 
+                    });
+                });
+                renderMenu();
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+                // Fallback: Show error message in menu container
+                const container = document.getElementById('menu-container');
+                container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-stone-500">Unable to load menu items. Please try again later.</p></div>';
+            }
+        }
+
+        // Reservation Form Handler
+        document.getElementById('reservation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const errorDiv = document.getElementById('reservation-error');
+            const successDiv = document.getElementById('reservation-success');
+            
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+            
+            const reservationData = {
+                name: document.getElementById('res-name').value,
+                email: document.getElementById('res-email').value,
+                phone: document.getElementById('res-phone').value,
+                guests: document.getElementById('res-guests').value,
+                date: document.getElementById('res-date').value,
+                time: document.getElementById('res-time').value,
+                notes: document.getElementById('res-notes').value || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            try {
+                await db.collection('reservations').add(reservationData);
+                successDiv.textContent = 'Reservation submitted successfully! We will contact you shortly to confirm.';
+                successDiv.classList.remove('hidden');
+                document.getElementById('reservation-form').reset();
+                
+                // Scroll to success message
+                successDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (error) {
+                console.error('Error submitting reservation:', error);
+                errorDiv.textContent = 'Failed to submit reservation. Please try again or call us directly.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
 
         // --- Render Menu ---
         function renderMenu(filter = 'all') {
@@ -398,24 +691,29 @@
 
             const items = filter === 'all' ? menuItems : menuItems.filter(item => item.category === filter);
 
+            if (items.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-stone-500">No items found in this category.</p></div>';
+                return;
+            }
+
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
                 card.innerHTML = `
                     <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
-                        <img src="${item.image}" 
+                        <img src="${item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'}" 
                              alt="${item.name}" 
                              onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'"
                              class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">
-                            ₵${item.price.toFixed(2)}
+                            ₵${parseFloat(item.price).toFixed(2)}
                         </div>
                     </div>
                     <div class="p-6 flex flex-col flex-1">
                         <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
                         <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
                         <div class="mt-6">
-                            <button onclick="addToCart(${item.id})" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
+                            <button onclick="addToCart('${item.id}')" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
                                 <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
                             </button>
                         </div>
@@ -447,6 +745,8 @@
         // --- Cart Logic ---
         function addToCart(id) {
             const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+            
             const existingItem = cart.find(i => i.id === id);
 
             if (existingItem) {
@@ -521,7 +821,7 @@
                     li.className = 'py-6 flex';
                     li.innerHTML = `
                         <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
-                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-center object-cover">
+                            <img src="${item.image || 'https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'}" alt="${item.name}" class="w-full h-full object-center object-cover">
                         </div>
                         <div class="ml-4 flex-1 flex flex-col">
                             <div>
@@ -533,12 +833,12 @@
                             </div>
                             <div class="flex-1 flex items-end justify-between text-sm">
                                 <div class="flex items-center border border-stone-300 rounded-md">
-                                    <button onclick="removeFromCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
+                                    <button onclick="removeFromCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
                                     <span class="px-2 font-medium text-stone-900">${item.quantity}</span>
-                                    <button onclick="addToCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
+                                    <button onclick="addToCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
                                 </div>
                                 <div class="flex">
-                                    <button type="button" onclick="cart = cart.filter(i => i.id !== ${item.id}); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
+                                    <button type="button" onclick="cart = cart.filter(i => i.id !== '${item.id}'); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
                                 </div>
                             </div>
                         </div>
@@ -585,7 +885,7 @@
         }
 
         // --- Init ---
-        renderMenu();
+        fetchMenu();
         updateCartUI();
 
     </script>
