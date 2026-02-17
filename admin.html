@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Luban Workshop</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+        }
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 scroll-smooth antialiased">
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center mb-4">
+                    <i data-lucide="utensils-crossed" class="h-10 w-10 text-red-700 mr-3"></i>
+                    <h1 class="serif text-3xl font-bold text-stone-900">Luban <span class="text-red-700">Workshop</span></h1>
+                </div>
+                <p class="text-stone-600">Admin Dashboard</p>
+            </div>
+            
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
+                    <input type="email" id="email" required 
+                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                    <input type="password" id="password" required 
+                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+                
+                <div id="login-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md"></div>
+                
+                <button type="submit" 
+                        class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-md border-b border-stone-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
+                        <span class="serif font-bold text-xl text-stone-900">Luban <span class="text-red-700">Workshop</span></span>
+                        <span class="ml-4 text-sm text-stone-500">Admin Dashboard</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="user-email" class="text-sm text-stone-600"></span>
+                        <button onclick="logout()" class="px-4 py-2 text-sm text-stone-600 hover:text-red-700 transition-colors font-medium">
+                            <i data-lucide="log-out" class="h-4 w-4 inline mr-1"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Menu Manager Section -->
+            <section class="mb-12">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="serif text-2xl font-bold text-stone-900">Menu Manager</h2>
+                        <button onclick="showAddDishModal()" 
+                                class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-medium">
+                            <i data-lucide="plus" class="h-4 w-4 inline mr-1"></i>
+                            Add Dish
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Category</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Price</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Description</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menu-items-table" class="bg-white divide-y divide-stone-200">
+                                <!-- Menu items will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reservations Section -->
+            <section>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="serif text-2xl font-bold text-stone-900 mb-6">Reservations</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Phone</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Time</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Guests</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservations-table" class="bg-white divide-y divide-stone-200">
+                                <!-- Reservations will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Add/Edit Dish Modal -->
+    <div id="dish-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center px-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modal-title" class="serif text-xl font-bold text-stone-900">Add Dish</h3>
+                <button onclick="closeDishModal()" class="text-stone-400 hover:text-stone-600">
+                    <i data-lucide="x" class="h-6 w-6"></i>
+                </button>
+            </div>
+            
+            <form id="dish-form" class="space-y-4">
+                <input type="hidden" id="dish-id">
+                
+                <div>
+                    <label for="dish-name" class="block text-sm font-medium text-stone-700 mb-2">Dish Name</label>
+                    <input type="text" id="dish-name" required 
+                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="dish-category" class="block text-sm font-medium text-stone-700 mb-2">Category</label>
+                    <select id="dish-category" required 
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <option value="mains">Mains</option>
+                        <option value="appetizers">Appetizers & Soups</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="dish-price" class="block text-sm font-medium text-stone-700 mb-2">Price ($)</label>
+                    <input type="number" id="dish-price" step="0.01" required 
+                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="dish-description" class="block text-sm font-medium text-stone-700 mb-2">Description</label>
+                    <textarea id="dish-description" rows="3" required 
+                              class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent"></textarea>
+                </div>
+                
+                <div>
+                    <label for="dish-image" class="block text-sm font-medium text-stone-700 mb-2">Image URL</label>
+                    <input type="url" id="dish-image" 
+                           class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeDishModal()" 
+                            class="px-4 py-2 border border-stone-300 text-stone-700 rounded-md hover:bg-stone-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors">
+                        Save Dish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        // NOTE: Replace with your actual Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Auth State Observer
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+                loadMenuItems();
+                loadReservations();
+                lucide.createIcons();
+            } else {
+                // User is signed out
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
+            }
+        });
+
+        // Login Form Handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                errorDiv.classList.add('hidden');
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Logout Function
+        function logout() {
+            auth.signOut();
+        }
+
+        // Load Menu Items
+        async function loadMenuItems() {
+            const tableBody = document.getElementById('menu-items-table');
+            tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-stone-500">Loading...</td></tr>';
+            
+            try {
+                const snapshot = await db.collection('menuItems').orderBy('name').get();
+                
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-stone-500">No menu items found. Add your first dish!</td></tr>';
+                    return;
+                }
+                
+                tableBody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const dish = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${dish.category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">$${dish.price}</td>
+                        <td class="px-6 py-4 text-sm text-stone-500 max-w-xs truncate">${dish.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="editDish('${doc.id}')" class="text-red-700 hover:text-red-900 mr-3">
+                                <i data-lucide="edit" class="h-4 w-4 inline"></i>
+                            </button>
+                            <button onclick="deleteDish('${doc.id}')" class="text-red-700 hover:text-red-900">
+                                <i data-lucide="trash-2" class="h-4 w-4 inline"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error loading menu items:', error);
+                tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-700">Error loading menu items</td></tr>';
+            }
+        }
+
+        // Load Reservations
+        async function loadReservations() {
+            const tableBody = document.getElementById('reservations-table');
+            tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-stone-500">Loading...</td></tr>';
+            
+            try {
+                const snapshot = await db.collection('reservations').orderBy('date', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-stone-500">No reservations found</td></tr>';
+                    return;
+                }
+                
+                tableBody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const reservation = doc.data();
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${reservation.name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${reservation.email || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${reservation.phone || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${reservation.date || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${reservation.time || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${reservation.guests || 'N/A'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading reservations:', error);
+                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-700">Error loading reservations</td></tr>';
+            }
+        }
+
+        // Show Add Dish Modal
+        function showAddDishModal() {
+            document.getElementById('modal-title').textContent = 'Add Dish';
+            document.getElementById('dish-form').reset();
+            document.getElementById('dish-id').value = '';
+            document.getElementById('dish-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // Close Dish Modal
+        function closeDishModal() {
+            document.getElementById('dish-modal').classList.add('hidden');
+        }
+
+        // Edit Dish
+        async function editDish(dishId) {
+            try {
+                const doc = await db.collection('menuItems').doc(dishId).get();
+                if (doc.exists) {
+                    const dish = doc.data();
+                    document.getElementById('modal-title').textContent = 'Edit Dish';
+                    document.getElementById('dish-id').value = dishId;
+                    document.getElementById('dish-name').value = dish.name;
+                    document.getElementById('dish-category').value = dish.category;
+                    document.getElementById('dish-price').value = dish.price;
+                    document.getElementById('dish-description').value = dish.description;
+                    document.getElementById('dish-image').value = dish.image || '';
+                    document.getElementById('dish-modal').classList.remove('hidden');
+                    lucide.createIcons();
+                }
+            } catch (error) {
+                console.error('Error loading dish:', error);
+                alert('Error loading dish details');
+            }
+        }
+
+        // Delete Dish
+        async function deleteDish(dishId) {
+            if (!confirm('Are you sure you want to delete this dish?')) return;
+            
+            try {
+                await db.collection('menuItems').doc(dishId).delete();
+                loadMenuItems();
+            } catch (error) {
+                console.error('Error deleting dish:', error);
+                alert('Error deleting dish');
+            }
+        }
+
+        // Dish Form Handler
+        document.getElementById('dish-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const dishId = document.getElementById('dish-id').value;
+            const dishData = {
+                name: document.getElementById('dish-name').value,
+                category: document.getElementById('dish-category').value,
+                price: parseFloat(document.getElementById('dish-price').value),
+                description: document.getElementById('dish-description').value,
+                image: document.getElementById('dish-image').value || ''
+            };
+            
+            try {
+                if (dishId) {
+                    // Update existing dish
+                    await db.collection('menuItems').doc(dishId).update(dishData);
+                } else {
+                    // Add new dish
+                    await db.collection('menuItems').add(dishData);
+                }
+                closeDishModal();
+                loadMenuItems();
+            } catch (error) {
+                console.error('Error saving dish:', error);
+                alert('Error saving dish');
+            }
+        });
+
+        // Initialize Lucide icons on page load
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
