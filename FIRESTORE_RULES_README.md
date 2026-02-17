@@ -13,12 +13,16 @@ Both files implement the following security policies:
 
 ### menuItems Collection
 - **Read Access**: Anyone (authenticated or not) can read menu items
-- **Write Access**: Only authenticated users with the admin email (`admin@luban.com`) can create, update, or delete menu items
+- **Write Access**: Only authenticated admin users can create, update, or delete menu items
+  - Production version: Requires admin custom claim
+  - Development version: Accepts either admin custom claim OR admin@luban.com email
 
 ### reservations Collection
-- **Read Access**: Only authenticated users with the admin email (`admin@luban.com`) or admin custom claim can read reservations
+- **Read Access**: Only admin users can read reservations
+  - Production version: Requires admin custom claim
+  - Development version: Accepts either admin custom claim OR admin@luban.com email
 - **Create Access**: Any authenticated user can create reservations (book a table)
-- **Update/Delete Access**: Only admins can update or delete reservations
+- **Update/Delete Access**: Only admin users can update or delete reservations
 
 ## How to Deploy to Firebase Console
 
