@@ -200,7 +200,7 @@
                     <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests *</label>
                     <select id="res-guests" required 
                             class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
-                        <option value="">Select number of guests</option>
+                        <option value="" disabled selected>Select number of guests</option>
                         <option value="1">1 Guest</option>
                         <option value="2">2 Guests</option>
                         <option value="3">3 Guests</option>
@@ -477,6 +477,9 @@
         lucide.createIcons();
 
         // Firebase Configuration
+        // Note: Firebase API keys are designed to be public. Security is enforced through
+        // Firestore security rules and Firebase App Check. Ensure proper security rules are
+        // configured in the Firebase Console to restrict unauthorized access.
         const firebaseConfig = {
             apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
             authDomain: "luban-workshop-restaurant.firebaseapp.com",
@@ -511,9 +514,9 @@
                 userInfoDesktop.classList.add('flex');
                 userInfoMobile.classList.remove('hidden');
                 
-                const email = user.email.split('@')[0];
-                document.getElementById('user-email-desktop').textContent = email;
-                document.getElementById('user-email-mobile').textContent = email;
+                const emailPrefix = user.email.split('@')[0];
+                document.getElementById('user-email-desktop').textContent = emailPrefix;
+                document.getElementById('user-email-mobile').textContent = emailPrefix;
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
@@ -624,6 +627,26 @@
         document.getElementById('reservation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorDiv = document.getElementById('reservation-error');
+            
+            // Validate date is in the future
+            const selectedDate = new Date(document.getElementById('res-date').value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of day
+            
+            if (selectedDate < today) {
+                errorDiv.textContent = 'Please select a date in the future.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate date is within reasonable range (3 months)
+            const threeMonthsFromNow = new Date();
+            threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+            if (selectedDate > threeMonthsFromNow) {
+                errorDiv.textContent = 'Reservations can only be made up to 3 months in advance.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
             
             const reservationData = {
                 name: document.getElementById('res-name').value,
@@ -852,6 +875,15 @@
         // --- Init ---
         fetchMenu();
         updateCartUI();
+        
+        // Set minimum date for reservation to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('res-date').setAttribute('min', today);
+        
+        // Set maximum date for reservation to 3 months from now
+        const maxDate = new Date();
+        maxDate.setMonth(maxDate.getMonth() + 3);
+        document.getElementById('res-date').setAttribute('max', maxDate.toISOString().split('T')[0]);
 
     </script>
 </body>
