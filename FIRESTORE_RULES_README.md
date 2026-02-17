@@ -1,10 +1,15 @@
 # Firestore Security Rules
 
-This file contains the Firestore Security Rules for the Luban Workshop restaurant application.
+This directory contains Firestore Security Rules for the Luban Workshop restaurant application.
+
+## Files
+
+- **`firestore.rules`**: Development version with both Custom Claims and email-based admin verification
+- **`firestore.rules.production`**: Production version with Custom Claims only (RECOMMENDED for production)
 
 ## Rules Overview
 
-The `firestore.rules` file implements the following security policies:
+Both files implement the following security policies:
 
 ### menuItems Collection
 - **Read Access**: Anyone (authenticated or not) can read menu items
@@ -17,12 +22,26 @@ The `firestore.rules` file implements the following security policies:
 
 ## How to Deploy to Firebase Console
 
+### Choosing the Right Rules File
+
+**For Production**: Use `firestore.rules.production`
+- More secure - uses only Firebase Custom Claims
+- Cannot be bypassed by creating an account with a specific email
+- Requires setting up Custom Claims (see Admin Configuration section below)
+
+**For Development/Testing**: Use `firestore.rules`
+- Supports both Custom Claims and email-based admin check
+- Easier to set up - just create a user with `admin@luban.com`
+- Less secure - should not be used in production
+
 ### Method 1: Copy and Paste (Quick Method)
 1. Open the [Firebase Console](https://console.firebase.google.com/)
 2. Select your project: `luban-workshop-restaurant`
 3. Navigate to **Firestore Database** in the left sidebar
 4. Click on the **Rules** tab
-5. Copy the entire content of the `firestore.rules` file
+5. Copy the entire content of either:
+   - `firestore.rules.production` (recommended for production)
+   - `firestore.rules` (for development/testing)
 6. Paste it into the Firebase Console rules editor
 7. Click **Publish** to deploy the rules
 
@@ -42,11 +61,16 @@ The `firestore.rules` file implements the following security policies:
    firebase init firestore
    ```
    - Select your project: `luban-workshop-restaurant`
-   - Accept the default file name: `firestore.rules`
+   - For production, use: `firestore.rules.production` as the rules file
+   - For development, use: `firestore.rules` as the rules file
 
 4. Deploy the rules:
    ```bash
+   # For production
    firebase deploy --only firestore:rules
+   
+   # Or specify the file explicitly
+   firebase deploy --only firestore:rules --config firebase.json
    ```
 
 ## Admin Email Configuration
@@ -70,15 +94,15 @@ This is the more secure approach that prevents spoofing:
 
 3. The rules will automatically check for the `admin` custom claim
 
-### Method 2: Email-based (Fallback for Development)
-For quick setup or development, the rules also check the email:
+### Method 2: Email-based (For Development/Quick Setup Only)
+⚠️ **WARNING**: This method is NOT secure for production use!
 
-1. Open `firestore.rules`
-2. The `isAdmin()` function (lines 7-14) checks for both custom claim and email
-3. Create a user account with email `admin@luban.com` in Firebase Authentication
-4. This method is less secure and should only be used for development
+1. Create a user account with email `admin@luban.com` in Firebase Authentication
+2. Use the `firestore.rules` file (not the `.production` version)
+3. The `isAdmin()` function (lines 10-15) checks for both custom claim and email
+4. This provides quick setup but can be bypassed by anyone creating an account with that email
 
-**Important**: For production, always use Custom Claims (Method 1) and remove the email check from the `isAdmin()` function.
+**Important**: For production, always use Method 1 (Custom Claims) with the `firestore.rules.production` file.
 
 ## Testing the Rules
 

@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin using Custom Claims
+    // This is the SECURE production approach
+    // Set custom claim: admin.auth().setCustomUserClaims(uid, { admin: true })
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // menuItems collection rules
+    match /menuItems/{menuItem} {
+      // Anyone can read menuItems
+      allow read: if true;
+      
+      // Only authenticated admin can write (create, update, delete) to menuItems
+      allow write: if isAdmin();
+    }
+    
+    // reservations collection rules
+    match /reservations/{reservation} {
+      // Only admins can read reservations
+      allow read: if isAdmin();
+      
+      // Authenticated users can create new reservations
+      allow create: if isAuthenticated();
+      
+      // Only admins can update or delete reservations
+      allow update, delete: if isAdmin();
+    }
+  }
+}
