@@ -228,7 +228,9 @@
 
     <script>
         // Firebase Configuration
-        // NOTE: Replace with your actual Firebase configuration
+        // NOTE: Replace with your actual Firebase configuration before deployment
+        // SECURITY: Ensure Firebase security rules are configured to restrict admin access
+        // Example rule: Only allow authenticated users with admin custom claim to write to menuItems
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -287,6 +289,7 @@
             tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-stone-500">Loading...</td></tr>';
             
             try {
+                // Note: orderBy('name') requires a Firestore index. If not configured, items will load unsorted
                 const snapshot = await db.collection('menuItems').orderBy('name').get();
                 
                 if (snapshot.empty) {
@@ -327,6 +330,7 @@
             tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-stone-500">Loading...</td></tr>';
             
             try {
+                // Note: orderBy('date', 'desc') requires a Firestore index on the date field
                 const snapshot = await db.collection('reservations').orderBy('date', 'desc').get();
                 
                 if (snapshot.empty) {
@@ -408,10 +412,18 @@
             e.preventDefault();
             
             const dishId = document.getElementById('dish-id').value;
+            const priceValue = parseFloat(document.getElementById('dish-price').value);
+            
+            // Validate price
+            if (isNaN(priceValue) || priceValue <= 0) {
+                alert('Please enter a valid price greater than 0');
+                return;
+            }
+            
             const dishData = {
                 name: document.getElementById('dish-name').value,
                 category: document.getElementById('dish-category').value,
-                price: parseFloat(document.getElementById('dish-price').value),
+                price: priceValue,
                 description: document.getElementById('dish-description').value,
                 image: document.getElementById('dish-image').value || ''
             };
