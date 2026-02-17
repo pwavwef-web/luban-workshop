@@ -11,8 +11,9 @@ The `firestore.rules` file implements the following security policies:
 - **Write Access**: Only authenticated users with the admin email (`admin@luban.com`) can create, update, or delete menu items
 
 ### reservations Collection
-- **Read Access**: Only authenticated users with the admin email (`admin@luban.com`) can read reservations
-- **Write Access**: Any authenticated user can create reservations (book a table)
+- **Read Access**: Only authenticated users with the admin email (`admin@luban.com`) or admin custom claim can read reservations
+- **Create Access**: Any authenticated user can create reservations (book a table)
+- **Update/Delete Access**: Only admins can update or delete reservations
 
 ## How to Deploy to Firebase Console
 
@@ -50,12 +51,34 @@ The `firestore.rules` file implements the following security policies:
 
 ## Admin Email Configuration
 
-The rules are currently configured to use `admin@luban.com` as the admin email. If you need to use a different admin email:
+The rules support two methods for admin authentication:
+
+### Method 1: Firebase Custom Claims (Recommended for Production)
+This is the more secure approach that prevents spoofing:
+
+1. Install Firebase Admin SDK in your backend or use Firebase Functions
+2. Set the custom claim for your admin user:
+   ```javascript
+   const admin = require('firebase-admin');
+   
+   // Set admin claim for a user
+   admin.auth().setCustomUserClaims(uid, { admin: true })
+     .then(() => {
+       console.log('Admin claim set successfully');
+     });
+   ```
+
+3. The rules will automatically check for the `admin` custom claim
+
+### Method 2: Email-based (Fallback for Development)
+For quick setup or development, the rules also check the email:
 
 1. Open `firestore.rules`
-2. Find the `isAdmin()` function (line 7-9)
-3. Change `'admin@luban.com'` to your desired admin email
-4. Re-deploy the rules
+2. The `isAdmin()` function (lines 7-14) checks for both custom claim and email
+3. Create a user account with email `admin@luban.com` in Firebase Authentication
+4. This method is less secure and should only be used for development
+
+**Important**: For production, always use Custom Claims (Method 1) and remove the email check from the `isAdmin()` function.
 
 ## Testing the Rules
 
@@ -86,7 +109,13 @@ The rules are currently configured to use `admin@luban.com` as the admin email. 
 
 ## Security Notes
 
-- These rules use the email address in the authentication token to identify admin users
-- Make sure to create the admin user account (`admin@luban.com`) in Firebase Authentication
-- For production use, consider using Firebase Custom Claims for more flexible role management
+- The rules support both Custom Claims (recommended) and email-based admin verification
+- **For Production**: Use Firebase Custom Claims for admin role management
+  - More secure - cannot be spoofed by creating an account with the admin email
+  - Centrally managed through Firebase Admin SDK
+  - To use only Custom Claims, remove the email check from `isAdmin()` function
+- **For Development**: The email-based check (`admin@luban.com`) provides quick setup
+- Create the admin user account in Firebase Authentication before deploying
+- Reservations can only be created by authenticated users, and only admins can modify or delete them
 - Always test rules thoroughly before deploying to production
+- Consider implementing rate limiting for reservation creation to prevent abuse
