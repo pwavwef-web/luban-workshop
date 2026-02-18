@@ -39,5 +39,32 @@ service cloud.firestore {
       // Only admins can update or delete reservations
       allow update, delete: if isAdmin();
     }
+    
+    // orders collection rules
+    match /orders/{order} {
+      // Admins can read all orders
+      allow read: if isAdmin();
+      
+      // Users can read their own orders
+      allow read: if isAuthenticated() && 
+                     request.auth.uid == resource.data.userId;
+      
+      // Authenticated users can create new orders
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
+      
+      // Users can update (cancel) their own pending orders within 5 minutes
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == resource.data.userId &&
+                       resource.data.status == 'pending' &&
+                       request.resource.data.status == 'cancelled' &&
+                       request.time < resource.data.createdAt + duration.value(5, 'm');
+      
+      // Admins can update any order (for status changes like completing orders)
+      allow update: if isAdmin();
+      
+      // Only admins can delete orders
+      allow delete: if isAdmin();
+    }
   }
 }
