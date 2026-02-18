@@ -74,7 +74,7 @@
         </button>
 
         <!-- Mobile Overlay -->
-        <div id="sidebar-overlay" onclick="toggleMobileSidebar()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleMobileSidebar()" role="button" tabindex="0" aria-label="Close sidebar" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
+        <div id="sidebar-overlay" role="button" tabindex="0" aria-label="Close sidebar" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
 
         <aside id="sidebar" class="w-64 bg-white shadow-xl z-30 flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="h-16 flex items-center px-6 border-b border-stone-100">
@@ -320,6 +320,17 @@
 
                 // Set default tab
                 switchTab('menu');
+                
+                // Setup overlay event listeners
+                const overlay = document.getElementById('sidebar-overlay');
+                overlay.addEventListener('click', toggleMobileSidebar);
+                overlay.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault(); // Prevent page scroll on Space
+                        toggleMobileSidebar();
+                    }
+                });
+                
                 lucide.createIcons();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
