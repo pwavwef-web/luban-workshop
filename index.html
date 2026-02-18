@@ -87,6 +87,8 @@
                     <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
                     <a href="#reservation"
                         class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
+                    <a href="#my-orders" id="my-orders-link-desktop"
+                        class="hidden text-stone-600 hover:text-red-700 transition-colors font-medium">My Orders</a>
                     <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate
                         Us</a>
                     <button onclick="toggleCart()"
@@ -126,6 +128,8 @@
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
                 <a href="#reservation"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
+                <a href="#my-orders" id="my-orders-link-mobile"
+                    class="hidden px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
                 <a href="#location"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
                 <button id="auth-btn-mobile" onclick="toggleAuthModal()"
@@ -273,6 +277,27 @@
                     Submit Reservation
                 </button>
             </form>
+        </div>
+    </section>
+
+    <!-- My Orders Section -->
+    <section id="my-orders" class="py-16 bg-stone-50 border-t border-stone-200 hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Order History</span>
+                <h2 class="mt-2 text-4xl font-extrabold text-stone-900 serif">My Orders</h2>
+                <p class="mt-4 text-lg text-stone-600">Track your orders and their status</p>
+            </div>
+            
+            <div id="orders-container" class="space-y-4">
+                <!-- Orders will be dynamically populated here -->
+            </div>
+            
+            <div id="no-orders-message" class="text-center py-12 hidden">
+                <i data-lucide="package" class="h-16 w-16 text-stone-300 mx-auto mb-4"></i>
+                <p class="text-stone-500 text-lg">You haven't placed any orders yet.</p>
+                <a href="#menu" class="inline-block mt-4 px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors">Browse Menu</a>
+            </div>
         </div>
     </section>
 
@@ -576,6 +601,9 @@
             const authBtnMobile = document.getElementById('auth-btn-mobile');
             const userInfoDesktop = document.getElementById('user-info-desktop');
             const userInfoMobile = document.getElementById('user-info-mobile');
+            const myOrdersLinkDesktop = document.getElementById('my-orders-link-desktop');
+            const myOrdersLinkMobile = document.getElementById('my-orders-link-mobile');
+            const myOrdersSection = document.getElementById('my-orders');
 
             if (user) {
                 // User is signed in
@@ -584,16 +612,28 @@
                 userInfoDesktop.classList.remove('hidden');
                 userInfoDesktop.classList.add('flex');
                 userInfoMobile.classList.remove('hidden');
+                myOrdersLinkDesktop.classList.remove('hidden');
+                myOrdersLinkMobile.classList.remove('hidden');
+                myOrdersLinkMobile.classList.add('block');
+                myOrdersSection.classList.remove('hidden');
 
                 const emailPrefix = user.email.split('@')[0];
                 document.getElementById('user-email-desktop').textContent = emailPrefix;
                 document.getElementById('user-email-mobile').textContent = emailPrefix;
+                
+                // Load user's orders
+                loadMyOrders(user);
+                listenToMyOrders(user);
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
                 authBtnMobile.classList.remove('hidden');
                 userInfoDesktop.classList.add('hidden');
                 userInfoMobile.classList.add('hidden');
+                myOrdersLinkDesktop.classList.add('hidden');
+                myOrdersLinkMobile.classList.add('hidden');
+                myOrdersLinkMobile.classList.remove('block');
+                myOrdersSection.classList.add('hidden');
             }
             lucide.createIcons();
         });
@@ -903,13 +943,128 @@
                 });
         }
 
-        // Update your Auth State Observer to call this function
-        auth.onAuthStateChanged(user => {
-            // ... existing auth code ...
-            if (user) {
-                listenToMyOrders(user); // <--- Add this line
+        // Load and display user's orders
+        function loadMyOrders(user) {
+            if (!user) return;
+
+            const ordersContainer = document.getElementById('orders-container');
+            const noOrdersMessage = document.getElementById('no-orders-message');
+            
+            db.collection('orders')
+                .where('userId', '==', user.uid)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    ordersContainer.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        noOrdersMessage.classList.remove('hidden');
+                        ordersContainer.classList.add('hidden');
+                        return;
+                    }
+                    
+                    noOrdersMessage.classList.add('hidden');
+                    ordersContainer.classList.remove('hidden');
+                    
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        
+                        // Calculate time elapsed since order creation
+                        const canCancel = canCancelOrder(order.createdAt);
+                        
+                        // Determine status colors
+                        let statusClass = 'bg-stone-100 text-stone-800';
+                        if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
+                        if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
+                        if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
+                        
+                        // Format items
+                        const itemsList = order.items ? order.items.map(item => 
+                            `<li class="text-stone-600">${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
+                        ).join('') : '<li class="text-stone-500 italic">No items</li>';
+                        
+                        // Format timestamp
+                        let timestamp = 'Just now';
+                        if (order.createdAt && order.createdAt.toDate) {
+                            const orderDate = order.createdAt.toDate();
+                            timestamp = orderDate.toLocaleString();
+                        }
+                        
+                        // Cancel button (only show if order can be cancelled)
+                        let cancelButton = '';
+                        if (canCancel && order.status === 'pending') {
+                            cancelButton = `
+                                <button onclick="cancelOrder('${orderId}')" 
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                                    Cancel Order
+                                </button>
+                            `;
+                        }
+                        
+                        const orderCard = `
+                            <div class="bg-white rounded-lg shadow-md p-6 border border-stone-200">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-stone-900">Order #${orderId.slice(-6).toUpperCase()}</h3>
+                                        <p class="text-sm text-stone-500">${timestamp}</p>
+                                    </div>
+                                    <div class="flex items-center gap-3 mt-3 md:mt-0">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                                            ${order.status ? order.status.toUpperCase() : 'PENDING'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="font-semibold text-stone-900 mb-2">Items:</h4>
+                                    <ul class="space-y-1">
+                                        ${itemsList}
+                                    </ul>
+                                </div>
+                                
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between pt-4 border-t border-stone-200">
+                                    <p class="text-lg font-bold text-stone-900">Total: $${(order.total || 0).toFixed(2)}</p>
+                                    <div class="mt-3 md:mt-0">
+                                        ${cancelButton}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        ordersContainer.innerHTML += orderCard;
+                    });
+                    
+                    lucide.createIcons();
+                });
+        }
+
+        // Check if order can be cancelled (within 5 minutes)
+        function canCancelOrder(createdAt) {
+            if (!createdAt || !createdAt.toDate) return false;
+            
+            const orderTime = createdAt.toDate();
+            const currentTime = new Date();
+            const diffMinutes = (currentTime - orderTime) / (1000 * 60);
+            
+            return diffMinutes <= 5;
+        }
+
+        // Cancel order function
+        async function cancelOrder(orderId) {
+            if (!confirm('Are you sure you want to cancel this order?')) {
+                return;
             }
-        });
+            
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled'
+                });
+                alert('Order cancelled successfully!');
+            } catch (error) {
+                console.error('Error cancelling order:', error);
+                alert('Failed to cancel order. Please try again.');
+            }
+        }
 
         // --- REAL CHECKOUT LOGIC ---
         async function checkout() {
