@@ -69,19 +69,19 @@
     <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
 
         <!-- Mobile Menu Toggle Button -->
-        <button id="mobile-menu-toggle" onclick="toggleMobileSidebar()" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
+        <button id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle navigation menu" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
             <i data-lucide="menu" class="h-6 w-6"></i>
         </button>
 
         <!-- Mobile Overlay -->
-        <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
+        <div id="sidebar-overlay" onclick="toggleMobileSidebar()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleMobileSidebar()" role="button" tabindex="0" aria-label="Close sidebar" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
 
         <aside id="sidebar" class="w-64 bg-white shadow-xl z-30 flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="h-16 flex items-center px-6 border-b border-stone-100">
                 <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
                 <span class="serif font-bold text-xl text-stone-900">Luban Admin</span>
                 <!-- Close button for mobile -->
-                <button onclick="toggleMobileSidebar()" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
+                <button onclick="toggleMobileSidebar()" aria-label="Close menu" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
                     <i data-lucide="x" class="h-5 w-5"></i>
                 </button>
             </div>
