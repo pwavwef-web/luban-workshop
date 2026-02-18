@@ -68,10 +68,22 @@
 
     <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
 
-        <aside class="w-64 bg-white shadow-xl z-10 flex flex-col">
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobile-menu-toggle" onclick="toggleMobileSidebar()" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
+            <i data-lucide="menu" class="h-6 w-6"></i>
+        </button>
+
+        <!-- Mobile Overlay -->
+        <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
+
+        <aside id="sidebar" class="w-64 bg-white shadow-xl z-30 flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="h-16 flex items-center px-6 border-b border-stone-100">
                 <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
                 <span class="serif font-bold text-xl text-stone-900">Luban Admin</span>
+                <!-- Close button for mobile -->
+                <button onclick="toggleMobileSidebar()" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2">
@@ -121,17 +133,17 @@
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto bg-stone-50 p-8">
+        <main class="flex-1 overflow-y-auto bg-stone-50 p-4 md:p-8 pt-20 md:pt-8">
 
             <div id="view-menu" class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <h2 class="serif text-3xl font-bold text-stone-900">Menu Manager</h2>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
                     <button onclick="showAddDishModal()"
-                        class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-medium shadow-sm flex items-center">
+                        class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-medium shadow-sm flex items-center text-sm sm:text-base">
                         <i data-lucide="plus" class="h-4 w-4 mr-2"></i> Add Dish
                     </button>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
@@ -157,9 +169,9 @@
 
             <div id="view-reservations" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
-                    <h2 class="serif text-3xl font-bold text-stone-900">Reservations</h2>
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Reservations</h2>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
@@ -191,9 +203,9 @@
 
             <div id="view-orders" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
-                    <h2 class="serif text-3xl font-bold text-stone-900">Incoming Orders</h2>
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Incoming Orders</h2>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
@@ -316,7 +328,29 @@
         });
 
         // --- Navigation Logic ---
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            
+            if (isOpen) {
+                // Close sidebar
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                // Open sidebar
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+
         function switchTab(tabName) {
+            // Close mobile sidebar when switching tabs
+            if (window.innerWidth < 768) {
+                toggleMobileSidebar();
+            }
+            
             // Hide all views
             ['menu', 'reservations', 'orders'].forEach(tab => {
                 document.getElementById('view-' + tab).classList.add('hidden');
