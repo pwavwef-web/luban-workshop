@@ -37,14 +37,15 @@
         @media (max-width: 768px) {
             #sidebar {
                 position: fixed;
-                left: -100%;
-                transition: left 0.3s ease-in-out;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out, visibility 0s linear 0.3s;
                 height: 100vh;
                 visibility: hidden;
             }
 
             #sidebar.active {
-                left: 0;
+                transform: translateX(0);
+                transition: transform 0.3s ease-in-out;
                 visibility: visible;
             }
 
@@ -100,7 +101,7 @@
     <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
         <!-- Sidebar overlay for mobile -->
         <div id="sidebar-overlay" onclick="toggleSidebar()" role="button" tabindex="0" 
-            onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleSidebar(); }" 
+            onkeydown="handleOverlayKeydown(event)" 
             aria-label="Close sidebar"></div>
 
         <aside id="sidebar" class="w-64 bg-white shadow-xl z-10 flex flex-col">
@@ -390,6 +391,13 @@
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
+        }
+
+        function handleOverlayKeydown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleSidebar();
+            }
         }
 
         // --- Real-time Listeners (Red Dot Logic) ---
