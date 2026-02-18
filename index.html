@@ -127,7 +127,7 @@
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
                 <a href="#reservation"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
-                <a href="#my-orders" id="my-orders-link-mobile" class="hidden block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
+                <a href="#my-orders" id="my-orders-link-mobile" class="hidden px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
                 <a href="#location"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
                 <button id="auth-btn-mobile" onclick="toggleAuthModal()"
@@ -955,7 +955,7 @@
             const now = new Date();
             const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
             const timeDiffMinutes = (now - orderTime) / (1000 * 60);
-            const canCancel = timeDiffMinutes <= 5 && order.status === 'pending';
+            const canCancel = timeDiffMinutes < 5 && order.status === 'pending';
             
             // Status badge styling
             let statusClass = 'bg-yellow-100 text-yellow-800';
@@ -1036,7 +1036,7 @@
                 const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
                 const timeDiffMinutes = (now - orderTime) / (1000 * 60);
                 
-                if (timeDiffMinutes > 5) {
+                if (timeDiffMinutes >= 5) {
                     alert('Sorry, you can only cancel orders within 5 minutes of placing them.');
                     return;
                 }
