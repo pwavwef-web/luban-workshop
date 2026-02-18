@@ -87,6 +87,7 @@
                     <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
                     <a href="#reservation"
                         class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
+                    <a href="#my-orders" id="my-orders-link-desktop" class="hidden text-stone-600 hover:text-red-700 transition-colors font-medium">My Orders</a>
                     <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate
                         Us</a>
                     <button onclick="toggleCart()"
@@ -126,6 +127,7 @@
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
                 <a href="#reservation"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
+                <a href="#my-orders" id="my-orders-link-mobile" class="hidden px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
                 <a href="#location"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
                 <button id="auth-btn-mobile" onclick="toggleAuthModal()"
@@ -273,6 +275,24 @@
                     Submit Reservation
                 </button>
             </form>
+        </div>
+    </section>
+
+    <section id="my-orders" class="hidden py-16 bg-stone-50 border-t border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold text-stone-900 mb-8 serif text-center">My Orders</h2>
+            
+            <div id="orders-container" class="space-y-4">
+                <!-- Orders will be dynamically loaded here -->
+            </div>
+
+            <div id="no-orders-message" class="text-center py-12">
+                <i data-lucide="package" class="h-16 w-16 mx-auto text-stone-300 mb-4" aria-hidden="true"></i>
+                <p class="text-stone-500 text-lg">You haven't placed any orders yet.</p>
+                <a href="#menu" class="inline-block mt-4 px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors">
+                    Browse Menu
+                </a>
+            </div>
         </div>
     </section>
 
@@ -576,6 +596,9 @@
             const authBtnMobile = document.getElementById('auth-btn-mobile');
             const userInfoDesktop = document.getElementById('user-info-desktop');
             const userInfoMobile = document.getElementById('user-info-mobile');
+            const myOrdersLinkDesktop = document.getElementById('my-orders-link-desktop');
+            const myOrdersLinkMobile = document.getElementById('my-orders-link-mobile');
+            const myOrdersSection = document.getElementById('my-orders');
 
             if (user) {
                 // User is signed in
@@ -584,16 +607,29 @@
                 userInfoDesktop.classList.remove('hidden');
                 userInfoDesktop.classList.add('flex');
                 userInfoMobile.classList.remove('hidden');
+                
+                // Show My Orders link and section
+                myOrdersLinkDesktop.classList.remove('hidden');
+                myOrdersLinkMobile.classList.remove('hidden');
+                myOrdersSection.classList.remove('hidden');
 
                 const emailPrefix = user.email.split('@')[0];
                 document.getElementById('user-email-desktop').textContent = emailPrefix;
                 document.getElementById('user-email-mobile').textContent = emailPrefix;
+                
+                // Load user's orders (includes real-time updates and notifications)
+                loadMyOrders(user);
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
                 authBtnMobile.classList.remove('hidden');
                 userInfoDesktop.classList.add('hidden');
                 userInfoMobile.classList.add('hidden');
+                
+                // Hide My Orders link and section
+                myOrdersLinkDesktop.classList.add('hidden');
+                myOrdersLinkMobile.classList.add('hidden');
+                myOrdersSection.classList.add('hidden');
             }
             lucide.createIcons();
         });
@@ -877,39 +913,163 @@
 
         // --- Paste this into your Main Website Script ---
 
-        let previousStatusMap = {}; // To track changes so we don't alert twice
+        // Constants
+        const ORDER_CANCELLATION_WINDOW_MINUTES = 5;
+        
+        let previousStatusMap = {}; // To track status changes for notifications
 
-        function listenToMyOrders(user) {
+        // Function to load and display user's orders (also handles notifications)
+        function loadMyOrders(user) {
             if (!user) return;
 
-            // Listen for orders created by this user
+            const ordersContainer = document.getElementById('orders-container');
+            const noOrdersMessage = document.getElementById('no-orders-message');
+
+            // Listen for orders in real-time
             db.collection('orders')
                 .where('userId', '==', user.uid)
                 .orderBy('createdAt', 'desc')
-                .limit(5)
                 .onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const order = doc.data();
-                        const orderId = doc.id;
-
-                        // If we tracked this order before, and status changed to completed
-                        if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
-                            alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
-                        }
-
-                        // Update our tracker
-                        previousStatusMap[orderId] = order.status;
-                    });
+                    ordersContainer.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        ordersContainer.classList.add('hidden');
+                        noOrdersMessage.classList.remove('hidden');
+                    } else {
+                        ordersContainer.classList.remove('hidden');
+                        noOrdersMessage.classList.add('hidden');
+                        
+                        snapshot.forEach(doc => {
+                            const order = doc.data();
+                            const orderId = doc.id;
+                            
+                            // Check for status change to completed (for notifications)
+                            if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
+                                alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
+                            }
+                            
+                            // Update our tracker
+                            previousStatusMap[orderId] = order.status;
+                            
+                            const orderCard = createOrderCard(order, orderId);
+                            ordersContainer.appendChild(orderCard);
+                        });
+                    }
+                    lucide.createIcons();
                 });
         }
 
-        // Update your Auth State Observer to call this function
-        auth.onAuthStateChanged(user => {
-            // ... existing auth code ...
-            if (user) {
-                listenToMyOrders(user); // <--- Add this line
+        // Function to create an order card
+        function createOrderCard(order, orderId) {
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-md p-6 border border-stone-200';
+            
+            // Calculate time difference for cancel button
+            const now = new Date();
+            const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
+            const timeDiffMinutes = (now - orderTime) / (1000 * 60);
+            const canCancel = timeDiffMinutes < ORDER_CANCELLATION_WINDOW_MINUTES && order.status === 'pending';
+            
+            // Status badge styling
+            let statusClass = 'bg-yellow-100 text-yellow-800';
+            let statusText = order.status;
+            if (order.status === 'completed') {
+                statusClass = 'bg-green-100 text-green-800';
+                statusText = 'completed';
+            } else if (order.status === 'cancelled') {
+                statusClass = 'bg-red-100 text-red-800';
+                statusText = 'cancelled';
+            } else if (order.status === 'pending') {
+                statusClass = 'bg-yellow-100 text-yellow-800';
+                statusText = 'pending';
             }
-        });
+            
+            // Format order date
+            const orderDate = orderTime.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Build items list
+            const itemsList = order.items.map(item => 
+                `<li class="flex justify-between py-2 border-b border-stone-100">
+                    <span>${item.quantity}x ${item.name}</span>
+                    <span class="font-medium">₵${(item.price * item.quantity).toFixed(2)}</span>
+                </li>`
+            ).join('');
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="font-bold text-lg text-stone-900">Order #${orderId.slice(-6).toUpperCase()}</h3>
+                        <p class="text-sm text-stone-500">${orderDate}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusClass}">${statusText}</span>
+                </div>
+                
+                <ul class="mb-4">
+                    ${itemsList}
+                </ul>
+                
+                <div class="flex justify-between items-center pt-4 border-t-2 border-stone-200">
+                    <span class="font-bold text-lg text-stone-900">Total: ₵${order.total.toFixed(2)}</span>
+                    ${canCancel ? `
+                        <button onclick="cancelOrder('${orderId}')" 
+                            class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors text-sm font-medium">
+                            Cancel Order
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Function to cancel an order
+        async function cancelOrder(orderId) {
+            if (!confirm('Are you sure you want to cancel this order?')) {
+                return;
+            }
+            
+            try {
+                // Get the order to verify it can be cancelled
+                const orderDoc = await db.collection('orders').doc(orderId).get();
+                const order = orderDoc.data();
+                
+                if (!order) {
+                    alert('Order not found.');
+                    return;
+                }
+                
+                // Check if order is still within the cancellation window
+                const now = new Date();
+                const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
+                const timeDiffMinutes = (now - orderTime) / (1000 * 60);
+                
+                if (timeDiffMinutes >= ORDER_CANCELLATION_WINDOW_MINUTES) {
+                    alert(`Sorry, you can only cancel orders within ${ORDER_CANCELLATION_WINDOW_MINUTES} minutes of placing them.`);
+                    return;
+                }
+                
+                if (order.status !== 'pending') {
+                    alert('Sorry, this order cannot be cancelled.');
+                    return;
+                }
+                
+                // Update order status to cancelled
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled'
+                });
+                
+                alert('Order cancelled successfully!');
+            } catch (error) {
+                console.error('Error cancelling order:', error);
+                alert('Failed to cancel order. Please try again.');
+            }
+        }
 
         // --- REAL CHECKOUT LOGIC ---
         async function checkout() {
