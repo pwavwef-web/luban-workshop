@@ -314,7 +314,7 @@
 
                 <div class="order-1 md:order-2 h-96 bg-stone-200 rounded-2xl overflow-hidden shadow-xl relative">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.0!2d-1.29!3d5.10!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMDYnMDAuMCJOIDHCsDE3JzI0LjAiVw!5e0!3m2!1sen!2sgh!4v1600000000000!5m2!1sen!2sgh"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d379.9803273682596!2d-1.2856029509704792!3d5.117627511674501!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfddff0037873e8b%3A0xb248c94a61401f0e!2sLuban%20Workshop%20Restaurant!5e0!3m2!1sen!2sgh!4v1771371964579!5m2!1sen!2sgh"
                         width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
                     </iframe>
                     <div class="absolute bottom-4 right-4 bg-white p-3 rounded-lg shadow-md flex items-center gap-2">
@@ -548,9 +548,6 @@
         lucide.createIcons();
 
         // Firebase Configuration
-        // Note: Firebase API keys are designed to be public. Security is enforced through
-        // Firestore security rules and Firebase App Check. Ensure proper security rules are
-        // configured in the Firebase Console to restrict unauthorized access.
         const firebaseConfig = {
             apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
             authDomain: "luban-workshop-restaurant.firebaseapp.com",
@@ -569,9 +566,12 @@
         // Global variables
         let menuItems = [];
         let cart = [];
+        let currentUser = null; // NEW: Track the logged-in user
 
         // --- Firebase Auth State Observer ---
         auth.onAuthStateChanged(user => {
+            currentUser = user; // Store user for checkout
+
             const authBtnDesktop = document.getElementById('auth-btn-desktop');
             const authBtnMobile = document.getElementById('auth-btn-mobile');
             const userInfoDesktop = document.getElementById('user-info-desktop');
@@ -598,21 +598,14 @@
             lucide.createIcons();
         });
 
-        // --- Fetch Menu from Firestore ---
-        // --- Fetch Menu from Firestore ---
+        // --- Fetch Menu ---
         async function fetchMenu() {
             try {
-                // CHANGED: Removed .orderBy('id') and changed to .orderBy('name') 
-                // ensuring it sorts by a field that actually exists.
                 const snapshot = await db.collection('menuItems').orderBy('name').get();
-
                 menuItems = [];
                 snapshot.forEach(doc => {
-                    // CHANGED: key is now 'id' instead of 'docId' so it matches your other functions
                     menuItems.push({ ...doc.data(), id: doc.id });
                 });
-
-                console.log("Menu items loaded:", menuItems); // Added for debugging
                 renderMenu();
             } catch (error) {
                 console.error('Error fetching menu:', error);
@@ -620,7 +613,7 @@
             }
         }
 
-        // --- Auth Functions ---
+        // --- Auth Functions (Login/Signup/Logout) ---
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             modal.classList.toggle('hidden');
@@ -650,7 +643,6 @@
             }
         }
 
-        // Login Form Handler
         document.getElementById('login-form-modal').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -661,7 +653,6 @@
                 await auth.signInWithEmailAndPassword(email, password);
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
-                // Reset form
                 document.getElementById('login-form-modal').reset();
             } catch (error) {
                 errorDiv.textContent = error.message;
@@ -669,7 +660,6 @@
             }
         });
 
-        // Signup Form Handler
         document.getElementById('signup-form-modal').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('signup-email').value;
@@ -687,7 +677,6 @@
                 await auth.createUserWithEmailAndPassword(email, password);
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
-                // Reset form
                 document.getElementById('signup-form-modal').reset();
             } catch (error) {
                 errorDiv.textContent = error.message;
@@ -695,32 +684,21 @@
             }
         });
 
-        // Logout Function
         function logout() {
             auth.signOut();
         }
 
-        // --- Reservation Form Handler ---
+        // --- Reservation Logic ---
         document.getElementById('reservation-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const errorDiv = document.getElementById('reservation-error');
 
-            // Validate date is in the future
             const selectedDate = new Date(document.getElementById('res-date').value);
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Reset time to start of day
+            today.setHours(0, 0, 0, 0);
 
             if (selectedDate < today) {
                 errorDiv.textContent = 'Please select a date in the future.';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            // Validate date is within reasonable range (3 months)
-            const threeMonthsFromNow = new Date();
-            threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
-            if (selectedDate > threeMonthsFromNow) {
-                errorDiv.textContent = 'Reservations can only be made up to 3 months in advance.';
                 errorDiv.classList.remove('hidden');
                 return;
             }
@@ -739,15 +717,12 @@
 
             try {
                 await db.collection('reservations').add(reservationData);
-                // Show success modal
                 document.getElementById('reservation-success-modal').classList.remove('hidden');
-                // Reset form
                 document.getElementById('reservation-form').reset();
                 errorDiv.classList.add('hidden');
-                lucide.createIcons();
             } catch (error) {
                 console.error('Error saving reservation:', error);
-                errorDiv.textContent = 'Failed to submit reservation. Please try again.';
+                errorDiv.textContent = 'Failed to submit reservation.';
                 errorDiv.classList.remove('hidden');
             }
         });
@@ -756,46 +731,35 @@
             document.getElementById('reservation-success-modal').classList.add('hidden');
         }
 
-        // --- Render Menu ---
+        // --- Menu & Cart Logic ---
         function renderMenu(filter = 'all') {
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
-
             const items = filter === 'all' ? menuItems : menuItems.filter(item => item.category === filter);
 
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
                 card.innerHTML = `
-                    <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
-                        <img src="${item.image}" 
-                             alt="${item.name}" 
-                             onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'"
-                             class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">
-                            ₵${item.price.toFixed(2)}
-                        </div>
+                <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'" class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">₵${item.price.toFixed(2)}</div>
+                </div>
+                <div class="p-6 flex flex-col flex-1">
+                    <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
+                    <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
+                    <div class="mt-6">
+                        <button onclick="addToCart('${item.id}')" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
+                        </button>
                     </div>
-                    <div class="p-6 flex flex-col flex-1">
-                        <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
-                        <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
-                        <div class="mt-6">
-                            <button onclick="addToCart(${item.id})" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-500">
-                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
-                            </button>
-                        </div>
-                    </div>
-                `;
+                </div>`;
                 container.appendChild(card);
             });
-
-            // Re-init icons for dynamic content
             lucide.createIcons();
         }
 
-        // --- Filter Functionality ---
         function filterMenu(category) {
-            // Update active button styles
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const btnText = btn.textContent.toLowerCase();
                 if ((category === 'all' && btnText === 'all') || btnText.includes(category)) {
@@ -809,34 +773,25 @@
             renderMenu(category);
         }
 
-        // --- Cart Logic ---
         function addToCart(id) {
             const item = menuItems.find(i => i.id === id);
             const existingItem = cart.find(i => i.id === id);
-
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
                 cart.push({ ...item, quantity: 1 });
             }
-
             updateCartUI();
-
-            // Temporary feedback on button could be added here
             const badgeDesktop = document.getElementById('cart-badge-desktop');
             const badgeMobile = document.getElementById('cart-badge-mobile');
-
-            // Animate badges
             [badgeDesktop, badgeMobile].forEach(el => {
                 el.classList.add('scale-125');
                 setTimeout(() => el.classList.remove('scale-125'), 200);
             });
-
-            // Auto open cart on first add could be annoying on mobile, so we skip it.
         }
 
         function removeFromCart(id) {
-            const index = cart.findIndex(i => i.id === id);
+            const index = cart.findIndex(i => i.id === id); // Fix: Use string ID comparison
             if (index > -1) {
                 if (cart[index].quantity > 1) {
                     cart[index].quantity -= 1;
@@ -854,7 +809,6 @@
             const badgeMobile = document.getElementById('cart-badge-mobile');
             const checkoutBtn = document.getElementById('checkout-btn');
 
-            // Update badges
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             badgeDesktop.innerText = count;
             badgeMobile.innerText = count;
@@ -869,15 +823,9 @@
                 checkoutBtn.disabled = true;
             }
 
-            // Update List
             cartList.innerHTML = '';
-
             if (cart.length === 0) {
-                cartList.innerHTML = `<li class="py-12 text-center flex flex-col items-center text-stone-500">
-                    <i data-lucide="shopping-basket" class="w-12 h-12 mb-4 text-stone-300"></i>
-                    <p class="text-lg font-medium">Your cart is empty</p>
-                    <p class="text-sm">Explore our menu to add items.</p>
-                </li>`;
+                cartList.innerHTML = `<li class="py-12 text-center flex flex-col items-center text-stone-500"><i data-lucide="shopping-basket" class="w-12 h-12 mb-4 text-stone-300"></i><p class="text-lg font-medium">Your cart is empty</p></li>`;
             } else {
                 let subtotal = 0;
                 cart.forEach(item => {
@@ -885,29 +833,23 @@
                     const li = document.createElement('li');
                     li.className = 'py-6 flex';
                     li.innerHTML = `
-                        <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
-                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-center object-cover">
+                    <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
+                        <img src="${item.image}" class="w-full h-full object-center object-cover">
+                    </div>
+                    <div class="ml-4 flex-1 flex flex-col">
+                        <div class="flex justify-between text-base font-medium text-stone-900">
+                            <h3>${item.name}</h3>
+                            <p class="ml-4">₵${(item.price * item.quantity).toFixed(2)}</p>
                         </div>
-                        <div class="ml-4 flex-1 flex flex-col">
-                            <div>
-                                <div class="flex justify-between text-base font-medium text-stone-900">
-                                    <h3>${item.name}</h3>
-                                    <p class="ml-4">₵${(item.price * item.quantity).toFixed(2)}</p>
-                                </div>
-                                <p class="mt-1 text-sm text-stone-500">₵${item.price.toFixed(2)} each</p>
-                            </div>
-                            <div class="flex-1 flex items-end justify-between text-sm">
-                                <div class="flex items-center border border-stone-300 rounded-md">
-                                    <button onclick="removeFromCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">-</button>
-                                    <span class="px-2 font-medium text-stone-900">${item.quantity}</span>
-                                    <button onclick="addToCart(${item.id})" class="px-2 py-1 hover:bg-stone-100 text-stone-600">+</button>
-                                </div>
-                                <div class="flex">
-                                    <button type="button" onclick="cart = cart.filter(i => i.id !== ${item.id}); updateCartUI();" class="font-medium text-red-600 hover:text-red-500">Remove</button>
-                                </div>
+                        <p class="mt-1 text-sm text-stone-500">₵${item.price.toFixed(2)} each</p>
+                        <div class="flex-1 flex items-end justify-between text-sm">
+                            <div class="flex items-center border border-stone-300 rounded-md">
+                                <button onclick="removeFromCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100">-</button>
+                                <span class="px-2 font-medium">${item.quantity}</span>
+                                <button onclick="addToCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100">+</button>
                             </div>
                         </div>
-                    `;
+                    </div>`;
                     cartList.appendChild(li);
                 });
                 totalEl.innerText = '₵' + subtotal.toFixed(2);
@@ -915,15 +857,11 @@
             lucide.createIcons();
         }
 
-        // --- Toggle Cart Drawer ---
         function toggleCart() {
             const overlay = document.getElementById('cart-overlay');
             const drawer = document.getElementById('cart-panel');
-            const isHidden = overlay.classList.contains('hidden');
-
-            if (isHidden) {
+            if (overlay.classList.contains('hidden')) {
                 overlay.classList.remove('hidden');
-                // Small delay to allow display block to apply before opacity transition
                 setTimeout(() => overlay.classList.remove('opacity-0'), 10);
                 drawer.classList.remove('translate-x-full');
             } else {
@@ -933,31 +871,88 @@
             }
         }
 
-        // --- Checkout Simulation ---
-        function checkout() {
-            toggleCart();
-            // Simulate API call
-            setTimeout(() => {
-                cart = [];
-                updateCartUI();
-                const modal = document.getElementById('success-modal');
-                modal.classList.remove('hidden');
-            }, 500);
-        }
-
         function closeSuccessModal() {
             document.getElementById('success-modal').classList.add('hidden');
+        }
+
+        // --- Paste this into your Main Website Script ---
+
+        let previousStatusMap = {}; // To track changes so we don't alert twice
+
+        function listenToMyOrders(user) {
+            if (!user) return;
+
+            // Listen for orders created by this user
+            db.collection('orders')
+                .where('userId', '==', user.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .onSnapshot(snapshot => {
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+
+                        // If we tracked this order before, and status changed to completed
+                        if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
+                            alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
+                        }
+
+                        // Update our tracker
+                        previousStatusMap[orderId] = order.status;
+                    });
+                });
+        }
+
+        // Update your Auth State Observer to call this function
+        auth.onAuthStateChanged(user => {
+            // ... existing auth code ...
+            if (user) {
+                listenToMyOrders(user); // <--- Add this line
+            }
+        });
+
+        // --- REAL CHECKOUT LOGIC ---
+        async function checkout() {
+            const checkoutBtn = document.getElementById('checkout-btn');
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Processing...';
+
+            try {
+                // 1. Prepare Order Data
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                const orderData = {
+                    items: cart,
+                    total: total,
+                    status: 'pending', // This triggers the red dot in admin
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    userEmail: currentUser ? currentUser.email : 'Guest',
+                    userId: currentUser ? currentUser.uid : null
+                };
+
+                // 2. Send to Firebase
+                await db.collection('orders').add(orderData);
+
+                // 3. Success Handling
+                toggleCart(); // Close drawer
+                cart = []; // Clear local cart
+                updateCartUI(); // Reset UI
+                document.getElementById('success-modal').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Order failed", error);
+                alert("Failed to place order. Please try again.");
+            } finally {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Place Order';
+            }
         }
 
         // --- Init ---
         fetchMenu();
         updateCartUI();
-
-        // Set minimum date for reservation to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('res-date').setAttribute('min', today);
-
-        // Set maximum date for reservation to 3 months from now
         const maxDate = new Date();
         maxDate.setMonth(maxDate.getMonth() + 3);
         document.getElementById('res-date').setAttribute('max', maxDate.toISOString().split('T')[0]);
