@@ -40,10 +40,12 @@
                 left: -100%;
                 transition: left 0.3s ease-in-out;
                 height: 100vh;
+                visibility: hidden;
             }
 
             #sidebar.active {
                 left: 0;
+                visibility: visible;
             }
 
             #sidebar-overlay {
@@ -97,7 +99,9 @@
 
     <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
         <!-- Sidebar overlay for mobile -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" role="button" tabindex="0" 
+            onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleSidebar(); }" 
+            aria-label="Close sidebar"></div>
 
         <aside id="sidebar" class="w-64 bg-white shadow-xl z-10 flex flex-col">
             <div class="h-16 flex items-center px-6 border-b border-stone-100">
@@ -315,6 +319,9 @@
     </div>
 
     <script>
+        // --- Constants ---
+        const MOBILE_BREAKPOINT = 768;
+
         // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
@@ -372,7 +379,7 @@
             activeBtn.classList.remove('text-stone-600');
 
             // Close sidebar on mobile after selecting a tab
-            if (window.innerWidth <= 768) {
+            if (window.innerWidth <= MOBILE_BREAKPOINT) {
                 toggleSidebar();
             }
         }
