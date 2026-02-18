@@ -69,7 +69,7 @@
     <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
 
         <!-- Mobile Menu Toggle Button -->
-        <button id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle navigation menu" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
+        <button id="mobile-menu-toggle" aria-label="Toggle navigation menu" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
             <i data-lucide="menu" class="h-6 w-6"></i>
         </button>
 
@@ -81,7 +81,7 @@
                 <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
                 <span class="serif font-bold text-xl text-stone-900">Luban Admin</span>
                 <!-- Close button for mobile -->
-                <button onclick="toggleMobileSidebar()" aria-label="Close menu" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
+                <button id="sidebar-close-btn" aria-label="Close menu" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
                     <i data-lucide="x" class="h-5 w-5"></i>
                 </button>
             </div>
@@ -321,15 +321,15 @@
                 // Set default tab
                 switchTab('menu');
                 
-                // Setup overlay event listeners
+                // Setup mobile sidebar event listeners
+                const menuToggle = document.getElementById('mobile-menu-toggle');
+                const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
                 const overlay = document.getElementById('sidebar-overlay');
+                
+                menuToggle.addEventListener('click', toggleMobileSidebar);
+                sidebarCloseBtn.addEventListener('click', toggleMobileSidebar);
                 overlay.addEventListener('click', toggleMobileSidebar);
-                overlay.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault(); // Prevent page scroll on Space
-                        toggleMobileSidebar();
-                    }
-                });
+                overlay.addEventListener('keydown', handleOverlayKeydown);
                 
                 lucide.createIcons();
             } else {
@@ -339,7 +339,15 @@
         });
 
         // --- Navigation Logic ---
+        const MOBILE_BREAKPOINT = 768; // Tailwind 'md:' breakpoint
         let isMobileSidebarOpen = false; // Track sidebar state
+
+        function handleOverlayKeydown(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault(); // Prevent page scroll on Space
+                toggleMobileSidebar();
+            }
+        }
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -360,7 +368,7 @@
 
         function switchTab(tabName) {
             // Close mobile sidebar when switching tabs (only if it's open)
-            if (window.innerWidth < 768 && isMobileSidebarOpen) {
+            if (window.innerWidth < MOBILE_BREAKPOINT && isMobileSidebarOpen) {
                 toggleMobileSidebar();
             }
             
