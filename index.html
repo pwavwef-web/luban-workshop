@@ -287,7 +287,7 @@
             </div>
 
             <div id="no-orders-message" class="text-center py-12">
-                <i data-lucide="package" class="h-16 w-16 mx-auto text-stone-300 mb-4"></i>
+                <i data-lucide="package" class="h-16 w-16 mx-auto text-stone-300 mb-4" aria-hidden="true"></i>
                 <p class="text-stone-500 text-lg">You haven't placed any orders yet.</p>
                 <a href="#menu" class="inline-block mt-4 px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors">
                     Browse Menu
@@ -617,9 +617,8 @@
                 document.getElementById('user-email-desktop').textContent = emailPrefix;
                 document.getElementById('user-email-mobile').textContent = emailPrefix;
                 
-                // Load user's orders and listen for notifications
+                // Load user's orders (includes real-time updates and notifications)
                 loadMyOrders(user);
-                listenToMyOrders(user);
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
@@ -914,7 +913,12 @@
 
         // --- Paste this into your Main Website Script ---
 
-        // Function to load and display user's orders
+        // Constants
+        const ORDER_CANCELLATION_WINDOW_MINUTES = 5;
+        
+        let previousStatusMap = {}; // To track status changes for notifications
+
+        // Function to load and display user's orders (also handles notifications)
         function loadMyOrders(user) {
             if (!user) return;
 
@@ -938,6 +942,15 @@
                         snapshot.forEach(doc => {
                             const order = doc.data();
                             const orderId = doc.id;
+                            
+                            // Check for status change to completed (for notifications)
+                            if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
+                                alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
+                            }
+                            
+                            // Update our tracker
+                            previousStatusMap[orderId] = order.status;
+                            
                             const orderCard = createOrderCard(order, orderId);
                             ordersContainer.appendChild(orderCard);
                         });
@@ -955,7 +968,7 @@
             const now = new Date();
             const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
             const timeDiffMinutes = (now - orderTime) / (1000 * 60);
-            const canCancel = timeDiffMinutes < 5 && order.status === 'pending';
+            const canCancel = timeDiffMinutes < ORDER_CANCELLATION_WINDOW_MINUTES && order.status === 'pending';
             
             // Status badge styling
             let statusClass = 'bg-yellow-100 text-yellow-800';
@@ -1031,13 +1044,13 @@
                     return;
                 }
                 
-                // Check if order is still within 5 minutes
+                // Check if order is still within the cancellation window
                 const now = new Date();
                 const orderTime = order.createdAt ? order.createdAt.toDate() : new Date();
                 const timeDiffMinutes = (now - orderTime) / (1000 * 60);
                 
-                if (timeDiffMinutes >= 5) {
-                    alert('Sorry, you can only cancel orders within 5 minutes of placing them.');
+                if (timeDiffMinutes >= ORDER_CANCELLATION_WINDOW_MINUTES) {
+                    alert(`Sorry, you can only cancel orders within ${ORDER_CANCELLATION_WINDOW_MINUTES} minutes of placing them.`);
                     return;
                 }
                 
@@ -1056,32 +1069,6 @@
                 console.error('Error cancelling order:', error);
                 alert('Failed to cancel order. Please try again.');
             }
-        }
-
-        let previousStatusMap = {}; // To track changes so we don't alert twice
-
-        function listenToMyOrders(user) {
-            if (!user) return;
-
-            // Listen for orders created by this user
-            db.collection('orders')
-                .where('userId', '==', user.uid)
-                .orderBy('createdAt', 'desc')
-                .limit(5)
-                .onSnapshot(snapshot => {
-                    snapshot.forEach(doc => {
-                        const order = doc.data();
-                        const orderId = doc.id;
-
-                        // If we tracked this order before, and status changed to completed
-                        if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
-                            alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
-                        }
-
-                        // Update our tracker
-                        previousStatusMap[orderId] = order.status;
-                    });
-                });
         }
 
         // --- REAL CHECKOUT LOGIC ---
