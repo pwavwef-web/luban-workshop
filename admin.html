@@ -328,26 +328,28 @@
         });
 
         // --- Navigation Logic ---
+        let isMobileSidebarOpen = false; // Track sidebar state
+
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             
-            const isOpen = !sidebar.classList.contains('-translate-x-full');
-            
-            if (isOpen) {
+            if (isMobileSidebarOpen) {
                 // Close sidebar
                 sidebar.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
+                isMobileSidebarOpen = false;
             } else {
                 // Open sidebar
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
+                isMobileSidebarOpen = true;
             }
         }
 
         function switchTab(tabName) {
-            // Close mobile sidebar when switching tabs
-            if (window.innerWidth < 768) {
+            // Close mobile sidebar when switching tabs (only if it's open)
+            if (window.innerWidth < 768 && isMobileSidebarOpen) {
                 toggleMobileSidebar();
             }
             
