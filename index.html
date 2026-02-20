@@ -605,6 +605,66 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // --- Hardcoded Dishes ---
+        const DISHES = [
+            { id: 'SP1', name: 'Chicken & Sweet Corn Soup', category: 'soups', price: 40, description: 'A smooth, savoury broth with tender chicken and sweet corn', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&h=400&fit=crop&auto=format' },
+            { id: 'SP2', name: 'Hot & Sour Soup', category: 'soups', price: 40, description: 'Traditional Chinese hot and sour broth with tofu and vegetables', image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S1', name: 'Beef Spring Rolls (3 pcs)', category: 'starters', price: 30, description: 'Crispy golden beef spring rolls', image: 'https://images.unsplash.com/photo-1606525437394-f0b0df43c5e0?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S2', name: 'Vegetable Spring Rolls (3 pcs)', category: 'starters', price: 25, description: 'Crispy golden vegetable spring rolls', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S3', name: 'Beef Samosa (5 pcs)', category: 'starters', price: 30, description: 'Golden fried beef samosas', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S4', name: 'Fish Samosa (5 pcs)', category: 'starters', price: 30, description: 'Golden fried fish samosas', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S5', name: 'Fried Chicken Pieces (6 pcs)', category: 'starters', price: 65, description: 'Crispy fried chicken pieces', image: 'https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S6', name: 'Special Chicken Wings', category: 'starters', price: 65, description: 'Special marinated chicken wings', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S7', name: 'Golden Fried Prawns', category: 'starters', price: 90, description: 'Crispy golden fried prawns', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=600&h=400&fit=crop&auto=format' },
+            { id: 'S8', name: 'Fried Squid in Spicy Salt', category: 'starters', price: 85, description: 'Tender squid tossed in spicy salt', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B1', name: 'Shredded Beef with Green Pepper & Onion', category: 'beef-lamb', price: 110, description: 'Shredded beef in sauce with green pepper and onion', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B2', name: 'Beef in Sichuan Sauce', category: 'beef-lamb', price: 110, description: 'Tender beef in authentic Sichuan sauce', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B3', name: 'Sliced Beef in Curry Sauce', category: 'beef-lamb', price: 110, description: 'Sliced beef in rich curry sauce', image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B4', name: 'Beef in Oyster Sauce', category: 'beef-lamb', price: 110, description: 'Beef in savoury oyster sauce', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B5', name: 'Crispy Chilli Beef', category: 'beef-lamb', price: 85, description: 'Crispy beef with a sweet chilli glaze', image: 'https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B6', name: 'Mongolian Shallot Lamb', category: 'beef-lamb', price: 115, description: 'Tender lamb with shallots Mongolian style', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop&auto=format' },
+            { id: 'B7', name: 'Lamb Chops', category: 'beef-lamb', price: 85, description: 'Grilled lamb chops', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop&auto=format' },
+            { id: 'P1', name: 'Sweet & Sour Pork', category: 'pork', price: 90, description: 'Classic sweet and sour pork', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&h=400&fit=crop&auto=format' },
+            { id: 'P2', name: 'Pork Sichuan Style', category: 'pork', price: 90, description: 'Pork in spicy Sichuan sauce', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop&auto=format' },
+            { id: 'P3', name: 'Pork in Chilli Sauce', category: 'pork', price: 90, description: 'Pork in rich chilli sauce', image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=600&h=400&fit=crop&auto=format' },
+            { id: 'P4', name: 'Pork in Oyster Sauce', category: 'pork', price: 90, description: 'Pork in savoury oyster sauce', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=600&h=400&fit=crop&auto=format' },
+            { id: 'P5', name: 'Fried Pork Ribs', category: 'pork', price: 75, description: 'Crispy fried pork ribs', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&h=400&fit=crop&auto=format' },
+            { id: 'K1', name: 'Sweet & Sour Chicken', category: 'chicken', price: 100, description: 'Classic sweet and sour chicken', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&h=400&fit=crop&auto=format' },
+            { id: 'K2', name: 'Chicken Sichuan Sauce', category: 'chicken', price: 100, description: 'Chicken in Sichuan sauce', image: 'https://images.unsplash.com/photo-1604908176997-7f81f85f7c8e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'K3', name: 'Chicken in Curry Sauce', category: 'chicken', price: 100, description: 'Chicken in curry sauce', image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=600&h=400&fit=crop&auto=format' },
+            { id: 'K4', name: 'Chicken in Oyster Sauce', category: 'chicken', price: 100, description: 'Chicken in oyster sauce', image: 'https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=600&h=400&fit=crop&auto=format' },
+            { id: 'Q1', name: 'Squid in Luban Chilli Sauce', category: 'seafood', price: 120, description: 'Squid in our signature Luban chilli sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=600&h=400&fit=crop&auto=format' },
+            { id: 'Q2', name: 'Squid in Sichuan Sauce', category: 'seafood', price: 120, description: 'Squid in Sichuan sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=600&h=400&fit=crop&auto=format' },
+            { id: 'Q3', name: 'Squid in Garlic Sauce', category: 'seafood', price: 120, description: 'Squid in garlic sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=600&h=400&fit=crop&auto=format' },
+            { id: 'F1', name: 'Fish Fillet in Chilli Sauce', category: 'seafood', price: 115, description: 'Fish fillet in chilli sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=600&h=400&fit=crop&auto=format' },
+            { id: 'F2', name: 'Fish Fillet in Vegetable Sauce', category: 'seafood', price: 115, description: 'Fish fillet in vegetable sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=600&h=400&fit=crop&auto=format' },
+            { id: 'F3', name: 'Fish Fillet in Sichuan Sauce', category: 'seafood', price: 115, description: 'Fish fillet in Sichuan sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=600&h=400&fit=crop&auto=format' },
+            { id: 'F4', name: 'Sweet & Sour Fish Fillet', category: 'seafood', price: 115, description: 'Sweet and sour fish fillet', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=600&h=400&fit=crop&auto=format' },
+            { id: 'PR1', name: 'Prawns in Chilli Sauce', category: 'seafood', price: 155, description: 'Prawns in chilli sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=600&h=400&fit=crop&auto=format' },
+            { id: 'PR2', name: 'Prawns in Curry Sauce', category: 'seafood', price: 155, description: 'Prawns in curry sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=600&h=400&fit=crop&auto=format' },
+            { id: 'PR3', name: 'Prawns in Sichuan Sauce', category: 'seafood', price: 155, description: 'Prawns in Sichuan sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=600&h=400&fit=crop&auto=format' },
+            { id: 'SF1', name: 'Special Seafood in Sichuan Sauce', category: 'seafood', price: 170, description: 'Special mixed seafood in Sichuan sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R1', name: 'Steamed Rice', category: 'rice', price: 29, description: 'Freshly steamed white rice', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R2', name: 'Special Jollof Rice', category: 'rice', price: 50, description: 'West African style jollof rice', image: 'https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R3', name: 'Combo Fried Rice', category: 'rice', price: 50, description: 'Mixed combo fried rice', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R4', name: 'Shrimp Fried Rice', category: 'rice', price: 50, description: 'Fried rice with shrimp', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'RS', name: 'Egg Fried Rice', category: 'rice', price: 40, description: 'Classic egg fried rice', image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R6', name: 'Beef Fried Rice', category: 'rice', price: 45, description: 'Fried rice with beef', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R7', name: 'Chicken Fried Rice', category: 'rice', price: 45, description: 'Fried rice with chicken', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R8', name: 'Seafood Fried Rice', category: 'rice', price: 85, description: 'Fried rice with mixed seafood', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'R9', name: 'Pork Fried Rice', category: 'rice', price: 45, description: 'Fried rice with pork', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'N1', name: 'Vegetable Noodles', category: 'noodles', price: 45, description: 'Wok-tossed noodles with vegetables', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'N2', name: 'Special Noodles', category: 'noodles', price: 80, description: 'Special Luban noodles', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'N4', name: 'Singapore Noodles', category: 'noodles', price: 80, description: 'Singapore style noodles', image: 'https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=600&h=400&fit=crop&auto=format' },
+            { id: 'N5', name: 'Seafood Noodles', category: 'noodles', price: 100, description: 'Noodles with mixed seafood', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'N6', name: 'Chicken Noodles', category: 'noodles', price: 60, description: 'Noodles with chicken', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&h=400&fit=crop&auto=format' },
+            { id: 'D1', name: 'Steamed Pork Dumpling', category: 'dumplings', price: 30, description: 'Handcrafted steamed pork dumplings', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=600&h=400&fit=crop&auto=format' },
+            { id: 'D2', name: 'Fried Pork Dumpling', category: 'dumplings', price: 30, description: 'Crispy fried pork dumplings', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=600&h=400&fit=crop&auto=format' },
+            { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30, description: 'Handcrafted steamed beef dumplings', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=600&h=400&fit=crop&auto=format' },
+            { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30, description: 'Crispy fried beef dumplings', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=600&h=400&fit=crop&auto=format' },
+            { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40, description: 'Fresh mixed vegetables in sauce', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=400&fit=crop&auto=format' },
+        ];
+
         // Global variables
         let menuItems = [];
         let cart = [];
@@ -655,19 +715,17 @@
             lucide.createIcons();
         });
 
-        // --- Fetch Menu ---
-        async function fetchMenu() {
-            try {
-                const snapshot = await db.collection('menuItems').orderBy('name').get();
-                menuItems = [];
-                snapshot.forEach(doc => {
-                    menuItems.push({ ...doc.data(), id: doc.id });
-                });
+        // --- Listen to Dish Availability ---
+        function listenToAvailability() {
+            db.collection('settings').doc('menuAvailability').onSnapshot(doc => {
+                const hiddenIds = (doc.exists && doc.data().hiddenDishIds) ? doc.data().hiddenDishIds : [];
+                menuItems = DISHES.filter(dish => !hiddenIds.includes(dish.id));
                 renderMenu();
-            } catch (error) {
-                console.error('Error fetching menu:', error);
+            }, (error) => {
+                console.error('Error fetching menu availability:', error);
+                menuItems = DISHES.slice();
                 renderMenu();
-            }
+            });
         }
 
         // --- Auth Functions (Login/Signup/Logout) ---
@@ -1121,7 +1179,7 @@
         }
 
         // --- Init ---
-        fetchMenu();
+        listenToAvailability();
         updateCartUI();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('res-date').setAttribute('min', today);
