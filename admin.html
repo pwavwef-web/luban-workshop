@@ -112,6 +112,12 @@
                     <span id="badge-orders"
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
+
+                <button onclick="switchTab('admin')" id="tab-btn-admin"
+                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="shield" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Admin</span>
+                </button>
             </nav>
 
             <div class="p-4 border-t border-stone-100">
@@ -236,6 +242,44 @@
                 </div>
             </div>
 
+            <!-- Admin Management Tab -->
+            <div id="view-admin" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Admin Management</h2>
+                    <p class="text-sm text-stone-500">Promote or revoke admin access for users.</p>
+                </div>
+
+                <!-- Promote User Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-base font-semibold text-stone-800 mb-4">Promote User to Admin</h3>
+                    <form id="promote-form" class="flex flex-col sm:flex-row gap-3">
+                        <input type="email" id="promote-email" placeholder="user@example.com" required
+                            class="flex-1 px-4 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
+                        <button type="submit"
+                            class="px-5 py-2 bg-red-700 text-white text-sm font-medium rounded-md hover:bg-red-800 transition-colors whitespace-nowrap">
+                            Grant Admin Access
+                        </button>
+                    </form>
+                    <div id="promote-message" class="hidden mt-3 text-sm p-3 rounded-md"></div>
+                </div>
+
+                <!-- Current Admins List -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Promoted At</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admins-table" class="bg-white divide-y divide-stone-200">
+                            <tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">Loading admins...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -256,8 +300,37 @@
         const db = firebase.firestore();
 
         // --- Auth State ---
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
+                // Verify admin status before showing the dashboard
+                let adminAccess = false;
+                try {
+                    const idTokenResult = await user.getIdTokenResult();
+                    if (idTokenResult.claims.admin === true) {
+                        adminAccess = true;
+                    } else if (user.email === 'admin@luban.com') {
+                        adminAccess = true;
+                    } else {
+                        // Check the Firestore admins collection
+                        const adminDoc = await db.collection('admins').doc(user.email).get();
+                        adminAccess = adminDoc.exists;
+                    }
+                } catch (err) {
+                    // Verification failed – treat as non-admin (adminAccess stays false)
+                    console.error('Admin check failed:', err);
+                }
+
+                // Block access for non-admins (also covers failed verification above)
+                if (!adminAccess) {
+                    await auth.signOut();
+                    const errDiv = document.getElementById('login-error');
+                    errDiv.textContent = 'Access denied. You do not have admin privileges.';
+                    errDiv.classList.remove('hidden');
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('admin-dashboard').classList.add('hidden');
+                    return;
+                }
+
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 document.getElementById('user-email').textContent = user.email;
@@ -322,7 +395,7 @@
             }
             
             // Hide all views
-            ['menu', 'reservations', 'orders'].forEach(tab => {
+            ['menu', 'reservations', 'orders', 'admin'].forEach(tab => {
                 document.getElementById('view-' + tab).classList.add('hidden');
 
                 // Reset Tab Styles
@@ -338,6 +411,9 @@
             const activeBtn = document.getElementById('tab-btn-' + tabName);
             activeBtn.classList.add('bg-red-50', 'text-red-700');
             activeBtn.classList.remove('text-stone-600');
+
+            // Load admins list when Admin tab is opened
+            if (tabName === 'admin') loadAdmins();
         }
 
         // --- Hardcoded Menu ---
@@ -633,6 +709,72 @@
         function toggleOrderDetails(id) {
             const row = document.getElementById(`order-details-${id}`);
             if (row) row.classList.toggle('hidden');
+        }
+
+        // --- Admin Management ---
+
+        async function loadAdmins() {
+            const tableBody = document.getElementById('admins-table');
+            try {
+                const snapshot = await db.collection('admins').get();
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">No additional admins yet.</td></tr>';
+                    return;
+                }
+                tableBody.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const promotedAt = data.promotedAt ? new Date(data.promotedAt.toDate()).toLocaleString() : '—';
+                    tableBody.innerHTML += `
+                        <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${doc.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${promotedAt}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="removeAdmin('${doc.id}')" class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors">
+                                    Revoke
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-red-600 italic">Failed to load admins.</td></tr>';
+                console.error('loadAdmins error:', err);
+            }
+        }
+
+        document.getElementById('promote-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('promote-email').value.trim().toLowerCase();
+            const msgDiv = document.getElementById('promote-message');
+            msgDiv.className = 'mt-3 text-sm p-3 rounded-md';
+            msgDiv.classList.remove('hidden');
+            try {
+                await db.collection('admins').doc(email).set({
+                    promotedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    promotedBy: auth.currentUser.email
+                });
+                msgDiv.textContent = `✓ ${email} has been granted admin access.`;
+                msgDiv.classList.add('bg-green-50', 'text-green-800');
+                document.getElementById('promote-email').value = '';
+                loadAdmins();
+            } catch (err) {
+                msgDiv.textContent = `Error: ${err.message}`;
+                msgDiv.classList.add('bg-red-50', 'text-red-800');
+                console.error('Promote error:', err);
+            }
+            setTimeout(() => msgDiv.classList.add('hidden'), 5000);
+        });
+
+        async function removeAdmin(email) {
+            if (!confirm(`Revoke admin access for ${email}?`)) return;
+            try {
+                await db.collection('admins').doc(email).delete();
+                loadAdmins();
+            } catch (err) {
+                alert('Failed to revoke admin access: ' + err.message);
+                console.error('removeAdmin error:', err);
+            }
         }
 
         // --- Auth Functions ---
