@@ -402,13 +402,7 @@
 
         // --- Real-time Listeners (Red Dot Logic) ---
 
-        function listenToMenu() {
-            db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
-                snapshot.forEach(doc => {
-                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
-                });
-
+        function renderMenuTable(hiddenIds) {
                 const tableBody = document.getElementById('menu-items-table');
                 tableBody.innerHTML = '';
 
@@ -435,6 +429,18 @@
                     tableBody.innerHTML += row;
                 });
                 lucide.createIcons();
+        }
+
+        function listenToMenu() {
+            db.collection('dishAvailability').onSnapshot(snapshot => {
+                const hiddenIds = new Set();
+                snapshot.forEach(doc => {
+                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                });
+                renderMenuTable(hiddenIds);
+            }, error => {
+                console.error('Error loading dish availability:', error);
+                renderMenuTable(new Set());
             });
         }
 

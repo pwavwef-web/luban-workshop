@@ -23,6 +23,15 @@ service cloud.firestore {
       // Only authenticated admin can write (create, update, delete) to menuItems
       allow write: if isAdmin();
     }
+
+    // dishAvailability collection – tracks which hardcoded dishes are hidden
+    match /dishAvailability/{dishId} {
+      // Anyone can read (main site needs to filter hidden dishes)
+      allow read: if true;
+      
+      // Only admins can toggle dish visibility
+      allow write: if isAdmin();
+    }
     
     // reservations collection rules
     match /reservations/{reservation} {
@@ -34,6 +43,19 @@ service cloud.firestore {
       
       // Only admins can update or delete reservations
       allow update, delete: if isAdmin();
+    }
+
+    // orders collection rules
+    match /orders/{order} {
+      // Admins can read all orders; users can read their own orders
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
+      
+      // Authenticated users can create orders
+      allow create: if isAuthenticated();
+      
+      // Admins can update or delete orders; users can update (cancel) their own pending orders
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
+      allow delete: if isAdmin();
     }
   }
 }
