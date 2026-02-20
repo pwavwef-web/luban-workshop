@@ -28,6 +28,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // dishAvailability collection rules (controls which hardcoded dishes show on the site)
+    match /dishAvailability/{dishId} {
+      // Anyone can read dish availability
+      allow read: if true;
+      
+      // Only admins can update dish visibility
+      allow write: if isAdmin();
+    }
+    
     // reservations collection rules
     match /reservations/{reservation} {
       // Only admins can read reservations
