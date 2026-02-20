@@ -112,6 +112,12 @@
                     <span id="badge-orders"
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
+
+                <button onclick="switchTab('admin-users')" id="tab-btn-admin-users"
+                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="shield" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Admin Users</span>
+                </button>
             </nav>
 
             <div class="p-4 border-t border-stone-100">
@@ -201,6 +207,44 @@
                 </div>
             </div>
 
+            <div id="view-admin-users" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Admin Users</h2>
+                    <p class="text-sm text-stone-500">Manage who has admin access to this dashboard.</p>
+                </div>
+
+                <!-- Promote user form -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <h3 class="text-base font-bold text-stone-800 mb-4">Promote a User to Admin</h3>
+                    <form id="promote-form" class="flex flex-col sm:flex-row gap-3">
+                        <input type="email" id="promote-email" placeholder="Enter user email address" required
+                            class="flex-1 px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                        <button type="submit"
+                            class="bg-red-700 text-white px-6 py-2 rounded-md hover:bg-red-800 transition-colors text-sm font-medium whitespace-nowrap">
+                            Grant Admin Access
+                        </button>
+                    </form>
+                    <div id="promote-feedback" class="hidden mt-3 text-sm p-3 rounded-md"></div>
+                </div>
+
+                <!-- Current admins list -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Admin Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Added At</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Added By</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-table" class="bg-white divide-y divide-stone-200">
+                            <tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">Loading admins...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div id="view-orders" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Incoming Orders</h2>
@@ -256,8 +300,36 @@
         const db = firebase.firestore();
 
         // --- Auth State ---
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
+                // Check if the logged-in user has admin privileges
+                let adminVerified = false;
+
+                // 1. Check Firebase Custom Claims
+                try {
+                    const tokenResult = await user.getIdTokenResult();
+                    if (tokenResult.claims.admin === true) adminVerified = true;
+                } catch (e) { /* token fetch failed, fall through */ }
+
+                // 2. Check bootstrap email (development fallback)
+                if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+
+                // 3. Check Firestore admins collection
+                if (!adminVerified && user.email) {
+                    try {
+                        const adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                        if (adminDoc.exists) adminVerified = true;
+                    } catch (e) { /* no permission or network error */ }
+                }
+
+                if (!adminVerified) {
+                    await auth.signOut();
+                    const errDiv = document.getElementById('login-error');
+                    errDiv.textContent = 'Access denied. You do not have admin privileges.';
+                    errDiv.classList.remove('hidden');
+                    return;
+                }
+
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 document.getElementById('user-email').textContent = user.email;
@@ -266,6 +338,7 @@
                 listenToMenu();
                 listenToReservations();
                 listenToOrders();
+                listenToAdminUsers();
 
                 // Set default tab
                 switchTab('menu');
@@ -322,7 +395,7 @@
             }
             
             // Hide all views
-            ['menu', 'reservations', 'orders'].forEach(tab => {
+            ['menu', 'reservations', 'orders', 'admin-users'].forEach(tab => {
                 document.getElementById('view-' + tab).classList.add('hidden');
 
                 // Reset Tab Styles
@@ -633,6 +706,81 @@
         function toggleOrderDetails(id) {
             const row = document.getElementById(`order-details-${id}`);
             if (row) row.classList.toggle('hidden');
+        }
+
+        // --- Admin Users Management ---
+
+        function listenToAdminUsers() {
+            db.collection('admins').orderBy('addedAt', 'desc').onSnapshot(snapshot => {
+                const tableBody = document.getElementById('admin-users-table');
+                tableBody.innerHTML = '';
+
+                if (snapshot.empty) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">No additional admins configured.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const addedAt = data.addedAt ? new Date(data.addedAt.toDate()).toLocaleDateString() : '—';
+                    const addedBy = data.addedBy || '—';
+                    const row = `
+                        <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${doc.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${addedAt}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${addedBy}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="revokeAdmin('${doc.id}')" class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors">Revoke</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+                lucide.createIcons();
+            }, error => {
+                console.error('Error loading admins:', error);
+            });
+        }
+
+        document.getElementById('promote-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('promote-email').value.trim().toLowerCase();
+            const feedbackDiv = document.getElementById('promote-feedback');
+            const currentUser = auth.currentUser;
+
+            if (!email) return;
+
+            try {
+                await db.collection('admins').doc(email).set({
+                    email: email,
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    addedBy: currentUser ? currentUser.email : 'unknown'
+                });
+                feedbackDiv.textContent = `✓ ${email} has been granted admin access.`;
+                feedbackDiv.className = 'mt-3 text-sm p-3 rounded-md bg-green-50 text-green-800';
+                feedbackDiv.classList.remove('hidden');
+                document.getElementById('promote-email').value = '';
+            } catch (error) {
+                feedbackDiv.textContent = `Error: ${error.message}`;
+                feedbackDiv.className = 'mt-3 text-sm p-3 rounded-md bg-red-50 text-red-800';
+                feedbackDiv.classList.remove('hidden');
+            }
+
+            setTimeout(() => feedbackDiv.classList.add('hidden'), 5000);
+        });
+
+        async function revokeAdmin(email) {
+            const currentUser = auth.currentUser;
+            if (currentUser && currentUser.email && currentUser.email.toLowerCase() === email.toLowerCase()) {
+                alert('You cannot revoke your own admin access.');
+                return;
+            }
+            if (!confirm(`Remove admin access for ${email}?`)) return;
+            try {
+                await db.collection('admins').doc(email).delete();
+            } catch (error) {
+                alert(`Failed to revoke access: ${error.message}`);
+            }
         }
 
         // --- Auth Functions ---
