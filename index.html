@@ -85,6 +85,7 @@
 
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
+                    <a href="menu.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Full Menu</a>
                     <a href="#reservation"
                         class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
                     <a href="#my-orders" id="my-orders-link-desktop"
@@ -126,6 +127,8 @@
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#menu"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
+                <a href="menu.html"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Full Menu</a>
                 <a href="#reservation"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
                 <a href="#my-orders" id="my-orders-link-mobile"
@@ -182,14 +185,29 @@
                 </p>
             </div>
 
-            <div class="flex justify-center space-x-2 mb-10 overflow-x-auto pb-4" id="category-filters">
-                <button onclick="filterMenu('all')"
-                    class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
-                <button onclick="filterMenu('mains')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Mains</button>
-                <button onclick="filterMenu('appetizers')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Appetizers
-                    & Soups</button>
+            <div class="flex justify-center flex-wrap gap-2 mb-10 overflow-x-auto pb-4" id="category-filters">
+                <button onclick="filterMenu('all')" data-category="all"
+                    class="category-btn active px-4 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
+                <button onclick="filterMenu('soups')" data-category="soups"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Soups</button>
+                <button onclick="filterMenu('starters')" data-category="starters"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Starters</button>
+                <button onclick="filterMenu('beef-lamb')" data-category="beef-lamb"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Beef &amp; Lamb</button>
+                <button onclick="filterMenu('pork')" data-category="pork"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Pork</button>
+                <button onclick="filterMenu('chicken')" data-category="chicken"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Chicken</button>
+                <button onclick="filterMenu('seafood')" data-category="seafood"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Seafood</button>
+                <button onclick="filterMenu('rice')" data-category="rice"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Rice</button>
+                <button onclick="filterMenu('noodles')" data-category="noodles"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Noodles</button>
+                <button onclick="filterMenu('dumplings')" data-category="dumplings"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Dumplings</button>
+                <button onclick="filterMenu('veg')" data-category="veg"
+                    class="category-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Vegetable</button>
             </div>
 
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
@@ -570,7 +588,7 @@
 
     <script>
         // Initialize Icons
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') lucide.createIcons();
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -584,9 +602,15 @@
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        let auth = null;
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+        } catch (e) {
+            console.warn('Firebase unavailable, running in offline mode:', e);
+        }
 
         // Global variables
         let menuItems = [];
@@ -594,6 +618,7 @@
         let currentUser = null; // NEW: Track the logged-in user
 
         // --- Firebase Auth State Observer ---
+        if (auth) {
         auth.onAuthStateChanged(user => {
             currentUser = user; // Store user for checkout
 
@@ -635,20 +660,99 @@
                 myOrdersLinkMobile.classList.remove('block');
                 myOrdersSection.classList.add('hidden');
             }
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         });
+        } // end if (auth)
+
+        // --- Default Menu Items (shown when Firebase menu is empty) ---
+        const defaultMenuItems = [
+            // Soups
+            { id: 'SP1', name: 'Chicken & Sweet Corn Soup', category: 'soups', price: 40, description: 'A smooth, savoury broth with tender chicken and sweet corn', image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=300&fit=crop&auto=format' },
+            { id: 'SP2', name: 'Hot & Sour Soup', category: 'soups', price: 40, description: 'Traditional Chinese hot and sour broth with tofu and vegetables', image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=300&fit=crop&auto=format' },
+            // Starters
+            { id: 'S1', name: 'Beef Spring Rolls (3 pcs)', category: 'starters', price: 30, description: 'Crispy golden rolls filled with seasoned beef', image: 'https://images.unsplash.com/photo-1606525437394-f0b0df43c5e0?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S2', name: 'Vegetable Spring Rolls (3 pcs)', category: 'starters', price: 25, description: 'Light and crispy rolls packed with fresh vegetables', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S3', name: 'Beef Samosa (5 pcs)', category: 'starters', price: 30, description: 'Golden pastry triangles filled with spiced beef', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S4', name: 'Fish Samosa (5 pcs)', category: 'starters', price: 30, description: 'Crispy pastry triangles with seasoned fish filling', image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S5', name: 'Fried Chicken Pieces (6 pcs)', category: 'starters', price: 65, description: 'Juicy fried chicken bites with a crispy coating', image: 'https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S6', name: 'Special Chicken Wings', category: 'starters', price: 65, description: 'Tender chicken wings marinated in our special sauce', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S7', name: 'Golden Fried Prawns', category: 'starters', price: 90, description: 'Succulent prawns fried to a golden crisp', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=300&fit=crop&auto=format' },
+            { id: 'S8', name: 'Fried Squid in Spicy Salt', category: 'starters', price: 85, description: 'Tender squid rings seasoned with spicy salt', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=400&h=300&fit=crop&auto=format' },
+            // Beef & Lamb
+            { id: 'B1', name: 'Shredded Beef with Green Pepper & Onion', category: 'beef-lamb', price: 110, description: 'Tender shredded beef stir-fried with green pepper and onion', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=400&h=300&fit=crop&auto=format' },
+            { id: 'B3', name: 'Sliced Beef in Curry Sauce', category: 'beef-lamb', price: 110, description: 'Sliced beef simmered in a rich, aromatic curry sauce', image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&fit=crop&auto=format' },
+            { id: 'B4', name: 'Beef in Oyster Sauce', category: 'beef-lamb', price: 110, description: 'Tender beef slices coated in a savoury oyster sauce', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=400&h=300&fit=crop&auto=format' },
+            { id: 'B5', name: 'Crispy Chilli Beef', category: 'beef-lamb', price: 85, description: 'Crispy strips of beef tossed in a sweet chilli glaze', image: 'https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=400&h=300&fit=crop&auto=format' },
+            { id: 'B6', name: 'Mongolian Shallot Lamb', category: 'beef-lamb', price: 115, description: 'Succulent lamb stir-fried with shallots in Mongolian style', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop&auto=format' },
+            { id: 'B7', name: 'Lamb Chops', category: 'beef-lamb', price: 85, description: 'Seasoned lamb chops grilled to perfection', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop&auto=format' },
+            // Pork
+            { id: 'P1', name: 'Sweet & Sour Pork', category: 'pork', price: 90, description: 'Crispy pork pieces in a tangy sweet and sour sauce', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop&auto=format' },
+            { id: 'P2', name: 'Pork Sichuan Style', category: 'pork', price: 90, description: 'Sliced pork in a bold, numbing Sichuan sauce', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&h=300&fit=crop&auto=format' },
+            { id: 'P3', name: 'Pork in Chilli Sauce', category: 'pork', price: 90, description: 'Tender pork coated in a fiery chilli sauce', image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop&auto=format' },
+            { id: 'P4', name: 'Pork in Oyster Sauce', category: 'pork', price: 90, description: 'Succulent pork slices glazed in umami oyster sauce', image: 'https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=400&h=300&fit=crop&auto=format' },
+            { id: 'P5', name: 'Fried Pork Ribs', category: 'pork', price: 75, description: 'Crispy fried pork ribs with a savoury coating', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop&auto=format' },
+            // Chicken
+            { id: 'K1', name: 'Sweet & Sour Chicken', category: 'chicken', price: 100, description: 'Tender chicken in a classic sweet and sour sauce', image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=300&fit=crop&auto=format' },
+            { id: 'K2', name: 'Chicken Sichuan Sauce', category: 'chicken', price: 100, description: 'Chicken stir-fried in a spicy Sichuan sauce', image: 'https://images.unsplash.com/photo-1604908176997-7f81f85f7c8e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'K3', name: 'Chicken in Curry Sauce', category: 'chicken', price: 100, description: 'Juicy chicken pieces simmered in aromatic curry sauce', image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=300&fit=crop&auto=format' },
+            { id: 'K4', name: 'Chicken in Oyster Sauce', category: 'chicken', price: 100, description: 'Tender chicken glazed in a rich oyster sauce', image: 'https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=400&h=300&fit=crop&auto=format' },
+            // Seafood
+            { id: 'Q1', name: 'Squid in Luban Chilli Sauce', category: 'seafood', price: 120, description: 'Tender squid in our signature Luban chilli sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=400&h=300&fit=crop&auto=format' },
+            { id: 'Q2', name: 'Squid in Sichuan Sauce', category: 'seafood', price: 120, description: 'Squid pieces tossed in a bold Sichuan sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=400&h=300&fit=crop&auto=format' },
+            { id: 'Q3', name: 'Squid in Garlic Sauce', category: 'seafood', price: 120, description: 'Succulent squid cooked in a fragrant garlic sauce', image: 'https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=400&h=300&fit=crop&auto=format' },
+            { id: 'F1', name: 'Fish Fillet in Chilli Sauce', category: 'seafood', price: 115, description: 'Fresh fish fillet bathed in a spicy chilli sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=400&h=300&fit=crop&auto=format' },
+            { id: 'F2', name: 'Fish Fillet in Vegetable Sauce', category: 'seafood', price: 115, description: 'Delicate fish fillet served in a light vegetable sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=400&h=300&fit=crop&auto=format' },
+            { id: 'F3', name: 'Fish Fillet in Sichuan Sauce', category: 'seafood', price: 115, description: 'Fish fillet slow-cooked in a numbing Sichuan sauce', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=400&h=300&fit=crop&auto=format' },
+            { id: 'F4', name: 'Sweet & Sour Fish Fillet', category: 'seafood', price: 115, description: 'Crispy fish fillet in a sweet and sour glaze', image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=400&h=300&fit=crop&auto=format' },
+            { id: 'PR1', name: 'Prawns in Chilli Sauce', category: 'seafood', price: 155, description: 'Juicy prawns tossed in a fiery chilli sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=300&fit=crop&auto=format' },
+            { id: 'PR2', name: 'Prawns in Curry Sauce', category: 'seafood', price: 155, description: 'Succulent prawns in a rich, aromatic curry sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=300&fit=crop&auto=format' },
+            { id: 'PR3', name: 'Prawns in Sichuan Sauce', category: 'seafood', price: 155, description: 'Plump prawns bathed in a bold Sichuan sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=300&fit=crop&auto=format' },
+            { id: 'SF1', name: 'Special Seafood in Sichuan Sauce', category: 'seafood', price: 170, description: 'Chef\'s selection of seafood in a signature Sichuan sauce', image: 'https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=300&fit=crop&auto=format' },
+            // Rice
+            { id: 'R1', name: 'Steamed Rice', category: 'rice', price: 29, description: 'Fluffy steamed white rice', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R2', name: 'Special Jollof Rice', category: 'rice', price: 50, description: 'Our special take on the classic West African jollof rice', image: 'https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R3', name: 'Combo Fried Rice', category: 'rice', price: 50, description: 'Wok-fried rice with a combination of meats and vegetables', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R4', name: 'Shrimp Fried Rice', category: 'rice', price: 50, description: 'Fragrant fried rice loaded with juicy shrimp', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'RS', name: 'Egg Fried Rice', category: 'rice', price: 40, description: 'Classic fried rice tossed with eggs', image: 'https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R6', name: 'Beef Fried Rice', category: 'rice', price: 45, description: 'Fried rice with tender slices of beef', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R7', name: 'Chicken Fried Rice', category: 'rice', price: 45, description: 'Wok-fried rice with seasoned chicken pieces', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R8', name: 'Seafood Fried Rice', category: 'rice', price: 85, description: 'Fried rice packed with mixed seafood', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'R9', name: 'Pork Fried Rice', category: 'rice', price: 45, description: 'Fragrant fried rice with tender pork pieces', image: 'https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=300&fit=crop&auto=format' },
+            // Noodles
+            { id: 'N1', name: 'Vegetable Noodles', category: 'noodles', price: 45, description: 'Wok-tossed noodles with fresh garden vegetables', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'N2', name: 'Special Noodles', category: 'noodles', price: 80, description: 'Our signature noodle dish with a special blend of flavours', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'N4', name: 'Singapore Noodles', category: 'noodles', price: 80, description: 'Stir-fried rice vermicelli with curry, vegetables and egg', image: 'https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=400&h=300&fit=crop&auto=format' },
+            { id: 'N5', name: 'Seafood Noodles', category: 'noodles', price: 100, description: 'Noodles tossed with a medley of fresh seafood', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop&auto=format' },
+            { id: 'N6', name: 'Chicken Noodles', category: 'noodles', price: 60, description: 'Stir-fried noodles with succulent chicken pieces', image: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop&auto=format' },
+            // Dumplings
+            { id: 'D1', name: 'Steamed Pork Dumpling', category: 'dumplings', price: 30, description: 'Handcrafted steamed dumplings with seasoned pork filling', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=300&fit=crop&auto=format' },
+            { id: 'D2', name: 'Fried Pork Dumpling', category: 'dumplings', price: 30, description: 'Pan-fried dumplings with a crispy bottom and juicy pork filling', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=300&fit=crop&auto=format' },
+            { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30, description: 'Delicate steamed dumplings filled with seasoned beef', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=300&fit=crop&auto=format' },
+            { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30, description: 'Crispy pan-fried dumplings with a savoury beef filling', image: 'https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=300&fit=crop&auto=format' },
+            // Vegetable
+            { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40, description: 'Fresh seasonal vegetables stir-fried in a light sauce', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop&auto=format' },
+        ];
 
         // --- Fetch Menu ---
         async function fetchMenu() {
             try {
+                if (!db) {
+                    menuItems = defaultMenuItems;
+                    renderMenu();
+                    return;
+                }
                 const snapshot = await db.collection('menuItems').orderBy('name').get();
                 menuItems = [];
                 snapshot.forEach(doc => {
                     menuItems.push({ ...doc.data(), id: doc.id });
                 });
+                if (menuItems.length === 0) {
+                    menuItems = defaultMenuItems;
+                }
                 renderMenu();
             } catch (error) {
                 console.error('Error fetching menu:', error);
+                menuItems = defaultMenuItems;
                 renderMenu();
             }
         }
@@ -657,7 +761,7 @@
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             modal.classList.toggle('hidden');
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function switchAuthTab(tab) {
@@ -796,13 +900,13 @@
                 </div>`;
                 container.appendChild(card);
             });
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function filterMenu(category) {
             document.querySelectorAll('.category-btn').forEach(btn => {
-                const btnText = btn.textContent.toLowerCase();
-                if ((category === 'all' && btnText === 'all') || btnText.includes(category)) {
+                const btnCategory = btn.getAttribute('data-category');
+                if (btnCategory === category) {
                     btn.classList.remove('bg-stone-100', 'text-stone-600');
                     btn.classList.add('bg-stone-900', 'text-white');
                 } else {
@@ -894,7 +998,7 @@
                 });
                 totalEl.innerText = '₵' + subtotal.toFixed(2);
             }
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function toggleCart() {
@@ -1034,7 +1138,7 @@
                         ordersContainer.innerHTML += orderCard;
                     });
                     
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 });
         }
 
