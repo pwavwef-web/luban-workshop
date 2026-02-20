@@ -27,6 +27,15 @@ service cloud.firestore {
       // Only authenticated admin can write (create, update, delete) to menuItems
       allow write: if isAdmin();
     }
+
+    // settings collection rules (dish availability)
+    match /settings/{doc} {
+      // Anyone can read settings (e.g. menuAvailability)
+      allow read: if true;
+      
+      // Only admins can write settings
+      allow write: if isAdmin();
+    }
     
     // reservations collection rules
     match /reservations/{reservation} {
