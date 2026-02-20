@@ -646,6 +646,49 @@
 
     <!-- ──────────────────── SCRIPTS ──────────────────── -->
 
+    <!-- Firebase (dish availability) – Firebase client config is intentionally public (project identifier only) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        (function () {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+                authDomain: "luban-workshop-restaurant.firebaseapp.com",
+                projectId: "luban-workshop-restaurant",
+                storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+                messagingSenderId: "360623290287",
+                appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+            };
+            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+            const db = firebase.firestore();
+
+            function applyAvailability(hiddenIds) {
+                // Card-based dishes: badge span contains the dish code
+                document.querySelectorAll('.menu-card').forEach(function (card) {
+                    var badge = card.querySelector('span.bg-red-100');
+                    if (badge) {
+                        card.style.display = hiddenIds.has(badge.textContent.trim()) ? 'none' : '';
+                    }
+                });
+                // Table-row-based dishes: first <td> contains the dish code
+                document.querySelectorAll('section table tbody tr').forEach(function (row) {
+                    var codeCell = row.querySelector('td:first-child');
+                    if (codeCell) {
+                        row.style.display = hiddenIds.has(codeCell.textContent.trim()) ? 'none' : '';
+                    }
+                });
+            }
+
+            db.collection('dishAvailability').onSnapshot(function (snapshot) {
+                var hiddenIds = new Set();
+                snapshot.forEach(function (doc) {
+                    if (doc.data().hidden === true) { hiddenIds.add(doc.id); }
+                });
+                applyAvailability(hiddenIds);
+            });
+        })();
+    </script>
+
     <script>
         // ── Footer year ──
         document.getElementById('footer-year').textContent = new Date().getFullYear();

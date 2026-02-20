@@ -237,6 +237,24 @@
             </div>
 
         </main>
+
+        <!-- Order Detail Modal -->
+        <div id="order-detail-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
+                <div class="flex items-center justify-between p-5 border-b border-stone-100">
+                    <h3 class="serif text-lg font-bold text-stone-900">Order <span id="modal-order-id" class="font-mono text-stone-500 text-base"></span></h3>
+                    <button onclick="closeOrderModal()" class="text-stone-400 hover:text-stone-600 p-1 rounded hover:bg-stone-100 transition-colors">
+                        <i data-lucide="x" class="h-5 w-5"></i>
+                    </button>
+                </div>
+                <div id="modal-order-items" class="px-5 py-3 overflow-y-auto divide-y divide-stone-100 flex-1"></div>
+                <div class="flex items-center justify-between px-5 py-4 border-t border-stone-100 bg-stone-50 rounded-b-xl">
+                    <span class="text-sm font-semibold text-stone-600">Total</span>
+                    <span id="modal-order-total" class="text-lg font-bold text-stone-900"></span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -339,6 +357,9 @@
             activeBtn.classList.add('bg-red-50', 'text-red-700');
             activeBtn.classList.remove('text-stone-600');
         }
+
+        // --- Orders cache (used by the order detail modal) ---
+        const ordersCache = {};
 
         // --- Hardcoded Menu ---
         const HARDCODED_MENU = [
@@ -544,6 +565,7 @@
                 snapshot.forEach(doc => {
                     const order = doc.data();
                     const id = doc.id;
+                    ordersCache[id] = order;
                     
                     // Count 'pending' for Red Dot
                     if (order.status === 'pending' || !order.status) pendingCount++;
@@ -580,8 +602,15 @@
                     const row = `
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-500">#${id.slice(-6).toUpperCase()}</td>
-                            <td class="px-6 py-4 text-sm text-stone-900 max-w-xs truncate" title="${itemsSummary}">${itemsSummary}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">$${(order.total || 0).toFixed(2)}</td>
+                            <td class="px-6 py-4 text-sm text-stone-900 max-w-xs">
+                                <div class="flex items-center gap-1 min-w-0">
+                                    <span class="truncate flex-1">${itemsSummary}</span>
+                                    <button onclick="openOrderModal('${id}')" class="flex-shrink-0 text-stone-300 hover:text-red-600 transition-colors ml-1" title="View full order">
+                                        <i data-lucide="eye" class="h-3.5 w-3.5"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">₵${(order.total || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
                             </td>
@@ -617,6 +646,34 @@
                 alert("Could not update order.");
             }
         }
+
+        function openOrderModal(id) {
+            const order = ordersCache[id];
+            if (!order) return;
+            document.getElementById('modal-order-id').textContent = '#' + id.slice(-6).toUpperCase();
+            const container = document.getElementById('modal-order-items');
+            const items = order.items || [];
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-stone-400 italic text-sm">No items recorded.</p>';
+            } else {
+                container.innerHTML = items.map(function (item) {
+                    return '<div class="flex items-center py-2.5">' +
+                        '<span class="h-6 w-6 flex-shrink-0 flex items-center justify-center bg-red-100 text-red-700 text-xs font-bold rounded-full mr-3">' + item.quantity + '</span>' +
+                        '<span class="text-stone-800 text-sm">' + item.name + '</span>' +
+                        '</div>';
+                }).join('');
+            }
+            document.getElementById('modal-order-total').textContent = '₵' + (order.total || 0).toFixed(2);
+            document.getElementById('order-detail-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-detail-modal').classList.add('hidden');
+        }
+        document.getElementById('order-detail-modal').addEventListener('click', function (e) {
+            if (e.target === this) { closeOrderModal(); }
+        });
 
         // --- Auth Functions ---
         document.getElementById('login-form').addEventListener('submit', async (e) => {
