@@ -17,6 +17,17 @@ Both files implement the following security policies:
   - Production version: Requires admin custom claim
   - Development version: Accepts either admin custom claim OR admin@luban.com email
 
+### dishAvailability Collection
+- **Read Access**: Anyone (authenticated or not) can read dish visibility status (needed by the main site to filter hidden dishes)
+- **Write Access**: Only authenticated admin users can toggle dish visibility
+  - Production version: Requires admin custom claim
+  - Development version: Accepts either admin custom claim OR admin@luban.com email
+
+### orders Collection
+- **Read Access**: Admins can read all orders; authenticated customers can read their own orders
+- **Create Access**: Any authenticated user can place an order
+- **Update/Delete Access**: Admins can update or delete any order; authenticated customers can update (cancel) their own orders
+
 ### reservations Collection
 - **Read Access**: Only admin users can read reservations
   - Production version: Requires admin custom claim
