@@ -17,12 +17,22 @@ Both files implement the following security policies:
   - Production version: Requires admin custom claim
   - Development version: Accepts either admin custom claim OR admin@luban.com email
 
+### dishAvailability Collection
+- **Read Access**: Anyone (authenticated or not) can read dish availability (used to filter hidden dishes on the main site and in the admin portal)
+- **Write Access**: Only authenticated admin users can toggle dish visibility
+
 ### reservations Collection
 - **Read Access**: Only admin users can read reservations
   - Production version: Requires admin custom claim
   - Development version: Accepts either admin custom claim OR admin@luban.com email
 - **Create Access**: Any authenticated user can create reservations (book a table)
 - **Update/Delete Access**: Only admin users can update or delete reservations
+
+### orders Collection
+- **Read Access**: Admins can read all orders; authenticated users can read their own orders
+- **Create Access**: Any authenticated user can create an order
+- **Update Access**: Admins can update any order; authenticated users can update (cancel) their own orders
+- **Delete Access**: Only admins can delete orders
 
 ## How to Deploy to Firebase Console
 
@@ -124,6 +134,16 @@ This is the more secure approach that prevents spoofing:
 - Try to add/edit/delete menu items
 - Operations should succeed
 
+### Test dishAvailability Read (Should Pass for Anyone)
+- Open the admin portal or main website without logging in
+- Dish visibility data should be readable by all users
+
+### Test dishAvailability Write (Should Pass for Admin Only)
+- Log in with `admin@luban.com`
+- Navigate to the admin dashboard → Menu Manager
+- Toggle dish visibility - operations should succeed
+- Try with a non-admin account - should fail
+
 ### Test reservations Write (Should Pass for Authenticated Users)
 - Log in with any authenticated user
 - Try to create a reservation
@@ -134,6 +154,19 @@ This is the more secure approach that prevents spoofing:
 - Navigate to the admin dashboard
 - Reservations should be visible
 - Try with a non-admin account - should fail
+
+### Test orders Create (Should Pass for Authenticated Users)
+- Log in with any authenticated user
+- Place an order through the website
+- Operation should succeed
+
+### Test orders Read (Should Pass for Admin and Order Owner)
+- Log in with `admin@luban.com` - all orders should be visible in admin portal
+- Log in as a customer - only that customer's own orders should be visible
+
+### Test orders Update (Should Pass for Admin and Order Owner)
+- Admin should be able to update order status (complete/cancel)
+- Customer should be able to cancel their own pending orders
 
 ## Security Notes
 

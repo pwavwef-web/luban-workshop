@@ -50,14 +50,29 @@ Both files implement these exact requirements:
 2. ✅ **Only admins can write to menuItems**
    - Only the admin user can add, edit, or delete menu items
 
-3. ✅ **Authenticated users can create reservations**
+3. ✅ **Anyone can read the dishAvailability collection**
+   - No login required; the main site filters hidden dishes from this collection
+
+4. ✅ **Only admins can write to dishAvailability**
+   - Only the admin user can toggle dish visibility
+
+5. ✅ **Authenticated users can create reservations**
    - Any logged-in user can book a table
 
-4. ✅ **Only admins can read reservations**
+6. ✅ **Only admins can read reservations**
    - Only the admin user can view all reservations
 
-5. ✅ **Only admins can update/delete reservations**
+7. ✅ **Only admins can update/delete reservations**
    - Only the admin user can modify or cancel reservations
+
+8. ✅ **Authenticated users can create orders**
+   - Any logged-in user can place an order
+
+9. ✅ **Users can read and update their own orders**
+   - Customers can view their order history and cancel pending orders (within 5 minutes)
+
+10. ✅ **Only admins can read all orders and delete orders**
+    - The admin dashboard shows all incoming orders
 
 ---
 
