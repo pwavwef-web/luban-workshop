@@ -138,10 +138,7 @@
             <div id="view-menu" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
-                    <button onclick="showAddDishModal()"
-                        class="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-medium shadow-sm flex items-center text-sm sm:text-base">
-                        <i data-lucide="plus" class="h-4 w-4 mr-2"></i> Add Dish
-                    </button>
+                    <p class="text-sm text-stone-500">Toggle dish visibility on the main website.</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
@@ -156,6 +153,9 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">
                                     Price</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">
+                                    Status</th>
                                 <th
                                     class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">
                                     Actions</th>
@@ -237,65 +237,6 @@
             </div>
 
         </main>
-    </div>
-
-    <div id="dish-modal"
-        class="hidden fixed inset-0 bg-stone-900 bg-opacity-75 flex items-center justify-center px-4 z-50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="modal-title" class="serif text-xl font-bold text-stone-900">Add Dish</h3>
-                <button onclick="closeDishModal()" class="text-stone-400 hover:text-stone-600"><i data-lucide="x"
-                        class="h-6 w-6"></i></button>
-            </div>
-            <form id="dish-form" class="space-y-4">
-                <input type="hidden" id="dish-id">
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Dish Name</label>
-                    <input type="text" id="dish-name" required
-                        class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Category</label>
-                        <select id="dish-category" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:outline-none">
-                            <option value="soups">Soups</option>
-                            <option value="starters">Starters</option>
-                            <option value="beef-lamb">Beef &amp; Lamb</option>
-                            <option value="pork">Pork</option>
-                            <option value="chicken">Chicken</option>
-                            <option value="seafood">Seafood</option>
-                            <option value="rice">Rice</option>
-                            <option value="noodles">Noodles</option>
-                            <option value="dumplings">Dumplings</option>
-                            <option value="veg">Vegetable</option>
-                            <option value="mains">Mains</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-stone-700 mb-1">Price ($)</label>
-                        <input type="number" id="dish-price" step="0.01" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Description</label>
-                    <textarea id="dish-description" rows="3" required
-                        class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
-                    <input type="url" id="dish-image"
-                        class="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:outline-none">
-                </div>
-                <div class="flex justify-end space-x-3 pt-4 border-t border-stone-100 mt-2">
-                    <button type="button" onclick="closeDishModal()"
-                        class="px-4 py-2 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 shadow-sm">Save Dish</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <script>
@@ -399,25 +340,95 @@
             activeBtn.classList.remove('text-stone-600');
         }
 
+        // --- Hardcoded Menu ---
+        const HARDCODED_MENU = [
+            { id: 'SP1', name: 'Chicken & Sweet Corn Soup', category: 'soups', price: 40 },
+            { id: 'SP2', name: 'Hot & Sour Soup', category: 'soups', price: 40 },
+            { id: 'S1', name: 'Beef Spring Rolls (3 pcs)', category: 'starters', price: 30 },
+            { id: 'S2', name: 'Vegetable Spring Rolls (3 pcs)', category: 'starters', price: 25 },
+            { id: 'S3', name: 'Beef Samosa (5 pcs)', category: 'starters', price: 30 },
+            { id: 'S4', name: 'Fish Samosa (5 pcs)', category: 'starters', price: 30 },
+            { id: 'S5', name: 'Fried Chicken Pieces (6 pcs)', category: 'starters', price: 65 },
+            { id: 'S6', name: 'Special Chicken Wings', category: 'starters', price: 65 },
+            { id: 'S7', name: 'Golden Fried Prawns', category: 'starters', price: 90 },
+            { id: 'S8', name: 'Fried Squid in Spicy Salt', category: 'starters', price: 85 },
+            { id: 'B1', name: 'Shredded Beef with Green Pepper & Onion', category: 'beef-lamb', price: 110 },
+            { id: 'B2', name: 'Beef in Sichuan Sauce', category: 'beef-lamb', price: 110 },
+            { id: 'B3', name: 'Sliced Beef in Curry Sauce', category: 'beef-lamb', price: 110 },
+            { id: 'B4', name: 'Beef in Oyster Sauce', category: 'beef-lamb', price: 110 },
+            { id: 'B5', name: 'Crispy Chilli Beef', category: 'beef-lamb', price: 85 },
+            { id: 'B6', name: 'Mongolian Shallot Lamb', category: 'beef-lamb', price: 115 },
+            { id: 'B7', name: 'Lamb Chops', category: 'beef-lamb', price: 85 },
+            { id: 'P1', name: 'Sweet & Sour Pork', category: 'pork', price: 90 },
+            { id: 'P2', name: 'Pork Sichuan Style', category: 'pork', price: 90 },
+            { id: 'P3', name: 'Pork in Chilli Sauce', category: 'pork', price: 90 },
+            { id: 'P4', name: 'Pork in Oyster Sauce', category: 'pork', price: 90 },
+            { id: 'P5', name: 'Fried Pork Ribs', category: 'pork', price: 75 },
+            { id: 'K1', name: 'Sweet & Sour Chicken', category: 'chicken', price: 100 },
+            { id: 'K2', name: 'Chicken Sichuan Sauce', category: 'chicken', price: 100 },
+            { id: 'K3', name: 'Chicken in Curry Sauce', category: 'chicken', price: 100 },
+            { id: 'K4', name: 'Chicken in Oyster Sauce', category: 'chicken', price: 100 },
+            { id: 'Q1', name: 'Squid in Luban Chilli Sauce', category: 'seafood', price: 120 },
+            { id: 'Q2', name: 'Squid in Sichuan Sauce', category: 'seafood', price: 120 },
+            { id: 'Q3', name: 'Squid in Garlic Sauce', category: 'seafood', price: 120 },
+            { id: 'F1', name: 'Fish Fillet in Chilli Sauce', category: 'seafood', price: 115 },
+            { id: 'F2', name: 'Fish Fillet in Vegetable Sauce', category: 'seafood', price: 115 },
+            { id: 'F3', name: 'Fish Fillet in Sichuan Sauce', category: 'seafood', price: 115 },
+            { id: 'F4', name: 'Sweet & Sour Fish Fillet', category: 'seafood', price: 115 },
+            { id: 'PR1', name: 'Prawns in Chilli Sauce', category: 'seafood', price: 155 },
+            { id: 'PR2', name: 'Prawns in Curry Sauce', category: 'seafood', price: 155 },
+            { id: 'PR3', name: 'Prawns in Sichuan Sauce', category: 'seafood', price: 155 },
+            { id: 'SF1', name: 'Special Seafood in Sichuan Sauce', category: 'seafood', price: 170 },
+            { id: 'R1', name: 'Steamed Rice', category: 'rice', price: 29 },
+            { id: 'R2', name: 'Special Jollof Rice', category: 'rice', price: 50 },
+            { id: 'R3', name: 'Combo Fried Rice', category: 'rice', price: 50 },
+            { id: 'R4', name: 'Shrimp Fried Rice', category: 'rice', price: 50 },
+            { id: 'RS', name: 'Egg Fried Rice', category: 'rice', price: 40 },
+            { id: 'R6', name: 'Beef Fried Rice', category: 'rice', price: 45 },
+            { id: 'R7', name: 'Chicken Fried Rice', category: 'rice', price: 45 },
+            { id: 'R8', name: 'Seafood Fried Rice', category: 'rice', price: 85 },
+            { id: 'R9', name: 'Pork Fried Rice', category: 'rice', price: 45 },
+            { id: 'N1', name: 'Vegetable Noodles', category: 'noodles', price: 45 },
+            { id: 'N2', name: 'Special Noodles', category: 'noodles', price: 80 },
+            { id: 'N4', name: 'Singapore Noodles', category: 'noodles', price: 80 },
+            { id: 'N5', name: 'Seafood Noodles', category: 'noodles', price: 100 },
+            { id: 'N6', name: 'Chicken Noodles', category: 'noodles', price: 60 },
+            { id: 'D1', name: 'Steamed Pork Dumpling', category: 'dumplings', price: 30 },
+            { id: 'D2', name: 'Fried Pork Dumpling', category: 'dumplings', price: 30 },
+            { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30 },
+            { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30 },
+            { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40 },
+        ];
+
         // --- Real-time Listeners (Red Dot Logic) ---
 
         function listenToMenu() {
-            db.collection('menuItems').orderBy('name').onSnapshot(snapshot => {
+            db.collection('dishAvailability').onSnapshot(snapshot => {
+                const hiddenIds = new Set();
+                snapshot.forEach(doc => {
+                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                });
+
                 const tableBody = document.getElementById('menu-items-table');
                 tableBody.innerHTML = '';
 
-                snapshot.forEach(doc => {
-                    const dish = doc.data();
+                HARDCODED_MENU.forEach(dish => {
+                    const isHidden = hiddenIds.has(dish.id);
+                    const statusBadge = isHidden
+                        ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
+                        : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
+                    const toggleIcon = isHidden ? 'eye' : 'eye-off';
+                    const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
                     const row = `
-                        <tr class="hover:bg-stone-50 transition-colors">
+                        <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">$${dish.price}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">₵${dish.price}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="editDish('${doc.id}')" class="text-stone-400 hover:text-red-700 mr-3 transition-colors"><i data-lucide="edit" class="h-4 w-4"></i></button>
-                                <button onclick="deleteDish('${doc.id}')" class="text-stone-400 hover:text-red-700 transition-colors"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
+                                <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
                             </td>
                         </tr>
                     `;
@@ -425,6 +436,15 @@
                 });
                 lucide.createIcons();
             });
+        }
+
+        async function toggleDishVisibility(id, currentlyHidden) {
+            try {
+                await db.collection('dishAvailability').doc(id).set({ hidden: !currentlyHidden });
+            } catch (error) {
+                console.error('Error toggling dish visibility:', error);
+                alert('Failed to update dish visibility. Please try again.');
+            }
         }
 
         function listenToReservations() {
@@ -614,50 +634,6 @@
         });
 
         function logout() { auth.signOut(); }
-
-        // --- Dish CRUD Functions (Same as before) ---
-        function showAddDishModal() {
-            document.getElementById('modal-title').textContent = 'Add Dish';
-            document.getElementById('dish-form').reset();
-            document.getElementById('dish-id').value = '';
-            document.getElementById('dish-modal').classList.remove('hidden');
-        }
-        function closeDishModal() { document.getElementById('dish-modal').classList.add('hidden'); }
-
-        async function editDish(id) {
-            const doc = await db.collection('menuItems').doc(id).get();
-            if (doc.exists) {
-                const d = doc.data();
-                document.getElementById('dish-id').value = id;
-                document.getElementById('dish-name').value = d.name;
-                document.getElementById('dish-category').value = d.category;
-                document.getElementById('dish-price').value = d.price;
-                document.getElementById('dish-description').value = d.description;
-                document.getElementById('dish-image').value = d.image || '';
-                document.getElementById('modal-title').textContent = 'Edit Dish';
-                document.getElementById('dish-modal').classList.remove('hidden');
-            }
-        }
-
-        async function deleteDish(id) {
-            if (confirm('Delete this dish?')) await db.collection('menuItems').doc(id).delete();
-        }
-
-        document.getElementById('dish-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('dish-id').value;
-            const data = {
-                name: document.getElementById('dish-name').value,
-                category: document.getElementById('dish-category').value,
-                price: parseFloat(document.getElementById('dish-price').value),
-                description: document.getElementById('dish-description').value,
-                image: document.getElementById('dish-image').value
-            };
-
-            if (id) await db.collection('menuItems').doc(id).update(data);
-            else await db.collection('menuItems').add(data);
-            closeDishModal();
-        });
 
     </script>
 </body>
