@@ -7,7 +7,9 @@ service cloud.firestore {
     // This is the SECURE production approach
     // Set custom claim: admin.auth().setCustomUserClaims(uid, { admin: true })
     function isAdmin() {
-      return request.auth != null && request.auth.token.admin == true;
+      return request.auth != null && 
+             (request.auth.token.admin == true ||
+              exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
     }
     
     // Helper function to check if user is authenticated
@@ -55,6 +57,15 @@ service cloud.firestore {
       
       // Only admins can update or delete reservations
       allow update, delete: if isAdmin();
+    }
+
+    // admins collection – stores email addresses of promoted admin users
+    match /admins/{email} {
+      // Any authenticated user can read (needed for self-check and rule evaluation)
+      allow read: if isAuthenticated();
+      
+      // Only existing admins can add or remove admin emails
+      allow write: if isAdmin();
     }
   }
 }
