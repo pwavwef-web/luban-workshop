@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu – Luban Workshop Restaurant</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body { font-family: 'Lato', sans-serif; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        .category-tab.active {
+            background-color: #b45309;
+            color: #fff;
+        }
+        .category-tab:hover {
+            background-color: #92400e;
+            color: #fff;
+        }
+        .category-section { display: none; }
+        .category-section.active { display: block; }
+
+        .menu-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        /* QR code container */
+        #qr-canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; }
+            .category-section { display: block !important; }
+        }
+    </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+    <!-- ──────────────────── NAV ──────────────────── -->
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2">
+                    <img src="https://github.com/user-attachments/assets/987f7821-9080-4715-8d6d-feeec2c8a615" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-cover border border-amber-200">
+                    <span class="serif text-xl font-bold text-amber-800">Luban Workshop</span>
+                </a>
+                <div class="flex gap-4 items-center">
+                    <a href="index.html" class="text-stone-600 hover:text-amber-700 text-sm font-medium transition">Home</a>
+                    <a href="menu.html" class="text-amber-700 font-semibold text-sm border-b-2 border-amber-600">Menu</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ──────────────────── HERO ──────────────────── -->
+    <header class="pt-16 bg-gradient-to-br from-amber-900 via-amber-800 to-stone-800 text-white">
+        <div class="max-w-6xl mx-auto px-4 py-16 text-center">
+            <img src="https://github.com/user-attachments/assets/987f7821-9080-4715-8d6d-feeec2c8a615"
+                 alt="Luban Workshop Restaurant Logo"
+                 class="mx-auto mb-6 h-28 w-28 rounded-full object-cover border-4 border-amber-300 shadow-2xl">
+            <p class="uppercase tracking-widest text-amber-300 text-sm mb-2">Authentic Chinese Cuisine</p>
+            <h1 class="serif text-5xl font-bold mb-4">Our Menu</h1>
+            <p class="text-amber-100 text-lg max-w-xl mx-auto">
+                Scan the QR code at your table or browse below to explore our full menu and place your order.
+            </p>
+        </div>
+    </header>
+
+    <!-- ──────────────────── QR CODE SECTION ──────────────────── -->
+    <section class="bg-white border-b border-stone-200 py-12 no-print">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <h2 class="serif text-3xl font-bold text-stone-800 mb-2">Scan &amp; Order</h2>
+            <p class="text-stone-500 mb-8">Scan this QR code to access our digital menu on your phone</p>
+            <div class="inline-block bg-white p-4 rounded-2xl shadow-xl border border-stone-100">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+            <p class="mt-4 text-sm text-stone-400">Point your camera at the code to open the menu</p>
+        </div>
+    </section>
+
+    <!-- ──────────────────── CATEGORY TABS ──────────────────── -->
+    <div class="sticky top-16 z-40 bg-white shadow-sm border-b border-stone-200 no-print">
+        <div class="max-w-6xl mx-auto px-4 overflow-x-auto">
+            <div class="flex gap-1 py-3 min-w-max" id="category-tabs">
+                <button class="category-tab active px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-amber-900 bg-amber-100 border border-amber-200" data-target="soups">Soups</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="starters">Starters</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="beef-lamb">Beef &amp; Lamb</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="pork">Pork</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="chicken">Chicken</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="seafood">Seafood</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="rice">Rice</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="noodles">Noodles</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="dumplings">Dumplings</button>
+                <button class="category-tab px-3 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 text-stone-700 hover:bg-amber-700 hover:text-white border border-stone-200" data-target="veg">Vegetable</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ──────────────────── MENU SECTIONS ──────────────────── -->
+    <main class="max-w-6xl mx-auto px-4 py-10">
+
+        <!-- ─── SOUPS ─── -->
+        <section id="soups" class="category-section active">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Soups</h2>
+            <p class="text-stone-400 mb-6 text-sm">Warming broths to start your meal</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=180&fit=crop&auto=format" alt="Chicken and Sweet Corn Soup" loading="lazy">
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">SP1</span>
+                        </div>
+                        <h3 class="serif font-bold text-lg text-stone-800">Chicken &amp; Sweet Corn Soup</h3>
+                        <p class="text-stone-400 text-sm mt-1">A smooth, savoury broth with tender chicken and sweet corn</p>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C40</p>
+                    </div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=180&fit=crop&auto=format" alt="Hot and Sour Soup" loading="lazy">
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">SP2</span>
+                        </div>
+                        <h3 class="serif font-bold text-lg text-stone-800">Hot &amp; Sour Soup</h3>
+                        <p class="text-stone-400 text-sm mt-1">Traditional Chinese hot and sour broth with tofu and vegetables</p>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C40</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── STARTERS ─── -->
+        <section id="starters" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Starters</h2>
+            <p class="text-stone-400 mb-6 text-sm">Perfect bites to kick off your experience</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1606525437394-f0b0df43c5e0?w=400&h=180&fit=crop&auto=format" alt="Beef Spring Rolls" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Beef Spring Rolls <span class="text-stone-400 text-sm font-normal">(3 pcs)</span></h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=180&fit=crop&auto=format" alt="Vegetable Spring Rolls" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S2</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Vegetable Spring Rolls <span class="text-stone-400 text-sm font-normal">(3 pcs)</span></h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C25</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=180&fit=crop&auto=format" alt="Beef Samosa" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S3</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Beef Samosa <span class="text-stone-400 text-sm font-normal">(5 pcs)</span></h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=180&fit=crop&auto=format" alt="Fish Samosa" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S4</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Fish Samosa <span class="text-stone-400 text-sm font-normal">(5 pcs)</span></h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=400&h=180&fit=crop&auto=format" alt="Fried Chicken Pieces" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S5</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Fried Chicken Pieces <span class="text-stone-400 text-sm font-normal">(6 pcs)</span></h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C65</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&h=180&fit=crop&auto=format" alt="Special Chicken Wings" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S6</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Special Chicken Wings</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C65</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=400&h=180&fit=crop&auto=format" alt="Golden Fried Prawns" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S7</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Golden Fried Prawns</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=400&h=180&fit=crop&auto=format" alt="Fried Squid in Spicy Salt" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">S8</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Fried Squid in Spicy Salt</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C85</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─── BEEF & LAMB ─── -->
+        <section id="beef-lamb" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Beef &amp; Lamb</h2>
+            <p class="text-stone-400 mb-6 text-sm">Tender cuts with bold, authentic sauces</p>
+            <div class="overflow-x-auto rounded-2xl shadow-md">
+                <table class="w-full bg-white text-sm">
+                    <thead class="bg-amber-800 text-white">
+                        <tr>
+                            <th class="text-left px-4 py-3 w-16">Code</th>
+                            <th class="text-left px-4 py-3">Dish</th>
+                            <th class="text-right px-4 py-3 w-24">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B1</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=80&h=60&fit=crop&auto=format" alt="Beef with green pepper" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Shredded Beef Sauce with Green Pepper &amp; Onion</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C110</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B2</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=80&h=60&fit=crop&auto=format" alt="Beef in Sichuan Sauce" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Beef in Sichuan Sauce</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">Ask staff</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B3</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=80&h=60&fit=crop&auto=format" alt="Beef in Curry Sauce" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Sliced Beef in Curry Sauce</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C110</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B4</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=80&h=60&fit=crop&auto=format" alt="Beef in Oyster Sauce" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Beef in Oyster Sauce</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C110</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B5</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=80&h=60&fit=crop&auto=format" alt="Crispy Chilli Beef" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Crispy Chilli Beef</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C85</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B6</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=60&fit=crop&auto=format" alt="Mongolian Shallot Lamb" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Mongolian Shallot Lamb</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C115</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">B7</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=60&fit=crop&auto=format" alt="Lamb Chops" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Lamb Chops</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C85</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ─── PORK ─── -->
+        <section id="pork" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Pork</h2>
+            <p class="text-stone-400 mb-6 text-sm">Classic pork dishes with vibrant Chinese flavours</p>
+            <div class="overflow-x-auto rounded-2xl shadow-md">
+                <table class="w-full bg-white text-sm">
+                    <thead class="bg-amber-800 text-white">
+                        <tr>
+                            <th class="text-left px-4 py-3 w-16">Code</th>
+                            <th class="text-left px-4 py-3">Dish</th>
+                            <th class="text-right px-4 py-3 w-24">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">P1</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=80&h=60&fit=crop&auto=format" alt="Sweet and Sour Pork" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Sweet &amp; Sour Pork</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C90</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">P2</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=80&h=60&fit=crop&auto=format" alt="Pork Sichuan Style" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Pork Sichuan Style</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C90</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">P3</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=80&h=60&fit=crop&auto=format" alt="Pork in Chilli Sauce" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Pork in Chilli Sauce</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C90</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">P4</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1529193591-8c9ae9699b13?w=80&h=60&fit=crop&auto=format" alt="Pork in Oyster Sauce" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Pork in Oyster Sauce</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C90</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="px-4 py-3 font-bold text-amber-700">P5</td>
+                            <td class="px-4 py-3 flex items-center gap-3">
+                                <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=80&h=60&fit=crop&auto=format" alt="Fried Pork Ribs" class="w-14 h-11 rounded-lg object-cover flex-shrink-0">
+                                <span class="font-medium">Fried Pork Ribs</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C75</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ─── CHICKEN ─── -->
+        <section id="chicken" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Chicken</h2>
+            <p class="text-stone-400 mb-6 text-sm">Succulent chicken prepared your way</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=400&h=180&fit=crop&auto=format" alt="Sweet and Sour Chicken" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">K1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Sweet &amp; Sour Chicken</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1604908176997-7f81f85f7c8e?w=400&h=180&fit=crop&auto=format" alt="Chicken Sichuan Sauce" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">K2</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Chicken Sichuan Sauce</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=400&h=180&fit=crop&auto=format" alt="Chicken in Curry Sauce" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">K3</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Chicken in Curry Sauce</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1562967915-6ba607ff4a08?w=400&h=180&fit=crop&auto=format" alt="Chicken in Oyster Sauce" loading="lazy">
+                    <div class="p-4">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">K4</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Chicken in Oyster Sauce</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C100</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─── SEAFOOD ─── -->
+        <section id="seafood" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Seafood</h2>
+            <p class="text-stone-400 mb-6 text-sm">Fresh from the sea, cooked to perfection</p>
+            <div class="overflow-x-auto rounded-2xl shadow-md mb-6">
+                <table class="w-full bg-white text-sm">
+                    <thead class="bg-amber-800 text-white">
+                        <tr>
+                            <th class="text-left px-4 py-3 w-16">Code</th>
+                            <th class="text-left px-4 py-3">Dish</th>
+                            <th class="text-right px-4 py-3 w-24">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">Q1</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=80&h=60&fit=crop&auto=format" alt="Squid" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Squid in Luban Chilli Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C120</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">Q2</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=80&h=60&fit=crop&auto=format" alt="Squid Sichuan" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Squid in Sichuan Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C120</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">Q3</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1617622141573-0e6db8c3dc7a?w=80&h=60&fit=crop&auto=format" alt="Squid Garlic" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Squid in Garlic Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C120</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">F1</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=80&h=60&fit=crop&auto=format" alt="Fish Fillet Chilli" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Fish Fillet in Chilli Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C115</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">F2</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=80&h=60&fit=crop&auto=format" alt="Fish Fillet Vegetable" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Fish Fillet in Vegetable Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C115</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">F3</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=80&h=60&fit=crop&auto=format" alt="Fish Fillet Sichuan" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Fish Fillet in Sichuan Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C115</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">F4</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?w=80&h=60&fit=crop&auto=format" alt="Sweet Sour Fish" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Sweet &amp; Sour Fish Fillet</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C115</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">PR1</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=80&h=60&fit=crop&auto=format" alt="Prawns Chilli" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Prawns in Chilli Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C155</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">PR2</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=80&h=60&fit=crop&auto=format" alt="Prawns Curry" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Prawns in Curry Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C155</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="px-4 py-3 font-bold text-amber-700">PR3</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=80&h=60&fit=crop&auto=format" alt="Prawns Sichuan" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Prawns in Sichuan Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C155</td></tr>
+                        <tr class="hover:bg-amber-50 bg-amber-50 font-semibold"><td class="px-4 py-3 font-bold text-amber-700">SF1</td>
+                            <td class="px-4 py-3 flex items-center gap-3"><img src="https://images.unsplash.com/photo-1559410545-0bdb565a7e6b?w=80&h=60&fit=crop&auto=format" alt="Special Seafood" class="w-14 h-11 rounded-lg object-cover flex-shrink-0"><span class="font-medium">Special Seafood in Sichuan Sauce</span></td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">C170</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ─── RICE ─── -->
+        <section id="rice" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Rice</h2>
+            <p class="text-stone-400 mb-6 text-sm">Fragrant rice dishes for every taste</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Steamed Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Steamed Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C29</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1596560548464-f010549b84d7?w=400&h=180&fit=crop&auto=format" alt="Special Jollof Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R2</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Special Jollof Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C50</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Combo Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R3</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Combo Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C50</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Shrimp Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R4</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Shrimp Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C50</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=400&h=180&fit=crop&auto=format" alt="Egg Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">RS</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Egg Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C40</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Beef Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R6</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Beef Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C45</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Chicken Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R7</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Chicken Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C45</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Seafood Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R8</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Seafood Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C85</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1603133872634-6e01db44284e?w=400&h=180&fit=crop&auto=format" alt="Pork Fried Rice" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">R9</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Pork Fried Rice</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C45</p></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─── NOODLES ─── -->
+        <section id="noodles" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Noodles</h2>
+            <p class="text-stone-400 mb-6 text-sm">Wok-tossed noodles done the Luban way</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=180&fit=crop&auto=format" alt="Vegetable Noodles" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">N1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Vegetable Noodles</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C45</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=180&fit=crop&auto=format" alt="Special Noodles" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">N2</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Special Noodles</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C80</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=400&h=180&fit=crop&auto=format" alt="Singapore Noodles" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">N4</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Singapore Noodles</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C80</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=180&fit=crop&auto=format" alt="Seafood Noodles" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">N5</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Seafood Noodles</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C100</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=180&fit=crop&auto=format" alt="Chicken Noodles" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">N6</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Chicken Noodles</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C60</p></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─── DUMPLINGS ─── -->
+        <section id="dumplings" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Dumplings</h2>
+            <p class="text-stone-400 mb-6 text-sm">Handcrafted dumplings, steamed or fried</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=180&fit=crop&auto=format" alt="Steamed Pork Dumpling" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">D1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Steamed Pork Dumpling</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=180&fit=crop&auto=format" alt="Fried Pork Dumpling" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">D2</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Fried Pork Dumpling</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=180&fit=crop&auto=format" alt="Steamed Beef Dumpling" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">D3</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Steamed Beef Dumpling</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p></div>
+                </div>
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1563245372-f89ffd94b5eb?w=400&h=180&fit=crop&auto=format" alt="Fried Beef Dumpling" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">D4</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Fried Beef Dumpling</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C30</p></div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─── VEG ─── -->
+        <section id="veg" class="category-section">
+            <h2 class="serif text-3xl font-bold text-amber-800 mb-1">Vegetable</h2>
+            <p class="text-stone-400 mb-6 text-sm">Fresh, light and delicious</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="menu-card bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=180&fit=crop&auto=format" alt="Mixed Vegetable Sauce" loading="lazy">
+                    <div class="p-4"><span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">V1</span>
+                        <h3 class="serif font-bold text-lg text-stone-800 mt-1">Mixed Vegetable Sauce</h3>
+                        <p class="mt-3 text-amber-700 font-bold text-lg">C40</p></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ──────────────────── FOOTER ──────────────────── -->
+    <footer class="bg-stone-800 text-stone-400 mt-16 py-10 text-center text-sm">
+        <p class="text-white font-semibold serif text-xl mb-1">Luban Workshop Restaurant</p>
+        <p class="mb-4">Authentic Chinese Cuisine</p>
+        <p>&copy; <span id="footer-year"></span> Luban Workshop. All rights reserved.</p>
+    </footer>
+
+    <!-- ──────────────────── SCRIPTS ──────────────────── -->
+    <!-- QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+    <script>
+        // ── Footer year ──
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // ── Generate QR code pointing to this page ──
+        (function () {
+            const menuUrl = window.location.href.split('#')[0].replace(/\/+$/, '');
+            QRCode.toCanvas(document.getElementById('qr-canvas'), menuUrl, {
+                width: 200,
+                margin: 2,
+                color: { dark: '#78350f', light: '#ffffff' }
+            }, function (err) {
+                if (err) {
+                    // Fallback: show QR via Google Charts API
+                    const img = document.createElement('img');
+                    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=78350f&data=' + encodeURIComponent(menuUrl);
+                    img.alt = 'QR Code for Luban Workshop Menu';
+                    img.className = 'mx-auto';
+                    const canvas = document.getElementById('qr-canvas');
+                    canvas.parentNode.replaceChild(img, canvas);
+                }
+            });
+        }());
+
+        // ── Category tab switching ──
+        document.getElementById('category-tabs').addEventListener('click', function (e) {
+            const btn = e.target.closest('.category-tab');
+            if (!btn) return;
+
+            // Update tab styles
+            document.querySelectorAll('.category-tab').forEach(function (t) {
+                t.classList.remove('active', 'bg-amber-800', 'text-white');
+                t.classList.add('text-stone-700', 'bg-white', 'border-stone-200');
+            });
+            btn.classList.add('active', 'bg-amber-800', 'text-white');
+            btn.classList.remove('text-stone-700');
+
+            // Show the matching section
+            const target = btn.getAttribute('data-target');
+            document.querySelectorAll('.category-section').forEach(function (s) {
+                s.classList.remove('active');
+            });
+            const section = document.getElementById(target);
+            if (section) {
+                section.classList.add('active');
+                // Smooth scroll to content on mobile
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
