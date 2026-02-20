@@ -646,6 +646,48 @@
 
     <!-- ──────────────────── SCRIPTS ──────────────────── -->
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase config (same project as admin)
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+                authDomain: "luban-workshop-restaurant.firebaseapp.com",
+                projectId: "luban-workshop-restaurant",
+                storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+                messagingSenderId: "360623290287",
+                appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+            });
+        }
+        const menuDb = firebase.firestore();
+
+        function applyDishAvailability(hiddenIds) {
+            // Card-style dishes (soups, starters, chicken, rice, noodles, dumplings, veg)
+            document.querySelectorAll('.menu-card').forEach(function (card) {
+                var codeSpan = card.querySelector('span[class*="bg-red-100"]');
+                if (codeSpan) {
+                    card.style.display = hiddenIds.has(codeSpan.textContent.trim()) ? 'none' : '';
+                }
+            });
+            // Table-style dishes (beef-lamb, pork, seafood)
+            document.querySelectorAll('tbody tr').forEach(function (row) {
+                var codeCell = row.querySelector('td:first-child');
+                if (codeCell && codeCell.textContent.trim()) {
+                    row.style.display = hiddenIds.has(codeCell.textContent.trim()) ? 'none' : '';
+                }
+            });
+        }
+
+        menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
+            var hiddenIds = new Set();
+            snapshot.forEach(function (doc) {
+                if (doc.data().hidden === true) hiddenIds.add(doc.id);
+            });
+            applyDishAvailability(hiddenIds);
+        });
+    </script>
+
     <script>
         // ── Footer year ──
         document.getElementById('footer-year').textContent = new Date().getFullYear();

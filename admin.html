@@ -555,6 +555,9 @@
                     if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
 
                     const itemsSummary = order.items ? order.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No items';
+                    const itemsDetail = order.items
+                        ? order.items.map(i => `<div class="py-0.5"><span class="font-bold text-stone-600">${i.quantity}&times;</span> ${i.name}</div>`).join('')
+                        : '<div class="text-stone-400 italic">No items</div>';
 
                     // Action Buttons Logic
                     let actions = '';
@@ -580,13 +583,22 @@
                     const row = `
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-500">#${id.slice(-6).toUpperCase()}</td>
-                            <td class="px-6 py-4 text-sm text-stone-900 max-w-xs truncate" title="${itemsSummary}">${itemsSummary}</td>
+                            <td class="px-6 py-4 text-sm text-stone-900 max-w-xs">
+                                <div class="truncate">${itemsSummary}</div>
+                                <button onclick="toggleOrderDetails('${id}')" class="text-xs text-red-600 hover:text-red-800 hover:underline mt-0.5 block">view all items</button>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">$${(order.total || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 ${actions}
+                            </td>
+                        </tr>
+                        <tr id="order-details-${id}" class="hidden bg-stone-50 border-b border-stone-100">
+                            <td colspan="5" class="px-6 py-3">
+                                <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Full Order</p>
+                                <div class="text-sm text-stone-800">${itemsDetail}</div>
                             </td>
                         </tr>
                     `;
@@ -616,6 +628,11 @@
                 console.error("Error updating order:", error);
                 alert("Could not update order.");
             }
+        }
+
+        function toggleOrderDetails(id) {
+            const row = document.getElementById(`order-details-${id}`);
+            if (row) row.classList.toggle('hidden');
         }
 
         // --- Auth Functions ---
