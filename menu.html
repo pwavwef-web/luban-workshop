@@ -74,12 +74,43 @@
         .dish-cell img { width: 48px; height: 38px; border-radius: 0.4rem; object-fit: cover; flex-shrink: 0; }
         .dish-cell span { font-weight: 500; }
 
-        /* Logo spin */
+        /* Nav logo spin */
         @keyframes slow-spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         nav img.logo-spin { animation: slow-spin 8s linear infinite; }
+
+        /* Hero logo flip (left-to-right Y-axis) */
+        .hero-flip-container {
+            width: 96px; height: 96px;
+            perspective: 400px;
+            margin: 0 auto 1rem;
+        }
+        .hero-flip-inner {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: flip-lr 4s linear infinite;
+        }
+        @keyframes flip-lr {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+        .hero-flip-front,
+        .hero-flip-back {
+            position: absolute; inset: 0;
+            backface-visibility: hidden;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .hero-flip-front img { width: 100%; height: 100%; object-fit: contain; }
+        .hero-flip-back {
+            transform: rotateY(180deg);
+            background: rgba(255,255,255,0.15);
+            font-size: 3rem; line-height: 1;
+        }
 
         /* Footer */
         footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.8rem; }
@@ -109,10 +140,14 @@
     <!-- ──────────────────── HERO ──────────────────── -->
     <header class="pt-16 bg-gradient-to-br from-red-900 via-red-800 to-stone-800 text-white">
         <div class="max-w-6xl mx-auto px-4 py-10 text-center">
-            <img src="logo.png"
-                 alt="Luban Workshop Restaurant Logo"
-                 class="mx-auto mb-4 h-24 w-24 object-contain"
-                 style="height:96px;width:96px;display:block;margin:0 auto 1rem;object-fit:contain;">
+            <div class="hero-flip-container">
+                <div class="hero-flip-inner">
+                    <div class="hero-flip-front">
+                        <img src="logo.png" alt="Luban Workshop Restaurant Logo">
+                    </div>
+                    <div class="hero-flip-back">🍽️</div>
+                </div>
+            </div>
             <p class="uppercase tracking-widest text-red-300 text-xs mb-2">Authentic Chinese Cuisine</p>
             <h1 class="serif text-4xl font-bold mb-3">Our Menu</h1>
             <p class="text-red-100 text-base max-w-xl mx-auto">
