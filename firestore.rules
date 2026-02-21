@@ -66,5 +66,17 @@ service cloud.firestore {
       // Only admins can update or delete reservations
       allow update, delete: if isAdmin();
     }
+
+    // contact_messages collection – submitted via the Contact Us page
+    match /contact_messages/{messageId} {
+      // Anyone can submit a contact message (no auth required)
+      allow create: if true;
+
+      // Only admins can read or update (e.g. mark as read) messages
+      allow read, update: if isAdmin();
+
+      // Only admins can delete messages
+      allow delete: if isAdmin();
+    }
   }
 }
