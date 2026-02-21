@@ -74,6 +74,13 @@
         .dish-cell img { width: 48px; height: 38px; border-radius: 0.4rem; object-fit: cover; flex-shrink: 0; }
         .dish-cell span { font-weight: 500; }
 
+        /* Logo spin */
+        @keyframes slow-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        nav img.logo-spin { animation: slow-spin 8s linear infinite; }
+
         /* Footer */
         footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.8rem; }
         footer p.name { color: #fff; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem; }
@@ -88,7 +95,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <a href="index.html" class="flex items-center gap-2">
-                    <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white" style="height:40px;width:40px;flex-shrink:0;object-fit:contain;">
+                    <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white logo-spin" style="height:40px;width:40px;flex-shrink:0;object-fit:contain;">
                     <span class="serif text-xl font-bold text-red-800">Luban Workshop</span>
                 </a>
                 <div class="flex gap-4 items-center">
