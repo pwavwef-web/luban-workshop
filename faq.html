@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ – Luban Workshop</title>
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Lato', sans-serif; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex-shrink-0 flex items-center">
+                    <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
+                            class="text-red-700">Workshop</span></span>
+                </a>
+                <a href="index.html"
+                    class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm">&larr; Back to
+                    Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h1 class="serif text-4xl font-bold text-stone-900 mb-2">Frequently Asked Questions</h1>
+        <p class="text-stone-500 text-sm mb-10">Find answers to the most common questions about Luban Workshop.</p>
+
+        <!-- Reservations -->
+        <section class="mb-10">
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-4">Reservations</h2>
+            <div class="space-y-3">
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">How do I make a reservation?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">You can reserve a table directly on our <a href="index.html#reservation"
+                                class="text-red-700 hover:underline">homepage</a> by completing the reservation form.
+                            Alternatively, call us on <strong>020 543 8455</strong> during opening hours.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">How far in advance can I book a table?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Reservations can be made up to 3 months in advance through our online form.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Can I cancel or modify a reservation?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">To cancel or change your reservation, please contact us by phone on
+                            <strong>020 543 8455</strong> or use the <a href="contact-us.html"
+                                class="text-red-700 hover:underline">contact form</a> at least 24 hours before your
+                            booking time.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Orders -->
+        <section class="mb-10">
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-4">Online Orders</h2>
+            <div class="space-y-3">
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Do I need an account to place an order?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Yes, you need to sign in to place an order online. Creating an account is free
+                            and only requires an email address.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Can I cancel my order after placing it?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Orders can be cancelled within 5 minutes of being placed. After that, the
+                            kitchen will have started preparing your food and the order can no longer be cancelled
+                            online. Please call us on <strong>020 543 8455</strong> if you need further assistance.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">How do I view my past orders?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Once signed in, you can view your order history in the "My Orders" section of
+                            the main page.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Food & Allergies -->
+        <section class="mb-10">
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-4">Food & Allergies</h2>
+            <div class="space-y-3">
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Do you cater for dietary requirements or
+                            allergies?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">We take allergies very seriously. Please inform our staff of any dietary
+                            requirements or allergies when you arrive or when making a reservation. Some dishes can be
+                            adapted on request.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Do you have vegetarian or vegan options?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Yes! We offer a range of vegetarian dishes on our menu. Please ask a member of
+                            staff for recommendations or check our online menu for dishes marked as vegetarian.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- General -->
+        <section class="mb-10">
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-4">General</h2>
+            <div class="space-y-3">
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">What are your opening hours?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">We are open every day from <strong>11:00 to 22:00</strong>.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Where are you located?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">You can find our address and directions in the <a href="index.html#location"
+                                class="text-red-700 hover:underline">Locate Us</a> section on the homepage.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">I have another question not listed here.</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Please reach out via our <a href="contact-us.html"
+                                class="text-red-700 hover:underline">Contact Us</a> page or call us on
+                            <strong>020 543 8455</strong> and we'll be happy to help.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-10 mt-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex justify-center items-center mb-4">
+                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
+                <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
+            </div>
+            <p class="mb-4">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 text-sm">
+                <a href="terms-of-use.html" class="hover:text-white transition-colors">Terms of Use</a>
+                <a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="contact-us.html" class="hover:text-white transition-colors">Contact Us</a>
+                <a href="faq.html" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleFaq(btn) {
+            const item = btn.closest('.faq-item');
+            item.classList.toggle('open');
+        }
+    </script>
+</body>
+
+</html>
