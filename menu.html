@@ -27,7 +27,7 @@
         nav .nav-links a.active { color: #b91c1c; font-weight: 600; border-bottom: 2px solid #dc2626; }
 
         /* Hero */
-        header { padding-top: 4rem; background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #292524 100%); color: #fff; }
+        header { padding-top: 4rem; background: #1c1917; color: #fff; }
         header > div { max-width: 72rem; margin: 0 auto; padding: 2.5rem 1rem; text-align: center; }
         header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.75rem; }
         header p.subtitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #fca5a5; margin-bottom: 0.5rem; }
@@ -140,8 +140,11 @@
     </nav>
 
     <!-- ──────────────────── HERO ──────────────────── -->
-    <header class="pt-16 bg-gradient-to-br from-red-900 via-red-800 to-stone-800 text-white">
-        <div class="max-w-6xl mx-auto px-4 py-10 text-center">
+    <header class="pt-16 relative overflow-hidden bg-stone-900 text-white">
+        <div class="absolute inset-0 opacity-40">
+            <img src="restcon.png" alt="Restaurant interior" class="w-full h-full object-cover object-bottom" style="object-position: bottom">
+        </div>
+        <div class="max-w-6xl mx-auto px-4 py-10 text-center relative">
             <div class="logo-hero-container">
                 <div class="logo-hero-flipper">
                     <div class="logo-hero-face logo-hero-front">
