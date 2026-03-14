@@ -377,6 +377,9 @@
                 overlay.addEventListener('keydown', handleOverlayKeydown);
                 
                 lucide.createIcons();
+
+                // Start tour for new admins (skipped if already completed)
+                startTour();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('admin-dashboard').classList.add('hidden');
@@ -891,7 +894,166 @@
                 .replace(/'/g, '&#39;');
         }
 
+        // --- Admin Tour ---
+        const TOUR_STORAGE_KEY = 'luban_admin_tour_completed';
+
+        const TOUR_STEPS = [
+            {
+                title: 'Welcome to the Admin Dashboard 👋',
+                description: 'This quick tour will walk you through every section of your admin panel. You can skip at any time or click Next to continue.',
+                target: null
+            },
+            {
+                title: 'Menu Manager',
+                description: 'Toggle the visibility of individual dishes on the main website. Turn items on or off so customers only see what is available today.',
+                target: 'tab-btn-menu'
+            },
+            {
+                title: 'Reservations',
+                description: 'View all table reservation requests from customers. Approve or decline reservations and keep track of upcoming bookings.',
+                target: 'tab-btn-reservations'
+            },
+            {
+                title: 'Orders',
+                description: 'Monitor incoming online orders in real time. See order details, totals, and update order statuses as they are prepared.',
+                target: 'tab-btn-orders'
+            },
+            {
+                title: 'Admin Users',
+                description: 'Grant or revoke admin dashboard access for other staff members. Use this section to manage who can log into this panel.',
+                target: 'tab-btn-admin-users'
+            },
+            {
+                title: 'Messages',
+                description: 'Read messages submitted by customers via the Contact Us page. Mark messages as read once you have reviewed them.',
+                target: 'tab-btn-messages'
+            }
+        ];
+
+        let tourCurrentStep = 0;
+        let tourPreviousFocus = null;
+
+        function startTour() {
+            if (localStorage.getItem(TOUR_STORAGE_KEY)) return;
+            tourCurrentStep = 0;
+            tourPreviousFocus = document.activeElement;
+            renderTourStep();
+            const overlay = document.getElementById('tour-overlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('tour-next-btn').focus();
+        }
+
+        function renderTourStep() {
+            const step = TOUR_STEPS[tourCurrentStep];
+            const total = TOUR_STEPS.length;
+
+            // Remove any previous highlight
+            document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+
+            // Highlight target element in sidebar
+            if (step.target) {
+                const targetEl = document.getElementById(step.target);
+                if (targetEl) targetEl.classList.add('tour-highlight');
+            }
+
+            document.getElementById('tour-title').textContent = step.title;
+            document.getElementById('tour-description').textContent = step.description;
+            document.getElementById('tour-step-counter').textContent = (tourCurrentStep + 1) + ' of ' + total;
+
+            // Progress dots
+            const dotsEl = document.getElementById('tour-dots');
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'inline-block w-2 h-2 rounded-full ' + (i === tourCurrentStep ? 'bg-red-700' : 'bg-stone-300');
+                dotsEl.appendChild(dot);
+            }
+
+            // Update Next button label on last step
+            const nextBtn = document.getElementById('tour-next-btn');
+            nextBtn.textContent = tourCurrentStep === total - 1 ? 'Get Started' : 'Next →';
+            nextBtn.focus();
+        }
+
+        function tourNext() {
+            // Remove highlight from current
+            const current = TOUR_STEPS[tourCurrentStep];
+            if (current.target) {
+                const el = document.getElementById(current.target);
+                if (el) el.classList.remove('tour-highlight');
+            }
+
+            if (tourCurrentStep < TOUR_STEPS.length - 1) {
+                tourCurrentStep++;
+                renderTourStep();
+            } else {
+                closeTour();
+            }
+        }
+
+        function closeTour() {
+            document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+            document.getElementById('tour-overlay').classList.add('hidden');
+            localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+            // Return focus to previous element or dashboard toggle
+            if (tourPreviousFocus && tourPreviousFocus.focus) {
+                tourPreviousFocus.focus();
+            }
+        }
+
     </script>
+
+    <!-- Admin Tour Overlay -->
+    <div id="tour-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+
+        <!-- Tour Card -->
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 z-10">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="map" class="h-5 w-5 text-red-700 flex-shrink-0"></i>
+                    <span class="text-xs font-semibold text-red-700 uppercase tracking-wider">Dashboard Tour</span>
+                </div>
+                <button onclick="closeTour()" aria-label="Skip tour" class="text-stone-400 hover:text-stone-600 transition-colors ml-4 flex-shrink-0">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+
+            <!-- Step Counter -->
+            <p id="tour-step-counter" class="text-xs text-stone-400 mb-3">1 of 6</p>
+
+            <!-- Content -->
+            <h2 id="tour-title" class="serif text-xl font-bold text-stone-900 mb-3"></h2>
+            <p id="tour-description" class="text-stone-600 text-sm leading-relaxed mb-6"></p>
+
+            <!-- Progress dots -->
+            <div id="tour-dots" class="flex gap-1.5 mb-6"></div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between">
+                <button onclick="closeTour()" class="text-sm text-stone-500 hover:text-stone-700 transition-colors underline underline-offset-2">
+                    Skip tour
+                </button>
+                <button id="tour-next-btn" onclick="tourNext()" class="bg-red-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-red-800 transition-colors">
+                    Next →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tour-highlight {
+            outline: 3px solid #b91c1c !important;
+            outline-offset: 2px;
+            border-radius: 8px;
+            background-color: #fef2f2 !important;
+            color: #b91c1c !important;
+            position: relative;
+            z-index: 51;
+        }
+    </style>
 </body>
 
 </html>
