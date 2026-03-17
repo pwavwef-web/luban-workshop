@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team | Luban Workshop Restaurant</title>
+    <meta name="description" content="Meet the dedicated staff and committee members behind Luban Workshop Restaurant – the people who make every dining experience exceptional.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://luban-restaurant.azlearner.me/team/">
+
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+
+        nav { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.97); box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 50; }
+        nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
+        nav a.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        nav .brand span { font-size: 1.1rem; font-weight: 700; color: #1c1917; }
+        nav .brand span em { color: #b91c1c; font-style: normal; }
+        nav .nav-links { display: flex; gap: 1rem; align-items: center; }
+        nav .nav-links a { color: #57534e; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        nav .nav-links a:hover { color: #b91c1c; }
+        nav .nav-links a.active { color: #b91c1c; font-weight: 600; border-bottom: 2px solid #dc2626; padding-bottom: 2px; }
+
+        header { padding-top: 4rem; background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 60%, #b91c1c 100%); color: #fff; }
+        header > div { max-width: 72rem; margin: 0 auto; padding: 3rem 1rem; text-align: center; }
+        header h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem; }
+        header p { font-size: 0.95rem; color: #fecaca; max-width: 36rem; margin: 0 auto; }
+
+        .filter-bar { background: #fff; border-bottom: 1px solid #e7e5e4; position: sticky; top: 64px; z-index: 40; }
+        .filter-bar > div { max-width: 72rem; margin: 0 auto; padding: 0.75rem 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.35rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 600; border: 1.5px solid #d6d3d1; background: #fff; color: #44403c; cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+
+        .team-grid { max-width: 72rem; margin: 0 auto; padding: 2rem 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+
+        .team-card { background: #fff; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: box-shadow 0.2s, transform 0.2s; }
+        .team-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.13); transform: translateY(-3px); }
+        .team-card .avatar { width: 100%; height: 200px; object-fit: cover; background: #f5f5f4; }
+        .team-card .avatar-placeholder { width: 100%; height: 200px; background: linear-gradient(135deg, #fef2f2, #fee2e2); display: flex; align-items: center; justify-content: center; }
+        .team-card .avatar-placeholder svg { width: 64px; height: 64px; color: #fca5a5; }
+        .team-card .card-body { padding: 1.25rem; }
+        .team-card .dept-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; background: #fee2e2; color: #b91c1c; padding: 0.15rem 0.55rem; border-radius: 9999px; margin-bottom: 0.5rem; }
+        .team-card h3 { font-size: 1.05rem; font-weight: 700; color: #1c1917; margin-bottom: 0.2rem; }
+        .team-card .role { font-size: 0.8rem; color: #b91c1c; font-weight: 600; margin-bottom: 0.5rem; }
+        .team-card .bio { font-size: 0.8rem; color: #78716c; line-height: 1.5; margin-bottom: 1rem; }
+        .team-card a.profile-link { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; font-weight: 600; color: #b91c1c; text-decoration: none; }
+        .team-card a.profile-link:hover { text-decoration: underline; }
+
+        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
+        footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div>
+            <a href="../index.html" class="brand">
+                <img src="../logo.png" alt="Luban Workshop Logo" style="height:36px;width:36px;border-radius:50%;object-fit:contain;background:#fff;">
+                <span>Luban <em>Workshop</em></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../menu.html">Menu</a>
+                <a href="index.html" class="active">Our Team</a>
+                <a href="profile-form.html" style="background:#b91c1c;color:#fff;padding:0.35rem 0.9rem;border-radius:6px;">+ Add Profile</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header>
+        <div>
+            <p style="text-transform:uppercase;letter-spacing:0.12em;font-size:0.72rem;color:#fca5a5;margin-bottom:0.5rem;">Luban Workshop Restaurant</p>
+            <h1 class="serif">Meet Our Team</h1>
+            <p>The passionate chefs, service staff and committee members who bring every guest an exceptional dining experience at Luban Workshop.</p>
+        </div>
+    </header>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div>
+            <button class="filter-btn active" onclick="filterTeam('all', this)">All</button>
+            <button class="filter-btn" onclick="filterTeam('kitchen', this)">Kitchen</button>
+            <button class="filter-btn" onclick="filterTeam('service', this)">Service</button>
+            <button class="filter-btn" onclick="filterTeam('management', this)">Management</button>
+            <button class="filter-btn" onclick="filterTeam('committee', this)">Committee</button>
+        </div>
+    </div>
+
+    <!-- Team Grid -->
+    <div class="team-grid" id="team-grid">
+
+        <!-- Example: Management -->
+        <div class="team-card" data-dept="management">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Management</span>
+                <h3 class="serif">General Manager</h3>
+                <p class="role">Restaurant Director</p>
+                <p class="bio">Overseeing all restaurant operations and ensuring the highest standards of service and cuisine at Luban Workshop.</p>
+                <a href="profile.html?id=gm" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Example: Kitchen -->
+        <div class="team-card" data-dept="kitchen">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Kitchen</span>
+                <h3 class="serif">Head Chef</h3>
+                <p class="role">Executive Chef</p>
+                <p class="bio">Bringing authentic Chinese culinary traditions to Cape Coast with creative flair and technical precision.</p>
+                <a href="profile.html?id=chef" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Example: Kitchen 2 -->
+        <div class="team-card" data-dept="kitchen">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Kitchen</span>
+                <h3 class="serif">Sous Chef</h3>
+                <p class="role">Sous Chef</p>
+                <p class="bio">Specialising in seafood and dim sum, ensuring consistent quality in every dish that leaves the kitchen.</p>
+                <a href="profile.html?id=souschef" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Example: Service -->
+        <div class="team-card" data-dept="service">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Service</span>
+                <h3 class="serif">Floor Supervisor</h3>
+                <p class="role">Senior Waitstaff</p>
+                <p class="bio">Leading the front-of-house team to deliver warm, attentive service to every guest who walks through our doors.</p>
+                <a href="profile.html?id=floor" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Example: Committee -->
+        <div class="team-card" data-dept="committee">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Committee</span>
+                <h3 class="serif">Committee Chair</h3>
+                <p class="role">Committee Chairperson</p>
+                <p class="bio">Guiding the strategic direction of Luban Workshop Restaurant and supporting the professional development of our team.</p>
+                <a href="profile.html?id=chair" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Example: Committee 2 -->
+        <div class="team-card" data-dept="committee">
+            <div class="avatar-placeholder">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="card-body">
+                <span class="dept-badge">Committee</span>
+                <h3 class="serif">Committee Member</h3>
+                <p class="role">Advisory Member</p>
+                <p class="bio">Providing expertise and oversight to ensure Luban Workshop maintains its standards of excellence and community engagement.</p>
+                <a href="profile.html?id=member" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CTA: Add Profile -->
+    <div style="max-width:72rem;margin:0 auto;padding:0 1rem 3rem;text-align:center;">
+        <div style="background:#fff;border:2px dashed #fca5a5;border-radius:1.25rem;padding:2.5rem 1.5rem;">
+            <i data-lucide="user-plus" style="width:48px;height:48px;color:#fca5a5;margin:0 auto 1rem;display:block;"></i>
+            <h3 class="serif" style="font-size:1.3rem;color:#1c1917;margin-bottom:0.5rem;">Are you part of our team?</h3>
+            <p style="font-size:0.88rem;color:#78716c;margin-bottom:1.25rem;">Submit your profile to be featured on this page.</p>
+            <a href="profile-form.html" style="display:inline-block;background:#b91c1c;color:#fff;font-weight:600;font-size:0.88rem;padding:0.65rem 1.75rem;border-radius:9999px;text-decoration:none;">
+                Submit Your Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p class="name">Luban Workshop Restaurant</p>
+        <p style="margin-bottom:0.75rem;">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
+        <div style="display:flex;justify-content:center;gap:1.5rem;font-size:0.8rem;margin-bottom:0.5rem;">
+            <a href="../index.html" style="color:#a8a29e;text-decoration:none;">Home</a>
+            <a href="../menu.html" style="color:#a8a29e;text-decoration:none;">Menu</a>
+            <a href="../contact-us.html" style="color:#a8a29e;text-decoration:none;">Contact</a>
+            <a href="../privacy-policy.html" style="color:#a8a29e;text-decoration:none;">Privacy</a>
+        </div>
+        <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        function filterTeam(dept, btn) {
+            document.querySelectorAll('.filter-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            btn.classList.add('active');
+
+            document.querySelectorAll('.team-card').forEach(function(card) {
+                if (dept === 'all' || card.dataset.dept === dept) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

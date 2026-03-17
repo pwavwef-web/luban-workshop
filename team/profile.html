@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Profile | Luban Workshop Restaurant</title>
+    <meta name="description" content="Individual staff profile at Luban Workshop Restaurant.">
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+
+        nav { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.97); box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 50; }
+        nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
+        nav a.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        nav .brand span { font-size: 1.1rem; font-weight: 700; color: #1c1917; }
+        nav .brand span em { color: #b91c1c; font-style: normal; }
+        nav .nav-links { display: flex; gap: 1rem; align-items: center; }
+        nav .nav-links a { color: #57534e; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        nav .nav-links a:hover { color: #b91c1c; }
+
+        .profile-hero { padding-top: 4rem; background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 60%, #b91c1c 100%); }
+        .profile-hero > div { max-width: 72rem; margin: 0 auto; padding: 2.5rem 1rem 0; }
+
+        .profile-card { max-width: 56rem; margin: -3rem auto 0; position: relative; z-index: 10; padding: 0 1rem 3rem; }
+
+        .card-inner { background: #fff; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(0,0,0,.12); overflow: hidden; }
+        .card-top { display: flex; flex-direction: column; align-items: center; padding: 2.5rem 2rem 1.5rem; text-align: center; }
+        @media (min-width: 640px) { .card-top { flex-direction: row; text-align: left; gap: 2rem; } }
+
+        .avatar-wrap { flex-shrink: 0; }
+        .avatar-wrap img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 4px solid #fca5a5; box-shadow: 0 4px 16px rgba(185,28,28,0.2); }
+        .avatar-wrap .avatar-placeholder { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, #fef2f2, #fee2e2); display: flex; align-items: center; justify-content: center; border: 4px solid #fca5a5; }
+        .avatar-wrap .avatar-placeholder svg { width: 64px; height: 64px; color: #fca5a5; }
+
+        .profile-info { flex: 1; }
+        .dept-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; background: #fee2e2; color: #b91c1c; padding: 0.2rem 0.65rem; border-radius: 9999px; margin-bottom: 0.5rem; }
+        .profile-info h1 { font-size: 1.75rem; font-weight: 700; color: #1c1917; line-height: 1.2; margin-bottom: 0.3rem; }
+        .profile-info .role { font-size: 0.95rem; color: #b91c1c; font-weight: 600; margin-bottom: 0.5rem; }
+        .profile-info .since { font-size: 0.8rem; color: #a8a29e; display: flex; align-items: center; gap: 0.3rem; }
+
+        .social-links { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: center; }
+        @media (min-width: 640px) { .social-links { justify-content: flex-start; } }
+        .social-links a { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #fee2e2; color: #b91c1c; text-decoration: none; transition: background 0.2s; }
+        .social-links a:hover { background: #b91c1c; color: #fff; }
+
+        .card-body { padding: 0 2rem 2rem; }
+        .divider { height: 1px; background: #f5f5f4; margin: 0 -2rem 1.5rem; }
+
+        .bio-section { margin-bottom: 1.5rem; }
+        .bio-section h2 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #b91c1c; margin-bottom: 0.65rem; }
+        .bio-section p { font-size: 0.9rem; color: #57534e; line-height: 1.75; }
+
+        .facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .fact-item { background: #fff9f9; border-left: 3px solid #fca5a5; border-radius: 0.5rem; padding: 0.85rem 1rem; }
+        .fact-item .fact-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a29e; margin-bottom: 0.2rem; }
+        .fact-item .fact-value { font-size: 0.9rem; font-weight: 600; color: #1c1917; }
+
+        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
+        footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div>
+            <a href="../index.html" class="brand">
+                <img src="../logo.png" alt="Luban Workshop Logo" style="height:36px;width:36px;border-radius:50%;object-fit:contain;background:#fff;">
+                <span>Luban <em>Workshop</em></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Our Team</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero strip -->
+    <div class="profile-hero">
+        <div>
+            <a href="index.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:#fca5a5;font-size:0.82rem;text-decoration:none;">
+                <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Team
+            </a>
+            <div style="height:4rem;"></div>
+        </div>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+        <div class="card-inner">
+
+            <!-- Top: Avatar + Name -->
+            <div class="card-top">
+                <div class="avatar-wrap">
+                    <div id="avatar-container">
+                        <!-- Photo or placeholder rendered by JS -->
+                        <div class="avatar-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <span class="dept-badge" id="dept-badge">Department</span>
+                    <h1 class="serif" id="profile-name">Staff Member</h1>
+                    <p class="role" id="profile-role">Position</p>
+                    <p class="since" id="profile-since">
+                        <i data-lucide="calendar" style="width:13px;height:13px;"></i>
+                        <span></span>
+                    </p>
+                    <div class="social-links" id="social-links"></div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body">
+                <div class="divider"></div>
+
+                <!-- Short bio -->
+                <div class="bio-section" id="short-bio-section">
+                    <h2>About</h2>
+                    <p id="short-bio-text">Loading…</p>
+                </div>
+
+                <!-- Full bio -->
+                <div class="bio-section" id="full-bio-section" style="display:none;">
+                    <div class="divider"></div>
+                    <h2>Background</h2>
+                    <p id="full-bio-text"></p>
+                </div>
+
+                <!-- Facts grid -->
+                <div class="facts-grid" id="facts-grid"></div>
+
+                <!-- CTA -->
+                <div style="background:#fff9f9;border-radius:0.75rem;padding:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;">
+                    <div>
+                        <p style="font-size:0.88rem;font-weight:600;color:#1c1917;margin-bottom:0.2rem;">Dine with us</p>
+                        <p style="font-size:0.8rem;color:#78716c;">Mon – Fri · 11:00 – 17:30 · Cape Coast, Ghana</p>
+                    </div>
+                    <a href="../index.html#reservation" style="background:#b91c1c;color:#fff;font-weight:600;font-size:0.85rem;padding:0.55rem 1.25rem;border-radius:9999px;text-decoration:none;">
+                        Reserve a Table
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p class="name">Luban Workshop Restaurant</p>
+        <p style="margin-bottom:0.75rem;">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
+        <div style="display:flex;justify-content:center;gap:1.5rem;font-size:0.8rem;margin-bottom:0.5rem;">
+            <a href="../index.html" style="color:#a8a29e;text-decoration:none;">Home</a>
+            <a href="index.html" style="color:#a8a29e;text-decoration:none;">Our Team</a>
+            <a href="../privacy-policy.html" style="color:#a8a29e;text-decoration:none;">Privacy</a>
+        </div>
+        <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // Sample profile data – in production this would come from a CMS or database
+        var profiles = {
+            'gm': {
+                name: 'General Manager',
+                role: 'Restaurant Director',
+                dept: 'Management',
+                since: 'January 2024',
+                shortBio: 'Overseeing all restaurant operations and ensuring the highest standards of service and cuisine at Luban Workshop.',
+                fullBio: 'With years of experience in hospitality management, our General Manager leads the team at Luban Workshop with a focus on excellence, consistency and creating an unforgettable dining experience for every guest.',
+                funFact: 'Has visited over 12 countries to study different culinary traditions.',
+                favouriteDish: 'Special Seafood in Sichuan Sauce',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            },
+            'chef': {
+                name: 'Head Chef',
+                role: 'Executive Chef',
+                dept: 'Kitchen',
+                since: 'March 2023',
+                shortBio: 'Bringing authentic Chinese culinary traditions to Cape Coast with creative flair and technical precision.',
+                fullBio: 'Our Executive Chef trained in Beijing before bringing their expertise to Ghana. Every dish on the Luban Workshop menu reflects their dedication to authentic flavour, quality ingredients and beautiful presentation.',
+                funFact: 'Can name over 50 types of Chinese noodle from memory.',
+                favouriteDish: 'Squid in Luban Chilli Sauce',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            },
+            'souschef': {
+                name: 'Sous Chef',
+                role: 'Sous Chef',
+                dept: 'Kitchen',
+                since: 'July 2023',
+                shortBio: 'Specialising in seafood and dim sum, ensuring consistent quality in every dish that leaves the kitchen.',
+                fullBio: 'Passionate about the art of dim sum and fresh seafood preparation, our Sous Chef works alongside the Executive Chef to maintain Luban Workshop\'s exacting standards every single day.',
+                funFact: 'Folds over 300 dumplings on a busy Friday service.',
+                favouriteDish: 'Steamed Pork Dumpling',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            },
+            'floor': {
+                name: 'Floor Supervisor',
+                role: 'Senior Waitstaff',
+                dept: 'Service',
+                since: 'February 2024',
+                shortBio: 'Leading the front-of-house team to deliver warm, attentive service to every guest.',
+                fullBio: 'Our Floor Supervisor ensures that every guest feels welcomed and well looked after from the moment they arrive. With a warm personality and sharp attention to detail, they set the standard for service excellence at Luban Workshop.',
+                funFact: 'Speaks three languages fluently.',
+                favouriteDish: 'Sweet & Sour Chicken',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            },
+            'chair': {
+                name: 'Committee Chair',
+                role: 'Committee Chairperson',
+                dept: 'Committee',
+                since: 'January 2023',
+                shortBio: 'Guiding the strategic direction of Luban Workshop Restaurant and supporting professional development of the team.',
+                fullBio: 'The Committee Chair provides strategic leadership and governance for Luban Workshop Restaurant, ensuring the restaurant fulfils its educational mission while delivering an exceptional dining experience to the Cape Coast community.',
+                funFact: 'Organised the inaugural Luban culinary showcase event.',
+                favouriteDish: 'Beef in Sichuan Sauce',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            },
+            'member': {
+                name: 'Committee Member',
+                role: 'Advisory Member',
+                dept: 'Committee',
+                since: 'April 2023',
+                shortBio: 'Providing expertise and oversight to ensure Luban Workshop maintains its standards of excellence.',
+                fullBio: 'As an Advisory Member of the committee, this individual brings valuable expertise to the governance of Luban Workshop Restaurant, helping shape policy and supporting the long-term vision of the restaurant.',
+                funFact: 'An avid food historian with a special interest in West African cuisine.',
+                favouriteDish: 'Mongolian Shallot Lamb',
+                photo: null,
+                linkedin: null, instagram: null, twitter: null
+            }
+        };
+
+        var deptColours = {
+            'Kitchen': '#fee2e2',
+            'Service': '#fef3c7',
+            'Management': '#e0f2fe',
+            'Committee': '#f3e8ff'
+        };
+        var deptTextColours = {
+            'Kitchen': '#b91c1c',
+            'Service': '#b45309',
+            'Management': '#0369a1',
+            'Committee': '#7e22ce'
+        };
+
+        function loadProfile() {
+            var params = new URLSearchParams(window.location.search);
+            var id = params.get('id') || 'gm';
+            var p = profiles[id];
+            if (!p) {
+                document.getElementById('profile-name').textContent = 'Profile Not Found';
+                document.getElementById('short-bio-text').textContent = 'This profile does not exist. Please return to the team page.';
+                return;
+            }
+
+            document.title = p.name + ' | Luban Workshop Restaurant';
+            document.getElementById('profile-name').textContent = p.name;
+            document.getElementById('profile-role').textContent = p.role;
+
+            var badge = document.getElementById('dept-badge');
+            badge.textContent = p.dept;
+            badge.style.background = deptColours[p.dept] || '#fee2e2';
+            badge.style.color = deptTextColours[p.dept] || '#b91c1c';
+
+            if (p.since) {
+                document.getElementById('profile-since').querySelector('span').textContent = 'With us since ' + p.since;
+            } else {
+                document.getElementById('profile-since').style.display = 'none';
+            }
+
+            document.getElementById('short-bio-text').textContent = p.shortBio;
+
+            if (p.fullBio) {
+                document.getElementById('full-bio-section').style.display = 'block';
+                document.getElementById('full-bio-text').textContent = p.fullBio;
+            }
+
+            if (p.photo) {
+                document.getElementById('avatar-container').innerHTML = '<img src="' + p.photo + '" alt="' + p.name + '">';
+            }
+
+            // Social links
+            var socialHtml = '';
+            if (p.linkedin) socialHtml += '<a href="' + p.linkedin + '" target="_blank" rel="noopener" title="LinkedIn"><i data-lucide="linkedin" style="width:16px;height:16px;"></i></a>';
+            if (p.instagram) socialHtml += '<a href="' + p.instagram + '" target="_blank" rel="noopener" title="Instagram"><i data-lucide="instagram" style="width:16px;height:16px;"></i></a>';
+            if (p.twitter) socialHtml += '<a href="' + p.twitter + '" target="_blank" rel="noopener" title="Twitter / X"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>';
+            document.getElementById('social-links').innerHTML = socialHtml;
+
+            // Facts grid
+            var facts = [];
+            if (p.dept) facts.push({ label: 'Department', value: p.dept });
+            if (p.role) facts.push({ label: 'Position', value: p.role });
+            if (p.since) facts.push({ label: 'Member Since', value: p.since });
+            if (p.favouriteDish) facts.push({ label: 'Favourite Dish', value: p.favouriteDish });
+            if (p.funFact) facts.push({ label: 'Fun Fact', value: p.funFact });
+
+            var factsGrid = document.getElementById('facts-grid');
+            factsGrid.innerHTML = facts.map(function(f) {
+                return '<div class="fact-item"><div class="fact-label">' + f.label + '</div><div class="fact-value">' + f.value + '</div></div>';
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        loadProfile();
+    </script>
+
+</body>
+</html>

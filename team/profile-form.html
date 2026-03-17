@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile Form | Luban Workshop Restaurant</title>
+    <meta name="description" content="Submit or update your staff profile for the Luban Workshop Restaurant team directory.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+
+        nav { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.97); box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 50; }
+        nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
+        nav a.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        nav .brand span { font-size: 1.1rem; font-weight: 700; color: #1c1917; }
+        nav .brand span em { color: #b91c1c; font-style: normal; }
+        nav .nav-links { display: flex; gap: 1rem; align-items: center; }
+        nav .nav-links a { color: #57534e; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        nav .nav-links a:hover { color: #b91c1c; }
+
+        .page-header { padding-top: 4rem; background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 60%, #b91c1c 100%); color: #fff; }
+        .page-header > div { max-width: 72rem; margin: 0 auto; padding: 2.5rem 1rem; }
+
+        .form-container { max-width: 48rem; margin: 0 auto; padding: 2.5rem 1rem 4rem; }
+
+        .form-card { background: #fff; border-radius: 1.25rem; padding: 2.5rem; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+        .form-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #f5f5f4; }
+        .form-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .form-section h3 { font-size: 1rem; font-weight: 700; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        @media (max-width: 600px) { .field-row { grid-template-columns: 1fr; } }
+        .field { margin-bottom: 1.25rem; }
+        .field label { display: block; font-size: 0.83rem; font-weight: 600; color: #44403c; margin-bottom: 0.4rem; }
+        .field label .req { color: #b91c1c; margin-left: 2px; }
+        .field label .hint { font-weight: 400; color: #a8a29e; font-size: 0.78rem; margin-left: 4px; }
+        .field input, .field select, .field textarea {
+            width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid #d6d3d1; border-radius: 0.5rem;
+            font-family: 'Lato', sans-serif; font-size: 0.88rem; color: #1c1917; background: #fafaf9;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus {
+            border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185,28,28,0.12);
+        }
+        .field textarea { resize: vertical; min-height: 100px; }
+        .field .char-count { font-size: 0.73rem; color: #a8a29e; text-align: right; margin-top: 0.2rem; }
+
+        .photo-upload { border: 2px dashed #fca5a5; border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: #fff9f9; cursor: pointer; transition: border-color 0.2s; }
+        .photo-upload:hover { border-color: #b91c1c; }
+        .photo-upload input[type="file"] { display: none; }
+        .photo-upload p { font-size: 0.82rem; color: #78716c; margin-top: 0.5rem; }
+        .photo-upload p strong { color: #b91c1c; }
+        #photo-preview { display: none; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.75rem; border: 3px solid #fca5a5; }
+
+        .social-row { display: grid; grid-template-columns: 40px 1fr; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+        .social-icon { display: flex; align-items: center; justify-content: center; color: #b91c1c; }
+
+        .submit-btn { width: 100%; padding: 0.85rem; background: #b91c1c; color: #fff; font-size: 1rem; font-weight: 700; font-family: 'Lato', sans-serif; border: none; border-radius: 0.65rem; cursor: pointer; transition: background 0.2s; margin-top: 1rem; }
+        .submit-btn:hover { background: #991b1b; }
+        .submit-btn:disabled { background: #d6d3d1; cursor: not-allowed; }
+
+        .success-banner { display: none; background: #f0fdf4; border: 1px solid #86efac; border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; color: #166534; font-size: 0.9rem; }
+        .error-banner { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.75rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; color: #991b1b; font-size: 0.9rem; }
+
+        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
+        footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div>
+            <a href="../index.html" class="brand">
+                <img src="../logo.png" alt="Luban Workshop Logo" style="height:36px;width:36px;border-radius:50%;object-fit:contain;background:#fff;">
+                <span>Luban <em>Workshop</em></span>
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Our Team</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <a href="index.html" style="display:inline-flex;align-items:center;gap:0.4rem;color:#fca5a5;font-size:0.82rem;text-decoration:none;margin-bottom:1rem;">
+                <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Team
+            </a>
+            <h1 class="serif" style="font-size:2rem;font-weight:700;margin-bottom:0.5rem;">Staff Profile Form</h1>
+            <p style="color:#fecaca;font-size:0.9rem;max-width:32rem;">Fill in your details below to be featured on the Luban Workshop team page. Fields marked <span style="color:#fca5a5;font-weight:700;">*</span> are required.</p>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+
+        <div id="success-banner" class="success-banner">
+            <strong>✓ Profile submitted successfully!</strong> Your profile will be reviewed and added to the team page shortly. Thank you.
+        </div>
+        <div id="error-banner" class="error-banner">
+            <strong>⚠ Please check the form.</strong> <span id="error-msg">Some required fields are missing or invalid.</span>
+        </div>
+
+        <form id="profile-form" class="form-card" novalidate>
+
+            <!-- Section: Photo -->
+            <div class="form-section">
+                <h3><i data-lucide="camera" style="width:16px;height:16px;"></i> Profile Photo</h3>
+                <label class="photo-upload" for="photo-input" id="photo-label">
+                    <img id="photo-preview" alt="Photo preview">
+                    <i data-lucide="upload-cloud" id="upload-icon" style="width:40px;height:40px;color:#fca5a5;margin:0 auto 0.5rem;display:block;"></i>
+                    <p><strong>Click to upload</strong> or drag &amp; drop</p>
+                    <p>JPG, PNG, WEBP · Max 2 MB · Recommended: square crop</p>
+                    <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp">
+                </label>
+                <p style="font-size:0.78rem;color:#a8a29e;margin-top:0.5rem;">Or enter a photo URL below instead:</p>
+                <div class="field" style="margin-bottom:0;">
+                    <input type="url" id="photo-url" name="photo_url" placeholder="https://example.com/your-photo.jpg">
+                </div>
+            </div>
+
+            <!-- Section: Personal Info -->
+            <div class="form-section">
+                <h3><i data-lucide="user" style="width:16px;height:16px;"></i> Personal Information</h3>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="first-name">First Name <span class="req">*</span></label>
+                        <input type="text" id="first-name" name="first_name" placeholder="e.g. Kwame" required>
+                    </div>
+                    <div class="field">
+                        <label for="last-name">Last Name <span class="req">*</span></label>
+                        <input type="text" id="last-name" name="last_name" placeholder="e.g. Asante" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="preferred-name">Preferred Name / Display Name <span class="hint">(optional)</span></label>
+                    <input type="text" id="preferred-name" name="preferred_name" placeholder="Name shown on the team page (leave blank to use full name)">
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="email">Email Address <span class="req">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="field">
+                        <label for="phone">Phone Number <span class="hint">(optional)</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="020 000 0000">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Section: Role & Department -->
+            <div class="form-section">
+                <h3><i data-lucide="briefcase" style="width:16px;height:16px;"></i> Role &amp; Department</h3>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="department">Department <span class="req">*</span></label>
+                        <select id="department" name="department" required>
+                            <option value="" disabled selected>Select department</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="service">Service</option>
+                            <option value="management">Management</option>
+                            <option value="committee">Committee</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="job-title">Job Title / Position <span class="req">*</span></label>
+                        <input type="text" id="job-title" name="job_title" placeholder="e.g. Sous Chef" required>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="start-date">Start Date <span class="hint">(approx. is fine)</span></label>
+                        <input type="month" id="start-date" name="start_date">
+                    </div>
+                    <div class="field">
+                        <label for="status">Status <span class="req">*</span></label>
+                        <select id="status" name="status" required>
+                            <option value="" disabled selected>Select status</option>
+                            <option value="current">Current Staff / Member</option>
+                            <option value="part-time">Part-Time</option>
+                            <option value="trainee">Trainee / Intern</option>
+                            <option value="alumni">Alumni</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Section: Bio -->
+            <div class="form-section">
+                <h3><i data-lucide="file-text" style="width:16px;height:16px;"></i> About You</h3>
+
+                <div class="field">
+                    <label for="short-bio">Short Bio <span class="req">*</span> <span class="hint">shown on the team card</span></label>
+                    <textarea id="short-bio" name="short_bio" maxlength="160" placeholder="A brief one or two sentence summary (max 160 characters)…" required></textarea>
+                    <div class="char-count"><span id="short-bio-count">0</span> / 160</div>
+                </div>
+
+                <div class="field">
+                    <label for="full-bio">Full Bio <span class="hint">shown on your profile page</span></label>
+                    <textarea id="full-bio" name="full_bio" maxlength="600" rows="5" placeholder="Tell us about your background, experience and what you love about working at Luban Workshop…"></textarea>
+                    <div class="char-count"><span id="full-bio-count">0</span> / 600</div>
+                </div>
+
+                <div class="field">
+                    <label for="fun-fact">Fun Fact <span class="hint">(optional · something interesting about you)</span></label>
+                    <input type="text" id="fun-fact" name="fun_fact" placeholder="e.g. I can make dumplings with my eyes closed!">
+                </div>
+
+                <div class="field">
+                    <label for="favourite-dish">Favourite Dish on Our Menu <span class="hint">(optional)</span></label>
+                    <input type="text" id="favourite-dish" name="favourite_dish" placeholder="e.g. Squid in Sichuan Sauce">
+                </div>
+            </div>
+
+            <!-- Section: Social Links -->
+            <div class="form-section">
+                <h3><i data-lucide="share-2" style="width:16px;height:16px;"></i> Social Links <span style="font-size:0.75rem;font-weight:400;color:#a8a29e;text-transform:none;letter-spacing:0;">(all optional)</span></h3>
+
+                <div class="social-row">
+                    <div class="social-icon"><i data-lucide="linkedin" style="width:20px;height:20px;"></i></div>
+                    <div class="field" style="margin-bottom:0;">
+                        <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/your-name">
+                    </div>
+                </div>
+                <div class="social-row">
+                    <div class="social-icon"><i data-lucide="instagram" style="width:20px;height:20px;"></i></div>
+                    <div class="field" style="margin-bottom:0;">
+                        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/yourhandle">
+                    </div>
+                </div>
+                <div class="social-row">
+                    <div class="social-icon"><i data-lucide="twitter" style="width:20px;height:20px;"></i></div>
+                    <div class="field" style="margin-bottom:0;">
+                        <input type="url" id="twitter" name="twitter" placeholder="https://x.com/yourhandle">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Consent -->
+            <div class="form-section">
+                <h3><i data-lucide="shield-check" style="width:16px;height:16px;"></i> Consent</h3>
+                <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                    <input type="checkbox" id="consent" name="consent" required style="width:auto;margin-top:3px;accent-color:#b91c1c;">
+                    <label for="consent" style="font-size:0.85rem;color:#57534e;cursor:pointer;">
+                        I give permission for my name, photo, role, and bio to be published on the Luban Workshop Restaurant team page and agree to the <a href="../privacy-policy.html" style="color:#b91c1c;" target="_blank">privacy policy</a>. <span class="req">*</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-btn">
+                Submit Profile
+            </button>
+
+            <p style="font-size:0.78rem;color:#a8a29e;text-align:center;margin-top:0.75rem;">Your submission will be reviewed by the team before going live.</p>
+
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p class="name">Luban Workshop Restaurant</p>
+        <p style="margin-bottom:0.75rem;">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
+        <div style="display:flex;justify-content:center;gap:1.5rem;font-size:0.8rem;margin-bottom:0.5rem;">
+            <a href="../index.html" style="color:#a8a29e;text-decoration:none;">Home</a>
+            <a href="index.html" style="color:#a8a29e;text-decoration:none;">Our Team</a>
+            <a href="../privacy-policy.html" style="color:#a8a29e;text-decoration:none;">Privacy</a>
+        </div>
+        <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // Character counters
+        function setupCounter(textareaId, countId) {
+            var el = document.getElementById(textareaId);
+            var counter = document.getElementById(countId);
+            if (!el || !counter) return;
+            el.addEventListener('input', function() {
+                counter.textContent = el.value.length;
+            });
+        }
+        setupCounter('short-bio', 'short-bio-count');
+        setupCounter('full-bio', 'full-bio-count');
+
+        // Photo preview
+        document.getElementById('photo-input').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Photo must be under 2 MB.');
+                e.target.value = '';
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var preview = document.getElementById('photo-preview');
+                var icon = document.getElementById('upload-icon');
+                preview.src = ev.target.result;
+                preview.style.display = 'block';
+                icon.style.display = 'none';
+                document.getElementById('photo-url').value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Form submission
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var errorBanner = document.getElementById('error-banner');
+            var errorMsg = document.getElementById('error-msg');
+            var successBanner = document.getElementById('success-banner');
+            errorBanner.style.display = 'none';
+            successBanner.style.display = 'none';
+
+            // Basic validation
+            var firstName = document.getElementById('first-name').value.trim();
+            var lastName = document.getElementById('last-name').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var department = document.getElementById('department').value;
+            var jobTitle = document.getElementById('job-title').value.trim();
+            var status = document.getElementById('status').value;
+            var shortBio = document.getElementById('short-bio').value.trim();
+            var consent = document.getElementById('consent').checked;
+
+            if (!firstName || !lastName) {
+                errorMsg.textContent = 'Please enter your first and last name.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errorMsg.textContent = 'Please enter a valid email address.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!department) {
+                errorMsg.textContent = 'Please select a department.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!jobTitle) {
+                errorMsg.textContent = 'Please enter your job title.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!status) {
+                errorMsg.textContent = 'Please select your employment status.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!shortBio) {
+                errorMsg.textContent = 'Please enter a short bio.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (!consent) {
+                errorMsg.textContent = 'Please agree to the consent statement before submitting.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // Simulate successful submission
+            var btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Submitting…';
+
+            setTimeout(function() {
+                successBanner.style.display = 'block';
+                successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('profile-form').reset();
+                document.getElementById('photo-preview').style.display = 'none';
+                document.getElementById('upload-icon').style.display = 'block';
+                document.getElementById('short-bio-count').textContent = '0';
+                document.getElementById('full-bio-count').textContent = '0';
+                btn.disabled = false;
+                btn.textContent = 'Submit Profile';
+            }, 1200);
+        });
+    </script>
+
+</body>
+</html>
