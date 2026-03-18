@@ -12,6 +12,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
@@ -291,6 +293,18 @@
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+        // Firebase setup
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         // Character counters
         function setupCounter(textareaId, countId) {
             var el = document.getElementById(textareaId);
@@ -387,22 +401,57 @@
                 return;
             }
 
-            // Simulate successful submission
             var btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.textContent = 'Submitting…';
 
-            setTimeout(function() {
-                successBanner.style.display = 'block';
-                successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                document.getElementById('profile-form').reset();
-                document.getElementById('photo-preview').style.display = 'none';
-                document.getElementById('upload-icon').style.display = 'block';
-                document.getElementById('short-bio-count').textContent = '0';
-                document.getElementById('full-bio-count').textContent = '0';
-                btn.disabled = false;
-                btn.textContent = 'Submit Profile';
-            }, 1200);
+            // Build profile data
+            var photoPreview = document.getElementById('photo-preview');
+            var photoUrlField = document.getElementById('photo-url').value.trim();
+            var photoData = '';
+            if (photoUrlField) {
+                photoData = photoUrlField;
+            } else if (photoPreview.style.display !== 'none' && photoPreview.src) {
+                photoData = photoPreview.src;
+            }
+
+            var profileData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                department: department,
+                jobTitle: jobTitle,
+                employmentStatus: status,
+                shortBio: shortBio,
+                fullBio: document.getElementById('full-bio').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                linkedin: document.getElementById('linkedin').value.trim(),
+                instagram: document.getElementById('instagram').value.trim(),
+                twitter: document.getElementById('twitter').value.trim(),
+                photo: photoData,
+                status: 'pending',
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            db.collection('teamProfiles').add(profileData)
+                .then(function() {
+                    successBanner.style.display = 'block';
+                    successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('profile-form').reset();
+                    document.getElementById('photo-preview').style.display = 'none';
+                    document.getElementById('upload-icon').style.display = 'block';
+                    document.getElementById('short-bio-count').textContent = '0';
+                    document.getElementById('full-bio-count').textContent = '0';
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Profile';
+                })
+                .catch(function(err) {
+                    errorMsg.textContent = 'Submission failed: ' + err.message;
+                    errorBanner.style.display = 'block';
+                    errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Profile';
+                });
         });
     </script>
 

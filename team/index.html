@@ -13,6 +13,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
@@ -99,8 +101,11 @@
     <!-- Team Grid -->
     <div class="team-grid" id="team-grid">
 
+        <!-- Placeholder profiles – shown only until real approved profiles load -->
+        <div id="placeholder-profiles">
+
         <!-- Example: Management -->
-        <div class="team-card" data-dept="management">
+        <div class="team-card placeholder-card" data-dept="management">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -114,7 +119,7 @@
         </div>
 
         <!-- Example: Kitchen -->
-        <div class="team-card" data-dept="kitchen">
+        <div class="team-card placeholder-card" data-dept="kitchen">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -128,7 +133,7 @@
         </div>
 
         <!-- Example: Kitchen 2 -->
-        <div class="team-card" data-dept="kitchen">
+        <div class="team-card placeholder-card" data-dept="kitchen">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -142,7 +147,7 @@
         </div>
 
         <!-- Example: Service -->
-        <div class="team-card" data-dept="service">
+        <div class="team-card placeholder-card" data-dept="service">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -156,7 +161,7 @@
         </div>
 
         <!-- Example: Committee -->
-        <div class="team-card" data-dept="committee">
+        <div class="team-card placeholder-card" data-dept="committee">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -170,7 +175,7 @@
         </div>
 
         <!-- Example: Committee 2 -->
-        <div class="team-card" data-dept="committee">
+        <div class="team-card placeholder-card" data-dept="committee">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -182,6 +187,10 @@
                 <a href="profile.html?id=member" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
             </div>
         </div>
+
+        </div><!-- end #placeholder-profiles -->
+
+        <!-- Real approved profiles injected here -->
 
     </div>
 
@@ -214,6 +223,18 @@
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+        // Firebase setup
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         function filterTeam(dept, btn) {
             document.querySelectorAll('.filter-btn').forEach(function(b) {
                 b.classList.remove('active');
@@ -228,6 +249,72 @@
                 }
             });
         }
+
+        function buildCard(doc) {
+            var d = doc.data();
+            var dept = (d.department || 'staff').toLowerCase();
+            var name = (d.firstName || '') + ' ' + (d.lastName || '');
+            var card = document.createElement('div');
+            card.className = 'team-card';
+            card.dataset.dept = dept;
+
+            var safePhoto = safeUrl(d.photo);
+            var photoHtml;
+            if (safePhoto) {
+                photoHtml = '<img class="avatar" src="' + escapeAttr(safePhoto) + '" alt="' + escapeAttr(name) + '" loading="lazy">';
+            } else {
+                photoHtml = '<div class="avatar-placeholder"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>';
+            }
+
+            card.innerHTML = photoHtml +
+                '<div class="card-body">' +
+                '<span class="dept-badge">' + escapeHtml(d.department || 'Staff') + '</span>' +
+                '<h3 class="serif">' + escapeHtml(name.trim()) + '</h3>' +
+                '<p class="role">' + escapeHtml(d.jobTitle || '') + '</p>' +
+                '<p class="bio">' + escapeHtml(d.shortBio || '') + '</p>' +
+                '</div>';
+            return card;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Allow only http/https URLs and data: images to prevent javascript: injection
+        function safeUrl(str) {
+            var s = String(str || '').trim();
+            if (/^https?:\/\//i.test(s) || /^data:image\//i.test(s)) return s;
+            return '';
+        }
+
+        // Load approved profiles from Firestore
+        db.collection('teamProfiles').where('status', '==', 'approved').orderBy('submittedAt', 'asc')
+            .get()
+            .then(function(snapshot) {
+                if (!snapshot.empty) {
+                    // Hide all placeholder cards
+                    document.getElementById('placeholder-profiles').style.display = 'none';
+
+                    var grid = document.getElementById('team-grid');
+                    snapshot.forEach(function(doc) {
+                        grid.appendChild(buildCard(doc));
+                    });
+
+                    // Re-init lucide icons for new cards (if any used)
+                    lucide.createIcons();
+                }
+            })
+            .catch(function(err) {
+                console.warn('Could not load team profiles:', err.message);
+            });
     </script>
 
 </body>
