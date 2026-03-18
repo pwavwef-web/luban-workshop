@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
@@ -75,12 +76,64 @@
 
         footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
         footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
+
+        /* Login screen */
+        #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; background: #fafaf9; }
+        .login-card { background: #fff; border-radius: 1.25rem; padding: 2.5rem; box-shadow: 0 8px 32px rgba(0,0,0,.12); width: 100%; max-width: 26rem; }
+        .login-card .login-logo { text-align: center; margin-bottom: 1.75rem; }
+        .login-card .login-logo h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #1c1917; margin-bottom: 0.25rem; }
+        .login-card .login-logo h2 em { color: #b91c1c; font-style: normal; }
+        .login-card .login-logo p { font-size: 0.85rem; color: #78716c; }
+        .login-card .field { margin-bottom: 1.1rem; }
+        .login-card .field label { display: block; font-size: 0.83rem; font-weight: 600; color: #44403c; margin-bottom: 0.4rem; }
+        .login-card .field input { width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid #d6d3d1; border-radius: 0.5rem; font-family: 'Lato', sans-serif; font-size: 0.88rem; color: #1c1917; background: #fafaf9; transition: border-color 0.2s, box-shadow 0.2s; outline: none; box-sizing: border-box; }
+        .login-card .field input:focus { border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185,28,28,0.12); }
+        #login-error { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.5rem; padding: 0.75rem 1rem; color: #991b1b; font-size: 0.85rem; margin-bottom: 1rem; text-align: center; }
+        .login-submit-btn { width: 100%; padding: 0.75rem; background: #b91c1c; color: #fff; font-size: 0.95rem; font-weight: 700; font-family: 'Lato', sans-serif; border: none; border-radius: 0.65rem; cursor: pointer; transition: background 0.2s; }
+        .login-submit-btn:hover { background: #991b1b; }
+        .login-submit-btn:disabled { background: #d6d3d1; cursor: not-allowed; }
+
+        /* Signout bar */
+        #signout-bar { display: none; background: #fff; border-bottom: 1px solid #f5f5f4; padding: 0.6rem 1rem; text-align: right; font-size: 0.82rem; color: #57534e; }
+        #signout-bar span { margin-right: 0.75rem; }
+        #signout-bar button { background: none; border: 1px solid #d6d3d1; border-radius: 0.4rem; padding: 0.25rem 0.75rem; cursor: pointer; color: #b91c1c; font-size: 0.8rem; font-weight: 600; font-family: 'Lato', sans-serif; }
+        #signout-bar button:hover { background: #fef2f2; }
     </style>
 </head>
 
 <body>
 
-    <!-- Navigation -->
+    <!-- Login Screen (shown until admin is authenticated) -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="../logo.png" alt="Luban Workshop Logo" style="height:52px;width:52px;border-radius:50%;object-fit:contain;background:#fff;margin:0 auto 0.75rem;display:block;">
+                <h2>Luban <em>Workshop</em></h2>
+                <p>Staff Profile Form &mdash; Admin Access Only</p>
+            </div>
+            <form id="login-form" novalidate>
+                <div id="login-error"></div>
+                <div class="field">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" name="login_email" placeholder="your-email@example.com" required autocomplete="username">
+                </div>
+                <div class="field">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="login_password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-submit-btn" id="login-btn">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Form Page (hidden until admin logs in) -->
+    <div id="form-page" style="display:none;">
+
+    <!-- Signed-in bar -->
+    <div id="signout-bar">
+        <span id="signed-in-email"></span>
+        <button onclick="doSignOut()">Sign Out</button>
+    </div>
     <nav>
         <div>
             <a href="../index.html" class="brand">
@@ -289,6 +342,8 @@
         <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
     </footer>
 
+    </div><!-- end #form-page -->
+
     <script>
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
@@ -303,7 +358,76 @@
             appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // --- Auth State ---
+        auth.onAuthStateChanged(async function(user) {
+            if (user) {
+                var adminVerified = false;
+
+                // 1. Check Firebase Custom Claims
+                try {
+                    var tokenResult = await user.getIdTokenResult();
+                    if (tokenResult.claims.admin === true) adminVerified = true;
+                } catch (e) { /* fall through */ }
+
+                // 2. Bootstrap email fallback
+                if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+
+                // 3. Check Firestore admins collection
+                if (!adminVerified && user.email) {
+                    try {
+                        var adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                        if (adminDoc.exists) adminVerified = true;
+                    } catch (e) { /* no permission */ }
+                }
+
+                if (!adminVerified) {
+                    await auth.signOut();
+                    var errDiv = document.getElementById('login-error');
+                    errDiv.textContent = 'Access denied. You do not have admin privileges.';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('form-page').style.display = 'block';
+                document.getElementById('signout-bar').style.display = 'block';
+                document.getElementById('signed-in-email').textContent = user.email;
+                lucide.createIcons();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('form-page').style.display = 'none';
+                document.getElementById('signout-bar').style.display = 'none';
+            }
+        });
+
+        // --- Login Form ---
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var loginBtn = document.getElementById('login-btn');
+            var errDiv = document.getElementById('login-error');
+            errDiv.style.display = 'none';
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in…';
+
+            var email = document.getElementById('login-email').value.trim();
+            var password = document.getElementById('login-password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (err) {
+                errDiv.textContent = 'Sign-in failed: ' + err.message;
+                errDiv.style.display = 'block';
+            }
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Sign In';
+        });
+
+        function doSignOut() {
+            auth.signOut();
+        }
 
         // Character counters
         function setupCounter(textareaId, countId) {

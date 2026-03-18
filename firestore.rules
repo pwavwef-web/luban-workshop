@@ -78,5 +78,24 @@ service cloud.firestore {
       // Only admins can delete messages
       allow delete: if isAdmin();
     }
+
+    // teamProfiles collection – staff profiles submitted via the profile form
+    match /teamProfiles/{profileId} {
+      // Anyone can read approved profiles (displayed publicly on the team page)
+      allow read: if resource.data.status == 'approved' || isAdmin();
+
+      // Only admins can create profiles (form is admin-gated)
+      allow create: if isAdmin() &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.firstName is string &&
+                       request.resource.data.firstName.size() > 0 &&
+                       request.resource.data.lastName is string &&
+                       request.resource.data.lastName.size() > 0 &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.size() > 0;
+
+      // Only admins can update (e.g. approve/reject) or delete profiles
+      allow update, delete: if isAdmin();
+    }
   }
 }
