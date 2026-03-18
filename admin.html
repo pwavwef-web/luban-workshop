@@ -129,6 +129,16 @@
                     <span id="badge-messages"
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
+
+                <a href="team/review.html"
+                    class="w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <div class="flex items-center">
+                        <i data-lucide="users" class="h-5 w-5 mr-3"></i>
+                        <span class="font-medium">Team Profiles</span>
+                    </div>
+                    <span id="badge-team-profiles"
+                        class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
+                </a>
             </nav>
 
             <div class="p-4 border-t border-stone-100">
@@ -362,6 +372,7 @@
                 listenToOrders();
                 listenToAdminUsers();
                 listenToMessages();
+                listenToTeamProfiles();
 
                 // Set default tab
                 switchTab('menu');
@@ -885,6 +896,23 @@
             }
         }
 
+        function listenToTeamProfiles() {
+            db.collection('teamProfiles')
+                .where('status', '==', 'pending')
+                .onSnapshot(snapshot => {
+                    const badge = document.getElementById('badge-team-profiles');
+                    if (badge) {
+                        if (snapshot.size > 0) {
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                }, err => {
+                    console.warn('Team profiles badge listener error:', err);
+                });
+        }
+
         function escapeHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -927,6 +955,11 @@
                 title: 'Messages',
                 description: 'Read messages submitted by customers via the Contact Us page. Mark messages as read once you have reviewed them.',
                 target: 'tab-btn-messages'
+            },
+            {
+                title: 'Team Profiles',
+                description: 'Review profile submissions from staff members. Approve profiles to make them live on the team page, or reject submissions that do not meet your standards.',
+                target: null
             }
         ];
 
@@ -1022,7 +1055,7 @@
             </div>
 
             <!-- Step Counter -->
-            <p id="tour-step-counter" class="text-xs text-stone-400 mb-3">1 of 6</p>
+            <p id="tour-step-counter" class="text-xs text-stone-400 mb-3">1 of 7</p>
 
             <!-- Content -->
             <h2 id="tour-title" class="serif text-xl font-bold text-stone-900 mb-3"></h2>

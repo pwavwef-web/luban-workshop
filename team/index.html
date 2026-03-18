@@ -13,6 +13,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
@@ -100,7 +102,7 @@
     <div class="team-grid" id="team-grid">
 
         <!-- Example: Management -->
-        <div class="team-card" data-dept="management">
+        <div class="team-card hardcoded-card" data-dept="management">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -114,7 +116,7 @@
         </div>
 
         <!-- Example: Kitchen -->
-        <div class="team-card" data-dept="kitchen">
+        <div class="team-card hardcoded-card" data-dept="kitchen">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -128,7 +130,7 @@
         </div>
 
         <!-- Example: Kitchen 2 -->
-        <div class="team-card" data-dept="kitchen">
+        <div class="team-card hardcoded-card" data-dept="kitchen">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -142,7 +144,7 @@
         </div>
 
         <!-- Example: Service -->
-        <div class="team-card" data-dept="service">
+        <div class="team-card hardcoded-card" data-dept="service">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -156,7 +158,7 @@
         </div>
 
         <!-- Example: Committee -->
-        <div class="team-card" data-dept="committee">
+        <div class="team-card hardcoded-card" data-dept="committee">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -170,7 +172,7 @@
         </div>
 
         <!-- Example: Committee 2 -->
-        <div class="team-card" data-dept="committee">
+        <div class="team-card hardcoded-card" data-dept="committee">
             <div class="avatar-placeholder">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
@@ -211,9 +213,22 @@
     </footer>
 
     <script>
+        // --- Firebase Init ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
 
+        // --- Filter Logic (works for both hardcoded and real cards) ---
         function filterTeam(dept, btn) {
             document.querySelectorAll('.filter-btn').forEach(function(b) {
                 b.classList.remove('active');
@@ -227,6 +242,76 @@
                     card.style.display = 'none';
                 }
             });
+        }
+
+        // --- Load Approved Profiles from Firestore ---
+        db.collection('teamProfiles')
+            .where('status', '==', 'approved')
+            .orderBy('reviewedAt', 'desc')
+            .onSnapshot(function(snapshot) {
+                var grid = document.getElementById('team-grid');
+                var hardcodedCards = grid.querySelectorAll('.hardcoded-card');
+                var realCards = grid.querySelectorAll('.real-card');
+
+                // Remove existing real cards before re-rendering
+                realCards.forEach(function(card) { card.remove(); });
+
+                if (!snapshot.empty) {
+                    // Hide all hardcoded placeholder cards
+                    hardcodedCards.forEach(function(card) { card.style.display = 'none'; });
+
+                    // Render real approved profiles
+                    snapshot.forEach(function(doc) {
+                        var p = doc.data();
+                        var card = buildProfileCard(doc.id, p);
+                        grid.insertBefore(card, grid.firstChild);
+                    });
+                } else {
+                    // No approved profiles — show the hardcoded placeholders
+                    hardcodedCards.forEach(function(card) { card.style.display = ''; });
+                }
+
+                lucide.createIcons();
+            }, function(err) {
+                console.warn('Could not load profiles from Firestore:', err);
+                // On error, keep hardcoded cards visible (default behaviour)
+            });
+
+        function buildProfileCard(id, p) {
+            var displayName = (p.preferredName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim()) || 'Team Member';
+            var dept = p.department || '';
+            var role = p.jobTitle || '';
+            var bio = p.shortBio || '';
+
+            var avatarHtml;
+            if (p.photoUrl) {
+                avatarHtml = '<img class="avatar" src="' + escapeHtml(p.photoUrl) + '" alt="' + escapeHtml(displayName) + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+                    + '<div class="avatar-placeholder" style="display:none;"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>';
+            } else {
+                avatarHtml = '<div class="avatar-placeholder"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>';
+            }
+
+            var div = document.createElement('div');
+            div.className = 'team-card real-card';
+            div.dataset.dept = dept;
+            div.innerHTML = avatarHtml
+                + '<div class="card-body">'
+                + '<span class="dept-badge">' + escapeHtml(dept.charAt(0).toUpperCase() + dept.slice(1)) + '</span>'
+                + '<h3 class="serif">' + escapeHtml(displayName) + '</h3>'
+                + '<p class="role">' + escapeHtml(role) + '</p>'
+                + '<p class="bio">' + escapeHtml(bio) + '</p>'
+                + '</div>';
+
+            return div;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
     </script>
 

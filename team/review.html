@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Review | Luban Workshop Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        .tab-btn { padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.82rem; font-weight: 600; border: 1.5px solid #d6d3d1; background: #fff; color: #44403c; cursor: pointer; transition: background 0.2s, color 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .tab-btn.active, .tab-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+        .tab-btn .badge { background: rgba(255,255,255,0.3); border-radius: 9999px; padding: 0.05rem 0.5rem; font-size: 0.72rem; }
+        .tab-btn:not(.active) .badge { background: #fee2e2; color: #b91c1c; }
+
+        .profile-card { background: #fff; border-radius: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,.08); overflow: hidden; transition: box-shadow 0.2s; }
+        .profile-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #fca5a5; flex-shrink: 0; }
+        .profile-avatar-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #fef2f2, #fee2e2); display: flex; align-items: center; justify-content: center; border: 3px solid #fca5a5; flex-shrink: 0; }
+
+        .dept-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; background: #fee2e2; color: #b91c1c; padding: 0.15rem 0.55rem; border-radius: 9999px; }
+
+        .action-btn { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: opacity 0.2s; }
+        .action-btn:hover { opacity: 0.85; }
+        .btn-approve { background: #16a34a; color: #fff; }
+        .btn-reject { background: #fef2f2; color: #b91c1c; border: 1.5px solid #fca5a5; }
+        .btn-unpublish { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+        .btn-restore { background: #f0fdf4; color: #166534; border: 1.5px solid #86efac; }
+        .btn-delete { background: #fef2f2; color: #991b1b; border: 1.5px solid #fca5a5; }
+
+        .status-badge { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.2rem 0.65rem; border-radius: 9999px; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #dcfce7; color: #166534; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+
+        .empty-state { text-align: center; padding: 4rem 2rem; color: #a8a29e; }
+        .empty-state svg { width: 56px; height: 56px; margin: 0 auto 1rem; color: #d6d3d1; display: block; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4 bg-stone-50">
+        <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center mb-4">
+                    <i data-lucide="users" class="h-10 w-10 text-red-700 mr-3"></i>
+                    <h1 class="serif text-3xl font-bold text-stone-900">Luban <span class="text-red-700">Workshop</span></h1>
+                </div>
+                <p class="text-stone-600">Profile Review — Admin Only</p>
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Email Address</label>
+                    <input type="email" id="login-email" required
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Password</label>
+                    <input type="password" id="login-password" required
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none">
+                </div>
+                <div id="login-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md"></div>
+                <button type="submit"
+                    class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium">
+                    Sign In
+                </button>
+            </form>
+            <p class="text-center text-sm text-stone-500 mt-4">
+                <a href="index.html" class="text-red-700 hover:underline">← Back to Team Page</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Review Dashboard -->
+    <div id="review-dashboard" class="hidden min-h-screen bg-stone-50">
+
+        <!-- Top Navigation -->
+        <nav class="bg-white shadow-sm border-b border-stone-200 sticky top-0 z-40">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <a href="index.html" class="text-stone-400 hover:text-red-700 transition-colors" title="Back to Team Page">
+                            <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                        </a>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="users" class="h-5 w-5 text-red-700"></i>
+                            <span class="serif font-bold text-lg text-stone-900">Profile Review</span>
+                        </div>
+                        <span class="hidden sm:inline text-xs text-stone-400">Admin Only</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="../admin.html" class="text-xs text-stone-500 hover:text-red-700 transition-colors hidden sm:block">
+                            Main Admin Dashboard
+                        </a>
+                        <button onclick="logout()"
+                            class="flex items-center gap-2 px-3 py-1.5 border border-stone-200 rounded-md text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-red-700 transition-colors">
+                            <i data-lucide="log-out" class="h-4 w-4"></i>
+                            <span class="hidden sm:inline">Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <!-- Page Title -->
+            <div class="mb-6">
+                <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900 mb-1">Staff Profile Submissions</h2>
+                <p class="text-stone-500 text-sm">Review submitted profiles and approve them to make them live on the team page.</p>
+            </div>
+
+            <!-- Info Banner -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                <i data-lucide="info" class="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
+                <p class="text-sm text-blue-800">
+                    <strong>Tip:</strong> Once you approve at least one profile, all placeholder cards on the team page are automatically replaced with real approved profiles.
+                </p>
+            </div>
+
+            <!-- Tab Bar -->
+            <div class="flex gap-2 flex-wrap mb-6">
+                <button class="tab-btn active" id="tab-pending" onclick="switchTab('pending', this)">
+                    <i data-lucide="clock" style="width:14px;height:14px;"></i>
+                    Pending
+                    <span class="badge" id="pending-count">0</span>
+                </button>
+                <button class="tab-btn" id="tab-approved" onclick="switchTab('approved', this)">
+                    <i data-lucide="check-circle" style="width:14px;height:14px;"></i>
+                    Approved
+                    <span class="badge" id="approved-count">0</span>
+                </button>
+                <button class="tab-btn" id="tab-rejected" onclick="switchTab('rejected', this)">
+                    <i data-lucide="x-circle" style="width:14px;height:14px;"></i>
+                    Rejected
+                    <span class="badge" id="rejected-count">0</span>
+                </button>
+            </div>
+
+            <!-- Profile Grids -->
+            <div id="view-pending">
+                <div id="pending-grid" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div class="empty-state">
+                        <i data-lucide="loader" style="width:40px;height:40px;margin:0 auto 1rem;color:#d6d3d1;display:block;"></i>
+                        <p>Loading submissions…</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-approved" class="hidden">
+                <div id="approved-grid" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div class="empty-state">
+                        <i data-lucide="loader" style="width:40px;height:40px;margin:0 auto 1rem;color:#d6d3d1;display:block;"></i>
+                        <p>Loading…</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-rejected" class="hidden">
+                <div id="rejected-grid" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div class="empty-state">
+                        <i data-lucide="loader" style="width:40px;height:40px;margin:0 auto 1rem;color:#d6d3d1;display:block;"></i>
+                        <p>Loading…</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Profile Detail Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black bg-opacity-60" onclick="closeModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-screen overflow-y-auto z-10">
+            <div class="sticky top-0 bg-white border-b border-stone-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                <h3 class="serif font-bold text-lg text-stone-900">Profile Details</h3>
+                <button onclick="closeModal()" class="text-stone-400 hover:text-stone-600 transition-colors">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="p-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Firebase Config ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
+            measurementId: "G-PZQ13BWZB3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- Auth State ---
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                let adminVerified = false;
+
+                try {
+                    const tokenResult = await user.getIdTokenResult();
+                    if (tokenResult.claims.admin === true) adminVerified = true;
+                } catch (e) { /* fall through */ }
+
+                if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+
+                if (!adminVerified && user.email) {
+                    try {
+                        const adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                        if (adminDoc.exists) adminVerified = true;
+                    } catch (e) { /* no permission */ }
+                }
+
+                if (!adminVerified) {
+                    await auth.signOut();
+                    const errDiv = document.getElementById('login-error');
+                    errDiv.textContent = 'Access denied. You do not have admin privileges.';
+                    errDiv.classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('review-dashboard').classList.remove('hidden');
+
+                listenToProfiles();
+                lucide.createIcons();
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('review-dashboard').classList.add('hidden');
+            }
+        });
+
+        // --- Login ---
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errDiv = document.getElementById('login-error');
+            errDiv.classList.add('hidden');
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (err) {
+                errDiv.textContent = err.message || 'Login failed. Please check your credentials.';
+                errDiv.classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            auth.signOut();
+        }
+
+        // --- Tab Switching ---
+        let activeTab = 'pending';
+
+        function switchTab(tab, btn) {
+            activeTab = tab;
+            ['pending', 'approved', 'rejected'].forEach(t => {
+                document.getElementById('view-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('active');
+            });
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            if (btn) btn.classList.add('active');
+            else document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // --- Real-time Profiles Listener ---
+        let allProfiles = {};
+
+        function listenToProfiles() {
+            db.collection('teamProfiles')
+                .orderBy('submittedAt', 'desc')
+                .onSnapshot(snapshot => {
+                    allProfiles = {};
+                    const pending = [], approved = [], rejected = [];
+
+                    snapshot.forEach(doc => {
+                        const data = { id: doc.id, ...doc.data() };
+                        allProfiles[doc.id] = data;
+                        const s = data.status || 'pending';
+                        if (s === 'approved') approved.push(data);
+                        else if (s === 'rejected') rejected.push(data);
+                        else pending.push(data);
+                    });
+
+                    document.getElementById('pending-count').textContent = pending.length;
+                    document.getElementById('approved-count').textContent = approved.length;
+                    document.getElementById('rejected-count').textContent = rejected.length;
+
+                    renderGrid('pending-grid', pending, 'pending');
+                    renderGrid('approved-grid', approved, 'approved');
+                    renderGrid('rejected-grid', rejected, 'rejected');
+
+                    lucide.createIcons();
+                }, err => {
+                    console.error('Error loading profiles:', err);
+                });
+        }
+
+        // --- Render Profile Grid ---
+        function renderGrid(containerId, profiles, status) {
+            const container = document.getElementById(containerId);
+            if (!profiles.length) {
+                const labels = {
+                    pending: 'No pending submissions at this time.',
+                    approved: 'No approved profiles yet.',
+                    rejected: 'No rejected profiles.'
+                };
+                container.innerHTML = `
+                    <div class="empty-state col-span-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <p>${labels[status]}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = profiles.map(p => renderProfileCard(p, status)).join('');
+        }
+
+        function renderProfileCard(p, status) {
+            const displayName = escapeHtml(p.preferredName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || 'Unknown');
+            const dept = escapeHtml(p.department || '');
+            const role = escapeHtml(p.jobTitle || '');
+            const bio = escapeHtml(p.shortBio || '');
+            const submittedDate = p.submittedAt ? new Date(p.submittedAt.toDate ? p.submittedAt.toDate() : p.submittedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Unknown date';
+            const email = escapeHtml(p.email || '');
+
+            const avatarHtml = p.photoUrl
+                ? `<img src="${escapeHtml(p.photoUrl)}" alt="${displayName}" class="profile-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                   <div class="profile-avatar-placeholder" style="display:none;"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:32px;height:32px;color:#fca5a5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>`
+                : `<div class="profile-avatar-placeholder"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:32px;height:32px;color:#fca5a5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>`;
+
+            let actions = '';
+            if (status === 'pending') {
+                actions = `
+                    <button onclick="approveProfile('${p.id}')" class="action-btn btn-approve">
+                        <i data-lucide="check" style="width:13px;height:13px;"></i> Approve
+                    </button>
+                    <button onclick="rejectProfile('${p.id}')" class="action-btn btn-reject">
+                        <i data-lucide="x" style="width:13px;height:13px;"></i> Reject
+                    </button>`;
+            } else if (status === 'approved') {
+                actions = `
+                    <button onclick="unpublishProfile('${p.id}')" class="action-btn btn-unpublish">
+                        <i data-lucide="eye-off" style="width:13px;height:13px;"></i> Unpublish
+                    </button>
+                    <button onclick="deleteProfile('${p.id}', '${displayName}')" class="action-btn btn-delete">
+                        <i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete
+                    </button>`;
+            } else {
+                actions = `
+                    <button onclick="approveProfile('${p.id}')" class="action-btn btn-approve">
+                        <i data-lucide="check" style="width:13px;height:13px;"></i> Approve
+                    </button>
+                    <button onclick="deleteProfile('${p.id}', '${displayName}')" class="action-btn btn-delete">
+                        <i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete
+                    </button>`;
+            }
+
+            const statusBadge = `<span class="status-badge status-${status}">${status}</span>`;
+
+            return `
+                <div class="profile-card">
+                    <div class="p-5">
+                        <div class="flex items-start gap-4">
+                            ${avatarHtml}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <div>
+                                        <span class="dept-badge">${dept}</span>
+                                    </div>
+                                    ${statusBadge}
+                                </div>
+                                <h3 class="serif font-bold text-stone-900 text-lg leading-tight">${displayName}</h3>
+                                <p class="text-red-700 font-semibold text-sm mb-1">${role}</p>
+                                <p class="text-xs text-stone-400 mb-2">${email} · Submitted ${submittedDate}</p>
+                                <p class="text-sm text-stone-600 line-clamp-2">${bio}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 mt-4 pt-4 border-t border-stone-100 flex-wrap">
+                            <button onclick="viewProfile('${p.id}')" class="action-btn" style="background:#f5f5f4;color:#1c1917;border:1.5px solid #e7e5e4;">
+                                <i data-lucide="eye" style="width:13px;height:13px;"></i> View Full Profile
+                            </button>
+                            ${actions}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // --- Profile Actions ---
+        async function approveProfile(id) {
+            try {
+                await db.collection('teamProfiles').doc(id).update({
+                    status: 'approved',
+                    reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (err) {
+                console.error('Error approving profile:', err);
+                alert('Failed to approve profile. Please try again.');
+            }
+        }
+
+        async function rejectProfile(id) {
+            if (!confirm('Reject this profile submission?')) return;
+            try {
+                await db.collection('teamProfiles').doc(id).update({
+                    status: 'rejected',
+                    reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (err) {
+                console.error('Error rejecting profile:', err);
+                alert('Failed to reject profile. Please try again.');
+            }
+        }
+
+        async function unpublishProfile(id) {
+            if (!confirm('Unpublish this profile? It will be hidden from the team page until re-approved.')) return;
+            try {
+                await db.collection('teamProfiles').doc(id).update({
+                    status: 'pending',
+                    reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (err) {
+                console.error('Error unpublishing profile:', err);
+                alert('Failed to unpublish profile. Please try again.');
+            }
+        }
+
+        async function deleteProfile(id, name) {
+            if (!confirm('Permanently delete the profile for ' + name + '? This cannot be undone.')) return;
+            try {
+                await db.collection('teamProfiles').doc(id).delete();
+            } catch (err) {
+                console.error('Error deleting profile:', err);
+                alert('Failed to delete profile. Please try again.');
+            }
+        }
+
+        // --- Profile Detail Modal ---
+        function viewProfile(id) {
+            const p = allProfiles[id];
+            if (!p) return;
+
+            const displayName = escapeHtml(p.preferredName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || 'Unknown');
+            const fields = [
+                ['Full Name', (p.firstName || '') + ' ' + (p.lastName || '')],
+                ['Preferred / Display Name', p.preferredName],
+                ['Department', p.department],
+                ['Job Title', p.jobTitle],
+                ['Employment Status', p.employmentStatus],
+                ['Start Date', p.startDate],
+                ['Email', p.email],
+                ['Phone', p.phone],
+                ['Short Bio', p.shortBio],
+                ['Full Bio', p.fullBio],
+                ['Fun Fact', p.funFact],
+                ['Favourite Dish', p.favouriteDish],
+                ['LinkedIn', p.linkedin],
+                ['Instagram', p.instagram],
+                ['Twitter', p.twitter],
+            ].filter(([, v]) => v && v.trim && v.trim());
+
+            const avatarHtml = p.photoUrl
+                ? `<img src="${escapeHtml(p.photoUrl)}" alt="${displayName}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #fca5a5;display:block;margin:0 auto 1rem;" onerror="this.style.display='none';">`
+                : '';
+
+            document.getElementById('modal-content').innerHTML = `
+                ${avatarHtml}
+                <h2 class="serif text-xl font-bold text-stone-900 text-center mb-1">${displayName}</h2>
+                <p class="text-red-700 font-semibold text-sm text-center mb-4">${escapeHtml(p.jobTitle || '')}</p>
+                <dl class="space-y-3">
+                    ${fields.map(([label, value]) => `
+                        <div class="flex gap-3">
+                            <dt class="w-36 flex-shrink-0 text-xs font-bold text-stone-500 uppercase tracking-wide pt-0.5">${escapeHtml(label)}</dt>
+                            <dd class="text-sm text-stone-700 flex-1">${escapeHtml(String(value))}</dd>
+                        </div>
+                    `).join('')}
+                </dl>
+            `;
+            document.getElementById('profile-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // --- Utilities ---
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

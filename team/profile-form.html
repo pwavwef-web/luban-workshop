@@ -12,6 +12,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
@@ -288,6 +290,18 @@
     </footer>
 
     <script>
+        // --- Firebase Init ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
 
@@ -304,6 +318,7 @@
         setupCounter('full-bio', 'full-bio-count');
 
         // Photo preview
+        var uploadedPhotoDataUrl = null;
         document.getElementById('photo-input').addEventListener('change', function(e) {
             var file = e.target.files[0];
             if (!file) return;
@@ -312,17 +327,49 @@
                 e.target.value = '';
                 return;
             }
-            var reader = new FileReader();
-            reader.onload = function(ev) {
+            resizeImageToBase64(file, 400, 400, 0.85).then(function(dataUrl) {
+                uploadedPhotoDataUrl = dataUrl;
                 var preview = document.getElementById('photo-preview');
                 var icon = document.getElementById('upload-icon');
-                preview.src = ev.target.result;
+                preview.src = dataUrl;
                 preview.style.display = 'block';
                 icon.style.display = 'none';
                 document.getElementById('photo-url').value = '';
-            };
-            reader.readAsDataURL(file);
+            }).catch(function() {
+                // fallback: use FileReader directly
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    uploadedPhotoDataUrl = ev.target.result;
+                    var preview = document.getElementById('photo-preview');
+                    var icon = document.getElementById('upload-icon');
+                    preview.src = ev.target.result;
+                    preview.style.display = 'block';
+                    icon.style.display = 'none';
+                    document.getElementById('photo-url').value = '';
+                };
+                reader.readAsDataURL(file);
+            });
         });
+
+        // Resize image using canvas
+        function resizeImageToBase64(file, maxWidth, maxHeight, quality) {
+            return new Promise(function(resolve, reject) {
+                var img = new Image();
+                var url = URL.createObjectURL(file);
+                img.onload = function() {
+                    var w = img.width, h = img.height;
+                    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                    if (h > maxHeight) { w = Math.round(w * maxHeight / h); h = maxHeight; }
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    URL.revokeObjectURL(url);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
 
         // Form submission
         document.getElementById('profile-form').addEventListener('submit', function(e) {
@@ -387,22 +434,59 @@
                 return;
             }
 
-            // Simulate successful submission
             var btn = document.getElementById('submit-btn');
             btn.disabled = true;
             btn.textContent = 'Submitting…';
 
-            setTimeout(function() {
+            // Determine photo URL
+            var photoUrl = uploadedPhotoDataUrl || document.getElementById('photo-url').value.trim() || null;
+
+            var profileData = {
+                firstName: firstName,
+                lastName: lastName,
+                preferredName: document.getElementById('preferred-name').value.trim() || null,
+                email: email,
+                phone: document.getElementById('phone').value.trim() || null,
+                department: department,
+                jobTitle: jobTitle,
+                employmentStatus: status,
+                startDate: document.getElementById('start-date').value || null,
+                shortBio: shortBio,
+                fullBio: document.getElementById('full-bio').value.trim() || null,
+                funFact: document.getElementById('fun-fact').value.trim() || null,
+                favouriteDish: document.getElementById('favourite-dish').value.trim() || null,
+                linkedin: document.getElementById('linkedin').value.trim() || null,
+                instagram: document.getElementById('instagram').value.trim() || null,
+                twitter: document.getElementById('twitter').value.trim() || null,
+                photoUrl: photoUrl,
+                status: 'pending',
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Remove null fields to keep Firestore docs clean
+            Object.keys(profileData).forEach(function(k) {
+                if (profileData[k] === null) delete profileData[k];
+            });
+
+            db.collection('teamProfiles').add(profileData).then(function() {
                 successBanner.style.display = 'block';
                 successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 document.getElementById('profile-form').reset();
+                uploadedPhotoDataUrl = null;
                 document.getElementById('photo-preview').style.display = 'none';
                 document.getElementById('upload-icon').style.display = 'block';
                 document.getElementById('short-bio-count').textContent = '0';
                 document.getElementById('full-bio-count').textContent = '0';
                 btn.disabled = false;
                 btn.textContent = 'Submit Profile';
-            }, 1200);
+            }).catch(function(err) {
+                console.error('Firestore error:', err);
+                errorMsg.textContent = 'Submission failed. Please check your connection and try again.';
+                errorBanner.style.display = 'block';
+                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                btn.disabled = false;
+                btn.textContent = 'Submit Profile';
+            });
         });
     </script>
 

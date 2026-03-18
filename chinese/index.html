@@ -111,19 +111,24 @@
             </div>
 
             <!-- 分类筛选 -->
-            <div class="flex justify-center space-x-2 mb-10 overflow-x-auto pb-4">
-                <button onclick="filterMenu('all', this)" class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium whitespace-nowrap">全部</button>
-                <button onclick="filterMenu('soups', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">汤类</button>
-                <button onclick="filterMenu('starters', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">前菜</button>
-                <button onclick="filterMenu('beef', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">牛羊肉</button>
-                <button onclick="filterMenu('seafood', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">海鲜</button>
-                <button onclick="filterMenu('rice', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">米饭</button>
-                <button onclick="filterMenu('noodles', this)" class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">面条</button>
+            <div class="flex justify-center flex-wrap gap-2 mb-10 pb-2">
+                <button onclick="filterMenu('all', this)" class="category-btn active px-5 py-2 rounded-full bg-stone-900 text-white text-sm font-medium whitespace-nowrap">全部</button>
+                <button onclick="filterMenu('soups', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">汤类</button>
+                <button onclick="filterMenu('starters', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">前菜</button>
+                <button onclick="filterMenu('beef', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">牛羊肉</button>
+                <button onclick="filterMenu('pork', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">猪肉</button>
+                <button onclick="filterMenu('chicken', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">鸡肉</button>
+                <button onclick="filterMenu('seafood', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">海鲜</button>
+                <button onclick="filterMenu('rice', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">米饭</button>
+                <button onclick="filterMenu('noodles', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">面条</button>
+                <button onclick="filterMenu('dumplings', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">饺子</button>
+                <button onclick="filterMenu('veg', this)" class="category-btn px-5 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium whitespace-nowrap hover:bg-stone-200">蔬菜</button>
             </div>
 
             <!-- 菜品卡片 -->
             <div class="grid grid-cols-1 gap-y-8 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
 
+                <!-- 汤类 Soups -->
                 <div class="menu-card" data-cat="soups">
                     <img src="../assets/menu-items-pictures/SP1.jpg" alt="鸡肉玉米羹" loading="lazy">
                     <div class="card-body">
@@ -144,13 +149,64 @@
                     </div>
                 </div>
 
+                <!-- 前菜 Starters -->
                 <div class="menu-card" data-cat="starters">
                     <img src="../assets/menu-items-pictures/S1.jpg" alt="牛肉春卷" loading="lazy">
                     <div class="card-body">
                         <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S1</span>
                         <h3 class="serif mt-2">牛肉春卷 <span style="font-size:0.8rem;color:#a8a29e;">(3件)</span></h3>
-                        <p class="en-name">Beef Spring Rolls</p>
+                        <p class="en-name">Beef Spring Rolls (3 pcs)</p>
                         <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S2.jpg" alt="蔬菜春卷" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S2</span>
+                        <h3 class="serif mt-2">蔬菜春卷 <span style="font-size:0.8rem;color:#a8a29e;">(3件)</span></h3>
+                        <p class="en-name">Vegetable Spring Rolls (3 pcs)</p>
+                        <p class="price">C25</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S3.jpg" alt="牛肉萨摩萨" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S3</span>
+                        <h3 class="serif mt-2">牛肉萨摩萨 <span style="font-size:0.8rem;color:#a8a29e;">(5件)</span></h3>
+                        <p class="en-name">Beef Samosa (5 pcs)</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S4.jpg" alt="鱼肉萨摩萨" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S4</span>
+                        <h3 class="serif mt-2">鱼肉萨摩萨 <span style="font-size:0.8rem;color:#a8a29e;">(5件)</span></h3>
+                        <p class="en-name">Fish Samosa (5 pcs)</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S5.jpg" alt="炸鸡块" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S5</span>
+                        <h3 class="serif mt-2">炸鸡块 <span style="font-size:0.8rem;color:#a8a29e;">(6件)</span></h3>
+                        <p class="en-name">Fried Chicken Pieces (6 pcs)</p>
+                        <p class="price">C65</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S6.jpg" alt="特色鸡翅" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S6</span>
+                        <h3 class="serif mt-2">特色鸡翅</h3>
+                        <p class="en-name">Special Chicken Wings</p>
+                        <p class="price">C65</p>
                     </div>
                 </div>
 
@@ -161,6 +217,27 @@
                         <h3 class="serif mt-2">黄金炸虾</h3>
                         <p class="en-name">Golden Fried Prawns</p>
                         <p class="price">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="starters">
+                    <img src="../assets/menu-items-pictures/S8.jpg" alt="椒盐鱿鱼圈" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">S8</span>
+                        <h3 class="serif mt-2">椒盐鱿鱼圈</h3>
+                        <p class="en-name">Fried Squid in Spicy Salt</p>
+                        <p class="price">C85</p>
+                    </div>
+                </div>
+
+                <!-- 牛羊肉 Beef & Lamb -->
+                <div class="menu-card" data-cat="beef">
+                    <img src="../assets/menu-items-pictures/B1.jpg" alt="青椒洋葱炒牛肉丝" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B1</span>
+                        <h3 class="serif mt-2">青椒洋葱炒牛肉丝</h3>
+                        <p class="en-name">Shredded Beef with Green Pepper &amp; Onion</p>
+                        <p class="price">C110</p>
                     </div>
                 </div>
 
@@ -175,6 +252,26 @@
                 </div>
 
                 <div class="menu-card" data-cat="beef">
+                    <img src="../assets/menu-items-pictures/B3.jpg" alt="咖喱牛肉片" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B3</span>
+                        <h3 class="serif mt-2">咖喱牛肉片</h3>
+                        <p class="en-name">Sliced Beef in Curry Sauce</p>
+                        <p class="price">C110</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="beef">
+                    <img src="../assets/menu-items-pictures/B4.jpg" alt="蚝油牛肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B4</span>
+                        <h3 class="serif mt-2">蚝油牛肉</h3>
+                        <p class="en-name">Beef in Oyster Sauce</p>
+                        <p class="price">C110</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="beef">
                     <img src="../assets/menu-items-pictures/B5.jpg" alt="香辣脆牛肉" loading="lazy">
                     <div class="card-body">
                         <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B5</span>
@@ -184,6 +281,119 @@
                     </div>
                 </div>
 
+                <div class="menu-card" data-cat="beef">
+                    <img src="../assets/menu-items-pictures/B6.jpg" alt="葱爆羊肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B6</span>
+                        <h3 class="serif mt-2">葱爆羊肉</h3>
+                        <p class="en-name">Mongolian Shallot Lamb</p>
+                        <p class="price">C115</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="beef">
+                    <img src="../assets/menu-items-pictures/B7.jpg" alt="羊排" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">B7</span>
+                        <h3 class="serif mt-2">羊排</h3>
+                        <p class="en-name">Lamb Chops</p>
+                        <p class="price">C85</p>
+                    </div>
+                </div>
+
+                <!-- 猪肉 Pork -->
+                <div class="menu-card" data-cat="pork">
+                    <img src="../assets/menu-items-pictures/P1.jpg" alt="糖醋猪肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">P1</span>
+                        <h3 class="serif mt-2">糖醋猪肉</h3>
+                        <p class="en-name">Sweet &amp; Sour Pork</p>
+                        <p class="price">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="pork">
+                    <img src="../assets/menu-items-pictures/P2.jpg" alt="四川辣汁猪肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">P2</span>
+                        <h3 class="serif mt-2">四川辣汁猪肉</h3>
+                        <p class="en-name">Pork Sichuan Style</p>
+                        <p class="price">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="pork">
+                    <img src="../assets/menu-items-pictures/P3.jpg" alt="辣汁猪肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">P3</span>
+                        <h3 class="serif mt-2">辣汁猪肉</h3>
+                        <p class="en-name">Pork in Chilli Sauce</p>
+                        <p class="price">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="pork">
+                    <img src="../assets/menu-items-pictures/P4.jpg" alt="蚝油猪肉" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">P4</span>
+                        <h3 class="serif mt-2">蚝油猪肉</h3>
+                        <p class="en-name">Pork in Oyster Sauce</p>
+                        <p class="price">C90</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="pork">
+                    <img src="../assets/menu-items-pictures/P5.jpg" alt="炸猪排" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">P5</span>
+                        <h3 class="serif mt-2">炸猪排</h3>
+                        <p class="en-name">Fried Pork Ribs</p>
+                        <p class="price">C75</p>
+                    </div>
+                </div>
+
+                <!-- 鸡肉 Chicken -->
+                <div class="menu-card" data-cat="chicken">
+                    <img src="../assets/menu-items-pictures/K1.jpg" alt="糖醋鸡" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">K1</span>
+                        <h3 class="serif mt-2">糖醋鸡</h3>
+                        <p class="en-name">Sweet &amp; Sour Chicken</p>
+                        <p class="price">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="chicken">
+                    <img src="../assets/menu-items-pictures/K2.jpg" alt="四川辣汁鸡" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">K2</span>
+                        <h3 class="serif mt-2">四川辣汁鸡</h3>
+                        <p class="en-name">Chicken Sichuan Sauce</p>
+                        <p class="price">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="chicken">
+                    <img src="../assets/menu-items-pictures/K3.jpg" alt="咖喱鸡" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">K3</span>
+                        <h3 class="serif mt-2">咖喱鸡</h3>
+                        <p class="en-name">Chicken in Curry Sauce</p>
+                        <p class="price">C100</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="chicken">
+                    <img src="../assets/menu-items-pictures/K4.jpg" alt="蚝油鸡" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">K4</span>
+                        <h3 class="serif mt-2">蚝油鸡</h3>
+                        <p class="en-name">Chicken in Oyster Sauce</p>
+                        <p class="price">C100</p>
+                    </div>
+                </div>
+
+                <!-- 海鲜 Seafood -->
                 <div class="menu-card" data-cat="seafood">
                     <img src="../assets/menu-items-pictures/Q1.jpg" alt="鲁班辣汁鱿鱼" loading="lazy">
                     <div class="card-body">
@@ -195,12 +405,123 @@
                 </div>
 
                 <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/Q2.jpg" alt="四川辣汁鱿鱼" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Q2</span>
+                        <h3 class="serif mt-2">四川辣汁鱿鱼</h3>
+                        <p class="en-name">Squid in Sichuan Sauce</p>
+                        <p class="price">C120</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/Q3.jpg" alt="蒜汁鱿鱼" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Q3</span>
+                        <h3 class="serif mt-2">蒜汁鱿鱼</h3>
+                        <p class="en-name">Squid in Garlic Sauce</p>
+                        <p class="price">C120</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/F1.jpg" alt="辣汁鱼片" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">F1</span>
+                        <h3 class="serif mt-2">辣汁鱼片</h3>
+                        <p class="en-name">Fish Fillet in Chilli Sauce</p>
+                        <p class="price">C115</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/F2.jpg" alt="素汁鱼片" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">F2</span>
+                        <h3 class="serif mt-2">素汁鱼片</h3>
+                        <p class="en-name">Fish Fillet in Vegetable Sauce</p>
+                        <p class="price">C115</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/F3.jpg" alt="四川辣汁鱼片" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">F3</span>
+                        <h3 class="serif mt-2">四川辣汁鱼片</h3>
+                        <p class="en-name">Fish Fillet in Sichuan Sauce</p>
+                        <p class="price">C115</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/F4.jpg" alt="糖醋鱼片" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">F4</span>
+                        <h3 class="serif mt-2">糖醋鱼片</h3>
+                        <p class="en-name">Sweet &amp; Sour Fish Fillet</p>
+                        <p class="price">C115</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/PR1.jpg" alt="辣汁大虾" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">PR1</span>
+                        <h3 class="serif mt-2">辣汁大虾</h3>
+                        <p class="en-name">Prawns in Chilli Sauce</p>
+                        <p class="price">C155</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/PR2.jpg" alt="咖喱大虾" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">PR2</span>
+                        <h3 class="serif mt-2">咖喱大虾</h3>
+                        <p class="en-name">Prawns in Curry Sauce</p>
+                        <p class="price">C155</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
+                    <img src="../assets/menu-items-pictures/PR3.jpg" alt="四川辣汁大虾" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">PR3</span>
+                        <h3 class="serif mt-2">四川辣汁大虾</h3>
+                        <p class="en-name">Prawns in Sichuan Sauce</p>
+                        <p class="price">C155</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="seafood">
                     <img src="../assets/menu-items-pictures/SF1.jpg" alt="四川辣汁特色海鲜" loading="lazy">
                     <div class="card-body">
                         <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">SF1</span>
                         <h3 class="serif mt-2">四川辣汁特色海鲜</h3>
                         <p class="en-name">Special Seafood in Sichuan Sauce</p>
                         <p class="price">C170</p>
+                    </div>
+                </div>
+
+                <!-- 米饭 Rice -->
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R1.jpg" alt="白米饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R1</span>
+                        <h3 class="serif mt-2">白米饭</h3>
+                        <p class="en-name">Steamed Rice</p>
+                        <p class="price">C29</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R2.jpg" alt="特色焦罗夫炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R2</span>
+                        <h3 class="serif mt-2">特色焦罗夫炒饭</h3>
+                        <p class="en-name">Special Jollof Rice</p>
+                        <p class="price">C50</p>
                     </div>
                 </div>
 
@@ -215,12 +536,93 @@
                 </div>
 
                 <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R4.jpg" alt="虾仁炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R4</span>
+                        <h3 class="serif mt-2">虾仁炒饭</h3>
+                        <p class="en-name">Shrimp Fried Rice</p>
+                        <p class="price">C50</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R5.jpg" alt="蛋炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R5</span>
+                        <h3 class="serif mt-2">蛋炒饭</h3>
+                        <p class="en-name">Egg Fried Rice</p>
+                        <p class="price">C40</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R6.jpg" alt="牛肉炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R6</span>
+                        <h3 class="serif mt-2">牛肉炒饭</h3>
+                        <p class="en-name">Beef Fried Rice</p>
+                        <p class="price">C45</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R7.jpg" alt="鸡肉炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R7</span>
+                        <h3 class="serif mt-2">鸡肉炒饭</h3>
+                        <p class="en-name">Chicken Fried Rice</p>
+                        <p class="price">C45</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
                     <img src="../assets/menu-items-pictures/R8.jpg" alt="海鲜炒饭" loading="lazy">
                     <div class="card-body">
                         <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R8</span>
                         <h3 class="serif mt-2">海鲜炒饭</h3>
                         <p class="en-name">Seafood Fried Rice</p>
                         <p class="price">C85</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="rice">
+                    <img src="../assets/menu-items-pictures/R9.jpg" alt="猪肉炒饭" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">R9</span>
+                        <h3 class="serif mt-2">猪肉炒饭</h3>
+                        <p class="en-name">Pork Fried Rice</p>
+                        <p class="price">C45</p>
+                    </div>
+                </div>
+
+                <!-- 面条 Noodles -->
+                <div class="menu-card" data-cat="noodles">
+                    <img src="../assets/menu-items-pictures/N1.jpg" alt="素炒面" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">N1</span>
+                        <h3 class="serif mt-2">素炒面</h3>
+                        <p class="en-name">Vegetable Noodles</p>
+                        <p class="price">C45</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="noodles">
+                    <img src="../assets/menu-items-pictures/N2.jpg" alt="特色炒面" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">N2</span>
+                        <h3 class="serif mt-2">特色炒面</h3>
+                        <p class="en-name">Special Noodles</p>
+                        <p class="price">C80</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="noodles">
+                    <img src="../assets/menu-items-pictures/N4.jpg" alt="星洲炒米" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">N4</span>
+                        <h3 class="serif mt-2">星洲炒米</h3>
+                        <p class="en-name">Singapore Noodles</p>
+                        <p class="price">C80</p>
                     </div>
                 </div>
 
@@ -235,12 +637,64 @@
                 </div>
 
                 <div class="menu-card" data-cat="noodles">
-                    <img src="../assets/menu-items-pictures/N4.jpg" alt="星洲炒米" loading="lazy">
+                    <img src="../assets/menu-items-pictures/N6.jpg" alt="鸡肉面" loading="lazy">
                     <div class="card-body">
-                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">N4</span>
-                        <h3 class="serif mt-2">星洲炒米</h3>
-                        <p class="en-name">Singapore Noodles</p>
-                        <p class="price">C80</p>
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">N6</span>
+                        <h3 class="serif mt-2">鸡肉面</h3>
+                        <p class="en-name">Chicken Noodles</p>
+                        <p class="price">C60</p>
+                    </div>
+                </div>
+
+                <!-- 饺子 Dumplings -->
+                <div class="menu-card" data-cat="dumplings">
+                    <img src="../assets/menu-items-pictures/D1.jpg" alt="猪肉蒸饺" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">D1</span>
+                        <h3 class="serif mt-2">猪肉蒸饺</h3>
+                        <p class="en-name">Steamed Pork Dumpling</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="dumplings">
+                    <img src="../assets/menu-items-pictures/D2.jpg" alt="猪肉煎饺" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">D2</span>
+                        <h3 class="serif mt-2">猪肉煎饺</h3>
+                        <p class="en-name">Fried Pork Dumpling</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="dumplings">
+                    <img src="../assets/menu-items-pictures/D3.jpg" alt="牛肉蒸饺" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">D3</span>
+                        <h3 class="serif mt-2">牛肉蒸饺</h3>
+                        <p class="en-name">Steamed Beef Dumpling</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <div class="menu-card" data-cat="dumplings">
+                    <img src="../assets/menu-items-pictures/D4.jpg" alt="牛肉煎饺" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">D4</span>
+                        <h3 class="serif mt-2">牛肉煎饺</h3>
+                        <p class="en-name">Fried Beef Dumpling</p>
+                        <p class="price">C30</p>
+                    </div>
+                </div>
+
+                <!-- 蔬菜 Vegetables -->
+                <div class="menu-card" data-cat="veg">
+                    <img src="../assets/menu-items-pictures/V1.jpg" alt="素炒时蔬" loading="lazy">
+                    <div class="card-body">
+                        <span class="text-xs font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">V1</span>
+                        <h3 class="serif mt-2">素炒时蔬</h3>
+                        <p class="en-name">Mixed Vegetable Sauce</p>
+                        <p class="price">C40</p>
                     </div>
                 </div>
 
