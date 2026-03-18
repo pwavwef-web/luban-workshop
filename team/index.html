@@ -247,7 +247,7 @@
         // --- Load Approved Profiles from Firestore ---
         db.collection('teamProfiles')
             .where('status', '==', 'approved')
-            .orderBy('reviewedAt', 'desc')
+            .orderBy('submittedAt', 'desc')
             .onSnapshot(function(snapshot) {
                 var grid = document.getElementById('team-grid');
                 var hardcodedCards = grid.querySelectorAll('.hardcoded-card');
