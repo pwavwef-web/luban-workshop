@@ -67,6 +67,16 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // teamProfiles collection – staff profile submissions (admin-only)
+    match /teamProfiles/{profileId} {
+      // Only admins can read team profiles (for the review dashboard)
+      allow read: if isAdmin();
+
+      // Only admins can create, update, or delete team profiles
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
     // contact_messages collection – submitted via the Contact Us page
     match /contact_messages/{messageId} {
       // Anyone can submit a contact message (no auth required)
