@@ -13,11 +13,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
         h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+
+        /* Login screen */
+        #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 100%); }
+
+        /* Main form content */
+        #form-content { display: none; }
 
         nav { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.97); box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 50; }
         nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
@@ -80,6 +87,37 @@
 
 <body>
 
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div style="background:#fff;border-radius:1.25rem;padding:2.5rem 2rem;width:100%;max-width:22rem;box-shadow:0 8px 32px rgba(0,0,0,.25);">
+            <div style="text-align:center;margin-bottom:1.75rem;">
+                <img src="../logo.png" alt="Luban Workshop" style="height:48px;width:48px;border-radius:50%;object-fit:contain;background:#fff;margin:0 auto 0.75rem;display:block;border:2px solid #fca5a5;">
+                <h1 class="serif" style="font-size:1.3rem;color:#1c1917;margin-bottom:0.25rem;">Staff Profile Form</h1>
+                <p style="font-size:0.8rem;color:#78716c;">Admin access only</p>
+            </div>
+            <div id="login-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:0.5rem;padding:0.75rem;font-size:0.82rem;color:#991b1b;margin-bottom:1rem;"></div>
+            <form id="login-form" onsubmit="doLogin(event)">
+                <div style="margin-bottom:1rem;">
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#44403c;margin-bottom:0.4rem;">Email</label>
+                    <input type="email" id="login-email" required placeholder="admin@example.com"
+                        style="width:100%;padding:0.55rem 0.85rem;border:1.5px solid #d6d3d1;border-radius:0.5rem;font-size:0.88rem;outline:none;box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:1.5rem;">
+                    <label style="display:block;font-size:0.8rem;font-weight:600;color:#44403c;margin-bottom:0.4rem;">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••"
+                        style="width:100%;padding:0.55rem 0.85rem;border:1.5px solid #d6d3d1;border-radius:0.5rem;font-size:0.88rem;outline:none;box-sizing:border-box;">
+                </div>
+                <button type="submit" id="login-btn"
+                    style="width:100%;padding:0.75rem;background:#b91c1c;color:#fff;font-weight:700;border:none;border-radius:0.65rem;cursor:pointer;font-size:0.95rem;">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Form Content (shown after admin login) -->
+    <div id="form-content">
+
     <!-- Navigation -->
     <nav>
         <div>
@@ -90,6 +128,8 @@
             <div class="nav-links">
                 <a href="../index.html">Home</a>
                 <a href="index.html">Our Team</a>
+                <span id="user-email" style="font-size:0.78rem;color:#a8a29e;"></span>
+                <button onclick="doSignOut()" style="background:#fef2f2;color:#b91c1c;border:1.5px solid #fca5a5;border-radius:6px;padding:0.3rem 0.75rem;font-size:0.78rem;font-weight:600;cursor:pointer;">Sign Out</button>
             </div>
         </div>
     </nav>
@@ -289,6 +329,8 @@
         <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
     </footer>
 
+    </div><!-- end #form-content -->
+
     <script>
         lucide.createIcons();
         document.getElementById('footer-year').textContent = new Date().getFullYear();
@@ -303,7 +345,68 @@
             appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // ---------- Auth ----------
+        auth.onAuthStateChanged(async function(user) {
+            if (!user) {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('form-content').style.display = 'none';
+                return;
+            }
+
+            var adminVerified = false;
+            try {
+                var tokenResult = await user.getIdTokenResult();
+                if (tokenResult.claims.admin === true) adminVerified = true;
+            } catch (e) {}
+            if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+            if (!adminVerified && user.email) {
+                try {
+                    var adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                    if (adminDoc.exists) adminVerified = true;
+                } catch (e) {}
+            }
+
+            if (!adminVerified) {
+                await auth.signOut();
+                showLoginError('Access denied. You do not have admin privileges.');
+                return;
+            }
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('form-content').style.display = 'block';
+            document.getElementById('user-email').textContent = user.email;
+        });
+
+        function doLogin(e) {
+            e.preventDefault();
+            var btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.textContent = 'Signing in…';
+            var email = document.getElementById('login-email').value.trim();
+            var password = document.getElementById('login-password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(function(err) {
+                    showLoginError(err.message);
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In';
+                });
+        }
+
+        function doSignOut() {
+            auth.signOut().then(function() {
+                document.getElementById('form-content').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+            });
+        }
+
+        function showLoginError(msg) {
+            var el = document.getElementById('login-error');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
 
         // Character counters
         function setupCounter(textareaId, countId) {
