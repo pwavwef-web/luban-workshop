@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Luban Workshop</title>
     <meta name="robots" content="noindex, nofollow">
+    <!-- PWA -->
+    <link rel="manifest" href="admin-manifest.json">
+    <meta name="theme-color" content="#b91c1c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Luban Admin">
+    <link rel="apple-touch-icon" href="logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
@@ -161,7 +169,7 @@
             <div id="view-menu" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
-                    <p class="text-sm text-stone-500">Toggle dish visibility on the main website.</p>
+                    <p class="text-sm text-stone-500">Toggle visibility and update prices for dishes.</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
@@ -363,6 +371,7 @@
                 document.getElementById('user-email').textContent = user.email;
 
                 // Initialize Listeners
+                listenToPrices();
                 listenToMenu();
                 listenToReservations();
                 listenToOrders();
@@ -383,6 +392,9 @@
                 overlay.addEventListener('keydown', handleOverlayKeydown);
                 
                 lucide.createIcons();
+
+                // Request notification permission
+                requestNotificationPermission();
 
                 // Start tour for new admins (skipped if already completed)
                 startTour();
@@ -507,39 +519,59 @@
 
         // --- Real-time Listeners (Red Dot Logic) ---
 
+        // Price overrides loaded from Firestore
+        let priceOverrides = {};
+        let menuHiddenIds = new Set();
+
+        function renderMenuTable() {
+            const tableBody = document.getElementById('menu-items-table');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+
+            HARDCODED_MENU.forEach(dish => {
+                const isHidden = menuHiddenIds.has(dish.id);
+                const currentPrice = priceOverrides[dish.id] !== undefined ? priceOverrides[dish.id] : dish.price;
+                const statusBadge = isHidden
+                    ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
+                    : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
+                const toggleIcon = isHidden ? 'eye' : 'eye-off';
+                const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
+                const row = `
+                    <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono" id="price-cell-${dish.id}">₵${currentPrice}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <button onclick="openPriceModal('${dish.id}', '${escapeHtml(dish.name)}', ${currentPrice})" class="text-stone-400 hover:text-blue-600 transition-colors" title="Edit Price"><i data-lucide="pencil" class="h-4 w-4 inline"></i></button>
+                            <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4 inline"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+            lucide.createIcons();
+        }
+
+        function listenToPrices() {
+            db.collection('menuPrices').onSnapshot(snapshot => {
+                priceOverrides = {};
+                snapshot.forEach(doc => {
+                    priceOverrides[doc.id] = doc.data().price;
+                });
+                renderMenuTable();
+            });
+        }
+
         function listenToMenu() {
             db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
+                menuHiddenIds = new Set();
                 snapshot.forEach(doc => {
-                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                    if (doc.data().hidden === true) menuHiddenIds.add(doc.id);
                 });
-
-                const tableBody = document.getElementById('menu-items-table');
-                tableBody.innerHTML = '';
-
-                HARDCODED_MENU.forEach(dish => {
-                    const isHidden = hiddenIds.has(dish.id);
-                    const statusBadge = isHidden
-                        ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
-                        : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
-                    const toggleIcon = isHidden ? 'eye' : 'eye-off';
-                    const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
-                    const row = `
-                        <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">₵${dish.price}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
-                });
-                lucide.createIcons();
+                renderMenuTable();
             });
         }
 
@@ -552,16 +584,58 @@
             }
         }
 
+        // --- Price Editing ---
+        function openPriceModal(dishId, dishName, currentPrice) {
+            document.getElementById('price-modal-dish-id').value = dishId;
+            document.getElementById('price-modal-dish-name').textContent = dishName;
+            document.getElementById('price-modal-input').value = currentPrice;
+            document.getElementById('price-modal').classList.remove('hidden');
+            document.getElementById('price-modal-input').focus();
+        }
+
+        function closePriceModal() {
+            document.getElementById('price-modal').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('price-modal-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const dishId = document.getElementById('price-modal-dish-id').value;
+                const newPrice = parseFloat(document.getElementById('price-modal-input').value);
+                if (isNaN(newPrice) || newPrice <= 0) {
+                    alert('Please enter a valid price greater than zero.');
+                    return;
+                }
+                try {
+                    await db.collection('menuPrices').doc(dishId).set({ price: newPrice, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    closePriceModal();
+                } catch (err) {
+                    console.error('Error saving price:', err);
+                    alert('Failed to save price. Please try again.');
+                }
+            });
+        });
+
         function listenToReservations() {
             db.collection('reservations').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
                 const tableBody = document.getElementById('reservations-table');
                 tableBody.innerHTML = '';
 
                 let pendingCount = 0;
+                let newCount = 0;
 
                 if (snapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-stone-500 italic">No reservations yet.</td></tr>';
                 }
+
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added' && !reservationsFirstLoad) newCount++;
+                });
+                if (newCount > 0) {
+                    showBrowserNotification('📅 New Reservation', `${newCount} new reservation${newCount > 1 ? 's' : ''} received.`, 'reservation');
+                    showAdminToast(`📅 ${newCount} new reservation${newCount > 1 ? 's' : ''} received.`);
+                }
+                reservationsFirstLoad = false;
 
                 snapshot.forEach(doc => {
                     const res = doc.data();
@@ -641,22 +715,33 @@
                 tableBody.innerHTML = '';
                 
                 let pendingCount = 0;
+                let newCount = 0;
 
                 if (snapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-stone-500 italic">No orders received yet.</td></tr>';
                 }
 
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added' && !ordersFirstLoad) newCount++;
+                });
+                if (newCount > 0) {
+                    showBrowserNotification('🛒 New Order', `${newCount} new order${newCount > 1 ? 's' : ''} received!`, 'order');
+                    showAdminToast(`🛒 ${newCount} new order${newCount > 1 ? 's' : ''} received!`);
+                }
+                ordersFirstLoad = false;
+
                 snapshot.forEach(doc => {
                     const order = doc.data();
                     const id = doc.id;
                     
-                    // Count 'pending' for Red Dot
-                    if (order.status === 'pending' || !order.status) pendingCount++;
+                    // Count 'pending' and 'preparing' for Red Dot
+                    if (order.status === 'pending' || !order.status || order.status === 'preparing') pendingCount++;
 
                     // Determine Status Colors
                     let statusClass = 'bg-stone-100 text-stone-800'; // Default
                     if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
-                    if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
+                    if (order.status === 'pending' || !order.status) statusClass = 'bg-yellow-100 text-yellow-800';
+                    if (order.status === 'preparing') statusClass = 'bg-orange-100 text-orange-800';
                     if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
 
                     const itemsSummary = order.items ? order.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No items';
@@ -666,10 +751,23 @@
 
                     // Action Buttons Logic
                     let actions = '';
-                    if (order.status !== 'completed' && order.status !== 'cancelled') {
-                        // Show Complete and Cancel buttons for pending orders
+                    if (!order.status || order.status === 'pending') {
+                        // Pending → can move to Preparing, Completed, or Cancel
                         actions = `
-                            <button onclick="updateOrderStatus('${id}', 'completed')" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-2 transition-colors" title="Mark Completed">
+                            <button onclick="updateOrderStatus('${id}', 'preparing')" class="text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100 p-2 rounded-full mr-1 transition-colors" title="Mark as Preparing">
+                                <i data-lucide="chef-hat" class="h-4 w-4"></i>
+                            </button>
+                            <button onclick="updateOrderStatus('${id}', 'completed')" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-1 transition-colors" title="Mark Completed">
+                                <i data-lucide="check" class="h-4 w-4"></i>
+                            </button>
+                            <button onclick="updateOrderStatus('${id}', 'cancelled')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
+                                <i data-lucide="x" class="h-4 w-4"></i>
+                            </button>
+                        `;
+                    } else if (order.status === 'preparing') {
+                        // Preparing → can mark Complete or Cancel
+                        actions = `
+                            <button onclick="updateOrderStatus('${id}', 'completed')" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-1 transition-colors" title="Mark Completed">
                                 <i data-lucide="check" class="h-4 w-4"></i>
                             </button>
                             <button onclick="updateOrderStatus('${id}', 'cancelled')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
@@ -692,7 +790,7 @@
                                 <div class="truncate">${itemsSummary}</div>
                                 <button onclick="toggleOrderDetails('${id}')" class="text-xs text-red-600 hover:text-red-800 hover:underline mt-0.5 block">view all items</button>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">$${(order.total || 0).toFixed(2)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">₵${(order.total || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
                             </td>
@@ -843,6 +941,17 @@
 
                     badge.classList.toggle('hidden', unread === 0);
 
+                    // Fire notification for new messages
+                    let newMsgCount = 0;
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added' && !messagesFirstLoad) newMsgCount++;
+                    });
+                    if (newMsgCount > 0) {
+                        showBrowserNotification('✉️ New Message', `${newMsgCount} new contact message${newMsgCount > 1 ? 's' : ''} received.`, 'message');
+                        showAdminToast(`✉️ ${newMsgCount} new message${newMsgCount > 1 ? 's' : ''} from customers.`);
+                    }
+                    messagesFirstLoad = false;
+
                     if (snapshot.empty) {
                         container.innerHTML = '<p class="text-stone-500 italic text-sm">No messages yet.</p>';
                         return;
@@ -899,6 +1008,77 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
+
+        // --- PWA & Push Notifications ---
+        let swRegistration = null;
+        let deferredInstallPrompt = null;
+
+        // Capture the install prompt event
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            const btn = document.getElementById('pwa-install-btn');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        async function installPWA() {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-btn').classList.add('hidden');
+            }
+            deferredInstallPrompt = null;
+        }
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                swRegistration = await navigator.serviceWorker.register('/admin-sw.js');
+                console.log('Admin SW registered');
+            } catch (e) {
+                console.error('SW registration failed', e);
+            }
+        }
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'granted') return;
+            if (Notification.permission === 'denied') return;
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                showAdminToast('🔔 Notifications enabled! You will be alerted for new orders, reservations and messages.');
+            }
+        }
+
+        function showBrowserNotification(title, body, tag) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            try {
+                if (swRegistration && swRegistration.showNotification) {
+                    swRegistration.showNotification(title, { body, icon: '/logo.png', badge: '/favicon.jpeg', tag });
+                } else {
+                    new Notification(title, { body, icon: '/logo.png', tag });
+                }
+            } catch (e) { console.error('Notification error', e); }
+        }
+
+        function showAdminToast(message) {
+            const toast = document.getElementById('admin-toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove('hidden', 'opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 400);
+            }, 4000);
+        }
+
+        // Track first load to avoid spurious notifications on initial snapshot
+        let ordersFirstLoad = true;
+        let reservationsFirstLoad = true;
+        let messagesFirstLoad = true;
 
         // --- Admin Tour ---
         const TOUR_STORAGE_KEY = 'luban_admin_tour_completed';
@@ -1007,7 +1187,38 @@
             }
         }
 
+        // --- Service Worker Registration ---
+        registerServiceWorker();
+
     </script>
+
+    <!-- Price Edit Modal -->
+    <div id="price-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="price-modal-title">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closePriceModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10">
+            <h2 id="price-modal-title" class="serif text-lg font-bold text-stone-900 mb-1">Edit Price</h2>
+            <p id="price-modal-dish-name" class="text-sm text-stone-500 mb-4"></p>
+            <form id="price-modal-form">
+                <input type="hidden" id="price-modal-dish-id">
+                <label class="block text-sm font-medium text-stone-700 mb-1">New Price (₵)</label>
+                <input type="number" id="price-modal-input" min="0" step="0.01" required
+                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm mb-4">
+                <div class="flex gap-3 justify-end">
+                    <button type="button" onclick="closePriceModal()" class="px-4 py-2 text-sm text-stone-600 border border-stone-300 rounded-md hover:bg-stone-50 transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">Save Price</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Toast Notification -->
+    <div id="admin-toast" class="hidden fixed bottom-6 right-6 z-50 bg-stone-900 text-white text-sm px-5 py-3 rounded-xl shadow-2xl transition-opacity duration-400 max-w-xs"></div>
+
+    <!-- PWA Install Button (shown when installable) -->
+    <button id="pwa-install-btn" onclick="installPWA()" class="hidden fixed bottom-6 left-6 z-50 bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-xl shadow-lg hover:bg-red-800 transition-colors flex items-center gap-2">
+        <i data-lucide="download" class="h-4 w-4"></i>
+        Install App
+    </button>
 
     <!-- Admin Tour Overlay -->
     <div id="tour-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="tour-title">

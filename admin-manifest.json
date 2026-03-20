@@ -1,0 +1,20 @@
+{
+  "name": "Luban Admin Dashboard",
+  "short_name": "Luban Admin",
+  "description": "Admin dashboard for managing Luban Workshop Restaurant orders, reservations and menu.",
+  "start_url": "/admin.html",
+  "scope": "/admin.html",
+  "display": "standalone",
+  "background_color": "#fafaf9",
+  "theme_color": "#b91c1c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "business"]
+}

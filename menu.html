@@ -26,6 +26,14 @@
     <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
 
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#b91c1c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Luban Menu">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -743,12 +751,41 @@
             });
         }
 
+        function applyPriceOverrides(prices) {
+            // Card-style items: code in span.bg-red-100, price in p.text-red-700.font-bold
+            document.querySelectorAll('.menu-card').forEach(function (card) {
+                var codeSpan = card.querySelector('span[class*="bg-red-100"]');
+                if (!codeSpan) return;
+                var id = codeSpan.textContent.trim();
+                if (prices[id] === undefined) return;
+                var priceEl = card.querySelector('p.text-red-700.font-bold');
+                if (priceEl) priceEl.textContent = 'C' + prices[id];
+            });
+            // Table-style items: code in first td, price in last td
+            document.querySelectorAll('tbody tr').forEach(function (row) {
+                var cells = row.querySelectorAll('td');
+                if (cells.length < 2) return;
+                var id = cells[0].textContent.trim();
+                if (prices[id] === undefined) return;
+                var lastCell = cells[cells.length - 1];
+                if (lastCell) lastCell.textContent = 'C' + prices[id];
+            });
+        }
+
         menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
             var hiddenIds = new Set();
             snapshot.forEach(function (doc) {
                 if (doc.data().hidden === true) hiddenIds.add(doc.id);
             });
             applyDishAvailability(hiddenIds);
+        });
+
+        menuDb.collection('menuPrices').onSnapshot(function (snapshot) {
+            var prices = {};
+            snapshot.forEach(function (doc) {
+                prices[doc.id] = doc.data().price;
+            });
+            applyPriceOverrides(prices);
         });
     </script>
 
