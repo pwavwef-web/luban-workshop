@@ -602,8 +602,8 @@
                 e.preventDefault();
                 const dishId = document.getElementById('price-modal-dish-id').value;
                 const newPrice = parseFloat(document.getElementById('price-modal-input').value);
-                if (isNaN(newPrice) || newPrice < 0) {
-                    alert('Please enter a valid price.');
+                if (isNaN(newPrice) || newPrice <= 0) {
+                    alert('Please enter a valid price greater than zero.');
                     return;
                 }
                 try {

@@ -6,19 +6,14 @@ const STATIC_ASSETS = [
   '/menu.html',
   '/manifest.json',
   '/logo.png',
-  '/favicon.jpeg',
-  '/styles.css',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap'
+  '/favicon.jpeg'
 ];
 
 // Install – pre-cache static assets
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      cache.addAll(STATIC_ASSETS.filter(url => !url.startsWith('https://cdn')))
-    ).catch(() => {})
+    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)).catch(() => {})
   );
 });
 
