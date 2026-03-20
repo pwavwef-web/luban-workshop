@@ -28,6 +28,14 @@
     <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
 
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#b91c1c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Luban">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <!-- Structured Data: Restaurant -->
     <script type="application/ld+json">
@@ -835,6 +843,11 @@
                 // Load user's orders
                 loadMyOrders(user);
                 listenToMyOrders(user);
+
+                // Request notification permission to receive order updates
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
@@ -851,18 +864,38 @@
             lucide.createIcons();
         });
 
-        // --- Menu from hardcoded data + visibility from Firestore ---
+        // --- Menu from hardcoded data + visibility from Firestore + price overrides ---
+        let menuPriceOverrides = {};
+
         function initMenu() {
+            // Load price overrides
+            db.collection('menuPrices').onSnapshot(snapshot => {
+                menuPriceOverrides = {};
+                snapshot.forEach(doc => {
+                    menuPriceOverrides[doc.id] = doc.data().price;
+                });
+                // Re-apply after prices load (availability snapshot will re-render too)
+            }, () => {});
+
             db.collection('dishAvailability').onSnapshot(snapshot => {
                 const hiddenIds = new Set();
                 snapshot.forEach(doc => {
                     if (doc.data().hidden === true) hiddenIds.add(doc.id);
                 });
-                menuItems = HARDCODED_MENU.filter(item => !hiddenIds.has(item.id));
+                // Apply price overrides to HARDCODED_MENU
+                menuItems = HARDCODED_MENU
+                    .filter(item => !hiddenIds.has(item.id))
+                    .map(item => ({
+                        ...item,
+                        price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price
+                    }));
                 renderMenu();
             }, error => {
                 console.error('Error loading dish availability:', error);
-                menuItems = HARDCODED_MENU.slice();
+                menuItems = HARDCODED_MENU.map(item => ({
+                    ...item,
+                    price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price
+                }));
                 renderMenu();
             });
         }
@@ -1150,6 +1183,39 @@
             document.getElementById('success-modal').classList.add('hidden');
         }
 
+        // --- PWA & Push Notifications ---
+        let pwaInstallPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            pwaInstallPrompt = e;
+            const btn = document.getElementById('pwa-install-btn-main');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        async function installPWAMain() {
+            if (!pwaInstallPrompt) return;
+            pwaInstallPrompt.prompt();
+            const { outcome } = await pwaInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                const btn = document.getElementById('pwa-install-btn-main');
+                if (btn) btn.classList.add('hidden');
+            }
+            pwaInstallPrompt = null;
+        }
+
+        function showUserNotification(title, body) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            try {
+                new Notification(title, { body, icon: '/logo.png' });
+            } catch (e) {}
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+
         // --- Paste this into your Main Website Script ---
 
         let previousStatusMap = {}; // To track changes so we don't alert twice
@@ -1166,10 +1232,15 @@
                     snapshot.forEach(doc => {
                         const order = doc.data();
                         const orderId = doc.id;
+                        const prevStatus = previousStatusMap[orderId];
 
-                        // If we tracked this order before, and status changed to completed
-                        if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
-                            alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
+                        // Notify when status changes to 'preparing'
+                        if (prevStatus && prevStatus !== 'preparing' && order.status === 'preparing') {
+                            showUserNotification('👨‍🍳 Order Being Prepared', `Your order #${orderId.slice(-6).toUpperCase()} is now being prepared!`);
+                        }
+                        // Notify when status changes to 'completed'
+                        if (prevStatus && prevStatus !== 'completed' && order.status === 'completed') {
+                            showUserNotification('✅ Order Ready!', `Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
                         }
 
                         // Update our tracker
@@ -1211,6 +1282,7 @@
                         let statusClass = 'bg-stone-100 text-stone-800';
                         if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
                         if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
+                        if (order.status === 'preparing') statusClass = 'bg-orange-100 text-orange-800';
                         if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
                         
                         // Format items
@@ -1348,6 +1420,12 @@
         document.getElementById('res-date').setAttribute('max', maxDate.toISOString().split('T')[0]);
 
     </script>
+
+    <!-- PWA Install Button (shown when installable) -->
+    <button id="pwa-install-btn-main" onclick="installPWAMain()" class="hidden fixed bottom-6 right-6 z-50 bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-xl shadow-lg hover:bg-red-800 transition-colors flex items-center gap-2">
+        <i data-lucide="download" class="h-4 w-4"></i>
+        Install App
+    </button>
 </body>
 
 </html>
