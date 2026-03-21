@@ -853,17 +853,46 @@
 
         // --- Menu from hardcoded data + visibility from Firestore ---
         function initMenu() {
+            let hiddenIds = new Set();
+            let priceOverrides = {};
+
+            function applyAndRender() {
+                const now = new Date();
+                menuItems = HARDCODED_MENU
+                    .filter(item => !hiddenIds.has(item.id))
+                    .map(item => {
+                        const override = priceOverrides[item.id];
+                        if (override && override.revertAt) {
+                            const revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
+                            if (revertAt > now) {
+                                return Object.assign({}, item, { price: override.newPrice });
+                            }
+                        }
+                        return item;
+                    });
+                renderMenu();
+            }
+
             db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
+                hiddenIds = new Set();
                 snapshot.forEach(doc => {
                     if (doc.data().hidden === true) hiddenIds.add(doc.id);
                 });
-                menuItems = HARDCODED_MENU.filter(item => !hiddenIds.has(item.id));
-                renderMenu();
+                applyAndRender();
             }, error => {
                 console.error('Error loading dish availability:', error);
                 menuItems = HARDCODED_MENU.slice();
                 renderMenu();
+            });
+
+            db.collection('priceOverrides').onSnapshot(snapshot => {
+                priceOverrides = {};
+                snapshot.forEach(doc => {
+                    priceOverrides[doc.id] = doc.data();
+                });
+                applyAndRender();
+            }, error => {
+                console.error('Error loading price overrides:', error);
             });
         }
 

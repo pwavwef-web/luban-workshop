@@ -507,39 +507,81 @@
 
         // --- Real-time Listeners (Red Dot Logic) ---
 
+        const DEFAULT_REVERT_DAYS = 30;
+
+        let hiddenDishIds = new Set();
+        let priceOverridesMap = {};
+        let currentEditDishId = null;
+
+        function renderMenuTable() {
+            const tableBody = document.getElementById('menu-items-table');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+
+            const now = new Date();
+
+            HARDCODED_MENU.forEach(dish => {
+                const isHidden = hiddenDishIds.has(dish.id);
+                const override = priceOverridesMap[dish.id];
+
+                let effectivePrice = dish.price;
+                let hasActiveOverride = false;
+                let revertDate = null;
+
+                if (override && override.revertAt) {
+                    const revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
+                    if (revertAt > now) {
+                        effectivePrice = override.newPrice;
+                        hasActiveOverride = true;
+                        revertDate = revertAt;
+                    }
+                }
+
+                const statusBadge = isHidden
+                    ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
+                    : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
+                const toggleIcon = isHidden ? 'eye' : 'eye-off';
+                const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
+                const priceCell = hasActiveOverride
+                    ? `₵${effectivePrice} <span class="ml-1 text-xs text-orange-600 font-normal" title="Reverts on ${revertDate.toLocaleDateString()}">(edited)</span>`
+                    : `₵${dish.price}`;
+                const safeName = dish.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+                const row = `
+                    <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">${priceCell}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openPriceEditModal('${dish.id}', '${safeName}', ${dish.price})" class="text-stone-400 hover:text-blue-600 transition-colors mr-2" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
+                            <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+            lucide.createIcons();
+        }
+
         function listenToMenu() {
-            db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
+            db.collection('priceOverrides').onSnapshot(snapshot => {
+                priceOverridesMap = {};
                 snapshot.forEach(doc => {
-                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                    priceOverridesMap[doc.id] = doc.data();
                 });
+                renderMenuTable();
+            }, error => {
+                console.error('Error loading price overrides:', error);
+            });
 
-                const tableBody = document.getElementById('menu-items-table');
-                tableBody.innerHTML = '';
-
-                HARDCODED_MENU.forEach(dish => {
-                    const isHidden = hiddenIds.has(dish.id);
-                    const statusBadge = isHidden
-                        ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
-                        : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
-                    const toggleIcon = isHidden ? 'eye' : 'eye-off';
-                    const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
-                    const row = `
-                        <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">₵${dish.price}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
+            db.collection('dishAvailability').onSnapshot(snapshot => {
+                hiddenDishIds = new Set();
+                snapshot.forEach(doc => {
+                    if (doc.data().hidden === true) hiddenDishIds.add(doc.id);
                 });
-                lucide.createIcons();
+                renderMenuTable();
             });
         }
 
@@ -549,6 +591,77 @@
             } catch (error) {
                 console.error('Error toggling dish visibility:', error);
                 alert('Failed to update dish visibility. Please try again.');
+            }
+        }
+
+        function openPriceEditModal(dishId, dishName, originalPrice) {
+            currentEditDishId = dishId;
+            document.getElementById('price-edit-title').textContent = dishName;
+            document.getElementById('price-edit-current').textContent = '₵' + originalPrice;
+            document.getElementById('price-edit-input').value = '';
+            document.getElementById('price-revert-check').checked = false;
+            document.getElementById('revert-days-section').classList.add('hidden');
+            document.getElementById('auto-revert-note').classList.remove('hidden');
+            document.getElementById('auto-revert-note').textContent = 'If not checked, price will automatically revert to the original after ' + DEFAULT_REVERT_DAYS + ' days.';
+            document.getElementById('price-edit-error').classList.add('hidden');
+            document.getElementById('price-edit-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closePriceEditModal() {
+            document.getElementById('price-edit-modal').classList.add('hidden');
+            currentEditDishId = null;
+        }
+
+        function toggleRevertDays() {
+            const checked = document.getElementById('price-revert-check').checked;
+            document.getElementById('revert-days-section').classList.toggle('hidden', !checked);
+            document.getElementById('auto-revert-note').classList.toggle('hidden', checked);
+        }
+
+        async function savePriceOverride() {
+            const errorDiv = document.getElementById('price-edit-error');
+            const newPriceVal = document.getElementById('price-edit-input').value;
+            const shouldRevert = document.getElementById('price-revert-check').checked;
+            const revertDaysVal = document.getElementById('price-revert-days').value;
+
+            errorDiv.classList.add('hidden');
+
+            const newPrice = parseFloat(newPriceVal);
+            if (!newPriceVal || isNaN(newPrice) || newPrice <= 0) {
+                errorDiv.textContent = 'Please enter a valid price greater than 0.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const revertDays = shouldRevert ? parseInt(revertDaysVal) : DEFAULT_REVERT_DAYS;
+            if (shouldRevert && (!revertDaysVal || isNaN(revertDays) || revertDays < 1)) {
+                errorDiv.textContent = 'Please enter a valid number of days (minimum 1).';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const dish = HARDCODED_MENU.find(d => d.id === currentEditDishId);
+            const originalPrice = dish ? dish.price : 0;
+
+            const now = new Date();
+            const revertAt = new Date(now.getTime() + revertDays * 24 * 60 * 60 * 1000);
+
+            try {
+                await db.collection('priceOverrides').doc(currentEditDishId).set({
+                    dishId: currentEditDishId,
+                    newPrice: newPrice,
+                    originalPrice: originalPrice,
+                    shouldRevert: shouldRevert,
+                    revertAfterDays: revertDays,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    revertAt: firebase.firestore.Timestamp.fromDate(revertAt)
+                });
+                closePriceEditModal();
+            } catch (error) {
+                console.error('Error saving price override:', error);
+                errorDiv.textContent = 'Failed to save price. Please try again.';
+                errorDiv.classList.remove('hidden');
             }
         }
 
@@ -1009,7 +1122,57 @@
 
     </script>
 
-    <!-- Admin Tour Overlay -->
+    <!-- ─── Price Edit Modal ─── -->
+    <div id="price-edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="price-edit-title">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black bg-opacity-60" onclick="closePriceEditModal()"></div>
+        <!-- Modal Card -->
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 z-10">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="pencil" class="h-5 w-5 text-red-700 flex-shrink-0"></i>
+                    <span class="text-xs font-semibold text-red-700 uppercase tracking-wider">Edit Price</span>
+                </div>
+                <button onclick="closePriceEditModal()" aria-label="Close" class="text-stone-400 hover:text-stone-600 transition-colors ml-4 flex-shrink-0">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+            <!-- Dish name & current price -->
+            <h2 id="price-edit-title" class="serif text-xl font-bold text-stone-900 mb-1"></h2>
+            <p class="text-sm text-stone-500 mb-5">Current price: <span id="price-edit-current" class="font-semibold text-stone-700"></span></p>
+            <!-- Form -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1" for="price-edit-input">New Price (₵)</label>
+                    <input type="number" id="price-edit-input" min="0.01" step="0.01"
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-stone-800"
+                        placeholder="Enter new price">
+                </div>
+                <div class="border border-stone-200 rounded-lg p-4 space-y-3">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="price-revert-check" onchange="toggleRevertDays()"
+                            class="w-4 h-4 text-red-700 border-stone-300 rounded focus:ring-red-700">
+                        <span class="text-sm font-medium text-stone-700">Revert to original price after a set number of days</span>
+                    </label>
+                    <div id="revert-days-section" class="hidden pl-7">
+                        <label class="block text-sm font-medium text-stone-700 mb-1" for="price-revert-days">Revert after (days)</label>
+                        <input type="number" id="price-revert-days" min="1" value="7"
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-stone-800"
+                            placeholder="Number of days">
+                    </div>
+                    <p id="auto-revert-note" class="text-xs text-stone-500 pl-7"></p>
+                </div>
+            </div>
+            <div id="price-edit-error" class="hidden mt-3 text-red-700 text-sm p-2 bg-red-50 rounded-md"></div>
+            <!-- Actions -->
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePriceEditModal()" class="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 transition-colors text-sm font-medium">Cancel</button>
+                <button onclick="savePriceOverride()" class="flex-1 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium">Save Price</button>
+            </div>
+        </div>
+    </div>
+
     <div id="tour-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="tour-title">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black bg-opacity-60"></div>

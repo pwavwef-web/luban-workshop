@@ -743,12 +743,57 @@
             });
         }
 
-        menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
-            var hiddenIds = new Set();
-            snapshot.forEach(function (doc) {
-                if (doc.data().hidden === true) hiddenIds.add(doc.id);
+        function applyPriceOverrides(overrides) {
+            var now = new Date();
+            // Card-style dishes
+            document.querySelectorAll('.menu-card').forEach(function (card) {
+                var codeSpan = card.querySelector('span[class*="bg-red-100"]');
+                if (codeSpan) {
+                    var dishId = codeSpan.textContent.trim();
+                    var override = overrides[dishId];
+                    if (override && override.revertAt) {
+                        var revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
+                        var priceEl = card.querySelector('p.mt-3');
+                        if (priceEl) {
+                            priceEl.textContent = revertAt > now ? 'C' + override.newPrice : 'C' + override.originalPrice;
+                        }
+                    }
+                }
             });
-            applyDishAvailability(hiddenIds);
+            // Table-style dishes
+            document.querySelectorAll('tbody tr').forEach(function (row) {
+                var codeCell = row.querySelector('td:first-child');
+                if (codeCell) {
+                    var dishId = codeCell.textContent.trim();
+                    var override = overrides[dishId];
+                    if (override && override.revertAt) {
+                        var revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
+                        var priceCell = row.querySelector('td:last-child');
+                        if (priceCell) {
+                            priceCell.textContent = revertAt > now ? 'C' + override.newPrice : 'C' + override.originalPrice;
+                        }
+                    }
+                }
+            });
+        }
+
+        var currentHiddenIds = new Set();
+        var currentPriceOverrides = {};
+
+        menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
+            currentHiddenIds = new Set();
+            snapshot.forEach(function (doc) {
+                if (doc.data().hidden === true) currentHiddenIds.add(doc.id);
+            });
+            applyDishAvailability(currentHiddenIds);
+        });
+
+        menuDb.collection('priceOverrides').onSnapshot(function (snapshot) {
+            currentPriceOverrides = {};
+            snapshot.forEach(function (doc) {
+                currentPriceOverrides[doc.id] = doc.data();
+            });
+            applyPriceOverrides(currentPriceOverrides);
         });
     </script>
 
