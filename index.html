@@ -867,6 +867,26 @@
         }
 
         function initMenu() {
+            let hiddenIds = new Set();
+            let priceOverrides = {};
+
+            function applyAndRender() {
+                const now = new Date();
+                menuItems = HARDCODED_MENU
+                    .filter(item => !hiddenIds.has(item.id))
+                    .map(item => {
+                        const override = priceOverrides[item.id];
+                        if (override && override.revertAt) {
+                            const revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
+                            if (revertAt > now) {
+                                return Object.assign({}, item, { price: override.newPrice });
+                            }
+                        }
+                        return item;
+                    });
+                renderMenu();
+            }
+
             db.collection('dishAvailability').onSnapshot(snapshot => {
                 menuHiddenIds = new Set();
                 snapshot.forEach(doc => {
@@ -884,6 +904,16 @@
                     menuPriceOverrides[doc.id] = doc.data().price;
                 });
                 rebuildMenuItems();
+            });
+
+            db.collection('priceOverrides').onSnapshot(snapshot => {
+                priceOverrides = {};
+                snapshot.forEach(doc => {
+                    priceOverrides[doc.id] = doc.data();
+                });
+                applyAndRender();
+            }, error => {
+                console.error('Error loading price overrides:', error);
             });
         }
 

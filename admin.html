@@ -641,6 +641,77 @@
             }
         }
 
+        function openPriceEditModal(dishId, dishName, originalPrice) {
+            currentEditDishId = dishId;
+            document.getElementById('price-edit-title').textContent = dishName;
+            document.getElementById('price-edit-current').textContent = '₵' + originalPrice;
+            document.getElementById('price-edit-input').value = '';
+            document.getElementById('price-revert-check').checked = false;
+            document.getElementById('revert-days-section').classList.add('hidden');
+            document.getElementById('auto-revert-note').classList.remove('hidden');
+            document.getElementById('auto-revert-note').textContent = 'If not checked, price will automatically revert to the original after ' + DEFAULT_REVERT_DAYS + ' days.';
+            document.getElementById('price-edit-error').classList.add('hidden');
+            document.getElementById('price-edit-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closePriceEditModal() {
+            document.getElementById('price-edit-modal').classList.add('hidden');
+            currentEditDishId = null;
+        }
+
+        function toggleRevertDays() {
+            const checked = document.getElementById('price-revert-check').checked;
+            document.getElementById('revert-days-section').classList.toggle('hidden', !checked);
+            document.getElementById('auto-revert-note').classList.toggle('hidden', checked);
+        }
+
+        async function savePriceOverride() {
+            const errorDiv = document.getElementById('price-edit-error');
+            const newPriceVal = document.getElementById('price-edit-input').value;
+            const shouldRevert = document.getElementById('price-revert-check').checked;
+            const revertDaysVal = document.getElementById('price-revert-days').value;
+
+            errorDiv.classList.add('hidden');
+
+            const newPrice = parseFloat(newPriceVal);
+            if (!newPriceVal || isNaN(newPrice) || newPrice <= 0) {
+                errorDiv.textContent = 'Please enter a valid price greater than 0.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const revertDays = shouldRevert ? parseInt(revertDaysVal) : DEFAULT_REVERT_DAYS;
+            if (shouldRevert && (!revertDaysVal || isNaN(revertDays) || revertDays < 1)) {
+                errorDiv.textContent = 'Please enter a valid number of days (minimum 1).';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const dish = HARDCODED_MENU.find(d => d.id === currentEditDishId);
+            const originalPrice = dish ? dish.price : 0;
+
+            const now = new Date();
+            const revertAt = new Date(now.getTime() + revertDays * 24 * 60 * 60 * 1000);
+
+            try {
+                await db.collection('priceOverrides').doc(currentEditDishId).set({
+                    dishId: currentEditDishId,
+                    newPrice: newPrice,
+                    originalPrice: originalPrice,
+                    shouldRevert: shouldRevert,
+                    revertAfterDays: revertDays,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    revertAt: firebase.firestore.Timestamp.fromDate(revertAt)
+                });
+                closePriceEditModal();
+            } catch (error) {
+                console.error('Error saving price override:', error);
+                errorDiv.textContent = 'Failed to save price. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
         function listenToReservations() {
             let knownReservationIds = null;
 
