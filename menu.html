@@ -26,6 +26,8 @@
     <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
 
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <meta name="theme-color" content="#b91c1c">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -750,6 +752,37 @@
             });
             applyDishAvailability(hiddenIds);
         });
+
+        function applyMenuPrices(priceOverrides) {
+            // Card-style dishes: find price paragraph inside each .menu-card
+            document.querySelectorAll('.menu-card').forEach(function (card) {
+                var codeSpan = card.querySelector('span[class*="bg-red-100"]');
+                if (!codeSpan) return;
+                var dishId = codeSpan.textContent.trim();
+                if (priceOverrides[dishId] === undefined) return;
+                var priceEl = card.querySelector('p[class*="text-red-700"]');
+                if (priceEl) priceEl.textContent = '₵' + priceOverrides[dishId];
+            });
+            // Table-style dishes: update the last cell in each tbody row
+            document.querySelectorAll('tbody tr').forEach(function (row) {
+                var firstCell = row.querySelector('td:first-child');
+                if (!firstCell || !firstCell.textContent.trim()) return;
+                var dishId = firstCell.textContent.trim();
+                if (priceOverrides[dishId] === undefined) return;
+                var lastCell = row.querySelector('td:last-child');
+                if (lastCell && lastCell.classList.contains('text-red-700')) {
+                    lastCell.textContent = '₵' + priceOverrides[dishId];
+                }
+            });
+        }
+
+        menuDb.collection('menuPrices').onSnapshot(function (snapshot) {
+            var priceOverrides = {};
+            snapshot.forEach(function (doc) {
+                priceOverrides[doc.id] = doc.data().price;
+            });
+            applyMenuPrices(priceOverrides);
+        });
     </script>
 
     <script>
@@ -793,6 +826,11 @@
                 }
             }
         });
+
+        // ── PWA Service Worker Registration ──
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(function () {});
+        }
     </script>
 
 </body>

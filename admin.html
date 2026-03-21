@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Luban Workshop</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#b91c1c">
+    <link rel="manifest" href="admin-manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
@@ -161,7 +163,7 @@
             <div id="view-menu" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
-                    <p class="text-sm text-stone-500">Toggle dish visibility on the main website.</p>
+                    <p class="text-sm text-stone-500">Toggle dish visibility and update prices on the main website.</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
@@ -327,6 +329,35 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // --- Push Notification helpers ---
+        let notificationsEnabled = false;
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+            try {
+                const perm = await Notification.requestPermission();
+                notificationsEnabled = perm === 'granted';
+            } catch (e) { /* ignored */ }
+        }
+
+        function showAdminNotification(title, body) {
+            if (Notification.permission !== 'granted') return;
+            try {
+                const n = new Notification(title, {
+                    body: body,
+                    icon: 'favicon.jpeg',
+                    badge: 'favicon.jpeg',
+                    requireInteraction: true
+                });
+                n.onclick = () => { window.focus(); n.close(); };
+            } catch (e) { /* ignored */ }
+        }
+
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('admin-sw.js').catch(() => {});
+        }
+
         // --- Auth State ---
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -368,6 +399,9 @@
                 listenToOrders();
                 listenToAdminUsers();
                 listenToMessages();
+
+                // Request notification permission
+                requestNotificationPermission();
 
                 // Set default tab
                 switchTab('menu');
@@ -507,41 +541,96 @@
 
         // --- Real-time Listeners (Red Dot Logic) ---
 
+        let menuHiddenIds = new Set();
+        let menuPriceOverrides = {};
+
+        function renderMenuTable() {
+            const tableBody = document.getElementById('menu-items-table');
+            tableBody.innerHTML = '';
+
+            HARDCODED_MENU.forEach(dish => {
+                const isHidden = menuHiddenIds.has(dish.id);
+                const currentPrice = menuPriceOverrides[dish.id] !== undefined ? menuPriceOverrides[dish.id] : dish.price;
+                const statusBadge = isHidden
+                    ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
+                    : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
+                const toggleIcon = isHidden ? 'eye' : 'eye-off';
+                const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
+                const priceLabel = menuPriceOverrides[dish.id] !== undefined
+                    ? `<span class="font-mono text-red-700">₵${currentPrice}</span> <span class="text-xs text-stone-400">(edited)</span>`
+                    : `<span class="font-mono">₵${currentPrice}</span>`;
+                const row = `
+                    <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${priceLabel}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openPriceModal('${dish.id}', ${JSON.stringify(dish.name)}, ${currentPrice})" class="text-stone-400 hover:text-blue-600 transition-colors mr-3" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
+                            <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+            lucide.createIcons();
+        }
+
         function listenToMenu() {
             db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
+                menuHiddenIds = new Set();
                 snapshot.forEach(doc => {
-                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                    if (doc.data().hidden === true) menuHiddenIds.add(doc.id);
                 });
+                renderMenuTable();
+            });
 
-                const tableBody = document.getElementById('menu-items-table');
-                tableBody.innerHTML = '';
-
-                HARDCODED_MENU.forEach(dish => {
-                    const isHidden = hiddenIds.has(dish.id);
-                    const statusBadge = isHidden
-                        ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
-                        : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
-                    const toggleIcon = isHidden ? 'eye' : 'eye-off';
-                    const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
-                    const row = `
-                        <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 font-mono">₵${dish.price}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                    tableBody.innerHTML += row;
+            db.collection('menuPrices').onSnapshot(snapshot => {
+                menuPriceOverrides = {};
+                snapshot.forEach(doc => {
+                    menuPriceOverrides[doc.id] = doc.data().price;
                 });
-                lucide.createIcons();
+                renderMenuTable();
             });
         }
+
+        // --- Price Edit Modal ---
+        let editingDishId = null;
+
+        function openPriceModal(dishId, dishName, currentPrice) {
+            editingDishId = dishId;
+            document.getElementById('price-edit-dish-name').textContent = dishName;
+            document.getElementById('price-edit-input').value = currentPrice;
+            document.getElementById('price-edit-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('price-edit-input').focus(), 50);
+        }
+
+        function closePriceModal() {
+            editingDishId = null;
+            document.getElementById('price-edit-modal').classList.add('hidden');
+        }
+
+        async function savePriceEdit() {
+            if (!editingDishId) return;
+            const newPrice = parseFloat(document.getElementById('price-edit-input').value);
+            if (isNaN(newPrice) || newPrice < 0) {
+                alert('Please enter a valid price.');
+                return;
+            }
+            try {
+                await db.collection('menuPrices').doc(editingDishId).set({ price: newPrice });
+                closePriceModal();
+            } catch (error) {
+                console.error('Error saving price:', error);
+                alert('Failed to save price. Please try again.');
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closePriceModal();
+        });
 
         async function toggleDishVisibility(id, currentlyHidden) {
             try {
@@ -553,11 +642,27 @@
         }
 
         function listenToReservations() {
+            let knownReservationIds = null;
+
             db.collection('reservations').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
                 const tableBody = document.getElementById('reservations-table');
                 tableBody.innerHTML = '';
 
                 let pendingCount = 0;
+
+                // Detect new pending reservations for notifications
+                if (knownReservationIds !== null) {
+                    snapshot.forEach(doc => {
+                        const res = doc.data();
+                        if (!knownReservationIds.has(doc.id) && (res.status === 'pending' || !res.status)) {
+                            showAdminNotification(
+                                'New Reservation 📅',
+                                `${res.name || 'Guest'} – ${res.date || ''} at ${res.time || ''} for ${res.guests || '?'} people`
+                            );
+                        }
+                    });
+                }
+                knownReservationIds = new Set(snapshot.docs.map(d => d.id));
 
                 if (snapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-stone-500 italic">No reservations yet.</td></tr>';
@@ -636,11 +741,27 @@
         }
 
         function listenToOrders() {
+            let knownOrderIds = null;
+
             db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
                 const tableBody = document.getElementById('orders-table');
                 tableBody.innerHTML = '';
                 
                 let pendingCount = 0;
+
+                // Detect new pending orders for notifications
+                if (knownOrderIds !== null) {
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        if (!knownOrderIds.has(doc.id) && (order.status === 'pending' || !order.status)) {
+                            showAdminNotification(
+                                'New Order Received! 🛒',
+                                `Order #${doc.id.slice(-6).toUpperCase()} – ₵${(order.total || 0).toFixed(2)}`
+                            );
+                        }
+                    });
+                }
+                knownOrderIds = new Set(snapshot.docs.map(d => d.id));
 
                 if (snapshot.empty) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-stone-500 italic">No orders received yet.</td></tr>';
@@ -650,13 +771,14 @@
                     const order = doc.data();
                     const id = doc.id;
                     
-                    // Count 'pending' for Red Dot
-                    if (order.status === 'pending' || !order.status) pendingCount++;
+                    // Count 'pending' and 'preparing' for Red Dot
+                    if (order.status === 'pending' || order.status === 'preparing' || !order.status) pendingCount++;
 
                     // Determine Status Colors
                     let statusClass = 'bg-stone-100 text-stone-800'; // Default
                     if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
                     if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
+                    if (order.status === 'preparing') statusClass = 'bg-blue-100 text-blue-800';
                     if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
 
                     const itemsSummary = order.items ? order.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No items';
@@ -666,8 +788,18 @@
 
                     // Action Buttons Logic
                     let actions = '';
-                    if (order.status !== 'completed' && order.status !== 'cancelled') {
-                        // Show Complete and Cancel buttons for pending orders
+                    if (order.status === 'pending' || !order.status) {
+                        // Pending: show Prepare and Cancel buttons
+                        actions = `
+                            <button onclick="updateOrderStatus('${id}', 'preparing')" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors" title="Mark as Preparing">
+                                <i data-lucide="chef-hat" class="h-4 w-4"></i>
+                            </button>
+                            <button onclick="updateOrderStatus('${id}', 'cancelled')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
+                                <i data-lucide="x" class="h-4 w-4"></i>
+                            </button>
+                        `;
+                    } else if (order.status === 'preparing') {
+                        // Preparing: show Complete and Cancel buttons
                         actions = `
                             <button onclick="updateOrderStatus('${id}', 'completed')" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-2 transition-colors" title="Mark Completed">
                                 <i data-lucide="check" class="h-4 w-4"></i>
@@ -677,7 +809,7 @@
                             </button>
                         `;
                     } else {
-                        // Show "Undo" button if completed or cancelled
+                        // Completed or Cancelled: show Undo button
                         actions = `
                             <button onclick="updateOrderStatus('${id}', 'pending')" class="text-stone-400 hover:text-stone-600 p-2 rounded-full transition-colors" title="Move back to Pending">
                                 <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
@@ -834,6 +966,8 @@
 
         // --- Messages (Contact Us) ---
         function listenToMessages() {
+            let knownMessageIds = null;
+
             db.collection('contact_messages')
                 .orderBy('createdAt', 'desc')
                 .onSnapshot(snapshot => {
@@ -842,6 +976,20 @@
                     const unread = snapshot.docs.filter(d => !d.data().read).length;
 
                     badge.classList.toggle('hidden', unread === 0);
+
+                    // Detect new unread messages for notifications
+                    if (knownMessageIds !== null) {
+                        snapshot.forEach(doc => {
+                            const m = doc.data();
+                            if (!knownMessageIds.has(doc.id) && !m.read) {
+                                showAdminNotification(
+                                    'New Message 💬',
+                                    `From: ${m.name || 'Unknown'} – ${m.subject || ''}`
+                                );
+                            }
+                        });
+                    }
+                    knownMessageIds = new Set(snapshot.docs.map(d => d.id));
 
                     if (snapshot.empty) {
                         container.innerHTML = '<p class="text-stone-500 italic text-sm">No messages yet.</p>';
@@ -1008,6 +1156,30 @@
         }
 
     </script>
+
+    <!-- Price Edit Modal -->
+    <div id="price-edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="price-edit-title">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closePriceModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10">
+            <h3 id="price-edit-title" class="text-lg font-bold text-stone-900 mb-1">Edit Dish Price</h3>
+            <p id="price-edit-dish-name" class="text-sm text-stone-500 mb-5"></p>
+            <label class="block text-sm font-medium text-stone-700 mb-2">New Price (₵)</label>
+            <input type="number" id="price-edit-input" min="0" step="1"
+                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-base"
+                placeholder="Enter new price">
+            <p class="text-xs text-stone-400 mt-2">This will update the price shown on the main website and menu page in real time.</p>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePriceModal()"
+                    class="flex-1 border border-stone-300 text-stone-600 py-2 rounded-md text-sm font-medium hover:bg-stone-50 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="savePriceEdit()"
+                    class="flex-1 bg-red-700 text-white py-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors">
+                    Save Price
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Tour Overlay -->
     <div id="tour-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="tour-title">

@@ -28,6 +28,8 @@
     <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
 
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <meta name="theme-color" content="#b91c1c">
+    <link rel="manifest" href="manifest.json">
 
     <!-- Structured Data: Restaurant -->
     <script type="application/ld+json">
@@ -775,6 +777,8 @@
         let menuItems = [];
         let cart = [];
         let currentUser = null; // NEW: Track the logged-in user
+        let menuHiddenIds = new Set();
+        let menuPriceOverrides = {};
 
         // --- Firebase Auth State Observer ---
         auth.onAuthStateChanged(async user => {
@@ -851,19 +855,35 @@
             lucide.createIcons();
         });
 
-        // --- Menu from hardcoded data + visibility from Firestore ---
+        // --- Menu from hardcoded data + visibility and prices from Firestore ---
+        function rebuildMenuItems() {
+            menuItems = HARDCODED_MENU
+                .filter(item => !menuHiddenIds.has(item.id))
+                .map(item => ({
+                    ...item,
+                    price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price
+                }));
+            renderMenu();
+        }
+
         function initMenu() {
             db.collection('dishAvailability').onSnapshot(snapshot => {
-                const hiddenIds = new Set();
+                menuHiddenIds = new Set();
                 snapshot.forEach(doc => {
-                    if (doc.data().hidden === true) hiddenIds.add(doc.id);
+                    if (doc.data().hidden === true) menuHiddenIds.add(doc.id);
                 });
-                menuItems = HARDCODED_MENU.filter(item => !hiddenIds.has(item.id));
-                renderMenu();
+                rebuildMenuItems();
             }, error => {
                 console.error('Error loading dish availability:', error);
-                menuItems = HARDCODED_MENU.slice();
-                renderMenu();
+                rebuildMenuItems();
+            });
+
+            db.collection('menuPrices').onSnapshot(snapshot => {
+                menuPriceOverrides = {};
+                snapshot.forEach(doc => {
+                    menuPriceOverrides[doc.id] = doc.data().price;
+                });
+                rebuildMenuItems();
             });
         }
 
@@ -1150,7 +1170,18 @@
             document.getElementById('success-modal').classList.add('hidden');
         }
 
-        // --- Paste this into your Main Website Script ---
+        // --- Push notification helper for customer page ---
+        function showCustomerNotification(title, body) {
+            if (Notification.permission !== 'granted') return;
+            try {
+                const n = new Notification(title, {
+                    body: body,
+                    icon: 'favicon.jpeg',
+                    badge: 'favicon.jpeg'
+                });
+                n.onclick = () => { window.focus(); n.close(); };
+            } catch (e) { /* ignored */ }
+        }
 
         let previousStatusMap = {}; // To track changes so we don't alert twice
 
@@ -1166,10 +1197,22 @@
                     snapshot.forEach(doc => {
                         const order = doc.data();
                         const orderId = doc.id;
+                        const prev = previousStatusMap[orderId];
 
-                        // If we tracked this order before, and status changed to completed
-                        if (previousStatusMap[orderId] === 'pending' && order.status === 'completed') {
-                            alert(`Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`);
+                        // Notify when order moves to preparing
+                        if (prev === 'pending' && order.status === 'preparing') {
+                            showCustomerNotification(
+                                'Order Being Prepared 🍳',
+                                `Your order #${orderId.slice(-6).toUpperCase()} is now being prepared!`
+                            );
+                        }
+
+                        // Notify when order is completed
+                        if ((prev === 'preparing' || prev === 'pending') && order.status === 'completed') {
+                            showCustomerNotification(
+                                'Order Ready for Pickup! ✅',
+                                `Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`
+                            );
                         }
 
                         // Update our tracker
@@ -1211,6 +1254,7 @@
                         let statusClass = 'bg-stone-100 text-stone-800';
                         if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
                         if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
+                        if (order.status === 'preparing') statusClass = 'bg-blue-100 text-blue-800';
                         if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
                         
                         // Format items
@@ -1346,6 +1390,23 @@
         const maxDate = new Date();
         maxDate.setMonth(maxDate.getMonth() + 3);
         document.getElementById('res-date').setAttribute('max', maxDate.toISOString().split('T')[0]);
+
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        // --- Request notification permission after user interaction ---
+        function requestCustomerNotificationPermission() {
+            if (!('Notification' in window) || Notification.permission !== 'default') return;
+            Notification.requestPermission().catch(() => {});
+        }
+
+        // Request after first user interaction
+        document.addEventListener('click', function onFirstClick() {
+            requestCustomerNotificationPermission();
+            document.removeEventListener('click', onFirstClick);
+        }, { once: true });
 
     </script>
 </body>
