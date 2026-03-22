@@ -70,7 +70,7 @@
 
         /* ── SLIDE 1 – TITLE ── */
         #slide-1 {
-            background: linear-gradient(135deg, var(--stone9) 0%, #7f1d1d 55%, var(--red) 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #9f1239 55%, #7f1d1d 100%);
             color: var(--white);
         }
         #slide-1 .slide-inner {
@@ -253,7 +253,7 @@
 
         /* ── STAT BOX ── */
         .stat-box {
-            background: linear-gradient(135deg, var(--stone9), #7f1d1d);
+            background: linear-gradient(135deg, #dc2626, #991b1b);
             color: #fff;
             border-radius: 14px;
             padding: 18px 22px;
@@ -269,7 +269,7 @@
 
         /* ── ACCENT BLOCK ── */
         .accent-block {
-            background: linear-gradient(135deg, var(--stone9) 0%, #7f1d1d 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             color: #fff;
             border-radius: 14px;
             padding: 18px 22px;
@@ -307,7 +307,7 @@
 
         /* ── SLIDE 10 – CLOSING ── */
         #slide-10 {
-            background: linear-gradient(135deg, var(--stone9) 0%, #7f1d1d 55%, var(--red) 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #9f1239 55%, #7f1d1d 100%);
             color: var(--white);
         }
         #slide-10 .slide-inner {
@@ -338,6 +338,34 @@
 
         /* ── DIVIDER ── */
         .divider { height: 1px; background: var(--stone2); }
+
+        /* ── HEADER LOGO ── */
+        .slide-header .header-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: var(--white);
+            border: 2px solid var(--red-lt);
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        /* ── FLOW DIAGRAM ── */
+        .flow-diagram {
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+        .flow-diagram svg {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+        }
 
         /* ── NAVIGATION BAR ── */
         #nav-bar {
@@ -552,6 +580,7 @@
                 <div class="icon-box">🌐</div>
                 <h2>Website Overview</h2>
                 <span class="slide-tag">What it is</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -607,6 +636,7 @@
                 <div class="icon-box">🍜</div>
                 <h2>Digital Menu System</h2>
                 <span class="slide-tag">Customer Feature</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -670,19 +700,52 @@
                 <div class="icon-box">🛒</div>
                 <h2>Online Ordering System</h2>
                 <span class="slide-tag">Customer Feature</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="flex:1;display:flex;flex-direction:column;">
                         <h3><span class="dot"></span>How to Place an Order</h3>
-                        <ol class="steps">
-                            <li><strong>Sign in</strong> – customers must be logged in to place an order.</li>
-                            <li><strong>Browse</strong> the menu and click <em>"Add to Cart"</em> on any dish.</li>
-                            <li>Open the <strong>Cart Drawer</strong> (shopping bag icon in the navigation bar).</li>
-                            <li>Review items, <strong>adjust quantities</strong>, and view the subtotal.</li>
-                            <li>Click <strong>"Place Order"</strong> to submit.</li>
-                            <li>Order is <strong>saved to Firestore</strong> and appears in the Admin Dashboard immediately.</li>
-                        </ol>
+                        <div class="flow-diagram">
+                            <svg viewBox="0 0 220 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Order placement flow diagram">
+                                <defs>
+                                    <marker id="ord-arr" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+                                        <path d="M0,1 L0,7 L7,4 z" fill="#b91c1c"/>
+                                    </marker>
+                                    <marker id="ord-arr-green" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+                                        <path d="M0,1 L0,7 L7,4 z" fill="#15803d"/>
+                                    </marker>
+                                </defs>
+                                <!-- Step 1: Sign In -->
+                                <rect x="10" y="0" width="200" height="46" rx="10" fill="#b91c1c"/>
+                                <text x="110" y="19" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">🔑 Sign In</text>
+                                <text x="110" y="37" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Login required to place orders</text>
+                                <!-- Arrow 1→2 -->
+                                <line x1="110" y1="46" x2="110" y2="55" stroke="#b91c1c" stroke-width="2" marker-end="url(#ord-arr)"/>
+                                <!-- Step 2: Browse Menu -->
+                                <rect x="10" y="57" width="200" height="46" rx="10" fill="#dc2626"/>
+                                <text x="110" y="76" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">🍜 Browse Menu</text>
+                                <text x="110" y="94" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Click "Add to Cart" on dishes</text>
+                                <!-- Arrow 2→3 -->
+                                <line x1="110" y1="103" x2="110" y2="112" stroke="#b91c1c" stroke-width="2" marker-end="url(#ord-arr)"/>
+                                <!-- Step 3: Open Cart -->
+                                <rect x="10" y="114" width="200" height="46" rx="10" fill="#dc2626"/>
+                                <text x="110" y="133" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">🛒 Open Cart Drawer</text>
+                                <text x="110" y="151" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Adjust quantities &amp; review total</text>
+                                <!-- Arrow 3→4 -->
+                                <line x1="110" y1="160" x2="110" y2="169" stroke="#b91c1c" stroke-width="2" marker-end="url(#ord-arr)"/>
+                                <!-- Step 4: Place Order -->
+                                <rect x="10" y="171" width="200" height="46" rx="10" fill="#ef4444"/>
+                                <text x="110" y="190" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">✅ Place Order</text>
+                                <text x="110" y="208" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Saved to Firestore instantly</text>
+                                <!-- Arrow 4→5 -->
+                                <line x1="110" y1="217" x2="110" y2="226" stroke="#15803d" stroke-width="2" marker-end="url(#ord-arr-green)"/>
+                                <!-- Step 5: Order Live -->
+                                <rect x="10" y="228" width="200" height="46" rx="10" fill="#15803d"/>
+                                <text x="110" y="247" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">⚡ Order Live in Dashboard</text>
+                                <text x="110" y="265" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Admin notified immediately</text>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 <div class="col">
@@ -724,16 +787,51 @@
                 <div class="icon-box">📅</div>
                 <h2>Table Reservation System</h2>
                 <span class="slide-tag">Customer Feature</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="flex:1;display:flex;flex-direction:column;">
                         <h3><span class="dot"></span>Making a Reservation</h3>
                         <ul class="pts">
                             <li>Available directly on the <strong>homepage</strong> (Reservation section) and via the navigation menu.</li>
                             <li><strong>No login required</strong> to make a reservation — anyone can book a table.</li>
                             <li>Reservations are saved instantly to <strong>Firestore</strong>.</li>
                         </ul>
+                        <div class="flow-diagram" style="margin-top:10px;">
+                            <svg viewBox="0 0 220 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reservation flow diagram">
+                                <defs>
+                                    <marker id="res-arr" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+                                        <path d="M0,1 L0,7 L7,4 z" fill="#b91c1c"/>
+                                    </marker>
+                                    <marker id="res-arr-green" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto">
+                                        <path d="M0,1 L0,7 L7,4 z" fill="#15803d"/>
+                                    </marker>
+                                </defs>
+                                <!-- Step 1 -->
+                                <rect x="10" y="0" width="200" height="44" rx="10" fill="#b91c1c"/>
+                                <text x="110" y="18" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">📋 Fill Reservation Form</text>
+                                <text x="110" y="35" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Name, date, time, guests</text>
+                                <!-- Arrow 1→2 -->
+                                <line x1="110" y1="44" x2="110" y2="53" stroke="#b91c1c" stroke-width="2" marker-end="url(#res-arr)"/>
+                                <!-- Step 2 -->
+                                <rect x="10" y="55" width="200" height="44" rx="10" fill="#dc2626"/>
+                                <text x="110" y="73" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">📤 Submit Booking</text>
+                                <text x="110" y="90" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">No account needed</text>
+                                <!-- Arrow 2→3 -->
+                                <line x1="110" y1="99" x2="110" y2="108" stroke="#b91c1c" stroke-width="2" marker-end="url(#res-arr)"/>
+                                <!-- Step 3 -->
+                                <rect x="10" y="110" width="200" height="44" rx="10" fill="#dc2626"/>
+                                <text x="110" y="128" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">💾 Saved to Firestore</text>
+                                <text x="110" y="145" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Instant confirmation shown</text>
+                                <!-- Arrow 3→4 -->
+                                <line x1="110" y1="154" x2="110" y2="163" stroke="#15803d" stroke-width="2" marker-end="url(#res-arr-green)"/>
+                                <!-- Step 4 -->
+                                <rect x="10" y="165" width="200" height="44" rx="10" fill="#15803d"/>
+                                <text x="110" y="183" text-anchor="middle" font-family="Lato,sans-serif" font-size="13" font-weight="bold" fill="white">👨‍💼 Admin Notified</text>
+                                <text x="110" y="200" text-anchor="middle" font-family="Lato,sans-serif" font-size="10" fill="rgba(255,255,255,0.85)">Appears in Reservations tab</text>
+                            </svg>
+                        </div>
                     </div>
                     <div class="card">
                         <h3><span class="dot"></span>Reservation Form Fields</h3>
@@ -780,6 +878,7 @@
                 <div class="icon-box">👤</div>
                 <h2>User Authentication &amp; Accounts</h2>
                 <span class="slide-tag">Security</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -837,6 +936,7 @@
                 <div class="icon-box">🔐</div>
                 <h2>Admin Login &amp; Access Control</h2>
                 <span class="slide-tag">Administration</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -892,6 +992,7 @@
                 <div class="icon-box">⚙️</div>
                 <h2>Admin Dashboard Features</h2>
                 <span class="slide-tag">Administration</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -962,6 +1063,7 @@
                 <div class="icon-box">🔧</div>
                 <h2>Team Profiles, Contact &amp; Technology</h2>
                 <span class="slide-tag">Backend &amp; More</span>
+                <img src="logo.png" class="header-logo" alt="Luban Workshop">
             </div>
             <div class="slide-body">
                 <div class="col">
@@ -1017,6 +1119,9 @@
     ══════════════════════════════════════════════ -->
     <div class="slide" id="slide-10">
         <div class="slide-inner">
+            <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px;">
+                <img src="logo.png" alt="Luban Workshop Logo" style="width:52px;height:52px;border-radius:50%;object-fit:contain;background:#fff;border:3px solid rgba(255,255,255,0.35);">
+            </div>
             <h2 class="serif">Thank You — <em>Questions?</em></h2>
             <p>Here is a quick recap of everything the Luban Workshop website delivers to our team and our customers.</p>
             <div class="closing-grid">
@@ -1169,13 +1274,23 @@
             const WHITE   = 'FFFFFF';
             const REDLT   = 'FEE2E2';
             const LIGHTBG = 'F5F5F4';
+            const BRIGHTRED = 'DC2626';
+            const MIDRED    = '9F1239';
 
             function addBg(slide, dark) {
                 if (dark) {
-                    slide.background = { color: STONE9 };
+                    slide.background = { color: BRIGHTRED };
                 } else {
                     slide.background = { color: LIGHTBG };
                 }
+            }
+
+            function addLogoToHeader(slide) {
+                slide.addShape(pptx.ShapeType.ellipse, {
+                    x: 12.5, y: 0.52, w: 0.48, h: 0.48,
+                    fill: { color: WHITE },
+                    line: { color: REDLT, width: 1.5 }
+                });
             }
 
             function addSlideNumber(slide, n) {
@@ -1220,6 +1335,8 @@
                         align: 'center', valign: 'middle'
                     });
                 }
+                // Logo circle on every content slide header
+                addLogoToHeader(slide);
                 addRedBar(slide);
             }
 
@@ -1235,8 +1352,8 @@
                 // Card background
                 slide.addShape(pptx.ShapeType.roundRect, {
                     x, y, w, h,
-                    fill: { color: dark ? STONE9 : WHITE },
-                    line: { color: dark ? DARKRED : 'E7E5E4', width: 1 },
+                    fill: { color: dark ? BRIGHTRED : WHITE },
+                    line: { color: dark ? MIDRED : 'E7E5E4', width: 1 },
                     rectRadius: 0.12,
                     shadow: { type: 'outer', blur: 6, opacity: 0.08, offset: 2, angle: 90 }
                 });
@@ -1267,30 +1384,37 @@
             // ────────────────────────────────────────────
             {
                 const s = pptx.addSlide();
-                s.background = { color: STONE9 };
+                s.background = { color: BRIGHTRED };
                 // Gradient overlay (simulated with shapes)
                 s.addShape(pptx.ShapeType.rect, {
                     x: 0, y: 0, w: 13.33, h: 7.5,
-                    fill: { type: 'solid', color: '7F1D1D', alpha: 55 }
+                    fill: { type: 'solid', color: MIDRED, alpha: 55 }
                 });
                 s.addShape(pptx.ShapeType.rect, {
                     x: 6, y: 0, w: 7.33, h: 7.5,
-                    fill: { type: 'solid', color: RED, alpha: 45 }
+                    fill: { type: 'solid', color: DARKRED, alpha: 45 }
+                });
+
+                // Logo circle
+                s.addShape(pptx.ShapeType.ellipse, {
+                    x: 5.92, y: 0.55, w: 1.5, h: 1.5,
+                    fill: { color: WHITE },
+                    line: { color: 'FFFFFF', alpha: 30, width: 2.5 }
                 });
 
                 s.addText('LUBAN WORKSHOP RESTAURANT', {
-                    x: 1, y: 1.4, w: 11.33, h: 0.5,
+                    x: 1, y: 2.25, w: 11.33, h: 0.5,
                     fontSize: 13, color: 'FCA5A5', bold: true,
                     align: 'center', charSpacing: 4
                 });
                 s.addText('Craftsmanship in\nEvery Bite', {
-                    x: 1, y: 1.9, w: 11.33, h: 1.8,
+                    x: 1, y: 2.75, w: 11.33, h: 1.5,
                     fontSize: 44, color: WHITE, bold: true,
                     align: 'center', fontFace: 'Georgia'
                 });
                 s.addText('A complete digital platform for dining, reservations, online ordering,\nand restaurant management — introducing the website to the entire team.', {
-                    x: 1.5, y: 3.75, w: 10.33, h: 0.8,
-                    fontSize: 13, color: 'D6D3D1', align: 'center'
+                    x: 1.5, y: 4.45, w: 10.33, h: 0.8,
+                    fontSize: 13, color: 'F5F5F4', align: 'center'
                 });
 
                 // Feature chips
@@ -1300,14 +1424,14 @@
                 const startX = (13.33 - totalW) / 2;
                 chips.forEach((chip, i) => {
                     s.addShape(pptx.ShapeType.roundRect, {
-                        x: startX + i * (chipW + 0.15), y: 4.75,
+                        x: startX + i * (chipW + 0.15), y: 5.45,
                         w: chipW, h: 0.38,
                         fill: { color: 'FFFFFF', alpha: 88 },
                         line: { color: 'FFFFFF', alpha: 60, width: 1 },
                         rectRadius: 0.19
                     });
                     s.addText(chip, {
-                        x: startX + i * (chipW + 0.15), y: 4.75,
+                        x: startX + i * (chipW + 0.15), y: 5.45,
                         w: chipW, h: 0.38,
                         fontSize: 10, color: WHITE, bold: true,
                         align: 'center', valign: 'middle'
@@ -1656,29 +1780,36 @@
             // ────────────────────────────────────────────
             {
                 const s = pptx.addSlide();
-                s.background = { color: STONE9 };
+                s.background = { color: BRIGHTRED };
                 s.addShape(pptx.ShapeType.rect, {
                     x: 0, y: 0, w: 13.33, h: 7.5,
-                    fill: { type: 'solid', color: '7F1D1D', alpha: 55 }
+                    fill: { type: 'solid', color: MIDRED, alpha: 55 }
                 });
                 s.addShape(pptx.ShapeType.rect, {
                     x: 6, y: 0, w: 7.33, h: 7.5,
-                    fill: { type: 'solid', color: RED, alpha: 45 }
+                    fill: { type: 'solid', color: DARKRED, alpha: 45 }
+                });
+
+                // Logo circle
+                s.addShape(pptx.ShapeType.ellipse, {
+                    x: 5.92, y: 0.12, w: 1.5, h: 1.5,
+                    fill: { color: WHITE },
+                    line: { color: 'FFFFFF', alpha: 30, width: 2.5 }
                 });
 
                 s.addText('Thank You', {
-                    x: 1, y: 0.5, w: 11.33, h: 0.8,
+                    x: 1, y: 1.75, w: 11.33, h: 0.65,
                     fontSize: 38, color: WHITE, bold: true,
                     align: 'center', fontFace: 'Georgia'
                 });
                 s.addText('Questions?', {
-                    x: 1, y: 1.2, w: 11.33, h: 0.65,
+                    x: 1, y: 2.5, w: 11.33, h: 0.55,
                     fontSize: 26, color: 'FCA5A5', bold: true,
                     align: 'center', fontFace: 'Georgia'
                 });
                 s.addText('Here is a quick recap of everything the Luban Workshop website delivers.', {
-                    x: 2, y: 1.9, w: 9.33, h: 0.4,
-                    fontSize: 12, color: 'D6D3D1', align: 'center'
+                    x: 2, y: 3.12, w: 9.33, h: 0.4,
+                    fontSize: 12, color: 'F5F5F4', align: 'center'
                 });
 
                 // 6 recap cards in a 3×2 grid
@@ -1690,9 +1821,9 @@
                     { icon: '👥', t: 'Team Profiles',   d: 'Staff submit profiles; admins approve before they appear publicly.' },
                     { icon: '🔧', t: 'Technology',      d: 'Firebase, Tailwind CSS, Vanilla JS. Secure Firestore rules protect all data.' }
                 ];
-                const cW = 3.8, cH = 1.55, gapX = 0.24, gapY = 0.2;
+                const cW = 3.8, cH = 1.5, gapX = 0.24, gapY = 0.18;
                 const startX = (13.33 - 3 * cW - 2 * gapX) / 2;
-                const startY = 2.45;
+                const startY = 3.5;
                 cards.forEach((c, i) => {
                     const row = Math.floor(i / 3), col = i % 3;
                     const cx = startX + col * (cW + gapX);
