@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Events &amp; Catering | Luban Workshop Restaurant</title>
+    <meta name="description" content="Book Luban Workshop Restaurant for private parties, corporate events, or external catering services in Cape Coast, Ghana. Enquire today.">
+    <meta name="keywords" content="Luban Workshop private events, Luban restaurant catering, private dining Cape Coast, corporate events Cape Coast, restaurant hire Cape Coast Ghana, catering services Cape Coast, Chinese catering Ghana">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://luban-restaurant.azlearner.me/events-and-catering.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://luban-restaurant.azlearner.me/events-and-catering.html">
+    <meta property="og:title" content="Private Events &amp; Catering | Luban Workshop Restaurant">
+    <meta property="og:description" content="Host your next private party or corporate event at Luban Workshop Restaurant, or let us bring our cuisine to you with our catering service.">
+    <meta property="og:image" content="https://luban-restaurant.azlearner.me/restcon.png">
+    <meta property="og:site_name" content="Luban Workshop Restaurant">
+    <meta property="og:locale" content="en_GB">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Private Events &amp; Catering | Luban Workshop Restaurant">
+    <meta name="twitter:description" content="Host your next private party or corporate event at Luban Workshop Restaurant, or let us bring our cuisine to you with our catering service.">
+    <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
+
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <meta name="theme-color" content="#b91c1c">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex-shrink-0 flex items-center">
+                    <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white mr-2">
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
+                            class="text-red-700">Workshop</span></span>
+                </a>
+                <a href="index.html"
+                    class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm">&larr; Back to
+                    Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-24 pb-16 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
+        <div class="absolute inset-0 opacity-30">
+            <img src="restcon.png" alt="Luban Workshop Restaurant interior" class="w-full h-full object-cover object-bottom">
+        </div>
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block text-red-400 font-semibold tracking-widest uppercase text-sm mb-4">Exclusive Experiences</span>
+            <h1 class="serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                Private Events &amp; Catering
+            </h1>
+            <p class="text-xl text-stone-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
+                From intimate gatherings to grand corporate functions, Luban Workshop brings culinary excellence to every occasion.
+            </p>
+            <a href="#reservation"
+                class="inline-block px-8 py-3 border border-transparent text-base font-medium rounded-md text-stone-900 bg-white hover:bg-stone-100 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
+                Book Now
+            </a>
+        </div>
+    </header>
+
+    <!-- Services Overview -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">What We Offer</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
+                    Tailored for Every Occasion
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-stone-500 mx-auto">
+                    Whether you are planning a celebration, a business event, or need catering delivered to your venue, we have you covered.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-10 md:grid-cols-3">
+
+                <!-- Private Parties -->
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col fade-in">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-6">
+                        <i data-lucide="party-popper" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">Private Parties</h3>
+                    <p class="text-stone-600 leading-relaxed mb-4 flex-1">
+                        Celebrate birthdays, anniversaries, graduations, and family milestones in style. Our private dining space can be reserved exclusively for your group, giving you a truly personalised atmosphere with a dedicated service team.
+                    </p>
+                    <ul class="space-y-2 text-stone-600 text-sm">
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Groups of up to 50 guests</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Customisable set menus</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Décor and table arrangements on request</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Dedicated events coordinator</li>
+                    </ul>
+                </div>
+
+                <!-- Corporate Events -->
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col fade-in">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-6">
+                        <i data-lucide="briefcase" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">Corporate Events</h3>
+                    <p class="text-stone-600 leading-relaxed mb-4 flex-1">
+                        Impress clients and reward your team with a premium dining experience at Luban Workshop. From business lunches and board dinners to staff appreciation events, we provide a professional and refined setting that leaves a lasting impression.
+                    </p>
+                    <ul class="space-y-2 text-stone-600 text-sm">
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Business lunches &amp; board dinners</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Staff appreciation events</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Bespoke corporate menus</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Audio-visual support available</li>
+                    </ul>
+                </div>
+
+                <!-- External Catering -->
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col fade-in">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-6">
+                        <i data-lucide="truck" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">External Catering</h3>
+                    <p class="text-stone-600 leading-relaxed mb-4 flex-1">
+                        Bring the Luban Workshop experience directly to your event. Our catering team will deliver, set up, and serve our full-quality cuisine at your chosen venue — whether it is an outdoor celebration, a campus function, or a home gathering.
+                    </p>
+                    <ul class="space-y-2 text-stone-600 text-sm">
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Delivery to your venue</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Full setup &amp; table service</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Buffet or plated options</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4 text-red-700 flex-shrink-0"></i> Flexible menu selection</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-16 bg-stone-900 text-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-400 font-semibold tracking-wide uppercase text-sm">Why Luban Workshop</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight sm:text-4xl serif">
+                    Craftsmanship in Every Detail
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                <div>
+                    <i data-lucide="chef-hat" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
+                    <h4 class="font-bold text-lg mb-2">Expert Chefs</h4>
+                    <p class="text-stone-400 text-sm">Trained culinary professionals dedicated to authentic flavour and presentation.</p>
+                </div>
+                <div>
+                    <i data-lucide="leaf" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
+                    <h4 class="font-bold text-lg mb-2">Fresh Ingredients</h4>
+                    <p class="text-stone-400 text-sm">Locally sourced, high-quality ingredients prepared fresh for every event.</p>
+                </div>
+                <div>
+                    <i data-lucide="settings" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
+                    <h4 class="font-bold text-lg mb-2">Full Customisation</h4>
+                    <p class="text-stone-400 text-sm">Menus, décor, and service style tailored precisely to your preferences.</p>
+                </div>
+                <div>
+                    <i data-lucide="shield-check" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
+                    <h4 class="font-bold text-lg mb-2">Trusted Service</h4>
+                    <p class="text-stone-400 text-sm">A professional events team ensuring seamless execution from start to finish.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservation / Enquiry Form -->
+    <section id="reservation" class="py-16 bg-white border-t border-stone-200">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Reserve Your Table</span>
+                <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
+                    Make a Reservation
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-stone-500 mx-auto">
+                    Book your table in advance for a guaranteed dining experience. For private events or catering enquiries, use the Special Requests field to tell us more about your occasion.
+                </p>
+            </div>
+
+            <form id="reservation-form" class="space-y-6 bg-stone-50 p-8 rounded-lg shadow-md">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="res-name" class="block text-sm font-medium text-stone-700 mb-2">Full Name *</label>
+                        <input type="text" id="res-name" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">Phone Number *</label>
+                        <input type="tel" id="res-phone" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="res-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
+                    <input type="email" id="res-email"
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="res-date" class="block text-sm font-medium text-stone-700 mb-2">Date *</label>
+                        <input type="date" id="res-date" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="res-time" class="block text-sm font-medium text-stone-700 mb-2">Time *</label>
+                        <input type="time" id="res-time" required
+                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests *</label>
+                    <select id="res-guests" required
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <option value="" disabled selected>Select number of guests</option>
+                        <option value="1">1 Guest</option>
+                        <option value="2">2 Guests</option>
+                        <option value="3">3 Guests</option>
+                        <option value="4">4 Guests</option>
+                        <option value="5">5 Guests</option>
+                        <option value="6">6 Guests</option>
+                        <option value="7">7 Guests</option>
+                        <option value="8">8+ Guests</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">Special Requests</label>
+                    <textarea id="res-notes" rows="3"
+                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        placeholder="Any dietary restrictions, special occasions, or event details (e.g. private party for 30, corporate lunch)..."></textarea>
+                </div>
+
+                <div id="reservation-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md">
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
+                    Submit Reservation
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-stone-500 text-sm">
+                Prefer to call? Reach us on <a href="tel:0205438455" class="text-red-700 hover:underline font-medium">020 543 8455</a> or email
+                <a href="mailto:reservations@lubanworkshop.com" class="text-red-700 hover:underline font-medium">reservations@lubanworkshop.com</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Reservation Success Modal -->
+    <div id="reservation-success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden"
+        aria-labelledby="res-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i data-lucide="check" class="h-6 w-6 text-green-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="res-modal-title">Reservation Confirmed!</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-stone-500">
+                                    Your reservation has been submitted. We'll be in touch to confirm the details shortly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeReservationModal()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex justify-center items-center mb-6">
+                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
+                <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
+            </div>
+            <p class="mb-6">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
+            <p class="mb-6 text-sm">For reservations: 020 543 8455</p>
+            <div class="flex justify-center space-x-6 text-sm mb-6">
+                <a href="terms-of-use.html" class="hover:text-white transition-colors">Terms of Use</a>
+                <a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="contact-us.html" class="hover:text-white transition-colors">Contact Us</a>
+                <a href="faq.html" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="https://www.facebook.com/profile.php/?id=61583678376642" class="hover:text-white transition-colors"><i data-lucide="facebook" class="h-5 w-5"></i></a>
+                <a href="https://www.instagram.com/lubanworkshoprestaurant/" class="hover:text-white transition-colors"><i data-lucide="instagram" class="h-5 w-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
+            measurementId: "G-PZQ13BWZB3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Set date picker constraints
+        const dateInput = document.getElementById('res-date');
+        const today = new Date();
+        const maxDate = new Date(today);
+        maxDate.setMonth(maxDate.getMonth() + 3);
+        dateInput.min = today.toISOString().split('T')[0];
+        dateInput.max = maxDate.toISOString().split('T')[0];
+
+        // Reservation form submission
+        document.getElementById('reservation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('reservation-error');
+
+            const selectedDate = new Date(document.getElementById('res-date').value);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            if (selectedDate < now) {
+                errorDiv.textContent = 'Please select a date in the future.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const reservationData = {
+                name: document.getElementById('res-name').value,
+                phone: document.getElementById('res-phone').value,
+                email: document.getElementById('res-email').value,
+                date: document.getElementById('res-date').value,
+                time: document.getElementById('res-time').value,
+                guests: document.getElementById('res-guests').value,
+                notes: document.getElementById('res-notes').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending'
+            };
+
+            try {
+                await db.collection('reservations').add(reservationData);
+                document.getElementById('reservation-success-modal').classList.remove('hidden');
+                document.getElementById('reservation-form').reset();
+                errorDiv.classList.add('hidden');
+            } catch (error) {
+                console.error('Error saving reservation:', error);
+                errorDiv.textContent = 'Failed to submit reservation. Please try again or call us directly.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        function closeReservationModal() {
+            document.getElementById('reservation-success-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

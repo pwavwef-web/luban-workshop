@@ -149,7 +149,7 @@
 
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
-                    <a href="#reservation"
+                    <a href="events-and-catering.html"
                         class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
                     <a href="#my-orders" id="my-orders-link-desktop"
                         class="hidden text-stone-600 hover:text-red-700 transition-colors font-medium">My Orders</a>
@@ -195,7 +195,7 @@
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#menu"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
-                <a href="#reservation"
+                <a href="events-and-catering.html"
                     class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
                 <a href="#my-orders" id="my-orders-link-mobile"
                     class="hidden px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
@@ -288,86 +288,56 @@
         </div>
     </section>
 
-    <!-- Reservation Section -->
+    <!-- Reservations & Events CTA Section -->
     <section id="reservation" class="py-16 bg-white border-t border-stone-200">
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Reserve Your Table</span>
+                <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">Reserve &amp; Events</span>
                 <h2 class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-stone-900 sm:text-4xl serif">
-                    Make a Reservation
+                    Book a Table or Host an Event
                 </h2>
                 <p class="mt-4 max-w-2xl text-xl text-stone-500 mx-auto">
-                    Book your table in advance for a guaranteed dining experience.
+                    Reserve your table for a regular dining visit, or explore our private events and catering options for your next special occasion.
                 </p>
             </div>
 
-            <form id="reservation-form" class="space-y-6 bg-stone-50 p-8 rounded-lg shadow-md">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="res-name" class="block text-sm font-medium text-stone-700 mb-2">Full Name *</label>
-                        <input type="text" id="res-name" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col items-center text-center">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-5">
+                        <i data-lucide="calendar" class="h-7 w-7"></i>
                     </div>
-                    <div>
-                        <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">Phone Number
-                            *</label>
-                        <input type="tel" id="res-phone" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">Table Reservation</h3>
+                    <p class="text-stone-600 text-sm mb-6 flex-1">Book your table in advance and guarantee your spot for a relaxed, premium dining experience.</p>
+                    <a href="events-and-catering.html#reservation"
+                        class="inline-block px-6 py-3 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-medium text-sm">
+                        Reserve Now
+                    </a>
+                </div>
+
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col items-center text-center">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-5">
+                        <i data-lucide="party-popper" class="h-7 w-7"></i>
                     </div>
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">Private Parties</h3>
+                    <p class="text-stone-600 text-sm mb-6 flex-1">Celebrate birthdays, anniversaries, and milestones with exclusive use of our dining space and a dedicated service team.</p>
+                    <a href="events-and-catering.html"
+                        class="inline-block px-6 py-3 bg-stone-900 text-white rounded-md hover:bg-stone-700 transition-colors font-medium text-sm">
+                        Learn More
+                    </a>
                 </div>
 
-                <div>
-                    <label for="res-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                    <input type="email" id="res-email"
-                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="res-date" class="block text-sm font-medium text-stone-700 mb-2">Date *</label>
-                        <input type="date" id="res-date" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                <div class="bg-stone-50 rounded-2xl p-8 shadow-sm border border-stone-100 flex flex-col items-center text-center">
+                    <div class="flex items-center justify-center h-14 w-14 rounded-xl bg-red-700 text-white mb-5">
+                        <i data-lucide="truck" class="h-7 w-7"></i>
                     </div>
-                    <div>
-                        <label for="res-time" class="block text-sm font-medium text-stone-700 mb-2">Time *</label>
-                        <input type="time" id="res-time" required
-                            class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
-                    </div>
+                    <h3 class="serif text-xl font-bold text-stone-900 mb-3">Corporate &amp; Catering</h3>
+                    <p class="text-stone-600 text-sm mb-6 flex-1">From boardroom lunches to off-site catering, we bring Luban Workshop quality directly to your event.</p>
+                    <a href="events-and-catering.html"
+                        class="inline-block px-6 py-3 bg-stone-900 text-white rounded-md hover:bg-stone-700 transition-colors font-medium text-sm">
+                        Learn More
+                    </a>
                 </div>
-
-                <div>
-                    <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">Number of Guests
-                        *</label>
-                    <select id="res-guests" required
-                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
-                        <option value="" disabled selected>Select number of guests</option>
-                        <option value="1">1 Guest</option>
-                        <option value="2">2 Guests</option>
-                        <option value="3">3 Guests</option>
-                        <option value="4">4 Guests</option>
-                        <option value="5">5 Guests</option>
-                        <option value="6">6 Guests</option>
-                        <option value="7">7 Guests</option>
-                        <option value="8">8+ Guests</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">Special
-                        Requests</label>
-                    <textarea id="res-notes" rows="3"
-                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                        placeholder="Any dietary restrictions or special occasions..."></textarea>
-                </div>
-
-                <div id="reservation-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md">
-                </div>
-
-                <button type="submit"
-                    class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
-                    Submit Reservation
-                </button>
-            </form>
+            </div>
         </div>
     </section>
 
@@ -653,41 +623,6 @@
                             Continue with Google
                         </button>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reservation Success Modal -->
-    <div id="reservation-success-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden"
-        aria-labelledby="res-modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-            <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div
-                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <i data-lucide="check" class="h-6 w-6 text-green-600"></i>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-stone-900" id="res-modal-title">Reservation
-                                Confirmed!</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-stone-500">
-                                    Your table has been reserved. We'll send you a confirmation email shortly.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeReservationModal()"
-                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
-                        Got it
-                    </button>
                 </div>
             </div>
         </div>
@@ -1011,49 +946,6 @@
                 }
                 console.error('Google sign-in error:', error);
             }
-        }
-
-        // --- Reservation Logic ---
-        document.getElementById('reservation-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const errorDiv = document.getElementById('reservation-error');
-
-            const selectedDate = new Date(document.getElementById('res-date').value);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            if (selectedDate < today) {
-                errorDiv.textContent = 'Please select a date in the future.';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            const reservationData = {
-                name: document.getElementById('res-name').value,
-                phone: document.getElementById('res-phone').value,
-                email: document.getElementById('res-email').value,
-                date: document.getElementById('res-date').value,
-                time: document.getElementById('res-time').value,
-                guests: document.getElementById('res-guests').value,
-                notes: document.getElementById('res-notes').value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'pending'
-            };
-
-            try {
-                await db.collection('reservations').add(reservationData);
-                document.getElementById('reservation-success-modal').classList.remove('hidden');
-                document.getElementById('reservation-form').reset();
-                errorDiv.classList.add('hidden');
-            } catch (error) {
-                console.error('Error saving reservation:', error);
-                errorDiv.textContent = 'Failed to submit reservation.';
-                errorDiv.classList.remove('hidden');
-            }
-        });
-
-        function closeReservationModal() {
-            document.getElementById('reservation-success-modal').classList.add('hidden');
         }
 
         // --- Menu & Cart Logic ---
@@ -1415,11 +1307,6 @@
         // --- Init ---
         initMenu();
         updateCartUI();
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('res-date').setAttribute('min', today);
-        const maxDate = new Date();
-        maxDate.setMonth(maxDate.getMonth() + 3);
-        document.getElementById('res-date').setAttribute('max', maxDate.toISOString().split('T')[0]);
 
         // --- PWA Service Worker Registration ---
         if ('serviceWorker' in navigator) {
