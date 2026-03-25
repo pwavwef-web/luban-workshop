@@ -10,14 +10,14 @@
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="GH-CP">
     <meta name="geo.placename" content="Cape Coast, Ghana">
-    <link rel="canonical" href="https://luban-restaurant.azlearner.me/">
+    <link rel="canonical" href="https://lubanrestaurant.com/">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="restaurant">
-    <meta property="og:url" content="https://luban-restaurant.azlearner.me/">
+    <meta property="og:url" content="https://lubanrestaurant.com/">
     <meta property="og:title" content="Luban Workshop Restaurant | Best Dining in Cape Coast, Ghana">
     <meta property="og:description" content="Luban restaurant – the best dining in Cape Coast. Authentic Chinese cuisine at UCC, Cape Coast. Open Mon–Fri 11:00–17:30. Reserve your table today.">
-    <meta property="og:image" content="https://luban-restaurant.azlearner.me/restcon.png">
+    <meta property="og:image" content="https://lubanrestaurant.com/restcon.png">
     <meta property="og:site_name" content="Luban Workshop Restaurant">
     <meta property="og:locale" content="en_GB">
 
@@ -25,7 +25,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Luban Workshop Restaurant | Best Dining in Cape Coast, Ghana">
     <meta name="twitter:description" content="Luban restaurant – the best dining in Cape Coast. Authentic Chinese cuisine at UCC, Cape Coast. Open Mon–Fri 11:00–17:30. Reserve your table today.">
-    <meta name="twitter:image" content="https://luban-restaurant.azlearner.me/restcon.png">
+    <meta name="twitter:image" content="https://lubanrestaurant.com/restcon.png">
 
     <link rel="icon" type="image/jpeg" href="favicon.jpeg">
     <meta name="theme-color" content="#b91c1c">
@@ -38,14 +38,14 @@
       "@type": "Restaurant",
       "name": "Luban Workshop Restaurant",
       "alternateName": "Luban Restaurant",
-      "url": "https://luban-restaurant.azlearner.me/",
-      "logo": "https://luban-restaurant.azlearner.me/logo.png",
-      "image": "https://luban-restaurant.azlearner.me/restcon.png",
+      "url": "https://lubanrestaurant.com/",
+      "logo": "https://lubanrestaurant.com/logo.png",
+      "image": "https://lubanrestaurant.com/restcon.png",
       "description": "Luban restaurant – authentic Chinese cuisine at Cape Coast, Ghana. Located at UCC, Cafe Roof Top, Casford Street, Cape Coast.",
       "telephone": "020 543 8455",
       "servesCuisine": "Chinese",
       "priceRange": "££",
-      "menu": "https://luban-restaurant.azlearner.me/menu.html",
+      "menu": "https://lubanrestaurant.com/menu.html",
       "acceptsReservations": "True",
       "address": {
         "@type": "PostalAddress",
@@ -141,82 +141,91 @@
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white mr-2">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white">
+                    <img src="assets/ucc-logo.png" alt="UCC Logo" class="h-9 w-9 object-contain">
                     <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
                             class="text-red-700">Workshop</span></span>
                 </div>
 
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Our Menu</a>
-                    <a href="events-and-catering.html"
-                        class="text-stone-600 hover:text-red-700 transition-colors font-medium">Reserve</a>
-                    <a href="#my-orders" id="my-orders-link-desktop"
-                        class="hidden text-stone-600 hover:text-red-700 transition-colors font-medium">My Orders</a>
-                    <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">Locate
-                        Us</a>
-                    <button onclick="toggleCart()"
-                        class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
+                <!-- Right side: cart, auth, nav drawer toggle (always visible) -->
+                <div class="flex items-center gap-2">
+                    <!-- Cart button -->
+                    <button onclick="toggleCart()" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
                         <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                        <span id="cart-badge-desktop"
-                            class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
+                        <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
                     </button>
-                    <button id="auth-btn-desktop" onclick="toggleAuthModal()"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
+                    <!-- Auth / User (always visible in nav bar, not in drawer) -->
+                    <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
                         Sign Up / Login
                     </button>
-                    <button id="user-info-desktop" onclick="logout()"
-                        class="hidden items-center gap-2 px-4 py-2 text-sm font-medium text-stone-600 hover:text-red-700 transition-colors">
+                    <button id="user-info-desktop" onclick="logout()" class="hidden items-center gap-2 px-3 py-1.5 text-sm font-medium text-stone-600 hover:text-red-700 transition-colors">
                         <i data-lucide="user" class="h-4 w-4"></i>
-                        <span id="user-email-desktop"></span>
+                        <span id="user-email-desktop" class="max-w-[120px] truncate"></span>
                     </button>
-                    <a id="admin-btn-desktop" href="admin.html"
-                        class="hidden items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-stone-800 rounded-md hover:bg-stone-900 transition-colors">
-                        <i data-lucide="shield" class="h-4 w-4"></i>
-                        Admin Dashboard
-                    </a>
-                </div>
-
-                <div class="flex items-center md:hidden gap-4">
-                    <button onclick="toggleCart()" class="relative p-2 text-stone-600">
-                        <i data-lucide="shopping-bag" class="h-6 w-6"></i>
-                        <span id="cart-badge-mobile"
-                            class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
-                    </button>
-                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')"
-                        class="text-stone-600 hover:text-red-700 p-2">
+                    <!-- Hamburger / nav drawer toggle (all screen sizes) -->
+                    <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
                 </div>
             </div>
         </div>
-
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#menu"
-                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Menu</a>
-                <a href="events-and-catering.html"
-                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Reserve</a>
-                <a href="#my-orders" id="my-orders-link-mobile"
-                    class="hidden px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">My Orders</a>
-                <a href="#location"
-                    class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">Location</a>
-                <button id="auth-btn-mobile" onclick="toggleAuthModal()"
-                    class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-700 hover:bg-red-800">Sign
-                    Up / Login</button>
-                <button id="user-info-mobile" onclick="logout()"
-                    class="hidden w-full text-left px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">
-                    <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
-                    <span id="user-email-mobile"></span>
-                </button>
-                <a id="admin-btn-mobile" href="admin.html"
-                    class="hidden px-3 py-2 rounded-md text-base font-medium text-white bg-stone-800 hover:bg-stone-900">
-                    <i data-lucide="shield" class="h-4 w-4 inline mr-2"></i>
-                    Admin Dashboard
-                </a>
-            </div>
-        </div>
     </nav>
+
+    <!-- ── Side nav drawer overlay ── -->
+    <div id="nav-drawer-overlay" class="fixed inset-0 bg-black/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleNavDrawer()"></div>
+
+    <!-- ── Side nav drawer ── -->
+    <div id="nav-drawer" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- Drawer header -->
+        <div class="flex justify-between items-center p-4 border-b border-stone-100">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Luban" class="h-8 w-8 rounded-full object-contain bg-white">
+                <img src="assets/ucc-logo.png" alt="UCC" class="h-7 w-7 object-contain">
+                <span class="serif font-bold text-stone-900 text-sm">Menu</span>
+            </div>
+            <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Close menu">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+        <!-- Drawer nav links -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-1">
+            <a href="#menu" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="utensils" class="h-5 w-5 flex-shrink-0"></i> Our Menu
+            </a>
+            <a href="events-and-catering.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="calendar" class="h-5 w-5 flex-shrink-0"></i> Reserve a Table
+            </a>
+            <a href="#my-orders" id="my-orders-link-desktop" onclick="toggleNavDrawer()" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="package" class="h-5 w-5 flex-shrink-0"></i> My Orders
+            </a>
+            <a href="#location" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="map-pin" class="h-5 w-5 flex-shrink-0"></i> Locate Us
+            </a>
+            <a href="faq.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="help-circle" class="h-5 w-5 flex-shrink-0"></i> FAQ
+            </a>
+            <a href="contact-us.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="phone" class="h-5 w-5 flex-shrink-0"></i> Contact Us
+            </a>
+            <a id="admin-btn-desktop" href="admin.html" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-stone-800 hover:bg-stone-900 font-medium transition-colors">
+                <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> Admin Dashboard
+            </a>
+        </div>
+        <!-- Auth section for small screens (visible on mobile where sign-in btn is hidden) -->
+        <div class="sm:hidden border-t border-stone-100 p-4">
+            <button id="auth-btn-mobile" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
+            <button id="user-info-mobile" onclick="logout()" class="hidden w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-red-700">
+                <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
+                <span id="user-email-mobile"></span>
+            </button>
+        </div>
+        <!-- Hidden compat elements for JS (my-orders-link-mobile, admin-btn-mobile) -->
+        <div class="hidden" aria-hidden="true">
+            <a href="#my-orders" id="my-orders-link-mobile"></a>
+            <a id="admin-btn-mobile" href="admin.html"></a>
+        </div>
+    </div>
 
     <header class="relative pt-24 pb-12 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
         <div class="absolute inset-0 opacity-40">
@@ -378,6 +387,10 @@
                             <div>
                                 <h4 class="font-bold text-stone-900">Address</h4>
                                 <p class="text-stone-600">Cafe Roof Top<br>Casford Street, UCC</p>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <img src="assets/ucc-logo.png" alt="University of Cape Coast" class="h-8 w-8 object-contain">
+                                    <span class="text-xs text-stone-500">University of Cape Coast Campus</span>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-start">
@@ -415,8 +428,9 @@
 
     <footer class="bg-stone-900 text-stone-400 py-12">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex justify-center items-center mb-6">
-                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
+            <div class="flex justify-center items-center gap-3 mb-6">
+                <img src="logo.png" alt="Luban Workshop" class="h-10 w-10 rounded-full object-contain bg-white">
+                <img src="assets/ucc-logo.png" alt="UCC" class="h-9 w-9 object-contain">
                 <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
             </div>
             <p class="mb-6">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
@@ -853,6 +867,21 @@
         }
 
         // --- Auth Functions (Login/Signup/Logout) ---
+        function toggleNavDrawer() {
+            const drawer = document.getElementById('nav-drawer');
+            const overlay = document.getElementById('nav-drawer-overlay');
+            const isOpen = !drawer.classList.contains('translate-x-full');
+            if (isOpen) {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            } else {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+            }
+        }
+
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
             modal.classList.toggle('hidden');
