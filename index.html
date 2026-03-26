@@ -159,10 +159,6 @@
                     <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
                         Sign Up / Login
                     </button>
-                    <button id="user-info-desktop" onclick="logout()" class="hidden items-center gap-2 px-3 py-1.5 text-sm font-medium text-stone-600 hover:text-red-700 transition-colors">
-                        <i data-lucide="user" class="h-4 w-4"></i>
-                        <span id="user-email-desktop" class="max-w-[120px] truncate"></span>
-                    </button>
                     <!-- Hamburger / nav drawer toggle (all screen sizes) -->
                     <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
                         <i data-lucide="menu" class="h-6 w-6"></i>
@@ -212,12 +208,12 @@
                 <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> Admin Dashboard
             </a>
         </div>
-        <!-- Auth section for small screens (visible on mobile where sign-in btn is hidden) -->
-        <div class="sm:hidden border-t border-stone-100 p-4">
-            <button id="auth-btn-mobile" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
-            <button id="user-info-mobile" onclick="logout()" class="hidden w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-red-700">
+        <!-- Auth section in sidebar (user info always shown here; sign-in shown on small screens) -->
+        <div class="border-t border-stone-100 p-4">
+            <button id="auth-btn-sidebar" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
+            <button id="user-info-sidebar" onclick="logout()" class="hidden w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-red-700">
                 <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
-                <span id="user-email-mobile"></span>
+                <span id="user-email-sidebar"></span>
             </button>
         </div>
         <!-- Hidden compat elements for JS (my-orders-link-mobile, admin-btn-mobile) -->
@@ -734,9 +730,8 @@
             currentUser = user; // Store user for checkout
 
             const authBtnDesktop = document.getElementById('auth-btn-desktop');
-            const authBtnMobile = document.getElementById('auth-btn-mobile');
-            const userInfoDesktop = document.getElementById('user-info-desktop');
-            const userInfoMobile = document.getElementById('user-info-mobile');
+            const authBtnMobile = document.getElementById('auth-btn-sidebar');
+            const userInfoMobile = document.getElementById('user-info-sidebar');
             const adminBtnDesktop = document.getElementById('admin-btn-desktop');
             const adminBtnMobile = document.getElementById('admin-btn-mobile');
             const myOrdersLinkDesktop = document.getElementById('my-orders-link-desktop');
@@ -747,8 +742,6 @@
                 // User is signed in
                 authBtnDesktop.classList.add('hidden');
                 authBtnMobile.classList.add('hidden');
-                userInfoDesktop.classList.remove('hidden');
-                userInfoDesktop.classList.add('flex');
                 userInfoMobile.classList.remove('hidden');
                 myOrdersLinkDesktop.classList.remove('hidden');
                 myOrdersLinkMobile.classList.remove('hidden');
@@ -756,8 +749,7 @@
                 myOrdersSection.classList.remove('hidden');
 
                 const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
-                document.getElementById('user-email-desktop').textContent = displayName;
-                document.getElementById('user-email-mobile').textContent = displayName;
+                document.getElementById('user-email-sidebar').textContent = displayName;
 
                 // Check if user is an admin
                 let isAdmin = false;
@@ -792,7 +784,6 @@
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
                 authBtnMobile.classList.remove('hidden');
-                userInfoDesktop.classList.add('hidden');
                 userInfoMobile.classList.add('hidden');
                 adminBtnDesktop.classList.add('hidden');
                 adminBtnMobile.classList.add('hidden');
