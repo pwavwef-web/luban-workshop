@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://luban-restaurant.azlearner.me/sitemap.xml
+Sitemap: https://lubanrestaurant.com/sitemap.xml
