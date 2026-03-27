@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8LVTFZH7VD');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Quiz | Luban Workshop Restaurant – Discover Your Future Career</title>
+    <meta name="description" content="Take our AI-powered career quiz to discover what career path suits you best. Powered by Gemini AI with a personalised career visualisation.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lubanrestaurant.com/career-quiz.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lubanrestaurant.com/career-quiz.html">
+    <meta property="og:title" content="Career Quiz | Luban Workshop Restaurant – Discover Your Future Career">
+    <meta property="og:description" content="Take our AI-powered career quiz and get a personalised career recommendation with a unique AI-generated image of your future.">
+    <meta property="og:image" content="https://lubanrestaurant.com/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Luban Workshop Restaurant">
+    <meta property="og:locale" content="en_GB">
+
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+
+        /* Progress bar */
+        #progress-fill { transition: width 0.4s ease; }
+
+        /* Question card animation */
+        .question-card {
+            animation: fadeSlideIn 0.35s ease forwards;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Answer option */
+        .answer-btn {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 2px solid #e7e5e4;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+            font-size: 0.95rem;
+            color: #292524;
+        }
+        .answer-btn:hover {
+            border-color: #b91c1c;
+            background: #fff1f2;
+            transform: translateX(4px);
+        }
+        .answer-btn.selected {
+            border-color: #b91c1c;
+            background: #fff1f2;
+            color: #991b1b;
+            font-weight: 600;
+        }
+        .answer-btn .option-letter {
+            min-width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #f5f5f4;
+            border: 1.5px solid #d6d3d1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #57534e;
+            flex-shrink: 0;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+        .answer-btn.selected .option-letter {
+            background: #b91c1c;
+            border-color: #b91c1c;
+            color: #fff;
+        }
+
+        /* Result image */
+        #result-image {
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            max-width: 100%;
+            width: 480px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #fee2e2;
+            border-top-color: #b91c1c;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* API key modal */
+        #api-key-modal {
+            backdrop-filter: blur(4px);
+        }
+
+        /* Share button */
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .share-btn:active { transform: scale(0.96); }
+    </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+    <!-- Navigation -->
+    <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex-shrink-0 flex items-center">
+                    <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span class="text-red-700">Workshop</span></span>
+                </a>
+                <a href="index.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm">&larr; Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-br from-stone-900 via-red-950 to-red-700 text-white pt-16 pb-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium text-red-200 mb-4">
+                <i data-lucide="sparkles" class="h-4 w-4"></i>
+                AI-Powered Career Discovery
+            </div>
+            <h1 class="serif text-4xl md:text-5xl font-bold mb-3">What Career Is Right for You?</h1>
+            <p class="text-red-100 text-lg max-w-xl mx-auto">Answer 8 quick questions and let our AI reveal your ideal career path — complete with a unique image of your future.</p>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+
+        <!-- ── WELCOME SCREEN ── -->
+        <div id="screen-welcome">
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
+                <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <i data-lucide="briefcase" class="h-10 w-10 text-red-700"></i>
+                </div>
+                <h2 class="serif text-2xl font-bold text-stone-900 mb-3">Ready to Discover Your Path?</h2>
+                <p class="text-stone-600 text-sm leading-relaxed mb-6 max-w-md mx-auto">
+                    This short 8-question quiz analyses your interests, work style, and personality to match you with a career that truly fits. When you finish, our AI will generate a personalised image of what your future could look like.
+                </p>
+                <ul class="flex flex-wrap justify-center gap-4 text-sm text-stone-500 mb-8">
+                    <li class="flex items-center gap-1.5"><i data-lucide="clock" class="h-4 w-4 text-red-600"></i> ~2 minutes</li>
+                    <li class="flex items-center gap-1.5"><i data-lucide="brain" class="h-4 w-4 text-red-600"></i> AI-powered analysis</li>
+                    <li class="flex items-center gap-1.5"><i data-lucide="image" class="h-4 w-4 text-red-600"></i> Custom career image</li>
+                </ul>
+                <button onclick="startQuiz()" class="inline-flex items-center gap-2 px-8 py-3 bg-red-700 hover:bg-red-800 text-white font-semibold rounded-full transition-colors text-base shadow-md">
+                    Start the Quiz <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </button>
+                <p class="text-xs text-stone-400 mt-4">Powered by Gemini 2.5 Pro · Your answers are not stored</p>
+            </div>
+        </div>
+
+        <!-- ── QUIZ SCREEN ── -->
+        <div id="screen-quiz" class="hidden">
+            <!-- Progress -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="q-label" class="text-sm font-semibold text-red-700">Question 1 of 8</span>
+                    <span id="q-pct" class="text-sm text-stone-500">0% complete</span>
+                </div>
+                <div class="w-full bg-stone-200 rounded-full h-2">
+                    <div id="progress-fill" class="bg-red-600 h-2 rounded-full" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- Question card -->
+            <div id="question-card" class="question-card bg-white rounded-2xl shadow-sm border border-stone-200 p-6 sm:p-8">
+                <p id="question-text" class="serif text-xl font-bold text-stone-900 mb-6"></p>
+                <div id="answers-list" class="space-y-3"></div>
+            </div>
+
+            <div class="mt-5 flex justify-between items-center">
+                <button id="btn-back" onclick="goBack()" class="text-stone-500 hover:text-red-700 transition-colors text-sm font-medium flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="h-4 w-4"></i> Back
+                </button>
+                <button id="btn-next" onclick="goNext()" disabled
+                    class="px-6 py-2.5 bg-red-700 text-white rounded-full font-semibold text-sm transition-colors hover:bg-red-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                    Next <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── LOADING SCREEN ── -->
+        <div id="screen-loading" class="hidden text-center py-16">
+            <div class="spinner mx-auto mb-6"></div>
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-2" id="loading-title">Analysing your answers…</h2>
+            <p class="text-stone-500 text-sm" id="loading-subtitle">Our AI is finding your perfect career match</p>
+            <div class="mt-6 flex justify-center gap-1.5" id="loading-steps">
+                <span class="inline-block w-2 h-2 rounded-full bg-red-300 animate-bounce" style="animation-delay:0s"></span>
+                <span class="inline-block w-2 h-2 rounded-full bg-red-300 animate-bounce" style="animation-delay:0.15s"></span>
+                <span class="inline-block w-2 h-2 rounded-full bg-red-300 animate-bounce" style="animation-delay:0.3s"></span>
+            </div>
+        </div>
+
+        <!-- ── RESULT SCREEN ── -->
+        <div id="screen-result" class="hidden">
+
+            <!-- Career card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-red-700 to-red-900 px-6 py-5 text-white">
+                    <div class="text-red-200 text-sm font-medium mb-1">Your AI Career Match</div>
+                    <h2 id="result-title" class="serif text-3xl font-bold"></h2>
+                    <p id="result-tagline" class="text-red-100 text-sm mt-1 italic"></p>
+                </div>
+                <div class="p-6">
+                    <p id="result-description" class="text-stone-700 leading-relaxed text-sm mb-5"></p>
+                    <div id="result-traits" class="flex flex-wrap gap-2 mb-5"></div>
+                    <h3 class="font-semibold text-stone-900 text-sm mb-2">Why this career fits you</h3>
+                    <p id="result-reasoning" class="text-stone-600 text-sm leading-relaxed"></p>
+                </div>
+            </div>
+
+            <!-- AI-Generated Image -->
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6 text-center">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <i data-lucide="sparkles" class="h-5 w-5 text-red-600"></i>
+                    <h3 class="font-semibold text-stone-900">Your Future Career — Visualised by AI</h3>
+                </div>
+                <div id="image-container">
+                    <div id="image-loading" class="flex flex-col items-center gap-3 py-8">
+                        <div class="spinner"></div>
+                        <p class="text-stone-500 text-sm">Generating your career image…</p>
+                    </div>
+                    <img id="result-image" class="hidden mx-auto rounded-xl shadow-md max-w-full" alt="AI-generated career visualisation" />
+                    <p id="image-error" class="hidden text-stone-500 text-sm py-6">Image generation is unavailable at this time.</p>
+                </div>
+                <p class="text-xs text-stone-400 mt-3">Image generated by Gemini AI · Not a real photo</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <button onclick="retakeQuiz()" class="share-btn bg-stone-100 hover:bg-stone-200 text-stone-700">
+                    <i data-lucide="refresh-cw" class="h-4 w-4"></i> Retake Quiz
+                </button>
+                <button onclick="shareResult()" class="share-btn bg-red-700 hover:bg-red-800 text-white">
+                    <i data-lucide="share-2" class="h-4 w-4"></i> Share Result
+                </button>
+            </div>
+        </div>
+
+        <!-- ── API KEY SETUP ── -->
+        <div id="screen-api-setup" class="hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
+                <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="key" class="h-8 w-8 text-amber-600"></i>
+                </div>
+                <h2 class="serif text-xl font-bold text-stone-900 mb-2">Gemini API Key Required</h2>
+                <p class="text-stone-600 text-sm leading-relaxed mb-5 max-w-sm mx-auto">
+                    To power the AI career analysis and image generation, please enter your Google AI API key. It is stored only in your browser and never sent to our servers.
+                </p>
+                <div class="max-w-sm mx-auto text-left mb-4">
+                    <label for="api-key-input" class="block text-sm font-medium text-stone-700 mb-1.5">Google AI API Key</label>
+                    <input type="password" id="api-key-input" placeholder="AIza…"
+                        class="w-full px-4 py-2.5 rounded-lg border border-stone-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-mono" />
+                    <p class="text-xs text-stone-400 mt-1.5">Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-red-600 hover:underline">aistudio.google.com</a></p>
+                </div>
+                <p id="api-key-error" class="hidden text-red-600 text-sm mb-3"></p>
+                <button onclick="saveApiKey()" class="px-7 py-2.5 bg-red-700 hover:bg-red-800 text-white font-semibold rounded-full transition-colors text-sm">
+                    Save &amp; Start Quiz
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-10 mt-6">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex justify-center items-center mb-4">
+                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
+                <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
+            </div>
+            <p class="mb-4">© 2026 Luban Workshop Restaurant. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 text-sm">
+                <a href="terms-of-use.html" class="hover:text-white transition-colors">Terms of Use</a>
+                <a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="contact-us.html" class="hover:text-white transition-colors">Contact Us</a>
+                <a href="faq.html" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-full shadow-lg text-sm font-medium text-white bg-stone-900 max-w-sm text-center">
+            <span id="toast-msg"></span>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // ─── Configuration ───────────────────────────────────────────────────────
+        const GEMINI_TEXT_MODEL  = 'gemini-2.5-pro';
+        const GEMINI_IMAGE_MODEL = 'gemini-2.0-flash-preview-image-generation';
+        const API_BASE           = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+        // ─── Quiz Questions ───────────────────────────────────────────────────────
+        const QUESTIONS = [
+            {
+                id: 'q1',
+                text: 'What kind of work environment excites you the most?',
+                options: [
+                    'Outdoors or on the move — I love being active',
+                    'A busy office or workplace with lots of people',
+                    'A quiet studio, lab, or workspace where I can focus',
+                    'Anywhere — I prefer working from home or remotely'
+                ]
+            },
+            {
+                id: 'q2',
+                text: 'How do you prefer to work with others?',
+                options: [
+                    'I love helping and caring for people directly',
+                    'I like leading a team and making decisions',
+                    'I prefer working independently on my own projects',
+                    'Small group collaboration is my sweet spot'
+                ]
+            },
+            {
+                id: 'q3',
+                text: 'Which of these activities sounds most appealing?',
+                options: [
+                    'Designing, drawing, writing, or making something creative',
+                    'Analysing data, solving puzzles, or doing research',
+                    'Teaching, coaching, or mentoring someone',
+                    'Building, fixing, or working with tools and machines'
+                ]
+            },
+            {
+                id: 'q4',
+                text: 'Which school subjects did you enjoy most?',
+                options: [
+                    'Science and Mathematics',
+                    'Art, Music, or Drama',
+                    'Social Studies, History, or Humanities',
+                    'Technology, Computing, or Engineering'
+                ]
+            },
+            {
+                id: 'q5',
+                text: 'When facing a difficult problem, you typically…',
+                options: [
+                    'Research thoroughly and think it through carefully',
+                    'Jump in, try things, and learn as you go',
+                    'Ask others and work through it together',
+                    'Find a creative or unconventional solution'
+                ]
+            },
+            {
+                id: 'q6',
+                text: 'What motivates you most at work?',
+                options: [
+                    'Making a positive difference in people\'s lives',
+                    'Financial reward and career advancement',
+                    'Creative expression and recognition',
+                    'Intellectual challenge and continuous learning'
+                ]
+            },
+            {
+                id: 'q7',
+                text: 'How would your friends describe you?',
+                options: [
+                    'Caring, empathetic, and a great listener',
+                    'Organised, responsible, and detail-oriented',
+                    'Creative, curious, and full of ideas',
+                    'Practical, hands-on, and resourceful'
+                ]
+            },
+            {
+                id: 'q8',
+                text: 'What does your ideal working week look like?',
+                options: [
+                    'Routine and predictable — I like knowing what\'s next',
+                    'Varied and dynamic — every day is different',
+                    'Project-based — focused sprints followed by breaks',
+                    'Flexible — I set my own schedule'
+                ]
+            }
+        ];
+
+        // ─── State ────────────────────────────────────────────────────────────────
+        let currentQuestion = 0;
+        let answers = {};
+        let apiKey = localStorage.getItem('gemini_api_key') || '';
+
+        // ─── Screen helpers ───────────────────────────────────────────────────────
+        function showScreen(id) {
+            ['screen-welcome', 'screen-quiz', 'screen-loading', 'screen-result', 'screen-api-setup']
+                .forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        // ─── Quiz flow ────────────────────────────────────────────────────────────
+        function startQuiz() {
+            if (!apiKey) {
+                showScreen('screen-api-setup');
+                return;
+            }
+            currentQuestion = 0;
+            answers = {};
+            showScreen('screen-quiz');
+            renderQuestion();
+            gtag('event', 'quiz_start', { event_category: 'career_quiz' });
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('api-key-input').value.trim();
+            const validKey = /^AIza[0-9A-Za-z_-]{35,}$/.test(val);
+            if (!validKey) {
+                document.getElementById('api-key-error').textContent = 'Please enter a valid Google AI API key (starts with "AIza" followed by 35+ characters).';
+                document.getElementById('api-key-error').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('api-key-error').classList.add('hidden');
+            apiKey = val;
+            localStorage.setItem('gemini_api_key', val);
+            currentQuestion = 0;
+            answers = {};
+            showScreen('screen-quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = QUESTIONS[currentQuestion];
+            const total = QUESTIONS.length;
+            const pct = Math.round((currentQuestion / total) * 100);
+
+            document.getElementById('q-label').textContent = `Question ${currentQuestion + 1} of ${total}`;
+            document.getElementById('q-pct').textContent = `${pct}% complete`;
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+
+            const card = document.getElementById('question-card');
+            card.classList.remove('question-card');
+            void card.offsetWidth; // reflow to restart animation
+            card.classList.add('question-card');
+
+            document.getElementById('question-text').textContent = q.text;
+
+            const list = document.getElementById('answers-list');
+            list.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn' + (answers[q.id] === i ? ' selected' : '');
+                btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+                btn.addEventListener('click', () => selectAnswer(i));
+                list.appendChild(btn);
+            });
+
+            document.getElementById('btn-back').style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').disabled = answers[q.id] === undefined;
+
+            const isLast = currentQuestion === total - 1;
+            document.getElementById('btn-next').innerHTML = isLast
+                ? 'Get My Results <i data-lucide="sparkles" class="h-4 w-4"></i>'
+                : 'Next <i data-lucide="arrow-right" class="h-4 w-4"></i>';
+            lucide.createIcons();
+        }
+
+        function selectAnswer(index) {
+            const q = QUESTIONS[currentQuestion];
+            answers[q.id] = index;
+            document.querySelectorAll('.answer-btn').forEach((btn, i) => {
+                btn.classList.toggle('selected', i === index);
+            });
+            document.getElementById('btn-next').disabled = false;
+        }
+
+        function goNext() {
+            const q = QUESTIONS[currentQuestion];
+            if (answers[q.id] === undefined) return;
+            if (currentQuestion < QUESTIONS.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                submitQuiz();
+            }
+        }
+
+        function goBack() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function retakeQuiz() {
+            currentQuestion = 0;
+            answers = {};
+            showScreen('screen-welcome');
+            gtag('event', 'quiz_retake', { event_category: 'career_quiz' });
+        }
+
+        // ─── AI Analysis ──────────────────────────────────────────────────────────
+        async function submitQuiz() {
+            showScreen('screen-loading');
+            document.getElementById('loading-title').textContent = 'Analysing your answers…';
+            document.getElementById('loading-subtitle').textContent = 'Our AI is finding your perfect career match';
+            gtag('event', 'quiz_submit', { event_category: 'career_quiz' });
+
+            // Build answers summary
+            const summary = QUESTIONS.map((q, i) => {
+                const ai = answers[q.id];
+                return `Q${i + 1}: ${q.text}\nAnswer: ${ai !== undefined ? q.options[ai] : 'No answer'}`;
+            }).join('\n\n');
+
+            const prompt = `You are a career counsellor. Based on the quiz answers below, determine the single best career match for this person.
+
+${summary}
+
+Respond with a JSON object (no markdown, no code fences) with exactly these fields:
+- "title": the job title (e.g. "Graphic Designer", "Nurse", "Software Engineer", "Crossing Guard", "Chef")
+- "tagline": a short one-sentence inspirational phrase about this career
+- "description": 2-3 sentences describing the career and what daily life looks like
+- "traits": an array of 3-5 personality traits that match this career (e.g. ["Creative", "Detail-oriented"])
+- "reasoning": 2 sentences explaining why this specific career fits the quiz answers
+- "imagePrompt": a vivid, detailed prompt for generating a photorealistic image of someone happily working in this career. Be specific about the setting, clothing, and actions. Keep it positive and professional.`;
+
+            let careerData;
+            try {
+                careerData = await callGeminiText(prompt);
+            } catch (err) {
+                showError('Career analysis failed: ' + err.message);
+                return;
+            }
+
+            // Show results
+            displayResult(careerData);
+
+            // Generate image
+            generateCareerImage(careerData.imagePrompt, careerData.title);
+        }
+
+        async function callGeminiText(prompt) {
+            const url = `${API_BASE}/${GEMINI_TEXT_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const body = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+            };
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                const msg = errData?.error?.message || `HTTP ${res.status}`;
+                if (res.status === 400 || res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('gemini_api_key');
+                    apiKey = '';
+                }
+                throw new Error(msg);
+            }
+
+            const data = await res.json();
+            const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            // Strip potential markdown fences
+            const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+            return JSON.parse(clean);
+        }
+
+        async function generateCareerImage(imagePrompt, careerTitle) {
+            document.getElementById('image-loading').classList.remove('hidden');
+            document.getElementById('result-image').classList.add('hidden');
+            document.getElementById('image-error').classList.add('hidden');
+
+            const url = `${API_BASE}/${GEMINI_IMAGE_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const fullPrompt = `Photorealistic image: ${imagePrompt} The scene should be warm, positive, and inspiring. No text or watermarks.`;
+            const body = {
+                contents: [{ parts: [{ text: fullPrompt }] }],
+                generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
+            };
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData?.error?.message || `HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+                const parts = data?.candidates?.[0]?.content?.parts || [];
+                const imagePart = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
+
+                if (imagePart) {
+                    const imgEl = document.getElementById('result-image');
+                    imgEl.src = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+                    imgEl.alt = `AI-generated image of a ${careerTitle}`;
+                    imgEl.classList.remove('hidden');
+                    document.getElementById('image-loading').classList.add('hidden');
+                    gtag('event', 'career_image_generated', { event_category: 'career_quiz', career: careerTitle });
+                } else {
+                    throw new Error('No image in response');
+                }
+            } catch (err) {
+                console.warn('Image generation failed:', err.message);
+                document.getElementById('image-loading').classList.add('hidden');
+                document.getElementById('image-error').classList.remove('hidden');
+            }
+        }
+
+        // ─── Result display ───────────────────────────────────────────────────────
+        function displayResult(data) {
+            showScreen('screen-result');
+            document.getElementById('result-title').textContent = data.title || 'Career Match';
+            document.getElementById('result-tagline').textContent = data.tagline || '';
+            document.getElementById('result-description').textContent = data.description || '';
+            document.getElementById('result-reasoning').textContent = data.reasoning || '';
+
+            const traitsEl = document.getElementById('result-traits');
+            traitsEl.innerHTML = '';
+            (data.traits || []).forEach(trait => {
+                const span = document.createElement('span');
+                span.className = 'px-3 py-1 bg-red-50 text-red-700 rounded-full text-xs font-semibold border border-red-100';
+                span.textContent = trait;
+                traitsEl.appendChild(span);
+            });
+
+            gtag('event', 'quiz_result', {
+                event_category: 'career_quiz',
+                career_match: data.title || 'unknown'
+            });
+        }
+
+        // ─── Toast notification ───────────────────────────────────────────────────
+        let toastTimer;
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const inner = document.getElementById('toast-inner');
+            document.getElementById('toast-msg').textContent = msg;
+            inner.className = `flex items-center gap-3 px-5 py-3 rounded-full shadow-lg text-sm font-medium text-white max-w-sm text-center ${isError ? 'bg-red-700' : 'bg-stone-900'}`;
+            toast.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        function showError(msg) {
+            showScreen('screen-welcome');
+            showToast('Something went wrong: ' + msg + ' — please try again.', true);
+        }
+
+        // ─── Share ────────────────────────────────────────────────────────────────
+        function shareResult() {
+            const title = document.getElementById('result-title').textContent;
+            const text = `I just took the Luban Workshop career quiz and my match is: ${title}! 🎯 Take it yourself at lubanrestaurant.com/career-quiz.html`;
+            if (navigator.share) {
+                navigator.share({ title: 'My Career Match', text, url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text).then(() => showToast('Result copied to clipboard! ✓')).catch(() => {});
+            }
+            gtag('event', 'quiz_share', { event_category: 'career_quiz', career: title });
+        }
+    </script>
+</body>
+</html>
