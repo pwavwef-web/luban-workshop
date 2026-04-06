@@ -42,6 +42,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // menuImages collection – stores admin-overridden images for hardcoded dishes
+    match /menuImages/{dishId} {
+      // Anyone can read (main site needs to display current images)
+      allow read: if true;
+
+      // Only admins can set or remove image overrides
+      allow write: if isAdmin();
+    }
+
     // priceOverrides collection – stores temporary price overrides for dishes
     match /priceOverrides/{dishId} {
       // Anyone can read (main site and menu page need to show updated prices)

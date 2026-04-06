@@ -552,6 +552,7 @@
 
         let menuHiddenIds = new Set();
         let menuPriceOverrides = {};
+        let menuImageOverrides = {};
 
         function renderMenuTable() {
             const tableBody = document.getElementById('menu-items-table');
@@ -560,6 +561,7 @@
             HARDCODED_MENU.forEach(dish => {
                 const isHidden = menuHiddenIds.has(dish.id);
                 const currentPrice = menuPriceOverrides[dish.id] !== undefined ? menuPriceOverrides[dish.id] : dish.price;
+                const hasImageOverride = menuImageOverrides[dish.id] !== undefined;
                 const statusBadge = isHidden
                     ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
                     : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Visible</span>';
@@ -571,15 +573,19 @@
                 const revertBtn = menuPriceOverrides[dish.id] !== undefined
                     ? `<button onclick="revertPrice('${dish.id}')" class="text-stone-400 hover:text-amber-600 transition-colors mr-3" title="Revert to original price (₵${dish.price})"><i data-lucide="rotate-ccw" class="h-4 w-4"></i></button>`
                     : '';
+                const imageIndicator = hasImageOverride
+                    ? `<span class="ml-1 text-xs text-blue-600" title="Custom image active">(custom)</span>`
+                    : '';
                 const row = `
                     <tr class="hover:bg-stone-50 transition-colors${isHidden ? ' opacity-60' : ''}">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${dish.name}${imageIndicator}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-stone-100 text-stone-800">${dish.category}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${priceLabel}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openImageModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')})" class="text-stone-400 hover:text-purple-600 transition-colors mr-3" title="Edit dish image"><i data-lucide="image" class="h-4 w-4"></i></button>
                             <button onclick="openPriceModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')}, ${currentPrice})" class="text-stone-400 hover:text-blue-600 transition-colors mr-3" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
                             ${revertBtn}<button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
                         </td>
@@ -603,6 +609,14 @@
                 menuPriceOverrides = {};
                 snapshot.forEach(doc => {
                     menuPriceOverrides[doc.id] = doc.data().price;
+                });
+                renderMenuTable();
+            });
+
+            db.collection('menuImages').onSnapshot(snapshot => {
+                menuImageOverrides = {};
+                snapshot.forEach(doc => {
+                    menuImageOverrides[doc.id] = doc.data().imageUrl;
                 });
                 renderMenuTable();
             });
@@ -655,8 +669,129 @@
             }
         }
 
+        // --- Image Edit Modal ---
+        let editingImageDishId = null;
+
+        function openImageModal(dishId, dishName) {
+            editingImageDishId = dishId;
+            document.getElementById('image-edit-dish-name').textContent = dishName;
+            document.getElementById('image-url-input').value = menuImageOverrides[dishId] || '';
+            document.getElementById('image-file-input').value = '';
+            document.getElementById('image-edit-feedback').textContent = '';
+            document.getElementById('image-edit-feedback').className = 'hidden text-sm mt-2';
+
+            // Show current image preview
+            const dish = HARDCODED_MENU.find(d => d.id === dishId);
+            const currentSrc = menuImageOverrides[dishId] || (dish ? `assets/menu-items-pictures/${dishId}.jpg` : '');
+            const PLACEHOLDER = 'https://placehold.co/400x300/e5e5e5/a3a3a3?text=No+Image';
+            const preview = document.getElementById('image-edit-preview');
+            preview.onerror = () => { if (preview.src !== PLACEHOLDER) preview.src = PLACEHOLDER; };
+            preview.src = currentSrc;
+
+            // Store dish ID on the revert button for safe access
+            const revertBtn = document.getElementById('image-revert-btn');
+            revertBtn.dataset.dishId = dishId;
+            revertBtn.classList.toggle('hidden', !menuImageOverrides[dishId]);
+
+            document.getElementById('image-edit-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('image-url-input').focus(), 50);
+        }
+
+        function closeImageModal() {
+            editingImageDishId = null;
+            document.getElementById('image-edit-modal').classList.add('hidden');
+        }
+
+        function showImageFeedback(msg, isError) {
+            const el = document.getElementById('image-edit-feedback');
+            el.textContent = msg;
+            el.className = `text-sm mt-2 ${isError ? 'text-red-600' : 'text-green-600'}`;
+        }
+
+        async function saveImageEdit() {
+            if (!editingImageDishId) return;
+            const urlInput = document.getElementById('image-url-input').value.trim();
+            const fileInput = document.getElementById('image-file-input');
+            const saveBtn = document.getElementById('image-save-btn');
+
+            if (!urlInput && (!fileInput.files || fileInput.files.length === 0)) {
+                showImageFeedback('Please provide an image URL or upload a file.', true);
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            try {
+                let imageUrl = urlInput;
+
+                // If a file is uploaded, convert to base64 data URL
+                if (fileInput.files && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (file.size > 700 * 1024) {
+                        showImageFeedback('File is too large. Please use an image under 700 KB.', true);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save Image';
+                        return;
+                    }
+                    imageUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.onerror = () => reject(new Error('Failed to read file'));
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                await db.collection('menuImages').doc(editingImageDishId).set({ imageUrl });
+                closeImageModal();
+            } catch (error) {
+                console.error('Error saving image:', error);
+                showImageFeedback('Failed to save image. Please try again.', true);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Image';
+            }
+        }
+
+        async function revertImage(dishId) {
+            if (!confirm('Remove the custom image and revert to the original?')) return;
+            try {
+                await db.collection('menuImages').doc(dishId).delete();
+                closeImageModal();
+            } catch (error) {
+                console.error('Error reverting image:', error);
+                alert('Failed to revert image. Please try again.');
+            }
+        }
+
+        // Live URL preview in image modal
+        function onImageUrlInput() {
+            const val = document.getElementById('image-url-input').value.trim();
+            const preview = document.getElementById('image-edit-preview');
+            const PLACEHOLDER = 'https://placehold.co/400x300/e5e5e5/a3a3a3?text=Invalid+URL';
+            if (val) {
+                preview.onerror = () => { if (preview.src !== PLACEHOLDER) preview.src = PLACEHOLDER; };
+                preview.src = val;
+            }
+        }
+
+        // Live file preview in image modal
+        function onImageFileChange() {
+            const fileInput = document.getElementById('image-file-input');
+            if (fileInput.files && fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const preview = document.getElementById('image-edit-preview');
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+                // Clear URL input when file is chosen
+                document.getElementById('image-url-input').value = '';
+            }
+        }
+
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closePriceModal();
+            if (e.key === 'Escape') { closePriceModal(); closeImageModal(); }
         });
 
         async function toggleDishVisibility(id, currentlyHidden) {
@@ -1203,6 +1338,61 @@
                 <button onclick="savePriceEdit()"
                     class="flex-1 bg-red-700 text-white py-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors">
                     Save Price
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Edit Modal -->
+    <div id="image-edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="image-edit-title">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeImageModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 z-10">
+            <h3 id="image-edit-title" class="text-lg font-bold text-stone-900 mb-1">Edit Dish Image</h3>
+            <p id="image-edit-dish-name" class="text-sm text-stone-500 mb-4"></p>
+
+            <!-- Current image preview -->
+            <div class="mb-4 flex justify-center">
+                <img id="image-edit-preview" src="" alt="Dish preview"
+                    class="h-40 w-full object-cover rounded-lg border border-stone-200 bg-stone-100">
+            </div>
+
+            <!-- URL input -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
+                <input type="url" id="image-url-input" oninput="onImageUrlInput()"
+                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-purple-600 focus:outline-none text-sm"
+                    placeholder="https://example.com/image.jpg">
+            </div>
+
+            <!-- Divider -->
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex-1 h-px bg-stone-200"></div>
+                <span class="text-xs text-stone-400 font-medium">OR</span>
+                <div class="flex-1 h-px bg-stone-200"></div>
+            </div>
+
+            <!-- File upload -->
+            <div class="mb-2">
+                <label class="block text-sm font-medium text-stone-700 mb-1">Upload Image File</label>
+                <input type="file" id="image-file-input" accept="image/*" onchange="onImageFileChange()"
+                    class="w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
+                <p class="text-xs text-stone-400 mt-1">Max 700 KB. Replaces the URL field when selected.</p>
+            </div>
+
+            <div id="image-edit-feedback" class="hidden text-sm mt-2"></div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeImageModal()"
+                    class="flex-1 border border-stone-300 text-stone-600 py-2 rounded-md text-sm font-medium hover:bg-stone-50 transition-colors">
+                    Cancel
+                </button>
+                <button id="image-revert-btn" onclick="revertImage(this.dataset.dishId)"
+                    class="hidden border border-amber-400 text-amber-600 py-2 px-4 rounded-md text-sm font-medium hover:bg-amber-50 transition-colors whitespace-nowrap">
+                    Delete Uploaded Image
+                </button>
+                <button id="image-save-btn" onclick="saveImageEdit()"
+                    class="flex-1 bg-purple-700 text-white py-2 rounded-md text-sm font-medium hover:bg-purple-800 transition-colors">
+                    Save Image
                 </button>
             </div>
         </div>
