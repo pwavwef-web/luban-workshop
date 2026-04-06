@@ -226,6 +226,15 @@
                 <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> Admin Dashboard
             </a>
         </div>
+        <!-- Cart button in drawer -->
+        <div class="px-4 pb-2">
+            <button onclick="toggleNavDrawer(); toggleCart();" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <span class="flex items-center gap-3">
+                    <i data-lucide="shopping-bag" class="h-5 w-5 flex-shrink-0"></i> View Cart
+                </span>
+                <span id="cart-badge-mobile" class="hidden items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-700 rounded-full">0</span>
+            </button>
+        </div>
         <!-- Auth section in sidebar (user info always shown here; sign-in shown on small screens) -->
         <div class="border-t border-stone-100 p-4">
             <button id="auth-btn-sidebar" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
@@ -743,6 +752,7 @@
         let currentUser = null; // NEW: Track the logged-in user
         let menuHiddenIds = new Set();
         let menuPriceOverrides = {};
+        let menuImageOverrides = {};
 
         // --- Firebase Auth State Observer ---
         auth.onAuthStateChanged(async user => {
@@ -820,7 +830,8 @@
                 .filter(item => !menuHiddenIds.has(item.id))
                 .map(item => ({
                     ...item,
-                    price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price
+                    price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price,
+                    image: menuImageOverrides[item.id] !== undefined ? menuImageOverrides[item.id] : item.image
                 }));
             renderMenu();
         }
@@ -835,13 +846,17 @@
                     .filter(item => !hiddenIds.has(item.id))
                     .map(item => {
                         const override = priceOverrides[item.id];
+                        let price = item.price;
                         if (override && override.revertAt) {
                             const revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
                             if (revertAt > now) {
-                                return Object.assign({}, item, { price: override.newPrice });
+                                price = override.newPrice;
                             }
                         }
-                        return item;
+                        return Object.assign({}, item, {
+                            price,
+                            image: menuImageOverrides[item.id] !== undefined ? menuImageOverrides[item.id] : item.image
+                        });
                     });
                 renderMenu();
             }
@@ -863,6 +878,16 @@
                     menuPriceOverrides[doc.id] = doc.data().price;
                 });
                 rebuildMenuItems();
+            });
+
+            db.collection('menuImages').onSnapshot(snapshot => {
+                menuImageOverrides = {};
+                snapshot.forEach(doc => {
+                    menuImageOverrides[doc.id] = doc.data().imageUrl;
+                });
+                rebuildMenuItems();
+            }, error => {
+                console.error('Error loading image overrides:', error);
             });
 
             db.collection('priceOverrides').onSnapshot(snapshot => {
@@ -1041,6 +1066,7 @@
             const badgeDesktop = document.getElementById('cart-badge-desktop');
             const badgeMobile = document.getElementById('cart-badge-mobile');
             [badgeDesktop, badgeMobile].forEach(el => {
+                if (!el) return;
                 el.classList.add('scale-125');
                 setTimeout(() => el.classList.remove('scale-125'), 200);
             });
@@ -1066,16 +1092,16 @@
             const checkoutBtn = document.getElementById('checkout-btn');
 
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-            badgeDesktop.innerText = count;
-            badgeMobile.innerText = count;
+            if (badgeDesktop) badgeDesktop.innerText = count;
+            if (badgeMobile) badgeMobile.innerText = count;
 
             if (count > 0) {
-                badgeDesktop.classList.remove('hidden');
-                badgeMobile.classList.remove('hidden');
+                if (badgeDesktop) badgeDesktop.classList.remove('hidden');
+                if (badgeMobile) { badgeMobile.classList.remove('hidden'); badgeMobile.classList.add('inline-flex'); }
                 checkoutBtn.disabled = false;
             } else {
-                badgeDesktop.classList.add('hidden');
-                badgeMobile.classList.add('hidden');
+                if (badgeDesktop) badgeDesktop.classList.add('hidden');
+                if (badgeMobile) { badgeMobile.classList.add('hidden'); badgeMobile.classList.remove('inline-flex'); }
                 checkoutBtn.disabled = true;
             }
 
