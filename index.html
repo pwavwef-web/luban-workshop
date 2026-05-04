@@ -162,6 +162,10 @@
 
                 <!-- Right side: cart, auth, nav drawer toggle (always visible) -->
                 <div class="flex items-center gap-2">
+                    <!-- My Orders button (shown when signed in) -->
+                    <a href="#my-orders" id="my-orders-link-desktop" class="hidden p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="My Orders">
+                        <i data-lucide="package" class="h-6 w-6"></i>
+                    </a>
                     <!-- Cart button -->
                     <button onclick="toggleCart()" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
                         <i data-lucide="shopping-bag" class="h-6 w-6"></i>
@@ -203,9 +207,6 @@
             </a>
             <a href="events-and-catering.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="calendar" class="h-5 w-5 flex-shrink-0"></i> Reserve a Table
-            </a>
-            <a href="#my-orders" id="my-orders-link-desktop" onclick="toggleNavDrawer()" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-                <i data-lucide="package" class="h-5 w-5 flex-shrink-0"></i> My Orders
             </a>
             <a href="#location" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="map-pin" class="h-5 w-5 flex-shrink-0"></i> Locate Us
