@@ -97,6 +97,13 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // users collection – stores customer profiles (name, phone)
+    match /users/{userId} {
+      // Users can read and write their own profile; admins can read all
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
     // teamProfiles collection – staff profiles submitted via the profile form
     match /teamProfiles/{profileId} {
       // Anyone can read approved profiles (displayed publicly on the team page)
