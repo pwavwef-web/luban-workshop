@@ -60,6 +60,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // admins collection – stores emails of users with admin privileges
+    match /admins/{adminEmail} {
+      // Only existing admins can read or manage the admin list
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
     // orders collection rules
     match /orders/{orderId} {
       // Admins can read all orders; customers can read their own
@@ -81,6 +88,47 @@ service cloud.firestore {
       allow create: if isAuthenticated();
       
       // Only admins can update or delete reservations
+      allow update, delete: if isAdmin();
+    }
+
+    // contact_messages collection – submitted via the Contact Us page
+    match /contact_messages/{messageId} {
+      // Anyone can submit a contact message (no auth required)
+      allow create: if true;
+
+      // Only admins can read or update (e.g. mark as read) messages
+      allow read, update: if isAdmin();
+
+      // Only admins can delete messages
+      allow delete: if isAdmin();
+    }
+
+    // users collection – stores customer profiles (name, phone)
+    match /users/{userId} {
+      // Users can read and write their own profile; admins can read all
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // teamProfiles collection – staff profiles submitted via the profile form
+    match /teamProfiles/{profileId} {
+      // Anyone can read approved profiles (displayed publicly on the team page)
+      allow read: if resource.data.get('status', '') == 'approved' || isAdmin();
+
+      // Only admins can create profiles (form is admin-gated)
+      allow create: if isAdmin() &&
+                       request.resource.data.status == 'pending' &&
+                       request.resource.data.firstName is string &&
+                       request.resource.data.firstName.size() > 0 &&
+                       request.resource.data.firstName.size() < 100 &&
+                       request.resource.data.lastName is string &&
+                       request.resource.data.lastName.size() > 0 &&
+                       request.resource.data.lastName.size() < 100 &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.size() > 0 &&
+                       request.resource.data.email.size() < 200;
+
+      // Only admins can update (e.g. approve/reject) or delete profiles
       allow update, delete: if isAdmin();
     }
   }
