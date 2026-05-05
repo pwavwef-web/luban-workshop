@@ -65,7 +65,7 @@ exports.notifyNewReservation = functions.firestore
       const msg = {
         to: cfg.recipient,
         from: cfg.sender,
-        subject: `🍽️ New Reservation – ${data.name || "Guest"} on ${data.date || "TBD"}`,
+        subject: `New Reservation - ${sanitizeSubject(data.name || "Guest")} on ${sanitizeSubject(data.date || "TBD")}`,
         html: `
           <h2 style="color:#b91c1c;">New Reservation Submitted</h2>
           <table cellpadding="6" cellspacing="0" style="font-family:sans-serif;font-size:14px;border-collapse:collapse;">
@@ -117,7 +117,7 @@ exports.notifyNewContactMsg = functions.firestore
       const msg = {
         to: cfg.recipient,
         from: cfg.sender,
-        subject: `✉️ New Contact Message – ${data.subject || "(no subject)"}`,
+        subject: `New Contact Message - ${sanitizeSubject(data.subject || "(no subject)")}`,
         html: `
           <h2 style="color:#b91c1c;">New Contact Form Submission</h2>
           <table cellpadding="6" cellspacing="0" style="font-family:sans-serif;font-size:14px;border-collapse:collapse;">
@@ -154,4 +154,13 @@ function escapeHtml(str) {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+}
+
+// ---------------------------------------------------------------------------
+// Utility – sanitize a string for use in an email subject line.
+// Strips newline characters and trims whitespace to prevent header injection.
+// ---------------------------------------------------------------------------
+function sanitizeSubject(str) {
+  if (str === undefined || str === null) return "";
+  return String(str).replace(/[\r\n\t]+/g, " ").trim().slice(0, 200);
 }
