@@ -3,11 +3,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is admin using Custom Claims
-    // This is the SECURE production approach
-    // Set custom claim: admin.auth().setCustomUserClaims(uid, { admin: true })
+    // Helper function to check if user is admin.
+    // Checks custom claim (recommended) or membership in the Firestore `admins`
+    // collection (managed via the Admin tab in the dashboard).
     function isAdmin() {
-      return request.auth != null && request.auth.token.admin == true;
+      return request.auth != null &&
+             (request.auth.token.admin == true ||
+              exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
     }
     
     // Helper function to check if user is authenticated
@@ -62,8 +64,9 @@ service cloud.firestore {
 
     // admins collection – stores emails of users with admin privileges
     match /admins/{adminEmail} {
-      // Only existing admins can read or manage the admin list
-      allow read: if isAdmin();
+      // Authenticated users can read their own document (needed for admin self-check);
+      // only existing admins can read the full list or manage entries
+      allow read: if isAdmin() || (isAuthenticated() && adminEmail == request.auth.token.email);
       allow write: if isAdmin();
     }
 
