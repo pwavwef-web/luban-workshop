@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, and the About Us canonical URL has been corrected. The remaining high-priority gap is deploying production Firestore rules; a handful of medium- and low-priority polish items also remain.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, the About Us canonical URL has been corrected, `about-us/profile.html` has been added to the sitemap, social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array, and both the favicon and PWA manifest icons now use PNG. The remaining high-priority gap is deploying production Firestore rules; a handful of medium- and low-priority polish items also remain.
 
 ---
 
@@ -98,18 +98,18 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | # | Issue | Location | Impact |
 |---|-------|----------|--------|
 | M1 | ~~`staff-guide.html` is indexed by search engines~~ | — | ✅ **No longer applicable** — page has been removed |
-| M2 | `sameAs` array in JSON-LD is empty | `index.html` structured data | Missed opportunity to link social media profiles |
-| M3 | `sitemap.xml` is missing `about-us/profile.html` | `sitemap.xml` | Page may not be indexed by Google |
+| M2 | ~~`sameAs` array in JSON-LD is empty~~ | — | ✅ **Resolved** — Facebook and Instagram profile URLs added to the `sameAs` array |
+| M3 | ~~`sitemap.xml` is missing `about-us/profile.html`~~ | — | ✅ **Resolved** — `about-us/profile.html` entry added to `sitemap.xml` |
 | M4 | ~~Tailwind CSS loaded from CDN (`cdn.tailwindcss.com`)~~ | — | ✅ **Resolved** — local build step generates a purged CSS bundle |
 | M5 | Firebase SDK loaded as compat (v10.7.1) via CDN | All pages | Older SDK version; no tree-shaking; larger bundle |
 | M6 | ~~No custom `404.html` error page~~ | — | ✅ **Resolved** — `404.html` exists and configured in `firebase.json` |
-| M7 | favicon is a JPEG (`favicon.jpeg`) | `<link rel="icon">` | JPEG favicons display poorly on some browsers/OS; `.ico` or `.png` preferred |
+| M7 | ~~favicon is a JPEG (`favicon.jpeg`)~~ | — | ✅ **Resolved** — `<link rel="icon">` now points to `logo.png` (PNG) |
 
 ### Low Priority
 
 | # | Issue | Location | Impact |
 |---|-------|----------|--------|
-| L1 | PWA manifest uses JPEG for the 192×192 icon | `manifest.json` | Some Android launchers reject JPEG icons; PNG recommended |
+| L1 | ~~PWA manifest uses JPEG for the 192×192 icon~~ | — | ✅ **Resolved** — `manifest.json` icons now reference `logo.png` with `type: image/png` |
 | L2 | ~~`career-quiz.html` indexed by search engines~~ | — | ✅ **No longer applicable** — page has been removed |
 | L3 | `presentation.html` uses external CDN (pptxgenjs) with a pinned version | `presentation.html` | Minor supply-chain risk; acceptable for an internal page |
 | L4 | ~~`about-us/index.html` canonical points to `/team/`~~ | — | ✅ **Resolved** — canonical now correctly set to `https://lubanrestaurant.com/about-us/` |
@@ -129,10 +129,10 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 ### Short-term (within 2 weeks)
 
 - [x] ~~**Set `staff-guide.html` to noindex**~~ — page has been removed. ✅
-- [ ] **Update `sitemap.xml`** — add `about-us/profile.html`.
-- [ ] **Fix JSON-LD `sameAs`** — add social media profile URLs (Facebook, WhatsApp Business, Instagram, etc.) to the `sameAs` array on the homepage.
+- [x] **Update `sitemap.xml`** — added `about-us/profile.html`. ✅
+- [x] **Fix JSON-LD `sameAs`** — Facebook and Instagram profile URLs added to the `sameAs` array on the homepage. ✅
 - [x] **Fix `about-us/index.html` canonical** — canonical now correctly points to `https://lubanrestaurant.com/about-us/`. ✅
-- [ ] **Replace JPEG favicon** — export a proper 32×32 `.ico` (or 32×32 + 180×180 PNGs) and update both `<link rel="icon">` and `manifest.json`.
+- [x] **Replace JPEG favicon** — `<link rel="icon">` now points to `logo.png` (PNG); `manifest.json` icons also updated to PNG. ✅
 - [x] **Add Google Fonts preconnect hints** — `preconnect` hints added sitewide. ✅
 
 ### Medium-term (within 1 month)
@@ -158,12 +158,12 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | Category | Score | Notes |
 |----------|-------|-------|
 | Core functionality | 9 / 10 | All key customer flows working; branded 404 page added |
-| SEO | 8 / 10 | Hours fixed, canonical corrected; `sameAs` and sitemap still need minor updates |
+| SEO | 9 / 10 | Hours fixed, canonical corrected, sitemap and `sameAs` updated |
 | Security | 7 / 10 | Good rules architecture; production rules must be deployed |
 | Performance | 7 / 10 | Local Tailwind build and Fonts preconnect added; image optimisation still pending |
-| PWA | 7 / 10 | Service worker and manifest present; icon format could be better |
+| PWA | 8 / 10 | Service worker and manifest present; icons and favicon now PNG |
 | Accessibility | 6 / 10 | Not fully audited; icon buttons likely missing labels |
-| **Overall** | **7.5 / 10** | Ready for launch; deploy production Firestore rules before promoting |
+| **Overall** | **7.8 / 10** | Ready for launch; deploy production Firestore rules before promoting |
 
 ---
 
