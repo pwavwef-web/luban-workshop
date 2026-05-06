@@ -83,6 +83,40 @@
     }
     </script>
 
+    <!-- Structured Data: FAQ (document-grounded questions) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What type of cuisine does Luban Workshop Restaurant serve?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Luban Workshop Restaurant serves authentic Chinese cuisine, including soups, beef, seafood, rice and noodles, and more."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the relationship between Luban Workshop Restaurant and UCC?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Luban Workshop Restaurant is located on the University of Cape Coast (UCC) campus. It serves as both a hospitality training ground for students and a fine-dining destination for the wider Cape Coast community."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Luban Workshop Restaurant a training restaurant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Luban Workshop Restaurant functions as both a hospitality training facility and a premier dining destination. It provides hands-on training for hospitality students at UCC while offering guests an exceptional fine-dining experience."
+          }
+        }
+      ]
+    }
+    </script>
+
     <link rel="stylesheet" href="tailwind.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -303,12 +337,13 @@
                 alt="Restaurant interior" class="w-full h-full object-cover object-bottom" style="object-position: bottom">
         </div>
         <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            <p class="text-red-400 tracking-widest uppercase text-xs mb-3">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
+            <h1 class="serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-3 drop-shadow-lg">
                 Craftsmanship in <br />Every Bite
             </h1>
-            <p class="mt-4 text-xl text-stone-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
-                Experience the culinary excellence of the Luban Workshop. Where technical precision meets traditional
-                flavor.
+            <p class="text-stone-400 text-sm italic mb-6">— Best Dining in Cape Coast, Ghana</p>
+            <p class="text-xl text-stone-200 max-w-2xl mx-auto mb-10 drop-shadow-md">
+                Cape Coast's premier destination for authentic Chinese cuisine — soups, beef, seafood, rice &amp; noodles. Located at the University of Cape Coast, Luban Workshop serves as both a hospitality training ground and a fine-dining destination.
             </p>
             <div class="flex justify-center gap-4">
                 <a href="#menu"
