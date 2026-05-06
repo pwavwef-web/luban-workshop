@@ -47,6 +47,30 @@
       "mainEntity": [
         {
           "@type": "Question",
+          "name": "What type of cuisine does Luban Workshop Restaurant serve?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Luban Workshop Restaurant serves authentic Chinese cuisine, including soups, beef, seafood, rice and noodles, and more."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the relationship between Luban Workshop Restaurant and UCC?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Luban Workshop Restaurant is located on the University of Cape Coast (UCC) campus. It serves as both a hospitality training ground for students and a fine-dining destination for the wider Cape Coast community."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Luban Workshop Restaurant a training restaurant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Luban Workshop Restaurant functions as both a hospitality training facility and Cape Coast's premier fine-dining destination, providing hands-on training for hospitality and culinary students at UCC while delivering an exceptional dining experience."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "How do I make a reservation?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -66,9 +90,7 @@
           "name": "Can I cancel or modify a reservation?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To ensure we provide the impeccable fine dining experience our guests expect, our team begins preparing for your arrival well in advance. If you need to cancel or modify your reservation, we graciously ask that you provide us with at least 24 hours' notice
-. Please contact us by phone at 020 543 8455 or use our online contact form so we may assist you.
-"
+            "text": "To ensure we provide the impeccable fine dining experience our guests expect, our team begins preparing for your arrival well in advance. If you need to cancel or modify your reservation, we graciously ask that you provide us with at least 24 hours' notice. Please contact us by phone at 020 543 8455 or use our online contact form so we may assist you."
           }
         },
         {
@@ -84,23 +106,7 @@
           "name": "Can I cancel my order after placing it?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "To ensure the utmost craftsmanship in every bite, our kitchen begins preparing your exquisite meal immediately. As such, online cancellations are graciously accommodated within the first 5 minutes of placing your order. Once this brief window has passed, online cancellations are no longer available. Should you need to cancel or modify your order after 5 minutes, please call our team directly at 020 543 8455. Please note that at this stage, any cancellations are subject to staff approval and depend on whether our chefs have commenced preparation"
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do you cater for dietary requirements or allergies?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We take allergies very seriously. Please inform our staff of any dietary requirements or allergies when you arrive or when making a reservation. Some dishes can be adapted on request."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do you have vegetarian or vegan options?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes! We offer a range of vegetarian dishes on our menu. Please ask a member of staff for recommendations or check our online menu for dishes marked as vegetarian."
+            "text": "To ensure the utmost craftsmanship in every bite, our kitchen begins preparing your exquisite meal immediately. As such, online cancellations are graciously accommodated within the first 5 minutes of placing your order. Once this brief window has passed, online cancellations are no longer available. Should you need to cancel or modify your order after 5 minutes, please call our team directly at 020 543 8455. Please note that at this stage, any cancellations are subject to staff approval and depend on whether our chefs have commenced preparation."
           }
         },
         {
@@ -167,6 +173,47 @@
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <h1 class="serif text-4xl font-bold text-stone-900 mb-2">Frequently Asked Questions</h1>
         <p class="text-stone-500 text-sm mb-10">Find answers to the most common questions about Luban Workshop.</p>
+
+        <!-- About Luban Workshop -->
+        <section class="mb-10">
+            <h2 class="serif text-2xl font-bold text-stone-900 mb-4">About Luban Workshop</h2>
+            <div class="space-y-3">
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">What type of cuisine does Luban Workshop Restaurant serve?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Luban Workshop Restaurant serves <strong>authentic Chinese cuisine</strong>, including soups, beef, seafood, rice &amp; noodles, and more. Our menu draws on traditional Chinese culinary techniques and flavours.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">What is the relationship between Luban Workshop Restaurant and UCC?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Luban Workshop Restaurant is located on the <strong>University of Cape Coast (UCC)</strong> campus at Cafe Roof Top, Casford Street. It serves as both a hospitality training ground for UCC students and a premier dining destination for guests in Cape Coast, Ghana.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl shadow-sm border border-stone-200">
+                    <button onclick="toggleFaq(this)"
+                        class="w-full flex items-center justify-between px-6 py-4 text-left">
+                        <span class="font-medium text-stone-800">Is Luban Workshop Restaurant a training restaurant?</span>
+                        <i data-lucide="plus" class="faq-icon h-5 w-5 text-red-700 flex-shrink-0 ml-4"></i>
+                    </button>
+                    <div class="faq-answer px-6 text-stone-600 text-sm leading-relaxed">
+                        <div class="pb-4">Yes. Luban Workshop functions as both a <strong>hospitality training facility</strong> and Cape Coast's premier fine-dining destination. It provides hands-on training for hospitality and culinary students at UCC while delivering an exceptional dining experience to all guests.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
         <!-- Reservations -->
         <section class="mb-10">
