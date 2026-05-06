@@ -3,7 +3,6 @@ const CACHE_NAME = 'luban-admin-v1';
 const STATIC_ASSETS = [
     '/admin.html',
     '/admin-manifest.json',
-    '/favicon.jpeg',
     '/logo.png'
 ];
 
@@ -51,8 +50,8 @@ self.addEventListener('push', event => {
         const title = (data.notification && data.notification.title) || 'Luban Admin';
         const options = {
             body: (data.notification && data.notification.body) || '',
-            icon: '/favicon.jpeg',
-            badge: '/favicon.jpeg',
+            icon: '/logo.png',
+            badge: '/logo.png',
             requireInteraction: true,
             data: data.data || {}
         };
