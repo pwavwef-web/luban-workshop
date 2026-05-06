@@ -147,10 +147,60 @@
                 transform: translateY(0);
             }
         }
+
+        /* Loading screen */
+        #menu-loading-screen {
+            transition: opacity 0.5s ease;
+        }
+        #menu-loading-screen.hiding {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.85; }
+        }
+        #menu-loading-screen img {
+            animation: logoPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes progressSlide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        .loading-bar-inner {
+            width: 40%;
+            animation: progressSlide 1.4s ease-in-out infinite;
+        }
+
+        /* Add-to-cart button feedback */
+        .btn-added {
+            background-color: #16a34a !important;
+        }
+        .btn-added:hover {
+            background-color: #15803d !important;
+        }
+        @keyframes cartBounce {
+            0%, 100% { transform: scale(1); }
+            40% { transform: scale(1.35); }
+            70% { transform: scale(0.9); }
+        }
+        .cart-bounce {
+            animation: cartBounce 0.4s ease;
+        }
     </style>
 </head>
 
 <body class="bg-stone-50 text-stone-800 scroll-smooth antialiased">
+
+    <!-- Menu loading screen -->
+    <div id="menu-loading-screen" class="fixed inset-0 bg-white z-[300] flex flex-col items-center justify-center">
+        <img src="logo.png" alt="Luban Workshop" class="h-24 w-24 rounded-full object-contain shadow-md mb-5">
+        <p class="text-stone-700 text-lg font-semibold mb-1 serif">Luban Workshop</p>
+        <p class="text-stone-400 text-sm mb-7">Loading our menu&hellip;</p>
+        <div class="w-52 h-1.5 bg-stone-200 rounded-full overflow-hidden" role="progressbar" aria-label="Loading menu" aria-valuemin="0" aria-valuemax="100">
+            <div class="loading-bar-inner h-full bg-red-700 rounded-full"></div>
+        </div>
+    </div>
 
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1044,6 +1094,16 @@
         }
 
         // --- Menu & Cart Logic ---
+        let menuLoadingHidden = false;
+        function hideMenuLoadingScreen() {
+            if (menuLoadingHidden) return;
+            menuLoadingHidden = true;
+            const screen = document.getElementById('menu-loading-screen');
+            if (!screen) return;
+            screen.classList.add('hiding');
+            setTimeout(() => screen.remove(), 520);
+        }
+
         function renderMenu(filter = 'all') {
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
@@ -1061,7 +1121,7 @@
                     <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
                     <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
                     <div class="mt-6">
-                        <button onclick="addToCart('${item.id}')" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+                        <button onclick="addToCart('${item.id}', this)" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
                             <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
                         </button>
                     </div>
@@ -1069,6 +1129,7 @@
                 container.appendChild(card);
             });
             lucide.createIcons();
+            hideMenuLoadingScreen();
         }
 
         function filterMenu(category) {
@@ -1085,7 +1146,7 @@
             renderMenu(category);
         }
 
-        function addToCart(id) {
+        function addToCart(id, btn) {
             const item = menuItems.find(i => i.id === id);
             const existingItem = cart.find(i => i.id === id);
             if (existingItem) {
@@ -1098,9 +1159,27 @@
             const badgeMobile = document.getElementById('cart-badge-mobile');
             [badgeDesktop, badgeMobile].forEach(el => {
                 if (!el) return;
-                el.classList.add('scale-125');
-                setTimeout(() => el.classList.remove('scale-125'), 200);
+                el.classList.remove('cart-bounce');
+                void el.offsetWidth; // Access offsetWidth to force a browser reflow, which resets the CSS animation so it can replay when the class is re-added
+                el.classList.add('cart-bounce');
+                el.addEventListener('animationend', () => el.classList.remove('cart-bounce'), { once: true });
             });
+
+            // Animate the "Add to Order" button
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                btn.classList.add('btn-added');
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4 mr-2"></i> Added!';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order';
+                    btn.classList.remove('btn-added');
+                    btn.disabled = false;
+                    btn.removeAttribute('aria-busy');
+                    lucide.createIcons();
+                }, 1300);
+            }
         }
 
         function removeFromCart(id) {
