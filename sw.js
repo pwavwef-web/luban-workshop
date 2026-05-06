@@ -4,7 +4,6 @@ const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/manifest.json',
-    '/favicon.jpeg',
     '/logo.png',
     '/restcon.png',
     '/styles.css',
@@ -56,8 +55,8 @@ self.addEventListener('push', event => {
         const title = (data.notification && data.notification.title) || 'Luban Restaurant';
         const options = {
             body: (data.notification && data.notification.body) || '',
-            icon: '/favicon.jpeg',
-            badge: '/favicon.jpeg',
+            icon: '/logo.png',
+            badge: '/logo.png',
             data: data.data || {}
         };
         event.waitUntil(self.registration.showNotification(title, options));

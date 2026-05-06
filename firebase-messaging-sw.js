@@ -20,8 +20,8 @@ messaging.onBackgroundMessage(function(payload) {
     const notificationTitle = (payload.notification && payload.notification.title) || 'Luban Restaurant';
     const notificationOptions = {
         body: (payload.notification && payload.notification.body) || '',
-        icon: '/favicon.jpeg',
-        badge: '/favicon.jpeg'
+        icon: '/logo.png',
+        badge: '/logo.png'
     };
     return self.registration.showNotification(notificationTitle, notificationOptions);
 });
