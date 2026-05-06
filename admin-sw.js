@@ -3,7 +3,6 @@ const CACHE_NAME = 'luban-admin-v1';
 const STATIC_ASSETS = [
     '/admin.html',
     '/admin-manifest.json',
-    '/logo.png',
     '/logo.png'
 ];
 
