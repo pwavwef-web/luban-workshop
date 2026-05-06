@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "predeploy": ["npm run build:css"],
+    "predeploy": ["npm run build"],
     "cleanUrls": true,
     "trailingSlash": false,
     "404": "404.html"

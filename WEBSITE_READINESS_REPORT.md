@@ -138,9 +138,9 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 ### Medium-term (within 1 month)
 
 - [x] **Introduce a build step** — Tailwind CLI build (`npm run build:css`) is wired as a Firebase Hosting `predeploy` hook; CSS is now locally generated and purged. ✅
-- [ ] **Upgrade to modular Firebase SDK** — migrate from `firebase-*-compat.js` to the modular SDK (`import { initializeApp } from 'firebase/app'`) and bundle with the above build step.
-- [ ] **Performance audit** — run Lighthouse on the homepage and menu page; target a Performance score ≥ 90 on mobile. Key wins: lazy-load images, defer non-critical JS, and serve WebP images.
-- [ ] **Accessibility audit** — run `axe` or Lighthouse Accessibility on all pages; add missing `aria-label` attributes on icon-only buttons.
+- [x] **Upgrade to modular Firebase SDK** — removed `firebase-*-compat.js`, added bundled modular Firebase bridge files, and wired JS bundling into the build/predeploy pipeline. ✅
+- [ ] **Performance audit** — Lighthouse mobile run completed (`/index.html`: 60, `/menu.html`: 74). Lazy-loading and WebP hero image were applied, but additional optimization is still required to reach ≥ 90.
+- [x] **Accessibility audit** — Lighthouse Accessibility was run across all pages and missing `aria-label` attributes were added to icon-only controls/links. ✅
 
 ### Long-term (ongoing)
 

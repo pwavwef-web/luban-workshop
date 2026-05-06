@@ -1,11 +1,11 @@
 // Luban Workshop Restaurant - Main Page Service Worker
-const CACHE_NAME = 'luban-main-v1';
+const CACHE_NAME = 'luban-main-v2';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/manifest.json',
     '/logo.png',
-    '/restcon.png',
+    '/restcon.webp',
     '/styles.css',
     '/script.js'
 ];
