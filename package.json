@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "npm run build:css && npm run build:js",
     "build:css": "tailwindcss -i src/tailwind.css -o tailwind.css --minify",
+    "build:js": "esbuild src/firebase-modular-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-modular.bundle.js && esbuild src/firebase-firestore-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-firestore.bundle.js && esbuild src/firebase-messaging-sw-entry.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-messaging-sw.bundle.js",
     "watch:css": "tailwindcss -i src/tailwind.css -o tailwind.css --watch"
   },
+  "dependencies": {
+    "firebase": "10.12.5"
+  },
   "devDependencies": {
+    "esbuild": "0.23.1",
     "tailwindcss": "^3.4.0"
   }
 }
