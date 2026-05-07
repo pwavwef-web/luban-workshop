@@ -80,6 +80,10 @@
         /* Main content */
         main { max-width: 72rem; margin: 0 auto; padding: 1.5rem 0.75rem; }
         .category-section { margin-bottom: 2.5rem; }
+        .category-section {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 1200px;
+        }
         .category-section h2 { font-size: 1.4rem; font-weight: 700; color: #b91c1c; margin-bottom: 0.25rem; }
         .category-section > p { font-size: 0.75rem; color: #a8a29e; margin-bottom: 1rem; }
 
@@ -838,21 +842,22 @@
         var currentHiddenIds = new Set();
         var currentPriceOverrides = {};
 
-        menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
-            currentHiddenIds = new Set();
-            snapshot.forEach(function (doc) {
-                if (doc.data().hidden === true) currentHiddenIds.add(doc.id);
+        function initRealtimeMenuSync() {
+            menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
+                currentHiddenIds = new Set();
+                snapshot.forEach(function (doc) {
+                    if (doc.data().hidden === true) currentHiddenIds.add(doc.id);
+                });
+                applyDishAvailability(currentHiddenIds);
             });
-            applyDishAvailability(currentHiddenIds);
-        });
 
-        menuDb.collection('priceOverrides').onSnapshot(function (snapshot) {
-            currentPriceOverrides = {};
-            snapshot.forEach(function (doc) {
-                currentPriceOverrides[doc.id] = doc.data();
+            menuDb.collection('priceOverrides').onSnapshot(function (snapshot) {
+                currentPriceOverrides = {};
+                snapshot.forEach(function (doc) {
+                    currentPriceOverrides[doc.id] = doc.data();
+                });
+                applyPriceOverrides(currentPriceOverrides);
             });
-            applyPriceOverrides(currentPriceOverrides);
-        });
 
         function applyMenuPrices(priceOverrides) {
             // Card-style dishes: find price paragraph inside each .menu-card
@@ -877,13 +882,22 @@
             });
         }
 
-        menuDb.collection('menuPrices').onSnapshot(function (snapshot) {
-            var priceOverrides = {};
-            snapshot.forEach(function (doc) {
-                priceOverrides[doc.id] = doc.data().price;
+            menuDb.collection('menuPrices').onSnapshot(function (snapshot) {
+                var priceOverrides = {};
+                snapshot.forEach(function (doc) {
+                    priceOverrides[doc.id] = doc.data().price;
+                });
+                applyMenuPrices(priceOverrides);
             });
-            applyMenuPrices(priceOverrides);
-        });
+        }
+
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(initRealtimeMenuSync, { timeout: 2500 });
+        } else {
+            window.addEventListener('load', function () {
+                setTimeout(initRealtimeMenuSync, 1000);
+            }, { once: true });
+        }
     </script>
 
     <script>
