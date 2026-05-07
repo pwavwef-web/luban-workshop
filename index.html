@@ -128,11 +128,6 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Firebase SDK -->
-    <script src="assets/js/firebase-modular.bundle.js"></script>
-
     <style>
         body {
             font-family: 'Lato', sans-serif;
@@ -221,6 +216,12 @@
         }
         .cart-bounce {
             animation: cartBounce 0.4s ease;
+        }
+
+        /* Improve initial mobile rendering for below-the-fold sections */
+        main section {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 760px;
         }
     </style>
 </head>
@@ -759,6 +760,9 @@
             </div>
         </div>
     </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/firebase-modular.bundle.js"></script>
 
     <script>
         // Initialize Icons
