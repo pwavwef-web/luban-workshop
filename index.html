@@ -231,7 +231,7 @@
     <div id="menu-loading-screen" class="fixed inset-0 bg-white z-[300] flex flex-col items-center justify-center">
         <img src="logo.png" alt="Luban Workshop" class="h-24 w-24 rounded-full object-contain shadow-md mb-5">
         <p class="text-stone-700 text-lg font-semibold mb-1 serif">Luban Workshop</p>
-        <p class="text-stone-400 text-sm mb-7">Loading our menu&hellip;</p>
+        <p class="text-stone-600 text-sm mb-7">Loading our menu&hellip;</p>
         <div class="w-52 h-1.5 bg-stone-200 rounded-full overflow-hidden" role="progressbar" aria-label="Loading menu" aria-valuemin="0" aria-valuemax="100">
             <div class="loading-bar-inner h-full bg-red-700 rounded-full"></div>
         </div>
@@ -569,7 +569,7 @@
                 <div class="flex items-start justify-between">
                     <h2 class="text-lg font-medium text-stone-900 serif">Your Order</h2>
                     <div class="ml-3 h-7 flex items-center">
-                        <button onclick="toggleCart()" class="-m-2 p-2 text-stone-400 hover:text-stone-500">
+                        <button onclick="toggleCart()" class="-m-2 p-2 text-stone-500 hover:text-stone-700">
                             <span class="sr-only">Close panel</span>
                             <i data-lucide="x" class="h-6 w-6"></i>
                         </button>
@@ -653,7 +653,7 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-stone-900 serif" id="auth-modal-title">Sign Up / Login</h3>
-                        <button onclick="toggleAuthModal()" aria-label="Close authentication dialog" class="text-stone-400 hover:text-stone-500">
+                        <button onclick="toggleAuthModal()" aria-label="Close authentication dialog" class="text-stone-500 hover:text-stone-700">
                             <i data-lucide="x" class="h-6 w-6"></i>
                         </button>
                     </div>
@@ -1029,8 +1029,15 @@
 
         function toggleAuthModal() {
             const modal = document.getElementById('auth-modal');
+            const opening = modal.classList.contains('hidden');
+            const trigger = opening ? document.activeElement : null;
             modal.classList.toggle('hidden');
             lucide.createIcons();
+            if (opening) {
+                _trapFocus(modal, trigger);
+            } else {
+                _releaseTrap();
+            }
         }
 
         function switchAuthTab(tab) {
@@ -1285,6 +1292,37 @@
             lucide.createIcons();
         }
 
+        // ── Focus-trap utility ───────────────────────────────────────────────────
+        const _FOCUSABLE_SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+        let _trapCleanup = null;
+        let _trapReturnFocus = null;
+
+        function _trapFocus(el, returnTo) {
+            _releaseTrap();
+            _trapReturnFocus = returnTo || null;
+            const getFocusable = () => [...el.querySelectorAll(_FOCUSABLE_SEL)].filter(n => getComputedStyle(n).display !== 'none');
+            setTimeout(() => { const nodes = getFocusable(); if (nodes[0]) nodes[0].focus(); }, 30);
+            function handler(e) {
+                if (e.key !== 'Tab') return;
+                const nodes = getFocusable();
+                if (!nodes.length) return;
+                const first = nodes[0], last = nodes[nodes.length - 1];
+                if (e.shiftKey) {
+                    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+                } else {
+                    if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+            }
+            el.addEventListener('keydown', handler);
+            _trapCleanup = () => el.removeEventListener('keydown', handler);
+        }
+
+        function _releaseTrap() {
+            if (_trapCleanup) { _trapCleanup(); _trapCleanup = null; }
+            if (_trapReturnFocus) { try { _trapReturnFocus.focus(); } catch (e) {} _trapReturnFocus = null; }
+        }
+        // ────────────────────────────────────────────────────────────────────────
+
         function toggleCart() {
             const overlay = document.getElementById('cart-overlay');
             const drawer = document.getElementById('cart-panel');
@@ -1292,7 +1330,9 @@
                 overlay.classList.remove('hidden');
                 setTimeout(() => overlay.classList.remove('opacity-0'), 10);
                 drawer.classList.remove('translate-x-full');
+                _trapFocus(drawer, document.activeElement);
             } else {
+                _releaseTrap();
                 overlay.classList.add('opacity-0');
                 drawer.classList.add('translate-x-full');
                 setTimeout(() => overlay.classList.add('hidden'), 300);
@@ -1301,6 +1341,7 @@
 
         function closeSuccessModal() {
             document.getElementById('success-modal').classList.add('hidden');
+            _releaseTrap();
         }
 
         // --- Push notification helper for customer page ---
@@ -1517,7 +1558,9 @@
                 toggleCart(); // Close drawer
                 cart = []; // Clear local cart
                 updateCartUI(); // Reset UI
-                document.getElementById('success-modal').classList.remove('hidden');
+                const successModal = document.getElementById('success-modal');
+                successModal.classList.remove('hidden');
+                _trapFocus(successModal);
 
             } catch (error) {
                 console.error("Order failed", error);
@@ -1536,6 +1579,14 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
+
+        // --- Global Escape key: close topmost open modal/drawer ---
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            if (!document.getElementById('success-modal').classList.contains('hidden')) { closeSuccessModal(); return; }
+            if (!document.getElementById('auth-modal').classList.contains('hidden')) { toggleAuthModal(); return; }
+            if (!document.getElementById('cart-overlay').classList.contains('hidden')) { toggleCart(); return; }
+        });
 
         // --- Request notification permission after user interaction ---
         function requestCustomerNotificationPermission() {

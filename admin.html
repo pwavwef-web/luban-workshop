@@ -77,7 +77,7 @@
             </form>
             <div class="mt-4 flex items-center gap-3">
                 <div class="flex-1 h-px bg-stone-200"></div>
-                <span class="text-xs text-stone-400">or</span>
+                <span class="text-xs text-stone-600">or</span>
                 <div class="flex-1 h-px bg-stone-200"></div>
             </div>
             <button id="google-signin-btn"
@@ -588,10 +588,10 @@
                 const toggleIcon = isHidden ? 'eye' : 'eye-off';
                 const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
                 const priceLabel = menuPriceOverrides[dish.id] !== undefined
-                    ? `<span class="font-mono text-red-700">₵${currentPrice}</span> <span class="text-xs text-stone-400">(edited)</span>`
+                    ? `<span class="font-mono text-red-700">₵${currentPrice}</span> <span class="text-xs text-stone-600">(edited)</span>`
                     : `<span class="font-mono">₵${currentPrice}</span>`;
                 const revertBtn = menuPriceOverrides[dish.id] !== undefined
-                    ? `<button onclick="revertPrice('${dish.id}')" aria-label="Revert ${dish.name} price" class="text-stone-400 hover:text-amber-600 transition-colors mr-3" title="Revert to original price (₵${dish.price})"><i data-lucide="rotate-ccw" class="h-4 w-4"></i></button>`
+                    ? `<button onclick="revertPrice('${dish.id}')" aria-label="Revert ${dish.name} price" class="text-stone-600 hover:text-amber-600 transition-colors mr-3" title="Revert to original price (₵${dish.price})"><i data-lucide="rotate-ccw" class="h-4 w-4"></i></button>`
                     : '';
                 const imageIndicator = hasImageOverride
                     ? `<span class="ml-1 text-xs text-blue-600" title="Custom image active">(custom)</span>`
@@ -605,9 +605,9 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${priceLabel}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openImageModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')})" aria-label="Edit image for ${dish.name}" class="text-stone-400 hover:text-purple-600 transition-colors mr-3" title="Edit dish image"><i data-lucide="image" class="h-4 w-4"></i></button>
-                            <button onclick="openPriceModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')}, ${currentPrice})" aria-label="Edit price for ${dish.name}" class="text-stone-400 hover:text-blue-600 transition-colors mr-3" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
-                            ${revertBtn}<button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" aria-label="${toggleTitle} for ${dish.name}" class="text-stone-400 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
+                            <button onclick="openImageModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')})" aria-label="Edit image for ${dish.name}" class="text-stone-600 hover:text-purple-600 transition-colors mr-3" title="Edit dish image"><i data-lucide="image" class="h-4 w-4"></i></button>
+                            <button onclick="openPriceModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')}, ${currentPrice})" aria-label="Edit price for ${dish.name}" class="text-stone-600 hover:text-blue-600 transition-colors mr-3" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
+                            ${revertBtn}<button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" aria-label="${toggleTitle} for ${dish.name}" class="text-stone-600 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
                         </td>
                     </tr>
                 `;
@@ -868,7 +868,7 @@
                     </button>`;
                     } else {
                         actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Mark reservation as pending" class="text-stone-400 hover:text-stone-600 p-2 rounded-full transition-colors" title="Mark Pending">
+                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Mark reservation as pending" class="text-stone-600 hover:text-stone-700 p-2 rounded-full transition-colors" title="Mark Pending">
                         <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
                     </button>`;
                     }
@@ -878,7 +878,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${res.name}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                         <div>${res.phone}</div>
-                        <div class="text-xs text-stone-400">${res.email}</div>
+                        <div class="text-xs text-stone-600">${res.email}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                         <div class="font-medium">${res.date}</div>
@@ -976,7 +976,7 @@
                     const itemsSummary = order.items ? order.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No items';
                     const itemsDetail = order.items
                         ? order.items.map(i => `<div class="py-0.5"><span class="font-bold text-stone-600">${i.quantity}&times;</span> ${i.name}</div>`).join('')
-                        : '<div class="text-stone-400 italic">No items</div>';
+                        : '<div class="text-stone-600 italic">No items</div>';
 
                     // Action Buttons Logic
                     let actions = '';
@@ -1003,7 +1003,7 @@
                     } else {
                         // Completed or Cancelled: show Undo button
                         actions = `
-                            <button onclick="updateOrderStatus('${id}', 'pending')" aria-label="Move order back to pending" class="text-stone-400 hover:text-stone-600 p-2 rounded-full transition-colors" title="Move back to Pending">
+                            <button onclick="updateOrderStatus('${id}', 'pending')" aria-label="Move order back to pending" class="text-stone-600 hover:text-stone-700 p-2 rounded-full transition-colors" title="Move back to Pending">
                                 <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
                             </button>
                         `;
@@ -1013,7 +1013,7 @@
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-500">#${id.slice(-6).toUpperCase()}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-900">
-                                <div class="font-medium">${order.customerName ? escapeHtml(order.customerName) : '<span class="text-stone-400 italic">—</span>'}</div>
+                                <div class="font-medium">${order.customerName ? escapeHtml(order.customerName) : '<span class="text-stone-600 italic">—</span>'}</div>
                                 <div class="text-stone-500">${escapeHtml(order.customerPhone)}</div>
                             </td>
                             <td class="px-6 py-4 text-sm text-stone-900 max-w-xs">
@@ -1376,7 +1376,7 @@
             <input type="number" id="price-edit-input" min="0" step="1"
                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-base"
                 placeholder="Enter new price">
-            <p class="text-xs text-stone-400 mt-2">This will update the price shown on the main website and menu page in real time.</p>
+            <p class="text-xs text-stone-600 mt-2">This will update the price shown on the main website and menu page in real time.</p>
             <div class="flex gap-3 mt-6">
                 <button onclick="closePriceModal()"
                     class="flex-1 border border-stone-300 text-stone-600 py-2 rounded-md text-sm font-medium hover:bg-stone-50 transition-colors">
@@ -1414,7 +1414,7 @@
             <!-- Divider -->
             <div class="flex items-center gap-3 mb-4">
                 <div class="flex-1 h-px bg-stone-200"></div>
-                <span class="text-xs text-stone-400 font-medium">OR</span>
+                <span class="text-xs text-stone-600 font-medium">OR</span>
                 <div class="flex-1 h-px bg-stone-200"></div>
             </div>
 
@@ -1423,7 +1423,7 @@
                 <label class="block text-sm font-medium text-stone-700 mb-1">Upload Image File</label>
                 <input type="file" id="image-file-input" accept="image/*" onchange="onImageFileChange()"
                     class="w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
-                <p class="text-xs text-stone-400 mt-1">Max 700 KB. Replaces the URL field when selected.</p>
+                <p class="text-xs text-stone-600 mt-1">Max 700 KB. Replaces the URL field when selected.</p>
             </div>
 
             <div id="image-edit-feedback" class="hidden text-sm mt-2"></div>
@@ -1458,13 +1458,13 @@
                     <i data-lucide="map" class="h-5 w-5 text-red-700 flex-shrink-0"></i>
                     <span class="text-xs font-semibold text-red-700 uppercase tracking-wider">Dashboard Tour</span>
                 </div>
-                <button onclick="closeTour()" aria-label="Skip tour" class="text-stone-400 hover:text-stone-600 transition-colors ml-4 flex-shrink-0">
+                <button onclick="closeTour()" aria-label="Skip tour" class="text-stone-600 hover:text-stone-700 transition-colors ml-4 flex-shrink-0">
                     <i data-lucide="x" class="h-5 w-5"></i>
                 </button>
             </div>
 
             <!-- Step Counter -->
-            <p id="tour-step-counter" class="text-xs text-stone-400 mb-3">1 of 6</p>
+            <p id="tour-step-counter" class="text-xs text-stone-600 mb-3">1 of 6</p>
 
             <!-- Content -->
             <h2 id="tour-title" class="serif text-xl font-bold text-stone-900 mb-3"></h2>
