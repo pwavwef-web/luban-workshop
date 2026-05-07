@@ -140,7 +140,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [x] **Introduce a build step** — Tailwind CLI build (`npm run build:css`) is wired as a Firebase Hosting `predeploy` hook; CSS is now locally generated and purged. ✅
 - [x] **Upgrade to modular Firebase SDK** — removed `firebase-*-compat.js`, added bundled modular Firebase bridge files, and wired JS bundling into the build/predeploy pipeline. ✅
 - [ ] **Performance audit** — Lighthouse mobile run completed (`/index.html`: 60, `/menu.html`: 74). Lazy-loading and WebP hero image were applied, but additional optimization is still required to reach ≥ 90.
-- [x] **Accessibility audit** — Lighthouse Accessibility was run across all pages and missing `aria-label` attributes were added to icon-only controls/links. ✅
+- [x] **Accessibility audit** — Lighthouse Accessibility was run across all pages and missing `aria-label` attributes were added to icon-only controls/links. Color contrast (`text-stone-400` → `text-stone-600`), FAQ accordion `aria-expanded`/`aria-controls`, focus traps for all modals/drawers, and `lang` attribute on `drinks.html` have all been fixed. ✅
 
 ### Long-term (ongoing)
 
@@ -162,8 +162,8 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | Security | 7 / 10 | Good rules architecture; production rules must be deployed |
 | Performance | 7 / 10 | Local Tailwind build and Fonts preconnect added; image optimisation still pending |
 | PWA | 8 / 10 | Service worker and manifest present; icons and favicon now PNG |
-| Accessibility | 6 / 10 | Not fully audited; icon buttons likely missing labels |
-| **Overall** | **7.8 / 10** | Ready for launch; deploy production Firestore rules before promoting |
+| Accessibility | 8 / 10 | Color contrast fixed (text-stone-600 on light bg); FAQ aria-expanded/controls added; focus traps and Escape key added to all modals/drawers; lang attribute added to drinks.html |
+| **Overall** | **8.1 / 10** | Ready for launch; deploy production Firestore rules before promoting |
 
 ---
 

@@ -187,22 +187,22 @@
                 <div>
                     <i data-lucide="chef-hat" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
                     <h4 class="font-bold text-lg mb-2">Expert Chefs</h4>
-                    <p class="text-stone-400 text-sm">Trained culinary professionals dedicated to authentic flavour and presentation.</p>
+                    <p class="text-stone-600 text-sm">Trained culinary professionals dedicated to authentic flavour and presentation.</p>
                 </div>
                 <div>
                     <i data-lucide="leaf" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
                     <h4 class="font-bold text-lg mb-2">Fresh Ingredients</h4>
-                    <p class="text-stone-400 text-sm">Locally sourced, high-quality ingredients prepared fresh for every event.</p>
+                    <p class="text-stone-600 text-sm">Locally sourced, high-quality ingredients prepared fresh for every event.</p>
                 </div>
                 <div>
                     <i data-lucide="settings" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
                     <h4 class="font-bold text-lg mb-2">Full Customisation</h4>
-                    <p class="text-stone-400 text-sm">Menus, décor, and service style tailored precisely to your preferences.</p>
+                    <p class="text-stone-600 text-sm">Menus, décor, and service style tailored precisely to your preferences.</p>
                 </div>
                 <div>
                     <i data-lucide="shield-check" class="h-10 w-10 text-red-400 mx-auto mb-4"></i>
                     <h4 class="font-bold text-lg mb-2">Trusted Service</h4>
-                    <p class="text-stone-400 text-sm">A professional events team ensuring seamless execution from start to finish.</p>
+                    <p class="text-stone-600 text-sm">A professional events team ensuring seamless execution from start to finish.</p>
                 </div>
             </div>
         </div>
@@ -404,7 +404,11 @@
 
             try {
                 await db.collection('reservations').add(reservationData);
-                document.getElementById('reservation-success-modal').classList.remove('hidden');
+                const resModal = document.getElementById('reservation-success-modal');
+                _resModalReturnFocus = document.activeElement;
+                resModal.classList.remove('hidden');
+                // Focus the dismiss button inside the modal
+                setTimeout(() => { const btn = resModal.querySelector('button'); if (btn) btn.focus(); }, 30);
                 document.getElementById('reservation-form').reset();
                 errorDiv.classList.add('hidden');
             } catch (error) {
@@ -414,8 +418,18 @@
             }
         });
 
+        let _resModalReturnFocus = null;
+
+        // Close modal on Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !document.getElementById('reservation-success-modal').classList.contains('hidden')) {
+                closeReservationModal();
+            }
+        });
+
         function closeReservationModal() {
             document.getElementById('reservation-success-modal').classList.add('hidden');
+            if (_resModalReturnFocus) { try { _resModalReturnFocus.focus(); } catch (e) {} _resModalReturnFocus = null; }
         }
     </script>
 </body>
