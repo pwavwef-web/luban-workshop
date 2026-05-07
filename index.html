@@ -371,33 +371,31 @@
                 </p>
             </div>
 
-            <div class="flex justify-center space-x-2 mb-10 overflow-x-auto pb-4" id="category-filters">
-                <button onclick="filterMenu('all')"
-                    class="category-btn active px-6 py-2 rounded-full bg-stone-900 text-white text-sm font-medium transition-colors hover:bg-stone-700 whitespace-nowrap">All</button>
-                <button onclick="filterMenu('soups')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Soups</button>
-                <button onclick="filterMenu('starters')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Starters</button>
-                <button onclick="filterMenu('beef-lamb')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Beef &amp; Lamb</button>
-                <button onclick="filterMenu('pork')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Pork</button>
-                <button onclick="filterMenu('chicken')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Chicken</button>
-                <button onclick="filterMenu('seafood')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Seafood</button>
-                <button onclick="filterMenu('rice')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Rice</button>
-                <button onclick="filterMenu('noodles')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Noodles</button>
-                <button onclick="filterMenu('dumplings')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Dumplings</button>
-                <button onclick="filterMenu('veg')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Vegetable</button>
-                <button onclick="filterMenu('mains')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Mains</button>
-                <button onclick="filterMenu('drinks')"
-                    class="category-btn px-6 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium transition-colors hover:bg-stone-200 whitespace-nowrap">Drinks</button>
+            <div class="flex justify-center gap-1 mb-10 overflow-x-auto pb-4" id="category-filters">
+                <button onclick="filterMenu('all')" data-target="all"
+                    class="category-btn active px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-red-900 bg-red-100 border border-red-200 whitespace-nowrap">All</button>
+                <button onclick="filterMenu('soups')" data-target="soups"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Soups</button>
+                <button onclick="filterMenu('starters')" data-target="starters"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Starters</button>
+                <button onclick="filterMenu('beef-lamb')" data-target="beef-lamb"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Beef &amp; Lamb</button>
+                <button onclick="filterMenu('pork')" data-target="pork"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Pork</button>
+                <button onclick="filterMenu('chicken')" data-target="chicken"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Chicken</button>
+                <button onclick="filterMenu('seafood')" data-target="seafood"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Seafood</button>
+                <button onclick="filterMenu('rice')" data-target="rice"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Rice</button>
+                <button onclick="filterMenu('noodles')" data-target="noodles"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Noodles</button>
+                <button onclick="filterMenu('dumplings')" data-target="dumplings"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Dumplings</button>
+                <button onclick="filterMenu('veg')" data-target="veg"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Vegetable</button>
+                <button onclick="filterMenu('drinks')" data-target="drinks"
+                    class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Drinks</button>
             </div>
 
             <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
@@ -1177,13 +1175,13 @@
 
         function filterMenu(category) {
             document.querySelectorAll('.category-btn').forEach(btn => {
-                const btnText = btn.textContent.toLowerCase();
-                if ((category === 'all' && btnText === 'all') || btnText.includes(category)) {
-                    btn.classList.remove('bg-stone-100', 'text-stone-600');
-                    btn.classList.add('bg-stone-900', 'text-white');
+                const target = btn.dataset.target;
+                if (target === category) {
+                    btn.classList.remove('text-stone-700', 'hover:bg-red-700', 'hover:text-white', 'border-stone-200');
+                    btn.classList.add('text-red-900', 'bg-red-100', 'border-red-200');
                 } else {
-                    btn.classList.remove('bg-stone-900', 'text-white');
-                    btn.classList.add('bg-stone-100', 'text-stone-600');
+                    btn.classList.remove('text-red-900', 'bg-red-100', 'border-red-200');
+                    btn.classList.add('text-stone-700', 'hover:bg-red-700', 'hover:text-white', 'border-stone-200');
                 }
             });
             renderMenu(category);
