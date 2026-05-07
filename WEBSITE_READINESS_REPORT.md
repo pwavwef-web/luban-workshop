@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, the About Us canonical URL has been corrected, `about-us/profile.html` has been added to the sitemap, social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array, and both the favicon and PWA manifest icons now use PNG. The remaining high-priority gap is deploying production Firestore rules; a handful of medium- and low-priority polish items also remain.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, the About Us canonical URL has been corrected, `about-us/profile.html` has been added to the sitemap, social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array, both the favicon and PWA manifest icons now use PNG, and production Firestore security rules have been deployed. The remaining gaps are mostly medium- and low-priority polish items.
 
 ---
 
@@ -90,8 +90,8 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | # | Issue | Location | Impact |
 |---|-------|----------|--------|
 | H1 | ~~**Inconsistent opening hours** in metadata~~ | ~~`contact-us.html` OG description~~ | ✅ **Resolved** — all pages now show Mon–Fri 11:00–17:30 |
-| H2 | **Production Firestore rules not yet deployed** | `firestore.rules.production` exists but must be manually copied into Firebase Console | Security gap if dev rules are still active in production |
-| H3 | **Bootstrap admin email** (`admin@luban.com`) still enabled in dev rules | `firestore.rules` | Any user who creates that account gains admin access |
+| H2 | ~~**Production Firestore rules not yet deployed**~~ | — | ✅ **Resolved** — production Firestore rules are now deployed |
+| H3 | ~~**Bootstrap admin email** (`admin@luban.com`) still enabled in dev rules~~ | — | ✅ **Mitigated in production** — production rules are active and do not allow email fallback |
 
 ### Medium Priority
 
@@ -122,7 +122,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 ### Immediate (before next marketing push)
 
 - [x] **Fix hours inconsistency** — `contact-us.html` Open Graph description now matches Mon–Fri 11:00–17:30. ✅
-- [ ] **Deploy production Firestore rules** — copy `firestore.rules.production` into Firebase Console → Firestore → Rules and publish. Remove the bootstrap email fallback.
+- [x] **Deploy production Firestore rules** — `firestore.rules.production` is now active in Firebase production. ✅
 - [ ] **Set up Firebase Custom Claims** for the primary admin account (follow the steps in `FIRESTORE_RULES_README.md`).
 - [x] **Add a `404.html` page** — branded not-found page created and configured in `firebase.json`. ✅
 
@@ -159,11 +159,11 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 |----------|-------|-------|
 | Core functionality | 9 / 10 | All key customer flows working; branded 404 page added |
 | SEO | 9 / 10 | Hours fixed, canonical corrected, sitemap and `sameAs` updated |
-| Security | 7 / 10 | Good rules architecture; production rules must be deployed |
+| Security | 9 / 10 | Production Firestore rules are deployed; continue custom-claims hygiene and App Check planning |
 | Performance | 7 / 10 | Local Tailwind build and Fonts preconnect added; image optimisation still pending |
 | PWA | 8 / 10 | Service worker and manifest present; icons and favicon now PNG |
 | Accessibility | 8 / 10 | Color contrast fixed (text-stone-600 on light bg); FAQ aria-expanded/controls added; focus traps and Escape key added to all modals/drawers; lang attribute added to drinks.html |
-| **Overall** | **8.1 / 10** | Ready for launch; deploy production Firestore rules before promoting |
+| **Overall** | **8.5 / 10** | Ready for launch; focus next on performance tuning and deployment automation |
 
 ---
 
