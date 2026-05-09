@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8LVTFZH7VD');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动与餐饮服务 | 鲁班工坊餐厅</title>
+  <meta name="description" content="鲁班工坊提供私人活动与外烩服务。填写预约表单，安排您的聚会、企业活动或团体用餐。">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="../logo.png">
+  <link rel="stylesheet" href="../tailwind.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../assets/js/firebase-firestore.bundle.js"></script>
+  <style>
+    body { font-family: 'Noto Sans SC', sans-serif; }
+    h1, h2, h3, .serif { font-family: 'Noto Serif SC', serif; }
+  </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 antialiased">
+  <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="index.html" class="flex items-center gap-2">
+          <img src="../logo.png" alt="鲁班工坊标志" class="h-10 w-10 rounded-full object-contain bg-white">
+          <span class="serif font-bold text-xl tracking-tight text-stone-900">鲁班工坊</span>
+        </a>
+        <div class="flex gap-4 text-sm">
+          <a href="index.html" class="text-stone-600 hover:text-red-700">首页</a>
+          <a href="contact-us.html" class="text-stone-600 hover:text-red-700">联系</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="relative pt-24 pb-14 bg-stone-900 overflow-hidden">
+    <div class="absolute inset-0 opacity-30">
+      <img src="../restcon.webp" alt="餐厅环境" class="w-full h-full object-cover object-bottom">
+    </div>
+    <div class="relative max-w-6xl mx-auto px-4 text-center text-white">
+      <p class="text-red-300 uppercase tracking-widest text-xs mb-3">私人活动 · 企业活动 · 外烩服务</p>
+      <h1 class="serif text-4xl sm:text-5xl font-bold mb-4">活动与餐饮服务</h1>
+      <p class="text-stone-200 max-w-2xl mx-auto">无论是家庭聚会还是商务活动，我们都能提供定制化的中式餐饮体验。</p>
+    </div>
+  </header>
+
+  <section class="py-12 bg-white">
+    <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-stone-50 rounded-xl p-6 border border-stone-200">
+        <h3 class="serif text-xl font-bold mb-2">私人聚会</h3>
+        <p class="text-stone-600 text-sm">生日、周年纪念、同学聚会等，支持包场与套餐定制。</p>
+      </div>
+      <div class="bg-stone-50 rounded-xl p-6 border border-stone-200">
+        <h3 class="serif text-xl font-bold mb-2">企业活动</h3>
+        <p class="text-stone-600 text-sm">商务午宴、团队活动、接待晚宴，提供专业服务流程。</p>
+      </div>
+      <div class="bg-stone-50 rounded-xl p-6 border border-stone-200">
+        <h3 class="serif text-xl font-bold mb-2">外烩配送</h3>
+        <p class="text-stone-600 text-sm">可配送到活动场地，支持现场布置与多种上餐形式。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 bg-stone-50 border-t border-stone-200">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="serif text-3xl font-bold text-stone-900">提交预约</h2>
+        <p class="text-stone-500 mt-3">请填写以下信息，我们会尽快联系您确认细节。</p>
+      </div>
+
+      <form id="reservation-form" class="space-y-6 bg-white p-8 rounded-lg shadow-md border border-stone-200">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="res-name" class="block text-sm font-medium text-stone-700 mb-2">姓名 *</label>
+            <input type="text" id="res-name" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+          </div>
+          <div>
+            <label for="res-phone" class="block text-sm font-medium text-stone-700 mb-2">电话 *</label>
+            <input type="tel" id="res-phone" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+          </div>
+        </div>
+
+        <div>
+          <label for="res-email" class="block text-sm font-medium text-stone-700 mb-2">邮箱</label>
+          <input type="email" id="res-email" class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="res-date" class="block text-sm font-medium text-stone-700 mb-2">日期 *</label>
+            <input type="date" id="res-date" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+          </div>
+          <div>
+            <label for="res-time" class="block text-sm font-medium text-stone-700 mb-2">时间 *</label>
+            <input type="time" id="res-time" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+          </div>
+        </div>
+
+        <div>
+          <label for="res-guests" class="block text-sm font-medium text-stone-700 mb-2">人数 *</label>
+          <select id="res-guests" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700">
+            <option value="" disabled selected>请选择人数</option>
+            <option value="1">1 人</option>
+            <option value="2">2 人</option>
+            <option value="3">3 人</option>
+            <option value="4">4 人</option>
+            <option value="5">5 人</option>
+            <option value="6">6 人</option>
+            <option value="7">7 人</option>
+            <option value="8">8 人及以上</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="res-notes" class="block text-sm font-medium text-stone-700 mb-2">备注</label>
+          <textarea id="res-notes" rows="3" class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700" placeholder="如需包场、活动类型、饮食禁忌等，请在此说明。"></textarea>
+        </div>
+
+        <div id="reservation-error" class="hidden text-red-700 text-sm text-center p-3 bg-red-50 rounded-md"></div>
+
+        <button type="submit" class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium text-lg">
+          提交预约
+        </button>
+      </form>
+
+      <div id="reservation-success" class="hidden mt-6 bg-green-50 border border-green-200 rounded-md p-4 text-green-700 text-sm text-center">
+        预约提交成功，我们会尽快与您确认。
+      </div>
+    </div>
+  </section>
+
+  <script>
+    lucide.createIcons();
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+      authDomain: "luban-workshop-restaurant.firebaseapp.com",
+      projectId: "luban-workshop-restaurant",
+      storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+      messagingSenderId: "360623290287",
+      appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
+      measurementId: "G-PZQ13BWZB3"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    const dateInput = document.getElementById('res-date');
+    const today = new Date();
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + 3);
+    dateInput.min = today.toISOString().split('T')[0];
+    dateInput.max = maxDate.toISOString().split('T')[0];
+
+    document.getElementById('reservation-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorDiv = document.getElementById('reservation-error');
+      const successDiv = document.getElementById('reservation-success');
+
+      const selectedDate = new Date(document.getElementById('res-date').value);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      if (selectedDate < now) {
+        errorDiv.textContent = '请选择未来日期。';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      const reservationData = {
+        name: document.getElementById('res-name').value,
+        phone: document.getElementById('res-phone').value,
+        email: document.getElementById('res-email').value,
+        date: document.getElementById('res-date').value,
+        time: document.getElementById('res-time').value,
+        guests: document.getElementById('res-guests').value,
+        notes: document.getElementById('res-notes').value,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'pending',
+        locale: 'zh-Hans'
+      };
+
+      try {
+        await db.collection('reservations').add(reservationData);
+        document.getElementById('reservation-form').reset();
+        errorDiv.classList.add('hidden');
+        successDiv.classList.remove('hidden');
+      } catch (error) {
+        console.error('预约提交失败:', error);
+        errorDiv.textContent = '提交失败，请稍后重试或电话联系。';
+        errorDiv.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+
+</html>

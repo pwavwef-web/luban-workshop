@@ -40,15 +40,19 @@
 
   <url>
     <loc>https://lubanrestaurant.com/events-and-catering.html</loc>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-05-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/events-and-catering.html"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/events-and-catering.html"/>
   </url>
   <url>
     <loc>https://lubanrestaurant.com/about-us/</loc>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-05-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/about-us/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/about-us.html"/>
   </url>
   <url>
     <loc>https://lubanrestaurant.com/about-us/profile.html</loc>
@@ -58,9 +62,11 @@
   </url>
   <url>
     <loc>https://lubanrestaurant.com/contact-us.html</loc>
-    <lastmod>2026-03-26</lastmod>
+    <lastmod>2026-05-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/contact-us.html"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/contact-us.html"/>
   </url>
   <url>
     <loc>https://lubanrestaurant.com/terms-of-use.html</loc>
@@ -110,5 +116,31 @@
     <priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/privacy-policy.html"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/privacy-policy.html"/>
+  </url>
+  <url>
+    <loc>https://lubanrestaurant.com/chinese/contact-us.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/contact-us.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/contact-us.html"/>
+  </url>
+
+  <url>
+    <loc>https://lubanrestaurant.com/chinese/events-and-catering.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/events-and-catering.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/events-and-catering.html"/>
+  </url>
+
+  <url>
+    <loc>https://lubanrestaurant.com/chinese/about-us.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://lubanrestaurant.com/chinese/about-us.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/about-us/"/>
   </url>
 </urlset>

@@ -1,8 +1,13 @@
 {
   "hosting": {
-    "predeploy": ["npm run build"],
+    "predeploy": [
+      "npm run build"
+    ],
     "cleanUrls": true,
     "trailingSlash": false,
     "404": "404.html"
+  },
+  "functions": {
+    "source": "functions"
   }
 }
