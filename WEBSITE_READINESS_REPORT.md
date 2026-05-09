@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, the About Us canonical URL has been corrected, `about-us/profile.html` has been added to the sitemap, social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array, both the favicon and PWA manifest icons now use PNG, and production Firestore security rules have been deployed. The remaining gaps are mostly medium- and low-priority polish items.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved, including consistent opening hours, a custom 404 page, local Tailwind build output, Google Fonts preconnect hints, corrected About Us canonical URL, `about-us/profile.html` in the sitemap, populated JSON-LD `sameAs` links, PNG favicon/manifest icons, deployed production Firestore rules, migration away from compat Firebase CDN scripts, expanded Chinese page coverage, and Cloud Functions email notifications for orders/reservations. The remaining gaps are mostly medium- and low-priority polish/operations items.
 
 ---
 
@@ -31,7 +31,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | 404 Not Found | `/404.html` | ❌ noindex | ✅ Live |
 | Admin Dashboard | `/admin.html` | ❌ noindex | ✅ Live |
 | Presentation | `/presentation.html` | ❌ noindex | ✅ Live |
-| **Chinese versions** | `/chinese/` (4 pages) | ✅ Yes | ✅ Live |
+| **Chinese versions** | `/chinese/` (7 pages) | ❌ noindex | ✅ Live |
 
 ---
 
@@ -70,7 +70,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Table reservation form backed by Firestore.
 - Contact form submitting to Firestore `contact_messages`.
 - User authentication (email + password) with sign-up, sign-in, and password reset.
-- Chinese-language versions of the homepage, menu, FAQ, and privacy policy.
+- Chinese-language versions of the homepage, menu, FAQ, privacy policy, contact page, events page, and about page.
 - QR code assets and shareable flyer page for offline/print promotion.
 - Team / About Us section with staff profile cards pulled from Firestore.
 
@@ -101,7 +101,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | M2 | ~~`sameAs` array in JSON-LD is empty~~ | — | ✅ **Resolved** — Facebook and Instagram profile URLs added to the `sameAs` array |
 | M3 | ~~`sitemap.xml` is missing `about-us/profile.html`~~ | — | ✅ **Resolved** — `about-us/profile.html` entry added to `sitemap.xml` |
 | M4 | ~~Tailwind CSS loaded from CDN (`cdn.tailwindcss.com`)~~ | — | ✅ **Resolved** — local build step generates a purged CSS bundle |
-| M5 | Firebase SDK loaded as compat (v10.7.1) via CDN | All pages | Older SDK version; no tree-shaking; larger bundle |
+| M5 | ~~Firebase SDK loaded as compat (v10.7.1) via CDN~~ | — | ✅ **Resolved** — compat CDN scripts removed; modular Firebase bundles are built via `esbuild` |
 | M6 | ~~No custom `404.html` error page~~ | — | ✅ **Resolved** — `404.html` exists and configured in `firebase.json` |
 | M7 | ~~favicon is a JPEG (`favicon.jpeg`)~~ | — | ✅ **Resolved** — `<link rel="icon">` now points to `logo.png` (PNG) |
 
@@ -147,9 +147,9 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [ ] **Set up Firebase Hosting via CI/CD** — add a GitHub Actions workflow to deploy on every push to `main`, so deployments are automated and auditable.
 - [ ] **Implement Firebase App Check** — protect Firestore and Authentication from abuse by unauthorised clients.
 - [ ] **Monitor Core Web Vitals** — use Google Search Console and GA4 to track real-user performance over time.
-- [ ] **Expand multilingual coverage** — the Chinese section currently covers only 4 pages; consider adding `contact-us`, `events-and-catering`, and `about-us` in Chinese.
+- [x] **Expand multilingual coverage** — Chinese pages now include `contact-us`, `events-and-catering`, and `about-us` in addition to the original set. ✅
 - [ ] **Social media integration** — add verified social profile links, an Instagram feed widget, or a WhatsApp chat button to increase engagement.
-- [ ] **Email notifications for new orders/reservations** — wire Firebase Functions to send email alerts to staff when a new order or reservation is submitted.
+- [x] **Email notifications for new orders/reservations** — Cloud Functions (`notifyOnNewOrder`, `notifyOnNewReservation`) now send SMTP notifications for new orders and reservations. ✅
 
 ---
 
