@@ -31,7 +31,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | 404 Not Found | `/404.html` | ❌ noindex | ✅ Live |
 | Admin Dashboard | `/admin.html` | ❌ noindex | ✅ Live |
 | Presentation | `/presentation.html` | ❌ noindex | ✅ Live |
-| **Chinese versions** | `/chinese/` (7 pages) | ❌ noindex | ✅ Live |
+| **Chinese versions** | `/chinese/` (7 pages) | ❌ noindex (current page meta) | ✅ Live |
 
 ---
 
