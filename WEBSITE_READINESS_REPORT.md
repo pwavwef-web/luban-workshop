@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live. The admin dashboard covers day-to-day operational needs. Since the initial audit, several previously-flagged items have been resolved: opening hours are now consistent across all pages, a custom 404 page has been added, Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle), Google Fonts preconnect hints have been added sitewide, the About Us canonical URL has been corrected, `about-us/profile.html` has been added to the sitemap, social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array, both the favicon and PWA manifest icons now use PNG, production Firestore security rules have been deployed, Firebase SDK usage has been migrated away from compat CDN scripts, Chinese page coverage has been expanded, and Cloud Functions now send email notifications for new orders and reservations. The remaining gaps are mostly medium- and low-priority polish/operations items.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved: opening hours are now consistent across all pages; a custom 404 page has been added; Tailwind CSS is now generated via a local build step (eliminating the 3 MB CDN bundle); Google Fonts preconnect hints have been added sitewide; the About Us canonical URL has been corrected; `about-us/profile.html` has been added to the sitemap; social media profile URLs (Facebook, Instagram) have been added to the JSON-LD `sameAs` array; both the favicon and PWA manifest icons now use PNG; production Firestore security rules have been deployed; Firebase SDK usage has been migrated away from compat CDN scripts; Chinese page coverage has been expanded; and Cloud Functions now send email notifications for new orders and reservations. The remaining gaps are mostly medium- and low-priority polish/operations items.
 
 ---
 
@@ -31,7 +31,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | 404 Not Found | `/404.html` | ❌ noindex | ✅ Live |
 | Admin Dashboard | `/admin.html` | ❌ noindex | ✅ Live |
 | Presentation | `/presentation.html` | ❌ noindex | ✅ Live |
-| **Chinese versions** | `/chinese/` (7 pages) | ❌ noindex (current page meta) | ✅ Live |
+| **Chinese versions** | `/chinese/` (7 pages) | ❌ noindex (documentation corrected to match current page meta) | ✅ Live |
 
 ---
 
