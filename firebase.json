@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "luban-workshop-restaurant",
     "public": ".",
     "ignore": [
       "firebase.json",
