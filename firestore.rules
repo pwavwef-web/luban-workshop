@@ -78,8 +78,17 @@ service cloud.firestore {
       // Only admins can read reservations
       allow read: if isAdmin();
       
-      // Authenticated users can create new reservations
-      allow create: if isAuthenticated();
+      // Authenticated users can create new reservations.
+      // Allow unauthenticated users to create reservations only when
+      // the request includes the required fields (basic validation)
+      allow create: if isAuthenticated() || (
+        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
+        request.resource.data.phone is string && request.resource.data.phone.size() > 0 &&
+        request.resource.data.date is string && request.resource.data.date.size() > 0 &&
+        request.resource.data.time is string && request.resource.data.time.size() > 0 &&
+        request.resource.data.guests is string && request.resource.data.guests.size() > 0 &&
+        request.resource.data.status == 'pending'
+      );
       
       // Only admins can update or delete reservations
       allow update, delete: if isAdmin();
