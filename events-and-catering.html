@@ -364,8 +364,17 @@
             measurementId: "G-PZQ13BWZB3"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Ensure the user is signed in anonymously so Firestore write rules
+        // that require authentication succeed for client-submitted reservations.
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                auth.signInAnonymously().catch(err => console.error('Anonymous sign-in failed:', err));
+            }
+        });
 
         // Set date picker constraints
         const dateInput = document.getElementById('res-date');
@@ -390,7 +399,7 @@
                 return;
             }
 
-            const reservationData = {
+                const reservationData = {
                 name: document.getElementById('res-name').value,
                 phone: document.getElementById('res-phone').value,
                 email: document.getElementById('res-email').value,
@@ -399,6 +408,9 @@
                 guests: document.getElementById('res-guests').value,
                 notes: document.getElementById('res-notes').value,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                // Include the authenticated user's UID (anonymous or signed-in)
+                userId: (auth && auth.currentUser) ? auth.currentUser.uid : null,
+                anonymous: (auth && auth.currentUser) ? !!auth.currentUser.isAnonymous : false,
                 status: 'pending'
             };
 
