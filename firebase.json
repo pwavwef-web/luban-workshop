@@ -4,7 +4,19 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      ".env*",
+      "functions/**",
+      "luabn/**",
+      "src/**",
+      "README.md",
+      "PRODUCTION_CHECKLIST.md",
+      "WEBSITE_READINESS_REPORT.md",
+      "FIRESTORE_RULES_README.md",
+      "restcon.png",
+      "restcon.webp"
     ]
   },
   "functions": [

@@ -2,7 +2,7 @@
   "name": "luban-workshop-functions",
   "private": true,
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "deploy": "firebase deploy --only functions",
