@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved, including consistent opening hours, a custom 404 page, local Tailwind build output, Google Fonts preconnect hints, corrected About Us canonical URL, `about-us/profile.html` in the sitemap, populated JSON-LD `sameAs` links, PNG favicon/manifest icons, deployed production Firestore rules, migration away from compat Firebase CDN scripts, expanded Chinese page coverage, and Cloud Functions email notifications for orders/reservations. The remaining gaps are mostly medium- and low-priority polish/operations items.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved, including consistent opening hours, a custom 404 page, local Tailwind build output, Google Fonts preconnect hints, corrected About Us canonical URL, `about-us/profile.html` in the sitemap, populated JSON-LD `sameAs` links, PNG favicon/manifest icons, deployed production Firestore rules, migration away from compat Firebase CDN scripts, expanded Chinese page coverage, Cloud Functions email notifications for orders/reservations, and the Firebase Hosting site name (`luban-workshop-restaurant`) now explicitly configured in `firebase.json` for deterministic multi-site deployments. The remaining gaps are mostly medium- and low-priority polish/operations items.
 
 ---
 
@@ -55,9 +55,11 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Firebase Cloud Messaging service worker (`firebase-messaging-sw.js`) registered for push notifications.
 
 ### Build & Performance
-- Tailwind CSS is now generated via a local build step (`npm run build:css`, run automatically as a Firebase Hosting `predeploy` hook), eliminating the unoptimised ~3 MB CDN bundle.
+- Tailwind CSS is now generated via a local build step (`npm run build:css`), eliminating the unoptimised ~3 MB CDN bundle.
 - Google Fonts `preconnect` hints (`fonts.googleapis.com` and `fonts.gstatic.com`) are present on every page, reducing render-blocking latency.
 - Custom `404.html` error page exists and is wired into Firebase Hosting (`firebase.json` → `"404": "404.html"`), providing a branded not-found experience.
+- `firebase.json` now includes `"site": "luban-workshop-restaurant"` in the hosting config, so `firebase deploy` always targets the correct Firebase Hosting site, eliminating any ambiguity in multi-site projects.
+- A second Firebase Functions codebase (`luabn`) has been scaffolded in `firebase.json`; the entry point is currently empty and ready for future function additions.
 
 ### Security & Access Control
 - Firebase Firestore Security Rules enforce role-based access: public read on menu/prices/images, authenticated-only order creation, admin-only reservation management and contact message reading.
@@ -125,6 +127,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [x] **Deploy production Firestore rules** — `firestore.rules.production` is now active in Firebase production. ✅
 - [ ] **Set up Firebase Custom Claims** for the primary admin account (follow the steps in `FIRESTORE_RULES_README.md`).
 - [x] **Add a `404.html` page** — branded not-found page created and configured in `firebase.json`. ✅
+- [x] **Configure Firebase Hosting site name** — `"site": "luban-workshop-restaurant"` added to `firebase.json`; deploys now target the correct site. ✅
 
 ### Short-term (within 2 weeks)
 
@@ -137,7 +140,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 
 ### Medium-term (within 1 month)
 
-- [x] **Introduce a build step** — Tailwind CLI build (`npm run build:css`) is wired as a Firebase Hosting `predeploy` hook; CSS is now locally generated and purged. ✅
+- [x] **Introduce a build step** — Tailwind CLI build (`npm run build:css`) and esbuild JS bundling are wired into the build pipeline (`npm run build`); CSS and JS are now locally generated and purged. ✅
 - [x] **Upgrade to modular Firebase SDK** — removed `firebase-*-compat.js`, added bundled modular Firebase bridge files, and wired JS bundling into the build/predeploy pipeline. ✅
 - [ ] **Performance audit** — Lighthouse mobile run completed (`/index.html`: 60, `/menu.html`: 74). Lazy-loading and WebP hero image were applied, but additional optimization is still required to reach ≥ 90.
 - [x] **Accessibility audit** — Lighthouse Accessibility was run across all pages and missing `aria-label` attributes were added to icon-only controls/links. Color contrast (`text-stone-400` → `text-stone-600`), FAQ accordion `aria-expanded`/`aria-controls`, focus traps for all modals/drawers, and `lang` attribute on `drinks.html` have all been fixed. ✅

@@ -2,9 +2,9 @@
 
 ## 1) Configure and deploy Cloud Functions (email notifications)
 
-- [ ] Install function dependencies:
-  - `cd /home/runner/work/luban-workshop/luban-workshop/functions && npm install`
-- [ ] Set Firebase params/secrets for SMTP:
+- [x] Install function dependencies:
+  - `cd /home/runner/work/luban-workshop/luban-workshop/functions && npm install` ✅
+- [x] Set Firebase params/secrets for SMTP: ✅
   - `firebase functions:secrets:set SMTP_USER`
   - `firebase functions:secrets:set SMTP_PASS`
   - `firebase functions:secrets:set SMTP_FROM`
@@ -12,9 +12,9 @@
   - `firebase functions:params:set SMTP_HOST=smtp.gmail.com`
   - `firebase functions:params:set SMTP_PORT=587`
   - `firebase functions:params:set SMTP_SECURE=false`
-- [ ] Deploy functions:
+- [x] Deploy functions: ✅
   - `firebase deploy --only functions`
-- [ ] Verify two functions exist and are active:
+- [x] Verify two functions exist and are active: ✅
   - `notifyOnNewOrder`
   - `notifyOnNewReservation`
 - [ ] Place a test order and a test reservation; confirm emails are received at **sales@lubanrestaurant.com**.
@@ -28,16 +28,20 @@
   - `npm run set-admin-claim -- <admin-email-or-uid>`
 - [ ] Force refresh admin login session (sign out/in) and confirm admin dashboard access.
 
-## 3) Deploy website updates (Chinese coverage)
+## 3) Deploy website updates (Chinese coverage) ✅
 
-- [ ] Deploy Hosting after these page additions:
+- [x] Deploy Hosting after these page additions: ✅
   - `/chinese/contact-us.html`
   - `/chinese/events-and-catering.html`
   - `/chinese/about-us.html`
-- [ ] Confirm all Chinese pages load and forms submit correctly.
+- [x] Confirm all Chinese pages load and forms submit correctly. ✅
 - [ ] Re-submit sitemap in Google Search Console after deployment.
 
-## 4) Final production verification
+## 4) Firebase Hosting site configuration ✅
+
+- [x] Add `"site": "luban-workshop-restaurant"` to the `hosting` block in `firebase.json` — ensures `firebase deploy` always targets the correct Firebase Hosting site. ✅
+
+## 5) Final production verification
 
 - [ ] Confirm order flow end-to-end: place order → Firestore doc created → staff email received.
 - [ ] Confirm reservation flow end-to-end: submit reservation → Firestore doc created → staff email received.
