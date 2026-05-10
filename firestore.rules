@@ -65,9 +65,13 @@ service cloud.firestore {
     match /orders/{orderId} {
       // Admins can read all orders; customers can read their own
       allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
-      
+
       // Authenticated users can place orders (userId must match their own UID)
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // Require that the placing user has a phone number recorded in their `/users/{uid}` document
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid &&
+                      (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone is string &&
+                        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone.size() > 0);
       
       // Admins can update/delete any order; customers can update (cancel) their own
       allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
@@ -108,9 +112,18 @@ service cloud.firestore {
 
     // users collection – stores customer profiles (name, phone)
     match /users/{userId} {
-      // Users can read and write their own profile; admins can read all
+      // Users can read their own profile; admins can read all
       allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
-      allow write: if isAuthenticated() && request.auth.uid == userId;
+
+      // Enforce that newly created user profiles include a phone number
+      allow create: if isAuthenticated() && request.auth.uid == userId &&
+                      request.resource.data.phone is string && request.resource.data.phone.size() > 0;
+
+      // Allow updates to the user's own profile (including adding phone later)
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+
+      // Allow delete only for the user themself or admins
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
     }
 
     // teamProfiles collection – staff profiles submitted via the profile form

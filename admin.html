@@ -418,6 +418,18 @@
                     return;
                 }
 
+                // Ensure admin user has a phone number on their profile; prompt if missing
+                try {
+                    const profileDoc = await db.collection('users').doc(user.uid).get();
+                    const profileData = profileDoc.exists ? profileDoc.data() : null;
+                    if (!profileData || !profileData.phone || (typeof profileData.phone === 'string' && profileData.phone.trim() === '')) {
+                        const phone = window.prompt('Please enter your phone number to complete your account:', '');
+                        if (phone && phone.trim()) {
+                            await db.collection('users').doc(user.uid).set({ phone: phone.trim(), name: user.displayName || '', email: user.email || '' }, { merge: true });
+                        }
+                    }
+                } catch (e) { console.error('Failed to ensure admin phone number:', e); }
+
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 document.getElementById('user-email').textContent = user.email;
