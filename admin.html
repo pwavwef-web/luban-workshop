@@ -358,6 +358,22 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // --- Phone Validation Utility (Ghana: +233 + 9 digits) ---
+        function formatGhanaPhone(phone) {
+            // Remove all non-digit characters except +
+            let cleaned = phone.replace(/[^\d+]/g, '');
+            // If it starts with +, remove it temporarily
+            let hasPlus = cleaned.startsWith('+');
+            if (hasPlus) cleaned = cleaned.substring(1);
+            // Remove leading 0 if present (for local Ghana format)
+            if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
+            // Remove leading 233 if present (convert to +233 format)
+            if (cleaned.startsWith('233')) cleaned = cleaned.substring(3);
+            // Should have exactly 9 digits now
+            if (!/^\d{9}$/.test(cleaned)) return null;
+            return '+233' + cleaned;
+        }
+
         // --- Push Notification helpers ---
         let notificationsEnabled = false;
 
@@ -423,9 +439,17 @@
                     const profileDoc = await db.collection('users').doc(user.uid).get();
                     const profileData = profileDoc.exists ? profileDoc.data() : null;
                     if (!profileData || !profileData.phone || (typeof profileData.phone === 'string' && profileData.phone.trim() === '')) {
-                        const phone = window.prompt('Please enter your phone number to complete your account:', '');
-                        if (phone && phone.trim()) {
-                            await db.collection('users').doc(user.uid).set({ phone: phone.trim(), name: user.displayName || '', email: user.email || '' }, { merge: true });
+                        let phone = null;
+                        let valid = false;
+                        while (!valid) {
+                            const rawPhone = window.prompt('Please enter your Ghana phone number (+233 and 9 digits, e.g., +233501234567):', '');
+                            if (!rawPhone) break; // User cancelled
+                            phone = formatGhanaPhone(rawPhone);
+                            if (phone) {
+                                valid = true;
+                                await db.collection('users').doc(user.uid).set({ phone, name: user.displayName || '', email: user.email || '' }, { merge: true });
+                            } else {
+                                alert('Invalid phone number. Please enter a valid Ghana number.');\n                            }
                         }
                     }
                 } catch (e) { console.error('Failed to ensure admin phone number:', e); }

@@ -5,6 +5,7 @@ const { defineString, defineSecret } = require('firebase-functions/params');
 const { logger } = require('firebase-functions');
 
 admin.initializeApp();
+const axios = require('axios');
 
 const SMTP_HOST = defineString('SMTP_HOST', { default: 'smtp.gmail.com' });
 const SMTP_PORT = defineString('SMTP_PORT', { default: '587' });
@@ -13,6 +14,9 @@ const SMTP_USER = defineSecret('SMTP_USER');
 const SMTP_PASS = defineSecret('SMTP_PASS');
 const SMTP_FROM = defineSecret('SMTP_FROM');
 const NOTIFICATION_RECIPIENT = defineSecret('NOTIFICATION_RECIPIENT');
+const ARKESEL_API_KEY = defineSecret('ARKESEL_API_KEY');
+const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Luban Restaurant' });
+const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/api/sms/send' });
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -167,6 +171,52 @@ exports.notifyOnNewReservation = onDocumentCreated(
         error: error?.message || error,
       });
       throw error;
+    }
+  }
+);
+
+// --- SMS via Arkesel: send SMS to customer when a new order is created ---
+exports.sendSmsOnNewOrder = onDocumentCreated(
+  {
+    document: 'orders/{orderId}',
+    region: 'us-central1',
+    // need ARKESEL_API_KEY secret available to this function
+    secrets: [ARKESEL_API_KEY],
+  },
+  async (event) => {
+    const orderId = event.params.orderId;
+    const order = event.data?.data() || {};
+    const to = order.customerPhone;
+    if (!to) {
+      logger.info('Order has no customer phone; skipping SMS', { orderId });
+      return;
+    }
+
+    const total = Number(order.total || 0).toFixed(2);
+    const message = `Luban Restaurant: We received your order #${orderId}. Total: ₵${total}. We'll notify you when it's ready.`;
+
+    try {
+      const url = ARKESEL_URL.value();
+      const apiKey = ARKESEL_API_KEY.value();
+      const sender = ARKESEL_SENDER.value();
+
+      // POST JSON to Arkesel. Headers use Bearer token by default; adjust if your Arkesel plan requires a different header.
+      await axios.post(url, {
+        to,
+        from: sender,
+        message,
+      }, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000,
+      });
+
+      logger.info('SMS sent to customer', { orderId, to });
+    } catch (err) {
+      logger.error('Failed to send SMS via Arkesel', { orderId, error: err?.message || err });
+      // Do not throw to avoid retry storms; log and allow other notifications to proceed
     }
   }
 );

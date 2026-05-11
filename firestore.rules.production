@@ -115,12 +115,16 @@ service cloud.firestore {
       // Users can read their own profile; admins can read all
       allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
 
-      // Enforce that newly created user profiles include a phone number
+      // Enforce that newly created user profiles include a properly formatted Ghana phone number
+      // Phone must be +233 followed by exactly 9 digits (e.g., +233501234567)
       allow create: if isAuthenticated() && request.auth.uid == userId &&
-                      request.resource.data.phone is string && request.resource.data.phone.size() > 0;
+                      request.resource.data.phone is string && 
+                      request.resource.data.phone.matches('^\\+233[0-9]{9}$');
 
-      // Allow updates to the user's own profile (including adding phone later)
-      allow update: if isAuthenticated() && request.auth.uid == userId;
+      // Allow updates to the user's own profile (including adding/updating phone)
+      allow update: if isAuthenticated() && request.auth.uid == userId &&
+                      request.resource.data.phone is string &&
+                      request.resource.data.phone.matches('^\\+233[0-9]{9}$');
 
       // Allow delete only for the user themself or admins
       allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
