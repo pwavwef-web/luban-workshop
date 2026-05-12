@@ -16,7 +16,7 @@ const SMTP_PASS = defineSecret('SMTP_PASS');
 const SMTP_FROM = defineSecret('SMTP_FROM');
 const NOTIFICATION_RECIPIENT = defineSecret('NOTIFICATION_RECIPIENT');
 const ARKESEL_API_KEY = defineSecret('ARKESEL_API_KEY');
-const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'AZ Learner' });
+const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Workshop ws' });
 const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/sms/api' });
 const ARKESEL_BALANCE_URL = defineString('ARKESEL_BALANCE_URL', { default: 'https://sms.arkesel.com/sms/api' });
 

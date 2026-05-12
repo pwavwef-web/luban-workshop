@@ -84,8 +84,15 @@ service cloud.firestore {
                       (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone is string &&
                         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone.size() > 0);
       
-      // Admins can update/delete any order; customers can update (cancel) their own
-      allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
+      // Admins can update/delete any order.
+      // Customers can update (cancel) their own orders; they may delete their own orders
+      // only when the order is finished (completed) or cancelled to prevent accidental removal.
+      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
+      allow delete: if isAdmin() || (
+        isAuthenticated() &&
+        request.auth.uid == resource.data.userId &&
+        (resource.data.status == 'completed' || resource.data.status == 'cancelled')
+      );
     }
 
     // reservations collection rules

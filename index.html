@@ -1584,6 +1584,17 @@
                                 </button>
                             `;
                         }
+
+                        // Delete button for old orders (completed or cancelled)
+                        let deleteButton = '';
+                        if (order.status === 'completed' || order.status === 'cancelled') {
+                            deleteButton = `
+                                <button onclick="deleteMyOrder('${orderId}')" 
+                                    class="px-4 py-2 bg-stone-200 text-stone-800 rounded-md hover:bg-stone-300 transition-colors text-sm ml-2">
+                                    Delete
+                                </button>
+                            `;
+                        }
                         
                         const orderCard = `
                             <div class="bg-white rounded-lg shadow-md p-6 border border-stone-200">
@@ -1610,6 +1621,7 @@
                                     <p class="text-lg font-bold text-stone-900">Total: $${(order.total || 0).toFixed(2)}</p>
                                     <div class="mt-3 md:mt-0">
                                         ${cancelButton}
+                                        ${deleteButton}
                                     </div>
                                 </div>
                             </div>
@@ -1647,6 +1659,18 @@
             } catch (error) {
                 console.error('Error cancelling order:', error);
                 alert('Failed to cancel order. Please try again.');
+            }
+        }
+
+        // Allow users to delete their own completed or cancelled orders
+        async function deleteMyOrder(orderId) {
+            if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+            try {
+                await db.collection('orders').doc(orderId).delete();
+                alert('Order deleted.');
+            } catch (err) {
+                console.error('Failed to delete order:', err);
+                alert('Could not delete order. If you see a permissions error, please contact support.');
             }
         }
 
