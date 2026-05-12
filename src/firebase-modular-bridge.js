@@ -4,6 +4,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
   signInWithPopup,
   signOut,
   GoogleAuthProvider
@@ -109,6 +110,7 @@ function getAuthApi() {
     onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
     signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
     createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    updateProfile: (user, profile) => updateProfile(user, profile),
     signInWithPopup: (provider) => signInWithPopup(auth, provider),
     signOut: () => signOut(auth),
     get currentUser() {
