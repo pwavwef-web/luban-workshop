@@ -449,7 +449,8 @@
                                 valid = true;
                                 await db.collection('users').doc(user.uid).set({ phone, name: user.displayName || '', email: user.email || '' }, { merge: true });
                             } else {
-                                alert('Invalid phone number. Please enter a valid Ghana number.');\n                            }
+                                alert('Invalid phone number. Please enter a valid Ghana number.');
+                            }
                         }
                     }
                 } catch (e) { console.error('Failed to ensure admin phone number:', e); }

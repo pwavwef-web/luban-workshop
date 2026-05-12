@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onRequest } = require('firebase-functions/v2/https');
 const { defineString, defineSecret } = require('firebase-functions/params');
 const { logger } = require('firebase-functions');
 
@@ -15,8 +16,9 @@ const SMTP_PASS = defineSecret('SMTP_PASS');
 const SMTP_FROM = defineSecret('SMTP_FROM');
 const NOTIFICATION_RECIPIENT = defineSecret('NOTIFICATION_RECIPIENT');
 const ARKESEL_API_KEY = defineSecret('ARKESEL_API_KEY');
-const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Luban Restaurant' });
-const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/api/sms/send' });
+const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'AZ Learner' });
+const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/sms/api' });
+const ARKESEL_BALANCE_URL = defineString('ARKESEL_BALANCE_URL', { default: 'https://sms.arkesel.com/sms/api' });
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -53,6 +55,25 @@ function createTransporter() {
       pass: SMTP_PASS.value(),
     },
   });
+}
+
+function normalizePhoneNumber(phone) {
+  const digits = String(phone || '').replace(/[^\d+]/g, '');
+  if (!digits) return '';
+
+  if (digits.startsWith('+233')) {
+    return digits.slice(1);
+  }
+
+  if (digits.startsWith('0')) {
+    return `233${digits.slice(1)}`;
+  }
+
+  return digits;
+}
+
+function getArkeselApiKey() {
+  return ARKESEL_API_KEY.value() || process.env.ARKESEL_API_KEY || '';
 }
 
 async function sendNotificationMail({ subject, html, text }) {
@@ -186,7 +207,7 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
   async (event) => {
     const orderId = event.params.orderId;
     const order = event.data?.data() || {};
-    const to = order.customerPhone;
+    const to = normalizePhoneNumber(order.customerPhone);
     if (!to) {
       logger.info('Order has no customer phone; skipping SMS', { orderId });
       return;
@@ -197,26 +218,75 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
 
     try {
       const url = ARKESEL_URL.value();
-      const apiKey = ARKESEL_API_KEY.value();
+      const apiKey = getArkeselApiKey();
       const sender = ARKESEL_SENDER.value();
 
-      // POST JSON to Arkesel. Headers use Bearer token by default; adjust if your Arkesel plan requires a different header.
-      await axios.post(url, {
-        to,
-        from: sender,
-        message,
-      }, {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
+      if (!apiKey) {
+        throw new Error('Missing Arkesel API key');
+      }
+
+      // Use Arkesel's documented query-string endpoint for plain SMS delivery.
+      await axios.get(url, {
+        params: {
+          action: 'send-sms',
+          api_key: apiKey,
+          to,
+          from: sender,
+          sms: message,
         },
         timeout: 10000,
       });
 
       logger.info('SMS sent to customer', { orderId, to });
     } catch (err) {
-      logger.error('Failed to send SMS via Arkesel', { orderId, error: err?.message || err });
+      logger.error('Failed to send SMS via Arkesel', {
+        orderId,
+        error: err?.message || err,
+        response: err?.response?.data,
+      });
       // Do not throw to avoid retry storms; log and allow other notifications to proceed
+    }
+  }
+);
+
+function extractBearerToken(authorizationHeader = '') {
+  const match = String(authorizationHeader).match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
+}
+
+exports.checkSmsBalance = onRequest(
+  {
+    region: 'us-central1',
+    secrets: [ARKESEL_API_KEY],
+  },
+  async (req, res) => {
+    try {
+      const token = extractBearerToken(req.get('authorization'));
+      if (!token) {
+        res.status(401).json({ error: 'Missing authorization token' });
+        return;
+      }
+
+      const decoded = await admin.auth().verifyIdToken(token);
+      const isAdminUser = decoded.admin === true || decoded.email === 'admin@luban.com';
+      if (!isAdminUser) {
+        res.status(403).json({ error: 'Forbidden' });
+        return;
+      }
+
+      const response = await axios.get(ARKESEL_BALANCE_URL.value(), {
+        params: {
+          action: 'check-balance',
+          api_key: ARKESEL_API_KEY.value(),
+          response: 'json',
+        },
+        timeout: 10000,
+      });
+
+      res.status(200).json({ ok: true, balance: response.data });
+    } catch (error) {
+      logger.error('Failed to check Arkesel balance', { error: error?.message || error });
+      res.status(500).json({ error: 'Failed to check balance' });
     }
   }
 );
