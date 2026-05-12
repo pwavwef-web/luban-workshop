@@ -214,7 +214,7 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
     }
 
     const total = Number(order.total || 0).toFixed(2);
-    const message = `Luban Restaurant: We received your order #${orderId}. Total: ₵${total}. We'll notify you when it's ready.`;
+    const message = `Hi ${escapeHtml(order.customerName || 'Customer')}, thanks for your order #${orderId} (₵${total}). We'll start preparing it now and will notify you when it's ready for pickup/delivery. Reply to this message or call 020 543 8455 for questions. - Luban Restaurant`;
 
     try {
       const url = ARKESEL_URL.value();
