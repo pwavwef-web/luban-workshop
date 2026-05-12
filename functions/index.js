@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineString, defineSecret } = require('firebase-functions/params');
 const { logger } = require('firebase-functions');
@@ -214,6 +214,7 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
     }
 
     const total = Number(order.total || 0).toFixed(2);
+    const customerName = escapeHtml(order.customerName || 'Customer');
     
     // Build items list for SMS
     const itemsList = Array.isArray(order.items)
@@ -222,7 +223,21 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
           .join(', ')
       : 'Your order';
 
-    const message = `Hi ${escapeHtml(order.customerName || 'Customer')}, thanks for ordering: ${itemsList} (₵${total}). We're preparing it now. - Luban Restaurant`;
+    const message = `Hi ${customerName},
+
+Thank you for ordering from Luban Workshop!
+
+📋 Your Order:
+${itemsList}
+
+💰 Total: ₵${total}
+
+We're preparing your order now. We'll notify you when it's ready!
+
+📞 Questions? Call us: 020 543 8455
+⏰ Mon-Fri 11:00-17:30
+
+- Luban Restaurant`;
 
     try {
       const url = ARKESEL_URL.value();
@@ -249,6 +264,80 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
     } catch (err) {
       logger.error('Failed to send SMS via Arkesel', {
         orderId,
+        error: err?.message || err,
+        response: err?.response?.data,
+      });
+      // Do not throw to avoid retry storms; log and allow other notifications to proceed
+    }
+  }
+);
+
+// --- SMS via Arkesel: notify customer when order status is updated ---
+exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
+  {
+    document: 'orders/{orderId}',
+    region: 'us-central1',
+    secrets: [ARKESEL_API_KEY],
+  },
+  async (event) => {
+    const orderId = event.params.orderId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    const oldStatus = beforeData.status || 'pending';
+    const newStatus = afterData.status || 'pending';
+
+    // Only send SMS if status actually changed
+    if (oldStatus === newStatus) {
+      return;
+    }
+
+    // Send SMS only for specific status transitions
+    const statusesToNotify = ['preparing', 'completed'];
+    if (!statusesToNotify.includes(newStatus)) {
+      return;
+    }
+
+    const to = normalizePhoneNumber(afterData.customerPhone);
+    if (!to) {
+      logger.info('Order has no customer phone; skipping SMS', { orderId });
+      return;
+    }
+
+    let message = '';
+    if (newStatus === 'preparing') {
+      message = `Hi ${escapeHtml(afterData.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
+    } else if (newStatus === 'completed') {
+      message = `Hi ${escapeHtml(afterData.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
+    }
+
+    if (!message) return;
+
+    try {
+      const url = ARKESEL_URL.value();
+      const apiKey = getArkeselApiKey();
+      const sender = ARKESEL_SENDER.value();
+
+      if (!apiKey) {
+        throw new Error('Missing Arkesel API key');
+      }
+
+      await axios.get(url, {
+        params: {
+          action: 'send-sms',
+          api_key: apiKey,
+          to,
+          from: sender,
+          sms: message,
+        },
+        timeout: 10000,
+      });
+
+      logger.info('SMS sent to customer on order status update', { orderId, newStatus, to });
+    } catch (err) {
+      logger.error('Failed to send SMS via Arkesel on order update', {
+        orderId,
+        newStatus,
         error: err?.message || err,
         response: err?.response?.data,
       });
