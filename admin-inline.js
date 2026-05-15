@@ -908,6 +908,110 @@
             }
         });
 
+        // --- SMS Balance Checker ---
+        async function checkSmsBalance() {
+            const btn = document.getElementById('check-balance-btn');
+            const loading = document.getElementById('balance-loading');
+            const result = document.getElementById('balance-result');
+            const error = document.getElementById('balance-error');
+            const initial = document.getElementById('balance-initial');
+            const errorMsg = document.getElementById('balance-error-message');
+
+            // Hide all states
+            loading.classList.add('hidden');
+            result.classList.add('hidden');
+            error.classList.add('hidden');
+            initial.classList.add('hidden');
+            
+            // Show loading
+            loading.classList.remove('hidden');
+            btn.disabled = true;
+
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('Not authenticated');
+                }
+
+                // Get ID token with Bearer format
+                const idToken = await user.getIdToken();
+                
+                // Call checkSmsBalance endpoint
+                const response = await fetch('https://checksmsbalance-s5psnepkqq-uc.a.run.app', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Populate balance result
+                displaySmsBalance(data.balance);
+                
+                // Show result
+                loading.classList.add('hidden');
+                result.classList.remove('hidden');
+                
+            } catch (err) {
+                console.error('Failed to check SMS balance:', err);
+                loading.classList.add('hidden');
+                error.classList.remove('hidden');
+                errorMsg.textContent = err.message || 'An error occurred while checking balance. Please try again.';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function displaySmsBalance(balanceData) {
+            const timestamp = new Date().toLocaleString();
+            
+            // Display status and credits
+            const statusEl = document.getElementById('balance-status');
+            const creditsEl = document.getElementById('balance-credits');
+            const detailsEl = document.getElementById('balance-details');
+            const timestampEl = document.getElementById('balance-timestamp');
+            
+            // Handle different response formats from Arkesel API
+            if (typeof balanceData === 'object') {
+                // If balance is a number
+                if (typeof balanceData.balance === 'number') {
+                    statusEl.textContent = 'Active';
+                    creditsEl.textContent = balanceData.balance.toFixed(2) + ' credits';
+                } else if (balanceData.balance && typeof balanceData.balance.balance === 'number') {
+                    statusEl.textContent = 'Active';
+                    creditsEl.textContent = balanceData.balance.balance.toFixed(2) + ' credits';
+                } else {
+                    statusEl.textContent = 'Active';
+                    creditsEl.textContent = JSON.stringify(balanceData.balance);
+                }
+                
+                // Display full response as details
+                const details = Object.entries(balanceData)
+                    .filter(([key]) => key !== 'balance')
+                    .map(([key, value]) => `<strong>${key}:</strong> ${value}`)
+                    .join('<br>');
+                
+                if (details) {
+                    detailsEl.innerHTML = details;
+                } else {
+                    detailsEl.innerHTML = '<p class="text-stone-500 italic">No additional details available</p>';
+                }
+            } else {
+                statusEl.textContent = 'Active';
+                creditsEl.textContent = balanceData;
+                detailsEl.innerHTML = '<p class="text-stone-500 italic">Balance successfully retrieved</p>';
+            }
+            
+            timestampEl.textContent = `Last checked: ${timestamp}`;
+        }
+
         function logout() { auth.signOut(); }
 
         // --- Google Sign-In ---
