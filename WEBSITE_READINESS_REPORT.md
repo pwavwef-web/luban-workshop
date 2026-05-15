@@ -130,7 +130,6 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [ ] **Set up Firebase Custom Claims** for the primary admin account (follow the steps in `FIRESTORE_RULES_README.md`).
 - [x] **Add a `404.html` page** — branded not-found page created and configured in `firebase.json`. ✅
 - [x] **Configure Firebase Hosting site name** — `"site": "luban-workshop-restaurant"` added to `firebase.json`; deploys now target the correct site. ✅
- - **Store App Check secret securely** — the reCAPTCHA *secret key* must never be committed. Use Firebase Console, Cloud Functions environment variables, or a secrets manager (e.g., Google Secret Manager) for server-side verification.
 
 ### Short-term (within 2 weeks)
 
@@ -151,8 +150,6 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 ### Long-term (ongoing)
 
 - [ ] **Set up Firebase Hosting via CI/CD** — add a GitHub Actions workflow to deploy on every push to `main`, so deployments are automated and auditable.
-- [ ] **Implement Firebase App Check** — protect Firestore and Authentication from abuse by unauthorised clients.
- - [x] **Implement Firebase App Check** — client-side snippets added to pages; replace the placeholder reCAPTCHA v3 key with your project site key and register domains in the Firebase Console (see Deployment notes).
 - [ ] **Monitor Core Web Vitals** — use Google Search Console and GA4 to track real-user performance over time.
 - [x] **Expand multilingual coverage** — Chinese pages now include `contact-us`, `events-and-catering`, and `about-us` in addition to the original set. ✅
 - [ ] **Social media integration** — add verified social profile links, an Instagram feed widget, or a WhatsApp chat button to increase engagement.
@@ -167,7 +164,6 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 |----------|-------|-------|
 | Core functionality | 9 / 10 | All key customer flows working; branded 404 page added |
 | SEO | 9 / 10 | Hours fixed, canonical corrected, sitemap and `sameAs` updated |
-| Security | 9 / 10 | Production Firestore rules are deployed; continue custom-claims hygiene and App Check planning |
 | Performance | 7 / 10 | Local Tailwind build and Fonts preconnect added; image optimisation still pending |
 | PWA | 8 / 10 | Service worker and manifest present; icons and favicon now PNG |
 | Accessibility | 8 / 10 | Color contrast fixed (text-stone-600 on light bg); FAQ aria-expanded/controls added; focus traps and Escape key added to all modals/drawers; lang attribute added to drinks.html |
