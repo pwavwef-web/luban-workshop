@@ -260,11 +260,11 @@
                         <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
                     </button>
                     <!-- Auth / User (always visible in nav bar, not in drawer) -->
-                    <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
+                    <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="hidden md:inline-flex px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
                         Sign Up / Login
                     </button>
                     <!-- Hamburger / nav drawer toggle (all screen sizes) -->
-                    <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
+                    <button onclick="toggleNavDrawer()" class="shrink-0 p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
                 </div>
