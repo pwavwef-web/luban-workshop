@@ -11,19 +11,6 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-
-        // Initialize Firebase App Check (replace placeholder with your reCAPTCHA v3 key)
-        (function() {
-            try {
-                const FIREBASE_RECAPTCHA_KEY = '6LfCxOosAAAAAPeHJWtCpJSlJ_yuRqkGMDO9Cdzz';
-                if (!FIREBASE_RECAPTCHA_KEY) {
-                    window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-                }
-                if (firebase && firebase.appCheck) {
-                    try { firebase.appCheck().activate(FIREBASE_RECAPTCHA_KEY, true); } catch (e) { console.warn('App Check activation failed:', e); }
-                }
-            } catch (e) { console.warn('App Check init error', e); }
-        })();
         const auth = firebase.auth();
         const db = firebase.firestore();
 

@@ -66,7 +66,6 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Two rules files provided: a development file (email-based fallback) and a hardened production file (Custom Claims only).
 - Admin dashboard verifies admin status client-side before rendering and signs out unauthorised users automatically.
 - Admin portal hidden from search engines and excluded from the PWA manifest scope.
- - Firebase App Check: client-side activation snippets were added across pages to register App Check tokens. Replace the placeholder reCAPTCHA v3 site key in the client snippets, add your site to App Check in the Firebase Console, and then enforce App Check for services (Firestore/Auth) from the console.
 
 ### User Features
 - Online ordering with cart, Firebase-backed order persistence, and real-time status updates.
