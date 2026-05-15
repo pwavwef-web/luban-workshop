@@ -17,6 +17,7 @@ const SMTP_FROM = defineSecret('SMTP_FROM');
 const NOTIFICATION_RECIPIENT = defineSecret('NOTIFICATION_RECIPIENT');
 const ARKESEL_API_KEY = defineSecret('ARKESEL_API_KEY');
 const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Workshop ws' });
+const RESTAURANT_SMS_NUMBER = defineString('RESTAURANT_SMS_NUMBER', { default: '020 543 8455' });
 const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/sms/api' });
 const ARKESEL_BALANCE_URL = defineString('ARKESEL_BALANCE_URL', { default: 'https://sms.arkesel.com/sms/api' });
 
@@ -74,6 +75,29 @@ function normalizePhoneNumber(phone) {
 
 function getArkeselApiKey() {
   return ARKESEL_API_KEY.value() || process.env.ARKESEL_API_KEY || '';
+}
+
+async function sendArkeselSms({ to, message, orderId, logContext }) {
+  const url = ARKESEL_URL.value();
+  const apiKey = getArkeselApiKey();
+  const sender = ARKESEL_SENDER.value();
+
+  if (!apiKey) {
+    throw new Error('Missing Arkesel API key');
+  }
+
+  await axios.get(url, {
+    params: {
+      action: 'send-sms',
+      api_key: apiKey,
+      to,
+      from: sender,
+      sms: message,
+    },
+    timeout: 10000,
+  });
+
+  logger.info(logContext, { orderId, to });
 }
 
 async function sendNotificationMail({ subject, html, text }) {
@@ -215,6 +239,7 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
 
     const total = Number(order.total || 0).toFixed(2);
     const customerName = escapeHtml(order.customerName || 'Customer');
+    const customerPhone = escapeHtml(order.customerPhone || 'Not provided');
     
     // Build items list for SMS
     const itemsList = Array.isArray(order.items)
@@ -223,7 +248,7 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
           .join(', ')
       : 'Your order';
 
-    const message = `Hi ${customerName},
+    const customerMessage = `Hi ${customerName},
 
 Thank you for ordering from Luban Workshop!
 
@@ -239,28 +264,37 @@ We're preparing your order now. We'll notify you when it's ready!
 
 - Luban Restaurant`;
 
+    const restaurantTo = normalizePhoneNumber(RESTAURANT_SMS_NUMBER.value());
+    const restaurantMessage = `New order received at Luban Workshop.
+
+Customer: ${customerName}
+Customer phone: ${customerPhone}
+
+📋 Order:
+${itemsList}
+
+💰 Total: ₵${total}
+
+Please prepare this order.`;
+
     try {
-      const url = ARKESEL_URL.value();
-      const apiKey = getArkeselApiKey();
-      const sender = ARKESEL_SENDER.value();
-
-      if (!apiKey) {
-        throw new Error('Missing Arkesel API key');
-      }
-
-      // Use Arkesel's documented query-string endpoint for plain SMS delivery.
-      await axios.get(url, {
-        params: {
-          action: 'send-sms',
-          api_key: apiKey,
-          to,
-          from: sender,
-          sms: message,
-        },
-        timeout: 10000,
+      await sendArkeselSms({
+        to,
+        message: customerMessage,
+        orderId,
+        logContext: 'SMS sent to customer',
       });
 
-      logger.info('SMS sent to customer', { orderId, to });
+      if (restaurantTo) {
+        await sendArkeselSms({
+          to: restaurantTo,
+          message: restaurantMessage,
+          orderId,
+          logContext: 'SMS sent to restaurant',
+        });
+      } else {
+        logger.info('Restaurant phone missing; skipping restaurant SMS', { orderId });
+      }
     } catch (err) {
       logger.error('Failed to send SMS via Arkesel', {
         orderId,
