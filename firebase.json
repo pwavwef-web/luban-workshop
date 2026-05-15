@@ -23,18 +23,6 @@
     {
       "codebase": "default",
       "source": "functions"
-    },
-    {
-      "source": "luabn",
-      "codebase": "luabn",
-      "disallowLegacyRuntimeConfig": true,
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ]
     }
   ],
   "firestore": {

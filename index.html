@@ -1691,7 +1691,14 @@
                 }
 
                 const customerName = currentUserProfile ? currentUserProfile.name : (currentUser ? currentUser.displayName || '' : '');
-                const customerPhone = currentUserProfile ? currentUserProfile.phone : '';
+                const customerPhone = (currentUserProfile && currentUserProfile.phone) || (currentUser && currentUser.phoneNumber) || '';
+
+                if (currentUser && !customerPhone) {
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.textContent = 'Place Order';
+                    alert('Please add a phone number in Account Settings so we can send your order SMS.');
+                    return;
+                }
 
                 const orderData = {
                     items: cart,

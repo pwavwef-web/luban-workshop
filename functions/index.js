@@ -1,12 +1,7 @@
-const admin = require('firebase-admin');
-const nodemailer = require('nodemailer');
 const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineString, defineSecret } = require('firebase-functions/params');
-const { logger } = require('firebase-functions');
-
-admin.initializeApp();
-const axios = require('axios');
+const logger = require('firebase-functions/logger');
 
 const SMTP_HOST = defineString('SMTP_HOST', { default: 'smtp.gmail.com' });
 const SMTP_PORT = defineString('SMTP_PORT', { default: '587' });
@@ -44,6 +39,7 @@ function formatItems(items = []) {
 }
 
 function createTransporter() {
+  const nodemailer = require('nodemailer');
   const secure = String(SMTP_SECURE.value()).toLowerCase() === 'true';
   const port = Number(SMTP_PORT.value());
 
@@ -77,7 +73,18 @@ function getArkeselApiKey() {
   return ARKESEL_API_KEY.value() || process.env.ARKESEL_API_KEY || '';
 }
 
+function getAdmin() {
+  const admin = require('firebase-admin');
+
+  if (!admin.apps.length) {
+    admin.initializeApp();
+  }
+
+  return admin;
+}
+
 async function sendArkeselSms({ to, message, orderId, logContext }) {
+  const axios = require('axios');
   const url = ARKESEL_URL.value();
   const apiKey = getArkeselApiKey();
   const sender = ARKESEL_SENDER.value();
@@ -98,6 +105,107 @@ async function sendArkeselSms({ to, message, orderId, logContext }) {
   });
 
   logger.info(logContext, { orderId, to });
+}
+
+async function sendCustomerOrderPlacedSms(orderId, order) {
+  const to = normalizePhoneNumber(order.customerPhone);
+  if (!to) {
+    logger.info('Order has no customer phone; skipping customer SMS', { orderId });
+    return;
+  }
+
+  const total = Number(order.total || 0).toFixed(2);
+  const customerName = escapeHtml(order.customerName || 'Customer');
+
+  const itemsList = Array.isArray(order.items)
+    ? order.items
+        .map(item => `${escapeHtml(item.name || 'Item')} (x${item.quantity || 1})`)
+        .join(', ')
+    : 'Your order';
+
+  const message = `Hi ${customerName},
+
+Thank you for ordering from Luban Workshop!
+
+📋 Your Order:
+${itemsList}
+
+💰 Total: ₵${total}
+
+We're preparing your order now. We'll notify you when it's ready!
+
+📞 Questions? Call us: 020 543 8455
+⏰ Mon-Fri 11:00-17:30
+
+- Luban Restaurant`;
+
+  await sendArkeselSms({
+    to,
+    message,
+    orderId,
+    logContext: 'SMS sent to customer',
+  });
+}
+
+async function sendRestaurantOrderPlacedSms(orderId, order) {
+  const to = normalizePhoneNumber(RESTAURANT_SMS_NUMBER.value());
+  if (!to) {
+    logger.info('Restaurant phone missing; skipping restaurant SMS', { orderId });
+    return;
+  }
+
+  const total = Number(order.total || 0).toFixed(2);
+  const customerName = escapeHtml(order.customerName || 'Customer');
+  const customerPhone = escapeHtml(order.customerPhone || 'Not provided');
+
+  const itemsList = Array.isArray(order.items)
+    ? order.items
+        .map(item => `${escapeHtml(item.name || 'Item')} (x${item.quantity || 1})`)
+        .join(', ')
+    : 'Your order';
+
+  const message = `New order received at Luban Workshop.
+
+Customer: ${customerName}
+Customer phone: ${customerPhone}
+
+📋 Order:
+${itemsList}
+
+💰 Total: ₵${total}
+
+Please prepare this order.`;
+
+  await sendArkeselSms({
+    to,
+    message,
+    orderId,
+    logContext: 'SMS sent to restaurant',
+  });
+}
+
+async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
+  const to = normalizePhoneNumber(order.customerPhone);
+  if (!to) {
+    logger.info('Order has no customer phone; skipping status SMS', { orderId, newStatus });
+    return;
+  }
+
+  let message = '';
+  if (newStatus === 'preparing') {
+    message = `Hi ${escapeHtml(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
+  } else if (newStatus === 'completed') {
+    message = `Hi ${escapeHtml(order.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
+  }
+
+  if (!message) return;
+
+  await sendArkeselSms({
+    to,
+    message,
+    orderId,
+    logContext: 'SMS sent to customer on order status update',
+  });
 }
 
 async function sendNotificationMail({ subject, html, text }) {
@@ -156,6 +264,68 @@ exports.notifyOnNewOrder = onDocumentCreated(
       logger.info('New-order notification sent', { orderId });
     } catch (error) {
       logger.error('Failed to send new-order notification', { orderId, error: error?.message || error });
+      throw error;
+    }
+  }
+);
+
+exports.notifyOnOrderCancelled = onDocumentUpdated(
+  {
+    document: 'orders/{orderId}',
+    region: 'us-central1',
+    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM, NOTIFICATION_RECIPIENT],
+  },
+  async (event) => {
+    const orderId = event.params.orderId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    if ((beforeData.status || 'pending') === (afterData.status || 'pending')) {
+      return;
+    }
+
+    if ((afterData.status || '').toLowerCase() !== 'cancelled') {
+      return;
+    }
+
+    const customerName = escapeHtml(afterData.customerName || 'Unknown');
+    const customerPhone = escapeHtml(afterData.customerPhone || 'Not provided');
+    const userEmail = escapeHtml(afterData.userEmail || 'Not provided');
+    const total = Number(afterData.total || 0).toFixed(2);
+
+    const subject = `Order Cancelled (#${orderId})`;
+    const text = [
+      `An order was cancelled.`,
+      `Order ID: ${orderId}`,
+      `Customer: ${afterData.customerName || 'Unknown'}`,
+      `Phone: ${afterData.customerPhone || 'Not provided'}`,
+      `Email: ${afterData.userEmail || 'Not provided'}`,
+      `Previous Status: ${beforeData.status || 'pending'}`,
+      `Current Status: ${afterData.status || 'cancelled'}`,
+      `Total: ${total}`,
+    ].join('\n');
+
+    const html = `
+      <h2>Order Cancelled</h2>
+      <p><strong>Order ID:</strong> ${escapeHtml(orderId)}</p>
+      <p><strong>Customer:</strong> ${customerName}</p>
+      <p><strong>Phone:</strong> ${customerPhone}</p>
+      <p><strong>Email:</strong> ${userEmail}</p>
+      <p><strong>Previous Status:</strong> ${escapeHtml(beforeData.status || 'pending')}</p>
+      <p><strong>Current Status:</strong> ${escapeHtml(afterData.status || 'cancelled')}</p>
+      <p><strong>Total:</strong> ${total}</p>
+      <h3>Items</h3>
+      <ul>${formatItems(afterData.items)}</ul>
+    `;
+
+    try {
+      await sendNotificationMail({ subject, html, text });
+      logger.info('Cancelled-order notification sent', { orderId });
+    } catch (error) {
+      logger.error('Failed to send cancelled-order notification', {
+        orderId,
+        error: error?.message || error,
+      });
       throw error;
     }
   }
@@ -231,70 +401,12 @@ exports.sendSmsOnNewOrder = onDocumentCreated(
   async (event) => {
     const orderId = event.params.orderId;
     const order = event.data?.data() || {};
-    const to = normalizePhoneNumber(order.customerPhone);
-    if (!to) {
-      logger.info('Order has no customer phone; skipping SMS', { orderId });
-      return;
-    }
-
-    const total = Number(order.total || 0).toFixed(2);
-    const customerName = escapeHtml(order.customerName || 'Customer');
-    const customerPhone = escapeHtml(order.customerPhone || 'Not provided');
-    
-    // Build items list for SMS
-    const itemsList = Array.isArray(order.items)
-      ? order.items
-          .map(item => `${escapeHtml(item.name || 'Item')} (x${item.quantity || 1})`)
-          .join(', ')
-      : 'Your order';
-
-    const customerMessage = `Hi ${customerName},
-
-Thank you for ordering from Luban Workshop!
-
-📋 Your Order:
-${itemsList}
-
-💰 Total: ₵${total}
-
-We're preparing your order now. We'll notify you when it's ready!
-
-📞 Questions? Call us: 020 543 8455
-⏰ Mon-Fri 11:00-17:30
-
-- Luban Restaurant`;
-
-    const restaurantTo = normalizePhoneNumber(RESTAURANT_SMS_NUMBER.value());
-    const restaurantMessage = `New order received at Luban Workshop.
-
-Customer: ${customerName}
-Customer phone: ${customerPhone}
-
-📋 Order:
-${itemsList}
-
-💰 Total: ₵${total}
-
-Please prepare this order.`;
 
     try {
-      await sendArkeselSms({
-        to,
-        message: customerMessage,
-        orderId,
-        logContext: 'SMS sent to customer',
-      });
-
-      if (restaurantTo) {
-        await sendArkeselSms({
-          to: restaurantTo,
-          message: restaurantMessage,
-          orderId,
-          logContext: 'SMS sent to restaurant',
-        });
-      } else {
-        logger.info('Restaurant phone missing; skipping restaurant SMS', { orderId });
-      }
+      await Promise.allSettled([
+        sendCustomerOrderPlacedSms(orderId, order),
+        sendRestaurantOrderPlacedSms(orderId, order),
+      ]);
     } catch (err) {
       logger.error('Failed to send SMS via Arkesel', {
         orderId,
@@ -332,42 +444,8 @@ exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
       return;
     }
 
-    const to = normalizePhoneNumber(afterData.customerPhone);
-    if (!to) {
-      logger.info('Order has no customer phone; skipping SMS', { orderId });
-      return;
-    }
-
-    let message = '';
-    if (newStatus === 'preparing') {
-      message = `Hi ${escapeHtml(afterData.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
-    } else if (newStatus === 'completed') {
-      message = `Hi ${escapeHtml(afterData.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
-    }
-
-    if (!message) return;
-
     try {
-      const url = ARKESEL_URL.value();
-      const apiKey = getArkeselApiKey();
-      const sender = ARKESEL_SENDER.value();
-
-      if (!apiKey) {
-        throw new Error('Missing Arkesel API key');
-      }
-
-      await axios.get(url, {
-        params: {
-          action: 'send-sms',
-          api_key: apiKey,
-          to,
-          from: sender,
-          sms: message,
-        },
-        timeout: 10000,
-      });
-
-      logger.info('SMS sent to customer on order status update', { orderId, newStatus, to });
+      await sendCustomerOrderStatusSms(orderId, afterData, newStatus);
     } catch (err) {
       logger.error('Failed to send SMS via Arkesel on order update', {
         orderId,
@@ -398,6 +476,7 @@ exports.checkSmsBalance = onRequest(
         return;
       }
 
+      const admin = getAdmin();
       const decoded = await admin.auth().verifyIdToken(token);
       const isAdminUser = decoded.admin === true || decoded.email === 'admin@luban.com';
       if (!isAdminUser) {
@@ -405,6 +484,7 @@ exports.checkSmsBalance = onRequest(
         return;
       }
 
+      const axios = require('axios');
       const response = await axios.get(ARKESEL_BALANCE_URL.value(), {
         params: {
           action: 'check-balance',
