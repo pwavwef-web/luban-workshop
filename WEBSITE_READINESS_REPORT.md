@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved, including consistent opening hours, a custom 404 page, local Tailwind build output, Google Fonts preconnect hints, corrected About Us canonical URL, `about-us/profile.html` in the sitemap, populated JSON-LD `sameAs` links, PNG favicon/manifest icons, deployed production Firestore rules, migration away from compat Firebase CDN scripts, expanded Chinese page coverage, Cloud Functions email notifications for orders/reservations, and the Firebase Hosting site name (`luban-workshop-restaurant`) now explicitly configured in `firebase.json` for deterministic multi-site deployments. The remaining gaps are mostly medium- and low-priority polish/operations items.
+The Luban Workshop Restaurant website is **substantially ready for public use**. Core customer-facing flows (browse menu, place order, book a table, contact the restaurant) are all implemented and live, and the admin dashboard covers day-to-day operational needs. Since the initial audit, several previously flagged items have been resolved, including consistent opening hours, a custom 404 page, local Tailwind build output, Google Fonts preconnect hints, corrected About Us canonical URL, `about-us/profile.html` in the sitemap, populated JSON-LD `sameAs` links, PNG favicon/manifest icons, deployed production Firestore rules, migration away from compat Firebase CDN scripts, expanded Chinese page coverage, Cloud Functions email notifications for orders/reservations, SMS notifications (customer order confirmation and restaurant alert via Arkesel) with a status-update SMS when an order moves to "preparing" or "completed", and the Firebase Hosting site name (`luban-workshop-restaurant`) now explicitly configured in `firebase.json` for deterministic multi-site deployments. The remaining gaps are mostly medium- and low-priority polish/operations items.
 
 ---
 
@@ -75,6 +75,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Chinese-language versions of the homepage, menu, FAQ, privacy policy, contact page, events page, and about page.
 - QR code assets and shareable flyer page for offline/print promotion.
 - Team / About Us section with staff profile cards pulled from Firestore.
+- SMS order confirmation sent to the customer immediately after an order is placed, and a follow-up SMS when the order status changes to "preparing" or "completed".
 
 ### Admin Features
 - Menu management: add, edit, delete dishes; toggle visibility; override prices and images.
@@ -82,6 +83,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Reservation management.
 - Contact messages inbox.
 - Admin user management (grant / revoke admin access via Firestore `admins` collection).
+- SMS balance check endpoint (`checkSmsBalance` Cloud Function) accessible to admins via Firebase Auth token, exposing remaining Arkesel credit.
 
 ---
 
@@ -153,6 +155,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [x] **Expand multilingual coverage** — Chinese pages now include `contact-us`, `events-and-catering`, and `about-us` in addition to the original set. ✅
 - [ ] **Social media integration** — add verified social profile links, an Instagram feed widget, or a WhatsApp chat button to increase engagement.
 - [x] **Email notifications for new orders/reservations** — Cloud Functions (`notifyOnNewOrder`, `notifyOnNewReservation`) now send SMTP notifications for new orders and reservations. ✅
+- [x] **SMS notifications for new orders** — Cloud Functions (`sendSmsOnNewOrder`, `sendSmsOnOrderStatusUpdate`) send Arkesel SMS to the customer on order creation and on status changes to "preparing" / "completed"; a restaurant alert SMS is also sent on every new order. A `checkSmsBalance` HTTP endpoint lets admins verify remaining SMS credit. ✅
 
 ---
 
@@ -166,8 +169,9 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 | Performance | 7 / 10 | Local Tailwind build and Fonts preconnect added; image optimisation still pending |
 | PWA | 8 / 10 | Service worker and manifest present; icons and favicon now PNG |
 | Accessibility | 8 / 10 | Color contrast fixed (text-stone-600 on light bg); FAQ aria-expanded/controls added; focus traps and Escape key added to all modals/drawers; lang attribute added to drinks.html |
-| **Overall** | **8.5 / 10** | Ready for launch; focus next on performance tuning and deployment automation |
+| Notifications | 9 / 10 | SMTP email + Arkesel SMS for new orders/reservations; SMS status updates for "preparing"/"completed"; admin SMS balance endpoint |
+| **Overall** | **8.7 / 10** | Ready for launch; focus next on performance tuning and deployment automation |
 
 ---
 
-*Report generated from static code analysis of the `luban-workshop` repository as of May 2026.*
+*Report generated from static code analysis of the `luban-workshop` repository as of May 2026 (last updated: SMS notification functions added).*
