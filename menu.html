@@ -785,6 +785,16 @@
                 messagingSenderId: "360623290287",
                 appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
             });
+            // Initialize Firebase App Check (replace with reCAPTCHA v3 site key)
+            (function() {
+                try {
+                    const FIREBASE_RECAPTCHA_KEY = '6LfCxOosAAAAAPeHJWtCpJSlJ_yuRqkGMDO9Cdzz';
+                    if (!FIREBASE_RECAPTCHA_KEY) window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+                    if (firebase && firebase.appCheck) {
+                        try { firebase.appCheck().activate(FIREBASE_RECAPTCHA_KEY, true); } catch (e) { console.warn('App Check activation failed:', e); }
+                    }
+                } catch (e) { console.warn('App Check init error', e); }
+            })();
         }
         const menuDb = firebase.firestore();
 

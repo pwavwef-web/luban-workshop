@@ -66,6 +66,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - Two rules files provided: a development file (email-based fallback) and a hardened production file (Custom Claims only).
 - Admin dashboard verifies admin status client-side before rendering and signs out unauthorised users automatically.
 - Admin portal hidden from search engines and excluded from the PWA manifest scope.
+ - Firebase App Check: client-side activation snippets were added across pages to register App Check tokens. Replace the placeholder reCAPTCHA v3 site key in the client snippets, add your site to App Check in the Firebase Console, and then enforce App Check for services (Firestore/Auth) from the console.
 
 ### User Features
 - Online ordering with cart, Firebase-backed order persistence, and real-time status updates.
@@ -130,6 +131,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 - [ ] **Set up Firebase Custom Claims** for the primary admin account (follow the steps in `FIRESTORE_RULES_README.md`).
 - [x] **Add a `404.html` page** — branded not-found page created and configured in `firebase.json`. ✅
 - [x] **Configure Firebase Hosting site name** — `"site": "luban-workshop-restaurant"` added to `firebase.json`; deploys now target the correct site. ✅
+ - **Store App Check secret securely** — the reCAPTCHA *secret key* must never be committed. Use Firebase Console, Cloud Functions environment variables, or a secrets manager (e.g., Google Secret Manager) for server-side verification.
 
 ### Short-term (within 2 weeks)
 
@@ -151,6 +153,7 @@ The Luban Workshop Restaurant website is **substantially ready for public use**.
 
 - [ ] **Set up Firebase Hosting via CI/CD** — add a GitHub Actions workflow to deploy on every push to `main`, so deployments are automated and auditable.
 - [ ] **Implement Firebase App Check** — protect Firestore and Authentication from abuse by unauthorised clients.
+ - [x] **Implement Firebase App Check** — client-side snippets added to pages; replace the placeholder reCAPTCHA v3 key with your project site key and register domains in the Firebase Console (see Deployment notes).
 - [ ] **Monitor Core Web Vitals** — use Google Search Console and GA4 to track real-user performance over time.
 - [x] **Expand multilingual coverage** — Chinese pages now include `contact-us`, `events-and-catering`, and `about-us` in addition to the original set. ✅
 - [ ] **Social media integration** — add verified social profile links, an Instagram feed widget, or a WhatsApp chat button to increase engagement.

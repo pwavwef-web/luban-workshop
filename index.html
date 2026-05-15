@@ -828,6 +828,28 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+
+        // Initialize Firebase App Check
+        (function() {
+            try {
+                // TODO: Replace with your reCAPTCHA v3 site key from Firebase Console -> App Check
+                const FIREBASE_RECAPTCHA_KEY = '6LfCxOosAAAAAPeHJWtCpJSlJ_yuRqkGMDO9Cdzz';
+                if (typeof window !== 'undefined') {
+                    // If no real key provided, enable debug provider for local testing
+                    if (!FIREBASE_RECAPTCHA_KEY) {
+                        // For local development set a debug token as documented by Firebase
+                        window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+                    }
+                }
+                if (firebase && firebase.appCheck) {
+                    try {
+                        firebase.appCheck().activate(FIREBASE_RECAPTCHA_KEY, true);
+                    } catch (e) {
+                        console.warn('App Check activation failed:', e);
+                    }
+                }
+            } catch (e) { console.warn('App Check init error', e); }
+        })();
         const auth = firebase.auth();
         const db = firebase.firestore();
 
