@@ -469,6 +469,17 @@ exports.checkSmsBalance = onRequest(
     secrets: [ARKESEL_API_KEY],
   },
   async (req, res) => {
+    // Enable CORS
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     try {
       const token = extractBearerToken(req.get('authorization'));
       if (!token) {
