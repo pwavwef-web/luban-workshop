@@ -2,10 +2,10 @@
 <html lang="zh-Hans">
 
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
-  <script>
+  <script type="text/plain" data-cookieconsent="analytics" data-src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
+  <script type="text/plain" data-cookieconsent="analytics">
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){dataLayer.push(arguments);} 
     gtag('js', new Date());
     gtag('config', 'G-8LVTFZH7VD');
   </script>
@@ -148,12 +148,19 @@
       projectId: "luban-workshop-restaurant",
       storageBucket: "luban-workshop-restaurant.firebasestorage.app",
       messagingSenderId: "360623290287",
-      appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
-      measurementId: "G-PZQ13BWZB3"
+      appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
     };
 
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+        // Analytics: initialize only after consent (prevents auto-start)
+        (function(){
+          function tryInit(){
+            try{ if (window.cookieConsent && window.cookieConsent.get().analytics && typeof firebase.analytics === 'function') firebase.analytics(); }catch(e){}
+          }
+          tryInit();
+          window.addEventListener('cookieConsentChanged', function(e){ if (e.detail && e.detail.analytics) tryInit(); });
+        })();
     }
     const db = firebase.firestore();
 
@@ -204,6 +211,7 @@
       }
     });
   </script>
+  <script src="../assets/js/cookie-consent.js" defer></script>
 </body>
 
 </html>

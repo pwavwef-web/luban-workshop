@@ -6,11 +6,18 @@
             projectId: "luban-workshop-restaurant",
             storageBucket: "luban-workshop-restaurant.firebasestorage.app",
             messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
-            measurementId: "G-PZQ13BWZB3"
+                        appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
         };
 
-        firebase.initializeApp(firebaseConfig);
+                firebase.initializeApp(firebaseConfig);
+                // Analytics: initialize only after consent (prevents auto-start)
+                (function(){
+                    function tryInit(){
+                        try{ if (window.cookieConsent && window.cookieConsent.get().analytics && typeof firebase.analytics === 'function') firebase.analytics(); }catch(e){}
+                    }
+                    tryInit();
+                    window.addEventListener('cookieConsentChanged', function(e){ if (e.detail && e.detail.analytics) tryInit(); });
+                })();
         const auth = firebase.auth();
         const db = firebase.firestore();
 

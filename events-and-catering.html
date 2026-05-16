@@ -2,14 +2,13 @@
 <html lang="en">
 
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-8LVTFZH7VD');
+        <!-- Google tag (gtag.js) - deferred until consent -->
+<script type="text/plain" data-cookieconsent="analytics" data-src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
+<script type="text/plain" data-cookieconsent="analytics">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date());
+    gtag('config', 'G-8LVTFZH7VD');
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,6 +46,7 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/cookie-consent.js" defer></script>
 
     <!-- Firebase SDK -->
     <script src="assets/js/firebase-firestore.bundle.js"></script>
@@ -360,12 +360,19 @@
             projectId: "luban-workshop-restaurant",
             storageBucket: "luban-workshop-restaurant.firebasestorage.app",
             messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a",
-            measurementId: "G-PZQ13BWZB3"
+                        appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+                firebase.initializeApp(firebaseConfig);
+                // Analytics: initialize only after consent (prevents auto-start)
+                (function(){
+                    function tryInit(){
+                        try{ if (window.cookieConsent && window.cookieConsent.get().analytics && typeof firebase.analytics === 'function') firebase.analytics(); }catch(e){}
+                    }
+                    tryInit();
+                    window.addEventListener('cookieConsentChanged', function(e){ if (e.detail && e.detail.analytics) tryInit(); });
+                })();
+                const db = firebase.firestore();
 
         // Set date picker constraints
         const dateInput = document.getElementById('res-date');

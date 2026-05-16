@@ -3,13 +3,12 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-8LVTFZH7VD');
+<script type="text/plain" data-cookieconsent="analytics" data-src="https://www.googletagmanager.com/gtag/js?id=G-8LVTFZH7VD"></script>
+<script type="text/plain" data-cookieconsent="analytics">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);} 
+    gtag('js', new Date());
+    gtag('config', 'G-8LVTFZH7VD');
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -150,6 +149,12 @@
                 </ul>
             </section>
 
+            <section>
+                <h2 class="serif text-2xl font-bold text-stone-900 mb-3">Manage Cookie Preferences</h2>
+                <p>You can revoke or change your cookie preferences at any time. Click the link below to remove stored consent and reload the page:</p>
+                <p><a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.revoke();" class="text-blue-600 underline">Revoke cookie consent</a></p>
+            </section>
+
         </div>
     </main>
 
@@ -170,6 +175,7 @@
     </footer>
 
     <script>lucide.createIcons();</script>
+    <script src="assets/js/cookie-consent.js" defer></script>
 </body>
 
 </html>
