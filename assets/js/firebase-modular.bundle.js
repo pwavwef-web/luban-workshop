@@ -5316,6 +5316,34 @@
       throw error;
     });
   }
+  async function updateProfile$1(auth, request) {
+    return _performApiRequest(auth, "POST", "/v1/accounts:update", request);
+  }
+  async function updateProfile(user, { displayName, photoURL: photoUrl }) {
+    if (displayName === void 0 && photoUrl === void 0) {
+      return;
+    }
+    const userInternal = getModularInstance(user);
+    const idToken = await userInternal.getIdToken();
+    const profileRequest = {
+      idToken,
+      displayName,
+      photoUrl,
+      returnSecureToken: true
+    };
+    const response = await _logoutIfInvalidated(userInternal, updateProfile$1(userInternal.auth, profileRequest));
+    userInternal.displayName = response.displayName || null;
+    userInternal.photoURL = response.photoUrl || null;
+    const passwordProvider = userInternal.providerData.find(
+      ({ providerId }) => providerId === "password"
+      /* ProviderId.PASSWORD */
+    );
+    if (passwordProvider) {
+      passwordProvider.displayName = userInternal.displayName;
+      passwordProvider.photoURL = userInternal.photoURL;
+    }
+    await userInternal._updateTokensIfNecessary(response);
+  }
   function onIdTokenChanged(auth, nextOrObserver, error, completed) {
     return getModularInstance(auth).onIdTokenChanged(nextOrObserver, error, completed);
   }
@@ -19493,6 +19521,7 @@ This typically indicates that your device does not have a healthy Internet conne
       onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
       signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
       createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+      updateProfile: (user, profile) => updateProfile(user, profile),
       signInWithPopup: (provider) => signInWithPopup(auth, provider),
       signOut: () => signOut(auth),
       get currentUser() {
@@ -20375,24 +20404,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm2017/index-21205181.js:
   (**
    * @license
    * Copyright 2020 Google LLC
