@@ -201,6 +201,10 @@
             animation: progressSlide 1.4s ease-in-out infinite;
         }
 
+        .auth-btn-force-hidden {
+            display: none !important;
+        }
+
         /* Add-to-cart button feedback */
         .btn-added {
             background-color: #16a34a !important;
@@ -1020,6 +1024,7 @@
             if (user) {
                 // User is signed in
                 authBtnDesktop.classList.add('hidden');
+                authBtnDesktop.classList.add('auth-btn-force-hidden');
                 authBtnMobile.classList.add('hidden');
                 userInfoMobile.classList.remove('hidden');
                 myOrdersLinkDesktop.classList.remove('hidden');
@@ -1062,6 +1067,7 @@
             } else {
                 // User is signed out
                 authBtnDesktop.classList.remove('hidden');
+                authBtnDesktop.classList.remove('auth-btn-force-hidden');
                 authBtnMobile.classList.remove('hidden');
                 userInfoMobile.classList.add('hidden');
                 adminBtnDesktop.classList.add('hidden');
