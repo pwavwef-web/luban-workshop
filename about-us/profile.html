@@ -22,6 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/firebase-firestore.bundle.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
@@ -270,16 +271,82 @@
             'Committee': '#7e22ce'
         };
 
-        function loadProfile() {
-            var params = new URLSearchParams(window.location.search);
-            var id = params.get('id') || 'gm';
-            var p = profiles[id];
-            if (!p) {
-                document.getElementById('profile-name').textContent = 'Profile Not Found';
-                document.getElementById('short-bio-text').textContent = 'This profile does not exist. Please return to the team page.';
-                return;
-            }
+        var firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
 
+        function formatDepartment(dept) {
+            var value = String(dept || 'Staff').trim();
+            if (!value) return 'Staff';
+            return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function safePhotoUrl(str) {
+            var value = String(str || '').trim();
+            if (/^https?:\/\//i.test(value) || /^data:image\//i.test(value)) return value;
+            return '';
+        }
+
+        function safeLinkUrl(str) {
+            var value = String(str || '').trim();
+            if (/^https?:\/\//i.test(value)) return value;
+            return '';
+        }
+
+        function showNotFound() {
+            document.getElementById('profile-name').textContent = 'Profile Not Found';
+            document.getElementById('profile-role').textContent = '';
+            document.getElementById('dept-badge').textContent = 'Team';
+            document.getElementById('profile-since').style.display = 'none';
+            document.getElementById('short-bio-text').textContent = 'This profile does not exist or is not approved yet. Please return to the team page.';
+            document.getElementById('full-bio-section').style.display = 'none';
+            document.getElementById('facts-grid').innerHTML = '';
+            document.getElementById('social-links').innerHTML = '';
+            lucide.createIcons();
+        }
+
+        function normalizeFirestoreProfile(doc) {
+            var d = doc.data();
+            var fullName = ((d.firstName || '') + ' ' + (d.lastName || '')).trim();
+            var dept = formatDepartment(d.department);
+
+            return {
+                name: d.preferredName || fullName || 'Staff Member',
+                role: d.jobTitle || '',
+                dept: dept,
+                since: null,
+                shortBio: d.shortBio || '',
+                fullBio: d.fullBio || '',
+                funFact: d.funFact || '',
+                favouriteDish: d.favouriteDish || '',
+                photo: d.photo || null,
+                linkedin: d.linkedin || null,
+                instagram: d.instagram || null,
+                twitter: d.twitter || null,
+                employmentStatus: d.employmentStatus || ''
+            };
+        }
+
+        function renderProfile(p) {
             document.title = p.name + ' | Luban Workshop Restaurant';
             document.getElementById('profile-name').textContent = p.name;
             document.getElementById('profile-role').textContent = p.role;
@@ -300,17 +367,23 @@
             if (p.fullBio) {
                 document.getElementById('full-bio-section').style.display = 'block';
                 document.getElementById('full-bio-text').textContent = p.fullBio;
+            } else {
+                document.getElementById('full-bio-section').style.display = 'none';
             }
 
-            if (p.photo) {
-                document.getElementById('avatar-container').innerHTML = '<img src="' + p.photo + '" alt="' + p.name + '">';
+            var safePhoto = safePhotoUrl(p.photo);
+            if (safePhoto) {
+                document.getElementById('avatar-container').innerHTML = '<img src="' + escapeAttr(safePhoto) + '" alt="' + escapeAttr(p.name) + '">';
             }
 
             // Social links
             var socialHtml = '';
-            if (p.linkedin) socialHtml += '<a href="' + p.linkedin + '" target="_blank" rel="noopener" title="LinkedIn"><i data-lucide="linkedin" style="width:16px;height:16px;"></i></a>';
-            if (p.instagram) socialHtml += '<a href="' + p.instagram + '" target="_blank" rel="noopener" title="Instagram"><i data-lucide="instagram" style="width:16px;height:16px;"></i></a>';
-            if (p.twitter) socialHtml += '<a href="' + p.twitter + '" target="_blank" rel="noopener" title="Twitter / X"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>';
+            var safeLinkedin = safeLinkUrl(p.linkedin);
+            var safeInstagram = safeLinkUrl(p.instagram);
+            var safeTwitter = safeLinkUrl(p.twitter);
+            if (safeLinkedin) socialHtml += '<a href="' + escapeAttr(safeLinkedin) + '" target="_blank" rel="noopener" title="LinkedIn"><i data-lucide="linkedin" style="width:16px;height:16px;"></i></a>';
+            if (safeInstagram) socialHtml += '<a href="' + escapeAttr(safeInstagram) + '" target="_blank" rel="noopener" title="Instagram"><i data-lucide="instagram" style="width:16px;height:16px;"></i></a>';
+            if (safeTwitter) socialHtml += '<a href="' + escapeAttr(safeTwitter) + '" target="_blank" rel="noopener" title="Twitter / X"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>';
             document.getElementById('social-links').innerHTML = socialHtml;
 
             // Facts grid
@@ -318,15 +391,46 @@
             if (p.dept) facts.push({ label: 'Department', value: p.dept });
             if (p.role) facts.push({ label: 'Position', value: p.role });
             if (p.since) facts.push({ label: 'Member Since', value: p.since });
+            if (p.employmentStatus) facts.push({ label: 'Employment', value: p.employmentStatus });
             if (p.favouriteDish) facts.push({ label: 'Favourite Dish', value: p.favouriteDish });
             if (p.funFact) facts.push({ label: 'Fun Fact', value: p.funFact });
 
             var factsGrid = document.getElementById('facts-grid');
             factsGrid.innerHTML = facts.map(function(f) {
-                return '<div class="fact-item"><div class="fact-label">' + f.label + '</div><div class="fact-value">' + f.value + '</div></div>';
+                return '<div class="fact-item"><div class="fact-label">' + escapeHtml(f.label) + '</div><div class="fact-value">' + escapeHtml(f.value) + '</div></div>';
             }).join('');
 
             lucide.createIcons();
+        }
+
+        function loadProfile() {
+            var params = new URLSearchParams(window.location.search);
+            var id = params.get('id') || 'gm';
+
+            if (profiles[id]) {
+                renderProfile(profiles[id]);
+                return;
+            }
+
+            db.collection('teamProfiles').doc(id).get()
+                .then(function(doc) {
+                    if (!doc.exists) {
+                        showNotFound();
+                        return;
+                    }
+
+                    var data = doc.data();
+                    if (!data || data.status !== 'approved') {
+                        showNotFound();
+                        return;
+                    }
+
+                    renderProfile(normalizeFirestoreProfile(doc));
+                })
+                .catch(function(err) {
+                    console.warn('Could not load profile:', err && err.message ? err.message : err);
+                    showNotFound();
+                });
         }
 
         loadProfile();
