@@ -1,5 +1,6 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import {
+  initializeFirestore,
   getFirestore,
   collection,
   doc,
@@ -21,6 +22,23 @@ function ensureApp() {
     throw new Error('Firebase app has not been initialized.');
   }
   return getApp();
+}
+
+let firestoreDb;
+
+function getDb() {
+  const app = ensureApp();
+  if (firestoreDb) return firestoreDb;
+
+  try {
+    firestoreDb = initializeFirestore(app, {
+      experimentalForceLongPolling: true
+    });
+  } catch (err) {
+    firestoreDb = getFirestore(app);
+  }
+
+  return firestoreDb;
 }
 
 function wrapDocSnapshot(snapshot) {
@@ -95,7 +113,7 @@ function createCollectionApi(collectionRef) {
 }
 
 function getFirestoreApi() {
-  const db = getFirestore(ensureApp());
+  const db = getDb();
   return {
     collection(path) {
       return createCollectionApi(collection(db, path));

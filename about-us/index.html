@@ -367,46 +367,48 @@
             return '';
         }
 
-        // Load approved profiles from Firestore
-        // Run two tolerant queries (boolean `approved` and string `status`) and merge results.
+        function replacePlaceholdersWithProfiles(profiles) {
+            if (profiles.length === 0) return;
+
+            profiles.sort(function(a, b) {
+                var aData = a.data();
+                var bData = b.data();
+                var aName = ((aData.firstName || '') + ' ' + (aData.lastName || '')).trim().toLowerCase();
+                var bName = ((bData.firstName || '') + ' ' + (bData.lastName || '')).trim().toLowerCase();
+                return aName.localeCompare(bName);
+            });
+
+            var placeholders = document.getElementById('placeholder-profiles');
+            if (placeholders) placeholders.style.display = 'none';
+
+            var grid = document.getElementById('team-grid');
+            Array.from(grid.querySelectorAll('.team-card')).forEach(function(n) {
+                if (!n.classList.contains('placeholder-card')) n.remove();
+            });
+
+            profiles.forEach(function(doc) {
+                grid.appendChild(buildCard(doc));
+            });
+
+            lucide.createIcons();
+        }
+
+        // Load approved profiles from Firestore. Public rules only allow documents
+        // constrained to status == 'approved', so keep this query exact.
         (function loadTeamProfiles() {
-            Promise.allSettled([
-                db.collection('teamProfiles').where('approved', '==', true).get(),
-                db.collection('teamProfiles').where('status', 'in', ['approved', 'Approved', 'APPROVED']).get()
-            ])
-            .then(function(results) {
-                var merged = [];
-                var seen = new Set();
+            db.collection('teamProfiles').where('status', '==', 'approved').get()
+            .then(function(snapshot) {
+                if (!snapshot || snapshot.empty) return;
 
-                results.forEach(function(r) {
-                    if (r.status === 'fulfilled' && r.value && !r.value.empty) {
-                        r.value.forEach(function(doc) {
-                            if (!seen.has(doc.id)) {
-                                seen.add(doc.id);
-                                merged.push(doc);
-                            }
-                        });
-                    }
+                var profiles = [];
+                snapshot.forEach(function(doc) {
+                    profiles.push(doc);
                 });
 
-                if (merged.length === 0) return;
-
-                var placeholders = document.getElementById('placeholder-profiles');
-                if (placeholders) placeholders.style.display = 'none';
-
-                var grid = document.getElementById('team-grid');
-                Array.from(grid.querySelectorAll('.team-card')).forEach(function(n) {
-                    if (!n.classList.contains('placeholder-card')) n.remove();
-                });
-
-                merged.forEach(function(doc) {
-                    grid.appendChild(buildCard(doc));
-                });
-
-                lucide.createIcons();
+                replacePlaceholdersWithProfiles(profiles);
             })
             .catch(function(err) {
-                console.warn('Could not load team profiles (merged queries):', err && err.message ? err.message : err);
+                console.warn('Could not load approved team profiles:', err && err.message ? err.message : err);
                 console.debug(err);
             });
         })();

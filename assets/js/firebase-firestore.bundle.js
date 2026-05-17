@@ -12401,6 +12401,23 @@ This typically indicates that your device does not have a healthy Internet conne
       __PRIVATE_configureFirestore(this), this._firestoreClient.terminate();
     }
   };
+  function initializeFirestore(e, t, n) {
+    n || (n = "(default)");
+    const r = _getProvider(e, "firestore");
+    if (r.isInitialized(n)) {
+      const e2 = r.getImmediate({
+        identifier: n
+      }), i = r.getOptions(n);
+      if (deepEqual(i, t)) return e2;
+      throw new FirestoreError(C.FAILED_PRECONDITION, "initializeFirestore() has already been called with different options. To avoid this error, call initializeFirestore() with the same options as when it was originally called, or call getFirestore() to return the already initialized instance.");
+    }
+    if (void 0 !== t.cacheSizeBytes && void 0 !== t.localCache) throw new FirestoreError(C.INVALID_ARGUMENT, "cache and cacheSizeBytes cannot be specified at the same time as cacheSizeBytes willbe deprecated. Instead, specify the cache size in the cache object");
+    if (void 0 !== t.cacheSizeBytes && -1 !== t.cacheSizeBytes && t.cacheSizeBytes < 1048576) throw new FirestoreError(C.INVALID_ARGUMENT, "cacheSizeBytes must be at least 1048576");
+    return r.initialize({
+      options: t,
+      instanceIdentifier: n
+    });
+  }
   function getFirestore(t, n) {
     const r = "object" == typeof t ? t : getApp(), i = "string" == typeof t ? t : n || "(default)", s = _getProvider(r, "firestore").getImmediate({
       identifier: i
@@ -13552,6 +13569,19 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     return getApp();
   }
+  var firestoreDb;
+  function getDb() {
+    const app = ensureApp();
+    if (firestoreDb) return firestoreDb;
+    try {
+      firestoreDb = initializeFirestore(app, {
+        experimentalForceLongPolling: true
+      });
+    } catch (err) {
+      firestoreDb = getFirestore(app);
+    }
+    return firestoreDb;
+  }
   function wrapDocSnapshot(snapshot) {
     return {
       id: snapshot.id,
@@ -13619,7 +13649,7 @@ This typically indicates that your device does not have a healthy Internet conne
     };
   }
   function getFirestoreApi() {
-    const db = getFirestore(ensureApp());
+    const db = getDb();
     return {
       collection(path) {
         return createCollectionApi(collection(db, path));
