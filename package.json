@@ -9,7 +9,7 @@
     "watch:css": "tailwindcss -i src/tailwind.css -o tailwind.css --watch"
   },
   "dependencies": {
-    "firebase": "10.12.5"
+    "firebase": "^12.13.0"
   },
   "devDependencies": {
     "esbuild": "^0.23.1",
