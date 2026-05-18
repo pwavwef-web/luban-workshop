@@ -26,8 +26,19 @@
     <script src="assets/js/firebase-modular.bundle.js"></script>
 
     <style>
+        :root {
+            --admin-red: #b91c1c;
+            --admin-red-dark: #7f1d1d;
+            --admin-ink: #1c1917;
+            --admin-muted: #78716c;
+            --admin-line: #e7e5e4;
+            --admin-surface: #ffffff;
+            --admin-warm: #f7f3ef;
+        }
+
         body {
             font-family: 'Lato', sans-serif;
+            background: var(--admin-warm);
         }
 
         .serif {
@@ -43,17 +54,179 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        .admin-login-shell {
+            background:
+                linear-gradient(135deg, rgba(28, 25, 23, 0.96) 0%, rgba(127, 29, 29, 0.92) 48%, rgba(247, 243, 239, 0.98) 48%, rgba(247, 243, 239, 1) 100%);
+        }
+
+        .admin-login-card {
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 8px;
+            box-shadow: 0 24px 70px rgba(28, 25, 23, 0.18);
+        }
+
+        .admin-shell {
+            background: var(--admin-warm);
+        }
+
+        .admin-mobile-toggle {
+            border: 1px solid rgba(231, 229, 228, 0.9);
+            border-radius: 8px;
+        }
+
+        .admin-sidebar {
+            background: linear-gradient(180deg, #ffffff 0%, #fffaf8 100%);
+            border-right: 1px solid var(--admin-line);
+            box-shadow: 10px 0 35px rgba(28, 25, 23, 0.08);
+        }
+
+        .admin-brand-mark,
+        .admin-user-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #fff1f1;
+            border: 1px solid #fecaca;
+            color: var(--admin-red);
+        }
+
+        .admin-brand-mark {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 8px;
+        }
+
+        .admin-nav-button,
+        .admin-nav-link {
+            position: relative;
+            border: 1px solid transparent;
+            border-radius: 8px !important;
+        }
+
+        .admin-nav-button:hover,
+        .admin-nav-link:hover {
+            border-color: #fecaca;
+            background: #fff1f1;
+            box-shadow: 0 8px 18px rgba(127, 29, 29, 0.08);
+        }
+
+        .admin-nav-active {
+            background: #fff1f1 !important;
+            border-color: #fecaca !important;
+            color: var(--admin-red-dark) !important;
+            box-shadow: inset 3px 0 0 var(--admin-red), 0 10px 24px rgba(127, 29, 29, 0.08);
+        }
+
+        .admin-main {
+            background: linear-gradient(180deg, #fbfaf8 0%, #f4f0ea 100%);
+        }
+
+        .admin-topbar {
+            max-width: 1180px;
+            margin: 0 auto 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--admin-line);
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(28, 25, 23, 0.06);
+        }
+
+        .admin-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 2.5rem;
+            padding: 0 0.875rem;
+            border: 1px solid var(--admin-line);
+            border-radius: 999px;
+            background: #fafaf9;
+            color: #44403c;
+            font-size: 0.8125rem;
+            font-weight: 700;
+        }
+
+        .admin-status-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 999px;
+            background: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+        }
+
+        .view-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .view-shell > .flex:first-child {
+            padding-bottom: 0.875rem;
+            border-bottom: 1px solid rgba(214, 211, 209, 0.75);
+        }
+
+        .admin-panel,
+        .admin-main .bg-white.rounded-xl {
+            border-radius: 8px !important;
+            border-color: var(--admin-line) !important;
+            box-shadow: 0 14px 34px rgba(28, 25, 23, 0.06) !important;
+        }
+
+        .admin-main table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .admin-main thead {
+            background: var(--admin-ink) !important;
+        }
+
+        .admin-main th {
+            color: #fafaf9 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .admin-main tbody tr {
+            transition: background-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .admin-main tbody tr:hover {
+            background: #fff7f7;
+        }
+
+        .admin-main input,
+        .admin-main select,
+        .admin-login-card input {
+            border-radius: 6px;
+        }
+
+        .admin-main button,
+        .admin-login-card button {
+            border-radius: 6px;
+        }
+
+        @media (max-width: 767px) {
+            .admin-login-shell {
+                background: var(--admin-warm);
+            }
+
+            .admin-topbar {
+                margin-top: 0;
+            }
+        }
     </style>
     <script src="assets/js/cookie-consent.js" defer></script>
 </head>
 
 <body class="bg-stone-50 text-stone-800 antialiased h-screen overflow-hidden">
 
-    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4 bg-stone-50">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+    <div id="login-screen" class="admin-login-shell min-h-screen flex items-center justify-center px-4 bg-stone-50">
+        <div class="admin-login-card max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
                 <div class="flex items-center justify-center mb-4">
-                    <i data-lucide="utensils-crossed" class="h-10 w-10 text-red-700 mr-3"></i>
+                    <span class="admin-brand-mark mr-3">
+                        <i data-lucide="utensils-crossed" class="h-5 w-5"></i>
+                    </span>
                     <h1 class="serif text-3xl font-bold text-stone-900">Luban <span class="text-red-700">Workshop</span>
                     </h1>
                 </div>
@@ -95,19 +268,21 @@
         </div>
     </div>
 
-    <div id="admin-dashboard" class="hidden flex h-screen bg-stone-50">
+    <div id="admin-dashboard" class="admin-shell hidden flex h-screen bg-stone-50">
 
         <!-- Mobile Menu Toggle Button -->
-        <button id="mobile-menu-toggle" aria-label="Toggle navigation menu" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
+        <button id="mobile-menu-toggle" aria-label="Toggle navigation menu" class="admin-mobile-toggle md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg text-stone-800 hover:bg-red-50 hover:text-red-700 transition-colors">
             <i data-lucide="menu" class="h-6 w-6"></i>
         </button>
 
         <!-- Mobile Overlay -->
         <div id="sidebar-overlay" tabindex="0" aria-label="Close sidebar" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"></div>
 
-        <aside id="sidebar" class="w-64 bg-white shadow-xl z-30 flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <aside id="sidebar" class="admin-sidebar w-64 bg-white shadow-xl z-30 flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="h-16 flex items-center px-6 border-b border-stone-100">
-                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-700 mr-2"></i>
+                <span class="admin-brand-mark mr-3">
+                    <i data-lucide="utensils-crossed" class="h-5 w-5"></i>
+                </span>
                 <span class="serif font-bold text-xl text-stone-900">Luban Admin</span>
                 <!-- Close button for mobile -->
                 <button id="sidebar-close-btn" aria-label="Close menu" class="md:hidden ml-auto p-1 hover:bg-red-50 hover:text-red-700 rounded transition-colors">
@@ -117,13 +292,13 @@
 
             <nav class="flex-1 px-4 py-6 space-y-2">
                 <button onclick="switchTab('menu')" id="tab-btn-menu"
-                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="book-open" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Menu Manager</span>
                 </button>
 
                 <button onclick="switchTab('reservations')" id="tab-btn-reservations"
-                    class="w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <div class="flex items-center">
                         <i data-lucide="calendar-clock" class="h-5 w-5 mr-3"></i>
                         <span class="font-medium">Reservations</span>
@@ -133,7 +308,7 @@
                 </button>
 
                 <button onclick="switchTab('orders')" id="tab-btn-orders"
-                    class="w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <div class="flex items-center">
                         <i data-lucide="shopping-bag" class="h-5 w-5 mr-3"></i>
                         <span class="font-medium">Orders</span>
@@ -143,13 +318,13 @@
                 </button>
 
                 <button onclick="switchTab('admin-users')" id="tab-btn-admin-users"
-                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="shield" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Admin Users</span>
                 </button>
 
                 <button onclick="switchTab('messages')" id="tab-btn-messages"
-                    class="w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <div class="flex items-center">
                         <i data-lucide="mail" class="h-5 w-5 mr-3"></i>
                         <span class="font-medium">Messages</span>
@@ -159,13 +334,13 @@
                 </button>
 
                 <button onclick="switchTab('account')" id="tab-btn-account"
-                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="settings" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Account Settings</span>
                 </button>
 
                 <a href="about-us/review.html"
-                    class="w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group" style="text-decoration:none;">
+                    class="admin-nav-link w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group" style="text-decoration:none;">
                     <i data-lucide="user-check" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Profile Review</span>
                 </a>
@@ -173,7 +348,7 @@
 
             <div class="p-4 border-t border-stone-100">
                 <div class="flex items-center mb-3">
-                    <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-700">
+                    <div class="admin-user-avatar h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-700">
                         <i data-lucide="chef-hat" class="h-6 w-6"></i>
                     </div>
 
@@ -190,15 +365,38 @@
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto bg-stone-50 p-4 md:p-8 pt-20 md:pt-8">
+        <main class="admin-main flex-1 overflow-y-auto bg-stone-50 p-4 md:p-8 pt-20 md:pt-8">
 
-            <div id="view-menu" class="space-y-6">
+            <div class="admin-topbar flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="admin-brand-mark">
+                        <i data-lucide="layout-dashboard" class="h-5 w-5"></i>
+                    </span>
+                    <div>
+                        <p class="text-xs font-bold uppercase text-red-700">Luban Workshop</p>
+                        <h1 class="serif text-2xl font-bold text-stone-950">Admin operations</h1>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <span class="admin-status-pill">
+                        <span class="admin-status-dot"></span>
+                        <span id="admin-date">Today</span>
+                    </span>
+                    <button onclick="logout()"
+                        class="inline-flex items-center justify-center gap-2 border border-stone-200 bg-white px-4 py-2 text-sm font-bold text-stone-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                        Sign out
+                    </button>
+                </div>
+            </div>
+
+            <div id="view-menu" class="view-shell space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
                     <p class="text-sm text-stone-500">Toggle dish visibility and update prices on the main website.</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
-                    <table class="min-w-full divide-y divide-stone-200">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="admin-table min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
                                 <th
@@ -224,12 +422,13 @@
                 </div>
             </div>
 
-            <div id="view-reservations" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
+            <div id="view-reservations" class="view-shell hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Reservations</h2>
+                    <p class="text-sm text-stone-500">Review bookings and keep front-of-house decisions moving.</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
-                    <table class="min-w-full divide-y divide-stone-200">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="admin-table min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
                                 <th
@@ -258,14 +457,14 @@
                 </div>
             </div>
 
-            <div id="view-admin-users" class="hidden space-y-6">
+            <div id="view-admin-users" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Admin Users</h2>
                     <p class="text-sm text-stone-500">Manage who has admin access to this dashboard.</p>
                 </div>
 
                 <!-- Promote user form -->
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
                     <h3 class="text-base font-bold text-stone-800 mb-4">Promote a User to Admin</h3>
                     <form id="promote-form" class="flex flex-col sm:flex-row gap-3">
                         <input type="email" id="promote-email" placeholder="Enter user email address" required
@@ -279,8 +478,8 @@
                 </div>
 
                 <!-- Current admins list -->
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
-                    <table class="min-w-full divide-y divide-stone-200">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="admin-table min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Admin Email</th>
@@ -296,12 +495,13 @@
                 </div>
             </div>
 
-            <div id="view-orders" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
+            <div id="view-orders" class="view-shell hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Incoming Orders</h2>
+                    <p class="text-sm text-stone-500">Track incoming orders and move them through preparation.</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
-                    <table class="min-w-full divide-y divide-stone-200">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
+                    <table class="admin-table min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>
                                 <th
@@ -337,7 +537,7 @@
             </div>
 
             <!-- Messages View -->
-            <div id="view-messages" class="hidden space-y-6">
+            <div id="view-messages" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Contact Messages</h2>
                     <p class="text-sm text-stone-500">Messages submitted via the Contact Us page.</p>
@@ -348,14 +548,14 @@
             </div>
 
             <!-- Account Settings View -->
-            <div id="view-account" class="hidden space-y-6">
+            <div id="view-account" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Account Settings</h2>
                     <p class="text-sm text-stone-500">Manage your account and monitor SMS credits.</p>
                 </div>
 
                 <!-- SMS Balance Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
                     <div class="flex items-start justify-between mb-6">
                         <div>
                             <h3 class="text-lg font-semibold text-stone-900 mb-2">SMS Balance</h3>
@@ -433,6 +633,15 @@
                 })();
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        const adminDateEl = document.getElementById('admin-date');
+        if (adminDateEl) {
+            adminDateEl.textContent = new Date().toLocaleDateString(undefined, {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
 
         // --- Phone Validation Utility (Ghana: +233 + 9 digits) ---
         function formatGhanaPhone(phone) {
@@ -608,8 +817,9 @@
 
                 // Reset Tab Styles
                 const btn = document.getElementById('tab-btn-' + tab);
-                btn.classList.remove('bg-red-50', 'text-red-700');
+                btn.classList.remove('bg-red-50', 'text-red-700', 'admin-nav-active');
                 btn.classList.add('text-stone-600');
+                btn.removeAttribute('aria-current');
             });
 
             // Show active view
@@ -617,8 +827,9 @@
 
             // Set Active Tab Style
             const activeBtn = document.getElementById('tab-btn-' + tabName);
-            activeBtn.classList.add('bg-red-50', 'text-red-700');
+            activeBtn.classList.add('bg-red-50', 'text-red-700', 'admin-nav-active');
             activeBtn.classList.remove('text-stone-600');
+            activeBtn.setAttribute('aria-current', 'page');
         }
 
         // --- Hardcoded Menu ---
@@ -1486,7 +1697,7 @@
                             ? '<span class="h-2 w-2 bg-red-600 rounded-full inline-block mr-2"></span>'
                             : '';
                         return `
-                            <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                            <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
                                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
                                     <div>
                                         <p class="font-semibold text-stone-900 flex items-center">
