@@ -72,9 +72,6 @@
         .detail-field .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #a8a29e; margin-bottom: 0.2rem; }
         .detail-field .value { font-size: 0.85rem; color: #1c1917; }
 
-        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
-        footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
-
         .badge-pending  { background: #fef3c7; color: #92400e; }
         .badge-approved { background: #dcfce7; color: #15803d; }
         .badge-rejected { background: #fef2f2; color: #b91c1c; }
@@ -189,21 +186,13 @@
         </div>
 
         <!-- Footer -->
-        <footer>
-            <p class="name">Luban Workshop Restaurant</p>
-            <p style="margin-bottom:0.75rem;">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
-            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;font-size:0.8rem;margin-bottom:0.5rem;">
-                <a href="index.html" style="color:#a8a29e;text-decoration:none;">About Us</a>
-            </div>
-            <p>&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
-        </footer>
+        <div data-luban-footer></div>
+        <script src="../assets/js/site-footer.js"></script>
 
     </div><!-- end #review-dashboard -->
 
     <script>
         lucide.createIcons();
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
-
         // Firebase setup
         const firebaseConfig = {
             apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",

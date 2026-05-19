@@ -419,22 +419,11 @@
     </main>
 
     <!-- 页脚 -->
-    <footer class="bg-stone-800 text-stone-400 mt-16 py-10 text-center text-sm">
-        <p style="font-family:'Noto Serif SC',serif;" class="text-white font-semibold text-xl mb-1">鲁班工坊餐厅</p>
-        <p class="mb-4">正宗中式美食</p>
-        <a href="index.html" class="inline-block mb-6 px-6 py-3 bg-red-700 text-white font-semibold rounded-full hover:bg-red-800 transition-colors text-sm shadow-md">
-            访问主页
-        </a>
-        <div class="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
-            <a href="about-us.html" class="text-stone-400 hover:text-white transition-colors">关于我们</a>
-        </div>
-        <p>&copy; <span id="footer-year"></span> Luban Workshop. 版权所有。</p>
-    </footer>
+    <div data-luban-footer></div>
+    <script src="../assets/js/site-footer.js"></script>
 
     <script>
         lucide.createIcons();
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
-
         // Show all sections on load
         document.querySelectorAll('.category-section').forEach(function(s) { s.style.display = 'block'; });
 

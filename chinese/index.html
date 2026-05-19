@@ -783,32 +783,11 @@
     </section>
 
     <!-- 页脚 -->
-    <footer class="bg-stone-900 text-stone-400 py-12">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex justify-center items-center mb-6">
-                <i data-lucide="utensils-crossed" class="h-6 w-6 text-red-600 mr-2"></i>
-                <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.5rem;color:#fff;">Luban Workshop</span>
-            </div>
-            <p class="mb-4 text-lg" style="font-family:'Noto Serif SC',serif;color:#e7e5e4;">鲁班工坊餐厅</p>
-            <p class="mb-6">© <span id="footer-year"></span> Luban Workshop Restaurant. 版权所有。</p>
-            <p class="mb-6 text-sm">预订电话：020 543 8455</p>
-            <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm mb-4">
-                <a href="about-us.html" class="hover:text-white transition-colors">关于我们</a>
-                <a href="faq.html" class="hover:text-white transition-colors">常见问题</a>
-                <a href="privacy-policy.html" class="hover:text-white transition-colors">隐私政策</a>
-                <a href="menu.html" class="hover:text-white transition-colors">菜单</a>
-            </div>
-            <div class="flex justify-center space-x-6 mt-4">
-                <a href="https://www.facebook.com/profile.php/?id=61583678376642" aria-label="Luban Workshop on Facebook" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors"><i data-lucide="facebook" class="h-5 w-5 text-stone-400"></i></a>
-                <a href="https://www.instagram.com/lubanworkshoprestaurant/" aria-label="Luban Workshop on Instagram" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors"><i data-lucide="instagram" class="h-5 w-5 text-stone-400"></i></a>
-            </div>
-        </div>
-    </footer>
+    <div data-luban-footer></div>
+    <script src="../assets/js/site-footer.js"></script>
 
     <script>
         lucide.createIcons();
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
-
         function filterMenu(cat, btn) {
             document.querySelectorAll('.category-btn').forEach(function(b) {
                 b.classList.remove('active', 'bg-stone-900', 'text-white');

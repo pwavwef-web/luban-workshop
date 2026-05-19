@@ -63,9 +63,6 @@
         .team-card .bio { font-size: 0.8rem; color: #78716c; line-height: 1.5; margin-bottom: 1rem; }
         .team-card a.profile-link { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; font-weight: 600; color: #b91c1c; text-decoration: none; }
         .team-card a.profile-link:hover { text-decoration: underline; }
-
-        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.82rem; }
-        footer p.name { color: #fff; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.2rem; margin-bottom: 0.3rem; }
     </style>
 </head>
 
@@ -279,23 +276,11 @@
     </section>
 
     <!-- Footer -->
-    <footer>
-        <p class="name">Luban Workshop Restaurant</p>
-        <p style="margin-bottom:0.75rem;">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
-        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;font-size:0.8rem;margin-bottom:0.5rem;">
-            <a href="../index.html" style="color:#a8a29e;text-decoration:none;">Home</a>
-            <a href="index.html" style="color:#a8a29e;text-decoration:none;">About Us</a>
-            <a href="../menu.html" style="color:#a8a29e;text-decoration:none;">Menu</a>
-            <a href="../contact-us.html" style="color:#a8a29e;text-decoration:none;">Contact</a>
-            <a href="../privacy-policy.html" style="color:#a8a29e;text-decoration:none;">Privacy</a>
-        </div>
-        <p style="margin-top:0.5rem;">&copy; <span id="footer-year"></span> Luban Workshop Restaurant. All rights reserved.</p>
-    </footer>
+    <div data-luban-footer></div>
+    <script src="../assets/js/site-footer.js"></script>
 
     <script>
         lucide.createIcons();
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
-
         // Firebase setup
         const firebaseConfig = {
             apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",

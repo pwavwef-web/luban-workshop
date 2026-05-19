@@ -178,11 +178,6 @@
             to   { transform: rotateY(360deg); }
         }
 
-        /* Footer */
-        footer { background: #292524; color: #a8a29e; margin-top: 3rem; padding: 2rem 1rem; text-align: center; font-size: 0.8rem; }
-        footer p.name { color: #fff; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem; }
-        footer p.tagline { margin-bottom: 1rem; }
-
         /* Refined menu layout */
         body::before {
             content: "";
@@ -473,16 +468,6 @@
             height: 42px;
             border-radius: 0.45rem;
             border: 1px solid var(--line);
-        }
-
-        footer {
-            background: linear-gradient(180deg, #2c211b, #17120f) !important;
-            border-top: 1px solid rgba(197, 139, 43, 0.35);
-        }
-
-        footer a {
-            border-radius: 0.5rem !important;
-            background: var(--luban-red) !important;
         }
 
         @media (max-width: 760px) {
@@ -1110,22 +1095,8 @@
     </main>
 
     <!-- ──────────────────── FOOTER ──────────────────── -->
-    <footer class="bg-stone-800 text-stone-400 mt-16 py-10 text-center text-sm">
-        <div class="flex justify-center items-center gap-3 mb-3">
-            <img src="logo.png" alt="Luban Workshop" class="h-9 w-9 rounded-full object-contain bg-white">
-            <img src="assets/ucc-logo.png" alt="UCC" class="h-8 w-8 object-contain">
-        </div>
-        <p class="text-white font-semibold serif text-xl mb-1">Luban Workshop Restaurant</p>
-        <p class="mb-4">Authentic Chinese Cuisine</p>
-        <a href="index.html"
-            class="inline-block mb-6 px-6 py-3 bg-red-700 text-white font-semibold rounded-full hover:bg-red-800 transition-colors text-sm shadow-md">
-            🛒 Order Online – Visit Main Site
-        </a>
-        <div class="mb-5 flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
-            <a href="about-us/" class="text-stone-400 hover:text-white transition-colors">About Us</a>
-        </div>
-        <p>&copy; <span id="footer-year"></span> Luban Workshop. All rights reserved.</p>
-    </footer>
+    <div data-luban-footer></div>
+    <script src="assets/js/site-footer.js"></script>
 
     <!-- ──────────────────── SCRIPTS ──────────────────── -->
 
@@ -1257,9 +1228,6 @@
     </script>
 
     <script>
-        // ── Footer year ──
-        document.getElementById('footer-year').textContent = new Date().getFullYear();
-
         // ── Show all sections on load (All tab is active) ──
         document.querySelectorAll('.category-section').forEach(function (s) {
             s.style.display = 'block';
