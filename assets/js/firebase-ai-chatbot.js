@@ -377,7 +377,9 @@ function appendMessage(role, text) {
 }
 
 function renderFormattedMessage(container, text) {
-  const source = String(text || '');
+  const source = String(text || '')
+    .replace(/\\\*/g, '*')
+    .replace(/\\_/g, '_');
   const markdownLinkPattern = /\[([^\]\n]+)\]\(([^)\s]+)\)/g;
   let lastIndex = 0;
   let match;
@@ -392,22 +394,22 @@ function renderFormattedMessage(container, text) {
 }
 
 function appendFormattedInline(container, text) {
-  const combinedPattern = /(\*\*([^*\n]+)\*\*)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?\b)/g;
+  const combinedPattern = /((\*{2,3}|__)([^\n]+?)\2)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?\b)/g;
   let lastIndex = 0;
   let match;
 
   while ((match = combinedPattern.exec(text)) !== null) {
     appendTextWithBreaks(container, text.slice(lastIndex, match.index));
 
-    if (match[2]) {
+    if (match[3]) {
       const strong = document.createElement('strong');
-      strong.textContent = match[2];
+      strong.textContent = match[3];
       container.appendChild(strong);
     } else {
-      const value = match[3] || match[4] || match[5] || match[6];
-      const href = match[4]
+      const value = match[4] || match[5] || match[6] || match[7];
+      const href = match[5]
         ? `mailto:${value}`
-        : match[5]
+        : match[6]
           ? `tel:${value.replace(/\s+/g, '')}`
           : value;
       appendSafeLink(container, value, href);
@@ -452,8 +454,8 @@ function normalizeSafeHref(href) {
   if (!value) return '';
 
   if (/^(https?:\/\/|mailto:|tel:)/i.test(value)) return value;
-  if (/^(?:\.{0,2}\/)?(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
-    return new URL(value.replace(/^\.{0,2}\//, ''), SITE_ROOT).href;
+  if (/^(?:\/|\.{0,2}\/)?(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
+    return new URL(value.replace(/^(?:\/|\.{0,2}\/)/, ''), SITE_ROOT).href;
   }
 
   return '';

@@ -1,5 +1,5 @@
 // Luban Workshop Restaurant - Main Page Service Worker
-const CACHE_NAME = 'luban-main-v3';
+const CACHE_NAME = 'luban-main-v4';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
@@ -7,7 +7,8 @@ const STATIC_ASSETS = [
     '/logo.png',
     '/restcon.png',
     '/styles.css',
-    '/script.js'
+    '/script.js',
+    '/assets/js/firebase-ai-chatbot.js'
 ];
 
 self.addEventListener('install', event => {
