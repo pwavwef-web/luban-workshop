@@ -128,6 +128,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // chatbotKnowledge collection - public, admin-managed facts for the site chatbot
+    match /chatbotKnowledge/{knowledgeId} {
+      // Anyone can read these documents because they are included in public chatbot answers
+      allow read: if true;
+
+      // Only admins can create or update chatbot knowledge
+      allow write: if isAdmin();
+    }
+
     // users collection – stores customer profiles (name, phone)
     match /users/{userId} {
       // Users can read their own profile; admins can read all
