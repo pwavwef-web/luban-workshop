@@ -680,7 +680,9 @@ async function readFirestoreKnowledge() {
   const chatbotLines = [];
   if (chatbotKnowledgeSnapshot) {
     chatbotKnowledgeSnapshot.forEach((docSnap) => {
-      const line = flattenDoc(docSnap.id, docSnap.data());
+      const data = docSnap.data();
+      if (isArchivedKnowledge(data)) return;
+      const line = flattenDoc(docSnap.id, data);
       if (line) chatbotLines.push(`- ${line}`);
     });
   }
@@ -705,6 +707,12 @@ async function safeGetDocs(ref) {
   }
 }
 
+function isArchivedKnowledge(data) {
+  if (!data || typeof data !== 'object') return false;
+  const status = String(data.status || '').toLowerCase();
+  return status === 'archived' || data.active === false || data.archived === true;
+}
+
 function flattenDoc(id, data) {
   if (!data || typeof data !== 'object') return '';
   const title = data.title || data.name || data.question || id;
@@ -712,7 +720,7 @@ function flattenDoc(id, data) {
   if (body) return `${title}: ${String(body)}`;
 
   const entries = Object.entries(data)
-    .filter(([key]) => !/photo|image|createdAt|updatedAt|status/i.test(key))
+    .filter(([key]) => !/photo|image|createdAt|updatedAt|archivedAt|status|active|archived|createdBy|updatedBy/i.test(key))
     .map(([key, value]) => `${key}: ${flattenValue(value)}`)
     .filter((line) => !line.endsWith(': '));
 
