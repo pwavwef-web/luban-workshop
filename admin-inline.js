@@ -288,10 +288,10 @@
                 const toggleIcon = isHidden ? 'eye' : 'eye-off';
                 const toggleTitle = isHidden ? 'Show on website' : 'Hide from website';
                 const priceLabel = menuPriceOverrides[dish.id] !== undefined
-                    ? `<span class="font-mono text-red-700">₵${currentPrice}</span> <span class="text-xs text-stone-600">(edited)</span>`
-                    : `<span class="font-mono">₵${currentPrice}</span>`;
+                    ? `<span class="font-mono text-red-700">\u20b5${currentPrice}</span> <span class="text-xs text-stone-600">(edited)</span>`
+                    : `<span class="font-mono">\u20b5${currentPrice}</span>`;
                 const revertBtn = menuPriceOverrides[dish.id] !== undefined
-                    ? `<button onclick="revertPrice('${dish.id}')" aria-label="Revert ${dish.name} price" class="text-stone-600 hover:text-amber-600 transition-colors mr-3" title="Revert to original price (₵${dish.price})"><i data-lucide="rotate-ccw" class="h-4 w-4"></i></button>`
+                    ? `<button onclick="revertPrice('${dish.id}')" aria-label="Revert ${dish.name} price" class="text-stone-600 hover:text-amber-600 transition-colors mr-3" title="Revert to original price (\u20b5${dish.price})"><i data-lucide="rotate-ccw" class="h-4 w-4"></i></button>`
                     : '';
                 const imageIndicator = hasImageOverride
                     ? `<span class="ml-1 text-xs text-blue-600" title="Custom image active">(custom)</span>`
@@ -380,7 +380,7 @@
                 console.error('Cannot revert: dish not found for id', dishId);
                 return;
             }
-            if (!confirm(`Revert price for "${dish.name}" back to the original (₵${dish.price})?`)) return;
+            if (!confirm(`Revert price for "${dish.name}" back to the original (\u20b5${dish.price})?`)) return;
             try {
                 await db.collection('menuPrices').doc(dishId).delete();
             } catch (error) {
@@ -538,8 +538,8 @@
                         const res = doc.data();
                         if (!knownReservationIds.has(doc.id) && (res.status === 'pending' || !res.status)) {
                             showAdminNotification(
-                                'New Reservation 📅',
-                                `${res.name || 'Guest'} – ${res.date || ''} at ${res.time || ''} for ${res.guests || '?'} people`
+                                'New Reservation \uD83D\uDCC5',
+                                `${res.name || 'Guest'} \u2013 ${res.date || ''} at ${res.time || ''} for ${res.guests || '?'} people`
                             );
                         }
                     });
@@ -640,8 +640,8 @@
                         const order = doc.data();
                         if (!knownOrderIds.has(doc.id) && (order.status === 'pending' || !order.status)) {
                             showAdminNotification(
-                                'New Order Received! 🛒',
-                                `Order #${doc.id.slice(-6).toUpperCase()} – ₵${(order.total || 0).toFixed(2)}`
+                                'New Order Received! \uD83D\uDED2',
+                                `Order #${doc.id.slice(-6).toUpperCase()} \u2013 \u20b5${(order.total || 0).toFixed(2)}`
                             );
                         }
                     });
@@ -777,14 +777,14 @@
                     }
 
                     const placedDate = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : null;
-                    const placedDateStr = placedDate ? placedDate.toLocaleDateString() : '—';
-                    const placedTimeStr = placedDate ? placedDate.toLocaleTimeString() : '—';
+                    const placedDateStr = placedDate ? placedDate.toLocaleDateString() : '\u2014';
+                    const placedTimeStr = placedDate ? placedDate.toLocaleTimeString() : '\u2014';
 
                     const row = `
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-stone-500">#${id.slice(-6).toUpperCase()}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-900">
-                                <div class="font-medium">${order.customerName ? escapeHtml(order.customerName) : '<span class="text-stone-600 italic">—</span>'}</div>
+                                <div class="font-medium">${order.customerName ? escapeHtml(order.customerName) : '<span class="text-stone-600 italic">\u2014</span>'}</div>
                                 <div class="text-stone-500">${escapeHtml(order.customerPhone)}</div>
                             </td>
                             <td class="px-6 py-4 text-sm text-stone-900 max-w-xs">
@@ -795,7 +795,7 @@
                                 <div class="font-medium">${placedDateStr}</div>
                                 <div class="text-xs">${placedTimeStr}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">₵${(order.total || 0).toFixed(2)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">\u20b5${(order.total || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
                             </td>
@@ -839,8 +839,8 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const addedAt = data.addedAt ? new Date(data.addedAt.toDate()).toLocaleDateString() : '—';
-                    const addedBy = data.addedBy || '—';
+                    const addedAt = data.addedAt ? new Date(data.addedAt.toDate()).toLocaleDateString() : '\u2014';
+                    const addedBy = data.addedBy || '\u2014';
                     const row = `
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${doc.id}</td>
@@ -873,7 +873,7 @@
                     addedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     addedBy: currentUser ? currentUser.email : 'unknown'
                 });
-                feedbackDiv.textContent = `✓ ${email} has been granted admin access.`;
+                feedbackDiv.textContent = `\u2713 ${email} has been granted admin access.`;
                 feedbackDiv.className = 'mt-3 text-sm p-3 rounded-md bg-green-50 text-green-800';
                 feedbackDiv.classList.remove('hidden');
                 document.getElementById('promote-email').value = '';
@@ -1053,8 +1053,8 @@
                             const m = doc.data();
                             if (!knownMessageIds.has(doc.id) && !m.read) {
                                 showAdminNotification(
-                                    'New Message 💬',
-                                    `From: ${m.name || 'Unknown'} – ${m.subject || ''}`
+                                    'New Message \uD83D\uDCAC',
+                                    `From: ${m.name || 'Unknown'} \u2013 ${m.subject || ''}`
                                 );
                             }
                         });
@@ -1069,34 +1069,61 @@
                     container.innerHTML = snapshot.docs.map(doc => {
                         const m = doc.data();
                         const date = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
+                        const replyHref = buildReplyMailto(m.email, m.subject);
+                        const replyAction = replyHref
+                            ? `<a href="${escapeHtml(replyHref)}" aria-label="Reply to ${escapeHtml(m.name || 'message sender')}" title="Reply by email"
+                                class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors whitespace-nowrap">
+                                <i data-lucide="mail" class="h-3.5 w-3.5"></i>
+                                <span>Reply</span>
+                            </a>`
+                            : `<button type="button" disabled title="No sender email"
+                                class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-200 text-stone-400 bg-stone-50 disabled:cursor-not-allowed whitespace-nowrap">
+                                <i data-lucide="mail-x" class="h-3.5 w-3.5"></i>
+                                <span>No email</span>
+                            </button>`;
                         const unreadDot = !m.read
                             ? '<span class="h-2 w-2 bg-red-600 rounded-full inline-block mr-2"></span>'
                             : '';
                         return `
                             <div class="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
                                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                                    <div>
+                                    <div class="min-w-0">
                                         <p class="font-semibold text-stone-900 flex items-center">
                                             ${unreadDot}${escapeHtml(m.name || 'Unknown')}
                                         </p>
-                                        <p class="text-xs text-stone-500 mt-0.5">${escapeHtml(m.email || '')} &middot; ${date}</p>
+                                        <p class="text-xs text-stone-500 mt-0.5" style="overflow-wrap: anywhere;">${escapeHtml(m.email || '')} &middot; ${date}</p>
                                     </div>
-                                    <button data-message-id="${escapeHtml(doc.id)}" onclick="markMessageRead(this)"
-                                        class="self-start text-xs px-3 py-1 rounded-md border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap ${m.read ? 'opacity-40 cursor-default' : ''}"
-                                        ${m.read ? 'disabled' : ''}>
-                                        ${m.read ? 'Read' : 'Mark as read'}
-                                    </button>
+                                    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                                        ${replyAction}
+                                        <button data-message-id="${escapeHtml(doc.id)}" onclick="markMessageRead(this)"
+                                            class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap ${m.read ? 'opacity-40 cursor-default' : ''}"
+                                            ${m.read ? 'disabled' : ''}>
+                                            <i data-lucide="check" class="h-3.5 w-3.5"></i>
+                                            <span>${m.read ? 'Read' : 'Mark as read'}</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <p class="text-sm font-medium text-stone-700 mb-1">Subject: ${escapeHtml(m.subject || '')}</p>
-                                <p class="text-sm text-stone-600 whitespace-pre-wrap">${escapeHtml(m.message || '')}</p>
+                                <p class="text-sm font-medium text-stone-700 mb-1" style="overflow-wrap: anywhere;">Subject: ${escapeHtml(m.subject || '')}</p>
+                                <p class="text-sm text-stone-600 whitespace-pre-wrap" style="overflow-wrap: anywhere;">${escapeHtml(m.message || '')}</p>
                             </div>
                         `;
                     }).join('');
+                    lucide.createIcons();
                 }, err => {
                     console.error('Messages listener error:', err);
                     document.getElementById('messages-container').innerHTML =
                         '<p class="text-red-600 text-sm">Failed to load messages.</p>';
                 });
+        }
+
+        function buildReplyMailto(email, subject) {
+            const recipient = String(email || '').trim();
+            if (!recipient) return '';
+
+            const baseSubject = String(subject || '').trim() || 'Contact message';
+            const replySubject = /^re:/i.test(baseSubject) ? baseSubject : `Re: ${baseSubject}`;
+            const encodedRecipient = encodeURIComponent(recipient).replace(/%40/g, '@');
+            return `mailto:${encodedRecipient}?subject=${encodeURIComponent(replySubject)}`;
         }
 
         async function markMessageRead(btn) {
@@ -1123,7 +1150,7 @@
 
         const TOUR_STEPS = [
             {
-                title: 'Welcome to the Admin Dashboard 👋',
+                title: 'Welcome to the Admin Dashboard \uD83D\uDC4B',
                 description: 'This quick tour will walk you through every section of your admin panel. You can skip at any time or click Next to continue.',
                 target: null
             },
@@ -1195,7 +1222,7 @@
 
             // Update Next button label on last step
             const nextBtn = document.getElementById('tour-next-btn');
-            nextBtn.textContent = tourCurrentStep === total - 1 ? 'Get Started' : 'Next →';
+            nextBtn.textContent = tourCurrentStep === total - 1 ? 'Get Started' : 'Next \u2192';
             nextBtn.focus();
         }
 
