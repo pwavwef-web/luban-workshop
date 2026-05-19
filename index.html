@@ -55,7 +55,7 @@
       "description": "Luban restaurant – authentic Chinese cuisine at Cape Coast, Ghana. Located at UCC, Cafe Roof Top, Casford Street, Cape Coast.",
       "telephone": "020 543 8455",
       "servesCuisine": "Chinese",
-      "priceRange": "££",
+      "priceRange": "₵₵",
       "menu": "https://lubanrestaurant.com/menu.html",
       "acceptsReservations": "True",
       "address": {
@@ -517,7 +517,7 @@
                             <i data-lucide="clock" class="h-6 w-6 text-red-700 mt-1 mr-4 flex-shrink-0"></i>
                             <div>
                                 <h4 class="font-bold text-stone-900">Opening Hours</h4>
-                                <p class="text-stone-600">Mon - Fri: 11:00 - 17:30<br>⫷⁜◈⁜◈⁜⁂⁜◈⁜◈⁜⫸
+                                <p class="text-stone-600">Mon–Fri: 11:00 – 17:30<br>Sat–Sun: Closed
                                 </p>
                             </div>
                         </div>
@@ -1655,7 +1655,7 @@
                         
                         // Format items
                         const itemsList = order.items ? order.items.map(item => 
-                            `<li class="text-stone-600">${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}</li>`
+                            `<li class="text-stone-600">${item.quantity}x ${item.name} - ₵${(item.price * item.quantity).toFixed(2)}</li>`
                         ).join('') : '<li class="text-stone-500 italic">No items</li>';
                         
                         // Format timestamp
@@ -1709,7 +1709,7 @@
                                 </div>
                                 
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between pt-4 border-t border-stone-200">
-                                    <p class="text-lg font-bold text-stone-900">Total: $${(order.total || 0).toFixed(2)}</p>
+                                    <p class="text-lg font-bold text-stone-900">Total: ₵${(order.total || 0).toFixed(2)}</p>
                                     <div class="mt-3 md:mt-0">
                                         ${cancelButton}
                                         ${deleteButton}

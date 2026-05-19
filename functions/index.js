@@ -25,6 +25,13 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function cleanPlainText(value) {
+  return String(value ?? '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function formatItems(items = []) {
   if (!Array.isArray(items) || items.length === 0) return '<li>No items found</li>';
   return items
@@ -33,7 +40,7 @@ function formatItems(items = []) {
       const qty = Number(item.quantity || 0);
       const price = Number(item.price || 0);
       const lineTotal = (qty * price).toFixed(2);
-      return `<li>${name} — Qty: ${qty}, Unit: ${price.toFixed(2)}, Line total: ${lineTotal}</li>`;
+      return `<li>${name} - Qty: ${qty}, Unit: ${price.toFixed(2)}, Line total: ${lineTotal}</li>`;
     })
     .join('');
 }
@@ -115,11 +122,11 @@ async function sendCustomerOrderPlacedSms(orderId, order) {
   }
 
   const total = Number(order.total || 0).toFixed(2);
-  const customerName = escapeHtml(order.customerName || 'Customer');
+  const customerName = cleanPlainText(order.customerName || 'Customer');
 
   const itemsList = Array.isArray(order.items)
     ? order.items
-        .map(item => `${escapeHtml(item.name || 'Item')} (x${item.quantity || 1})`)
+        .map(item => `${cleanPlainText(item.name || 'Item')} (x${item.quantity || 1})`)
         .join(', ')
     : 'Your order';
 
@@ -127,15 +134,15 @@ async function sendCustomerOrderPlacedSms(orderId, order) {
 
 Thank you for ordering from Luban Workshop!
 
-📋 Your Order:
+Your order:
 ${itemsList}
 
-💰 Total: ₵${total}
+Total: GHS ${total}
 
 We're preparing your order now. We'll notify you when it's ready!
 
-📞 Questions? Call us: 020 543 8455
-⏰ Mon-Fri 11:00-17:30
+Questions? Call us: 020 543 8455
+Hours: Mon-Fri 11:00-17:30
 
 - Luban Restaurant`;
 
@@ -155,12 +162,12 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
   }
 
   const total = Number(order.total || 0).toFixed(2);
-  const customerName = escapeHtml(order.customerName || 'Customer');
-  const customerPhone = escapeHtml(order.customerPhone || 'Not provided');
+  const customerName = cleanPlainText(order.customerName || 'Customer');
+  const customerPhone = cleanPlainText(order.customerPhone || 'Not provided');
 
   const itemsList = Array.isArray(order.items)
     ? order.items
-        .map(item => `${escapeHtml(item.name || 'Item')} (x${item.quantity || 1})`)
+        .map(item => `${cleanPlainText(item.name || 'Item')} (x${item.quantity || 1})`)
         .join(', ')
     : 'Your order';
 
@@ -169,10 +176,10 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
 Customer: ${customerName}
 Customer phone: ${customerPhone}
 
-📋 Order:
+Order:
 ${itemsList}
 
-💰 Total: ₵${total}
+Total: GHS ${total}
 
 Please prepare this order.`;
 
@@ -193,9 +200,9 @@ async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
 
   let message = '';
   if (newStatus === 'preparing') {
-    message = `Hi ${escapeHtml(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
+    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
   } else if (newStatus === 'completed') {
-    message = `Hi ${escapeHtml(order.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
+    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
   }
 
   if (!message) return;
@@ -208,22 +215,32 @@ async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
   });
 }
 
-async function sendNotificationMail({ to, subject, html, text }) {
+async function sendNotificationMail({ to, subject, html, text, replyTo }) {
   const transporter = createTransporter();
 
-  await transporter.sendMail({
+  const mailOptions = {
     from: SMTP_FROM.value(),
     to: to || NOTIFICATION_RECIPIENT.value(),
     subject,
     text,
     html,
-  });
+  };
+
+  if (replyTo) {
+    mailOptions.replyTo = replyTo;
+  }
+
+  await transporter.sendMail(mailOptions);
+}
+
+function normalizeEmail(email) {
+  const value = String(email || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '';
+  return value;
 }
 
 function getCustomerEmail(order = {}) {
-  const email = String(order.userEmail || order.customerEmail || order.email || '').trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '';
-  return email;
+  return normalizeEmail(order.userEmail || order.customerEmail || order.email);
 }
 
 function formatMoney(value) {
@@ -626,6 +643,103 @@ function buildRestaurantReservationEmail({ reservationId, reservation }) {
   return { subject, text, html };
 }
 
+function formatContactSubmittedAt(value) {
+  let date = null;
+
+  if (value && typeof value.toDate === 'function') {
+    date = value.toDate();
+  } else if (value instanceof Date) {
+    date = value;
+  } else if (value) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      date = parsed;
+    }
+  }
+
+  if (!date) return 'Just now';
+
+  return date.toLocaleString('en-GB', {
+    timeZone: 'Africa/Accra',
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
+
+function cleanSubjectLine(value, fallback = 'New Contact Message') {
+  const subject = String(value || '')
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!subject) return fallback;
+  return subject.length > 96 ? `${subject.slice(0, 93)}...` : subject;
+}
+
+function buildRestaurantContactMessageEmail({ messageId, contactMessage }) {
+  const name = String(contactMessage.name || '').trim() || 'Unknown sender';
+  const email = String(contactMessage.email || '').trim() || 'Not provided';
+  const replyTo = normalizeEmail(email);
+  const submittedSubject = cleanSubjectLine(contactMessage.subject, 'No subject');
+  const submittedAt = formatContactSubmittedAt(contactMessage.createdAt);
+  const body = String(contactMessage.message || '').trim() || 'No message provided.';
+  const subject = `New Contact Message: ${cleanSubjectLine(contactMessage.subject, `#${messageId}`)}`;
+
+  const text = [
+    'A new contact form message was submitted.',
+    `Message ID: ${messageId}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Subject: ${submittedSubject}`,
+    `Submitted: ${submittedAt}`,
+    '',
+    'Message:',
+    body,
+  ].join('\n');
+
+  const detailRows = buildRestaurantDetailRows([
+    { label: 'Name', value: name },
+    { label: 'Email', value: email },
+    { label: 'Subject', value: submittedSubject },
+    { label: 'Submitted', value: submittedAt },
+  ]);
+
+  const mainHtml = `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:22px;">
+      <tr>
+        <td style="background:#ffffff;border:1px solid #f5f5f4;border-radius:18px;padding:20px;">
+          <h2 style="font-family:Georgia,'Times New Roman',serif;margin:0 0 12px;font-size:22px;color:#1c1917;">Sender details</h2>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${detailRows}</table>
+        </td>
+      </tr>
+    </table>
+
+    <div style="background:#fff9f9;border:1px solid #fee2e2;border-radius:16px;padding:18px;">
+      <p style="margin:0 0 8px;color:#a8a29e;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:800;">Message</p>
+      <p style="margin:0;color:#1c1917;font-size:15px;line-height:1.7;white-space:pre-line;">${escapeHtml(body)}</p>
+    </div>
+  `;
+
+  const html = buildRestaurantEmailShell({
+    badge: 'CONTACT',
+    eyebrow: 'Guest message',
+    headline: 'New contact message',
+    intro: 'A guest has sent a message through the Contact Us form. Review the details below and follow up promptly.',
+    cards: [
+      { label: 'Message ID', value: `#${messageId}` },
+      { label: 'From', value: name },
+      { label: 'Status', value: 'Unread', tone: 'red' },
+    ],
+    mainHtml,
+    actionTitle: 'Next step',
+    actionText: replyTo
+      ? 'Reply directly to this email or mark the message as read in the admin contact inbox after follow-up.'
+      : 'Follow up from the admin contact inbox and mark the message as read once it has been handled.',
+  });
+
+  return { subject, text, html, replyTo };
+}
+
 exports.notifyOnNewOrder = onDocumentCreated(
   {
     document: 'orders/{orderId}',
@@ -706,6 +820,29 @@ exports.notifyOnNewReservation = onDocumentCreated(
         error: error?.message || error,
       });
       throw error;
+    }
+  }
+);
+
+exports.notifyOnNewContactMessage = onDocumentCreated(
+  {
+    document: 'contact_messages/{messageId}',
+    region: 'us-central1',
+    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM, NOTIFICATION_RECIPIENT],
+  },
+  async (event) => {
+    const messageId = event.params.messageId;
+    const contactMessage = event.data?.data() || {};
+    const message = buildRestaurantContactMessageEmail({ messageId, contactMessage });
+
+    try {
+      await sendNotificationMail(message);
+      logger.info('New-contact-message notification sent', { messageId });
+    } catch (error) {
+      logger.error('Failed to send new-contact-message notification after document creation', {
+        messageId,
+        error: error?.message || error,
+      });
     }
   }
 );
