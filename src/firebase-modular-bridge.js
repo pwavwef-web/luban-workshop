@@ -25,6 +25,12 @@ import {
   onSnapshot,
   serverTimestamp
 } from 'firebase/firestore';
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from 'firebase/storage';
 
 function ensureApp() {
   if (!getApps().length) {
@@ -128,6 +134,35 @@ function getFirestoreApi() {
   };
 }
 
+function createStorageRefApi(refObj) {
+  return {
+    fullPath: refObj.fullPath,
+    child(path) {
+      return createStorageRefApi(storageRef(refObj, path));
+    },
+    async put(data, metadata) {
+      const snapshot = await uploadBytes(refObj, data, metadata);
+      return {
+        metadata: snapshot.metadata,
+        ref: createStorageRefApi(snapshot.ref),
+        state: 'success'
+      };
+    },
+    getDownloadURL() {
+      return getDownloadURL(refObj);
+    }
+  };
+}
+
+function getStorageApi() {
+  const storage = getStorage(ensureApp());
+  return {
+    ref(path) {
+      return createStorageRefApi(storageRef(storage, path || ''));
+    }
+  };
+}
+
 const firebase = {
   apps: getApps(),
   initializeApp(config) {
@@ -142,7 +177,8 @@ const firebase = {
     FieldValue: {
       serverTimestamp
     }
-  })
+  }),
+  storage: () => getStorageApi()
 };
 
 window.firebase = firebase;

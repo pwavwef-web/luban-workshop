@@ -65,11 +65,12 @@
         .field textarea { resize: vertical; min-height: 100px; }
         .field .char-count { font-size: 0.73rem; color: #a8a29e; text-align: right; margin-top: 0.2rem; }
 
-        .photo-upload { border: 2px dashed #fca5a5; border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: #fff9f9; cursor: pointer; transition: border-color 0.2s; }
-        .photo-upload:hover { border-color: #b91c1c; }
+        .photo-upload { border: 2px dashed #fca5a5; border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: #fff9f9; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+        .photo-upload:hover, .photo-upload.drag-over { border-color: #b91c1c; background: #fef2f2; }
         .photo-upload input[type="file"] { display: none; }
         .photo-upload p { font-size: 0.82rem; color: #78716c; margin-top: 0.5rem; }
         .photo-upload p strong { color: #b91c1c; }
+        .photo-upload .file-name { display: none; color: #44403c; font-weight: 700; overflow-wrap: anywhere; }
         #photo-preview { display: none; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.75rem; border: 3px solid #fca5a5; }
 
         .social-row { display: grid; grid-template-columns: 40px 1fr; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
@@ -182,7 +183,8 @@
                     <img id="photo-preview" alt="Photo preview">
                     <i data-lucide="upload-cloud" id="upload-icon" style="width:40px;height:40px;color:#fca5a5;margin:0 auto 0.5rem;display:block;"></i>
                     <p><strong>Click to upload</strong> or drag &amp; drop</p>
-                    <p>JPG, PNG, WEBP · Max 2 MB · Recommended: square crop</p>
+                    <p>JPG, PNG, WEBP &middot; Max 10 MB &middot; Recommended: square crop</p>
+                    <p class="file-name" id="photo-file-name"></p>
                     <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp">
                 </label>
                 <p style="font-size:0.78rem;color:#a8a29e;margin-top:0.5rem;">Or enter a photo URL below instead:</p>
@@ -436,29 +438,156 @@
         setupCounter('short-bio', 'short-bio-count');
         setupCounter('full-bio', 'full-bio-count');
 
-        // Photo preview
-        document.getElementById('photo-input').addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Photo must be under 2 MB.');
-                e.target.value = '';
+        // Photo preview and upload state
+        var MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024;
+        var ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        var selectedPhotoFile = null;
+        var selectedPhotoPreviewUrl = '';
+
+        function formatFileSize(bytes) {
+            return (bytes / (1024 * 1024)).toFixed(1).replace(/\.0$/, '') + ' MB';
+        }
+
+        function showFormError(message) {
+            var errorBanner = document.getElementById('error-banner');
+            var errorMsg = document.getElementById('error-msg');
+            errorMsg.textContent = message;
+            errorBanner.style.display = 'block';
+            errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function clearSelectedPhoto() {
+            selectedPhotoFile = null;
+            if (selectedPhotoPreviewUrl) {
+                URL.revokeObjectURL(selectedPhotoPreviewUrl);
+                selectedPhotoPreviewUrl = '';
+            }
+            document.getElementById('photo-input').value = '';
+            document.getElementById('photo-preview').removeAttribute('src');
+            document.getElementById('photo-preview').style.display = 'none';
+            document.getElementById('upload-icon').style.display = 'block';
+            document.getElementById('photo-file-name').style.display = 'none';
+            document.getElementById('photo-file-name').textContent = '';
+        }
+
+        function validatePhotoFile(file) {
+            var fileName = (file && file.name ? file.name : '').toLowerCase();
+            var allowedByExtension = /\.(jpe?g|png|webp)$/.test(fileName);
+
+            if (!file) return 'Please choose a photo file.';
+            if (file.size <= 0) return 'The selected photo appears to be empty. Please choose another file.';
+            if (file.size > MAX_PHOTO_SIZE_BYTES) return 'Photo must be 10 MB or smaller.';
+            if (ALLOWED_PHOTO_TYPES.indexOf(file.type) === -1 && !allowedByExtension) {
+                return 'Please upload a JPG, PNG, or WEBP image.';
+            }
+            return '';
+        }
+
+        function validatePhotoUrl(value) {
+            if (!value) return '';
+            try {
+                var parsed = new URL(value);
+                if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+                    return 'Photo URL must start with http:// or https://.';
+                }
+            } catch (err) {
+                return 'Please enter a valid photo URL.';
+            }
+            return '';
+        }
+
+        function setSelectedPhoto(file) {
+            var validationError = validatePhotoFile(file);
+            if (validationError) {
+                clearSelectedPhoto();
+                showFormError(validationError);
                 return;
             }
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                var preview = document.getElementById('photo-preview');
-                var icon = document.getElementById('upload-icon');
-                preview.src = ev.target.result;
-                preview.style.display = 'block';
-                icon.style.display = 'none';
-                document.getElementById('photo-url').value = '';
-            };
-            reader.readAsDataURL(file);
+
+            document.getElementById('error-banner').style.display = 'none';
+            if (selectedPhotoPreviewUrl) URL.revokeObjectURL(selectedPhotoPreviewUrl);
+            selectedPhotoFile = file;
+            selectedPhotoPreviewUrl = URL.createObjectURL(file);
+
+            var preview = document.getElementById('photo-preview');
+            var icon = document.getElementById('upload-icon');
+            var fileName = document.getElementById('photo-file-name');
+            preview.src = selectedPhotoPreviewUrl;
+            preview.style.display = 'block';
+            icon.style.display = 'none';
+            fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+            fileName.style.display = 'block';
+            document.getElementById('photo-url').value = '';
+        }
+
+        var photoInput = document.getElementById('photo-input');
+        var photoLabel = document.getElementById('photo-label');
+        var photoUrlInput = document.getElementById('photo-url');
+
+        photoInput.addEventListener('change', function(e) {
+            setSelectedPhoto(e.target.files[0]);
         });
 
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            photoLabel.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                photoLabel.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            photoLabel.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                photoLabel.classList.remove('drag-over');
+            });
+        });
+
+        photoLabel.addEventListener('drop', function(e) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+                setSelectedPhoto(e.dataTransfer.files[0]);
+            }
+        });
+
+        photoUrlInput.addEventListener('input', function() {
+            if (photoUrlInput.value.trim()) clearSelectedPhoto();
+        });
+
+        function buildStoragePhotoPath(file) {
+            var extension = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (extension === 'jpeg') extension = 'jpg';
+            if (['jpg', 'png', 'webp'].indexOf(extension) === -1) {
+                extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+            }
+            var safeId = Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+            return 'team-profiles/' + safeId + '.' + extension;
+        }
+
+        function getPhotoContentType(file) {
+            var fileName = (file.name || '').toLowerCase();
+            if (ALLOWED_PHOTO_TYPES.indexOf(file.type) !== -1) return file.type;
+            if (/\.png$/.test(fileName)) return 'image/png';
+            if (/\.webp$/.test(fileName)) return 'image/webp';
+            return 'image/jpeg';
+        }
+
+        async function uploadSelectedPhotoIfNeeded() {
+            if (!selectedPhotoFile) return '';
+
+            var validationError = validatePhotoFile(selectedPhotoFile);
+            if (validationError) throw new Error(validationError);
+            if (!firebase.storage) throw new Error('Firebase Storage is not available on this page.');
+
+            var storageRef = firebase.storage().ref(buildStoragePhotoPath(selectedPhotoFile));
+            var snapshot = await storageRef.put(selectedPhotoFile, {
+                contentType: getPhotoContentType(selectedPhotoFile)
+            });
+            return snapshot.ref.getDownloadURL();
+        }
+
         // Form submission
-        document.getElementById('profile-form').addEventListener('submit', function(e) {
+        document.getElementById('profile-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             var errorBanner = document.getElementById('error-banner');
@@ -476,62 +605,70 @@
             var status = document.getElementById('status').value;
             var shortBio = document.getElementById('short-bio').value.trim();
             var consent = document.getElementById('consent').checked;
+            var pendingPhotoUrl = document.getElementById('photo-url').value.trim();
 
             if (!firstName || !lastName) {
-                errorMsg.textContent = 'Please enter your first and last name.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please enter your first and last name.');
                 return;
             }
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                errorMsg.textContent = 'Please enter a valid email address.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please enter a valid email address.');
                 return;
             }
             if (!department) {
-                errorMsg.textContent = 'Please select a department.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please select a department.');
                 return;
             }
             if (!jobTitle) {
-                errorMsg.textContent = 'Please enter your job title.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please enter your job title.');
                 return;
             }
             if (!status) {
-                errorMsg.textContent = 'Please select your employment status.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please select your employment status.');
                 return;
             }
             if (!shortBio) {
-                errorMsg.textContent = 'Please enter a short bio.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please enter a short bio.');
                 return;
             }
             if (!consent) {
-                errorMsg.textContent = 'Please agree to the consent statement before submitting.';
-                errorBanner.style.display = 'block';
-                errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFormError('Please agree to the consent statement before submitting.');
                 return;
+            }
+            if (selectedPhotoFile) {
+                var photoValidationError = validatePhotoFile(selectedPhotoFile);
+                if (photoValidationError) {
+                    showFormError(photoValidationError);
+                    return;
+                }
+            }
+            if (pendingPhotoUrl) {
+                var photoUrlValidationError = validatePhotoUrl(pendingPhotoUrl);
+                if (photoUrlValidationError) {
+                    showFormError(photoUrlValidationError);
+                    return;
+                }
             }
 
             var btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.textContent = 'Submitting…';
+            btn.textContent = selectedPhotoFile ? 'Uploading photo...' : 'Submitting...';
 
             // Build profile data
-            var photoPreview = document.getElementById('photo-preview');
-            var photoUrlField = document.getElementById('photo-url').value.trim();
+            var photoUrlField = pendingPhotoUrl;
             var photoData = '';
-            if (photoUrlField) {
-                photoData = photoUrlField;
-            } else if (photoPreview.style.display !== 'none' && photoPreview.src) {
-                photoData = photoPreview.src;
+
+            try {
+                if (photoUrlField) {
+                    photoData = photoUrlField;
+                } else {
+                    photoData = await uploadSelectedPhotoIfNeeded();
+                }
+            } catch (err) {
+                showFormError('Photo upload failed: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Submit Profile';
+                return;
             }
 
             var profileData = {
@@ -555,13 +692,13 @@
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
+            btn.textContent = 'Submitting...';
             db.collection('teamProfiles').add(profileData)
                 .then(function() {
                     successBanner.style.display = 'block';
                     successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     document.getElementById('profile-form').reset();
-                    document.getElementById('photo-preview').style.display = 'none';
-                    document.getElementById('upload-icon').style.display = 'block';
+                    clearSelectedPhoto();
                     document.getElementById('short-bio-count').textContent = '0';
                     document.getElementById('full-bio-count').textContent = '0';
                     btn.disabled = false;
