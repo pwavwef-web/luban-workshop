@@ -447,6 +447,20 @@
             return 'GHS ' + amount.toFixed(2).replace(/\.00$/, '');
         }
 
+        function getPublicPromotionComboLabel(items) {
+            if (!Array.isArray(items) || !items.length) return '';
+            var categories = items.map(function(item) {
+                return String(item && item.category ? item.category : '').toLowerCase();
+            }).filter(Boolean);
+            if (categories.includes('starter') && (categories.includes('main') || categories.includes('mains')) && (categories.includes('drink') || categories.includes('drinks') || categories.includes('beverage'))) {
+                return 'Starter + main + drink combo';
+            }
+            if (items.length >= 3) {
+                return items.length + ' item combo';
+            }
+            return '';
+        }
+
         function getPublicPromotionPricing(data) {
             var items = Array.isArray(data.items) ? data.items : [];
             if (data.discountType === 'bundle' && data.bundlePrice !== undefined && data.bundlePrice !== null && data.bundlePrice !== '') {
@@ -493,21 +507,26 @@
                 var data = item.data;
                 var type = data.type === 'deal' ? 'Deal' : 'Promotion';
                 var pricing = getPublicPromotionPricing(data);
-                var itemRows = Array.isArray(data.items) && data.items.length
-                    ? '<ul class="public-promo-items">' + data.items.slice(0, 5).map(function(dish) {
+                var selectedItems = Array.isArray(data.items) ? data.items : [];
+                var comboLabel = getPublicPromotionComboLabel(selectedItems);
+                var itemRows = selectedItems.length
+                    ? '<ul class="public-promo-items">' + selectedItems.slice(0, 5).map(function(dish) {
+                        var category = dish.category ? '<span class="public-promo-tag">' + escapeHtml(dish.category) + '</span>' : '';
                         var price = dish.promoPrice !== null && dish.promoPrice !== undefined && dish.promoPrice !== ''
                             ? '<strong>' + escapeHtml(formatPublicPrice(dish.promoPrice)) + '</strong>'
                             : '';
-                        return '<li><span>' + escapeHtml(dish.name || dish.id) + '</span>' + price + '</li>';
+                        return '<li><span class="public-promo-item-name">' + escapeHtml(dish.name || dish.id) + '</span>' + category + price + '</li>';
                     }).join('') + '</ul>'
                     : '';
                 var code = data.code ? '<p><span style="color:#a8a29e;">Code:</span> <strong style="color:#fecaca;font-family:monospace;">' + escapeHtml(data.code) + '</strong></p>' : '';
                 var expiry = data.expiresAt ? '<p style="font-size:0.78rem;font-weight:700;color:#a8a29e;">Valid until ' + escapeHtml(data.expiresAt) + '</p>' : '';
+                var combo = comboLabel ? '<p class="public-promo-combo">' + escapeHtml(comboLabel) + '</p>' : '';
 
                 return '<article class="public-promo-card">' +
                     '<span class="public-promo-type"><i data-lucide="badge-percent" style="width:14px;height:14px;"></i>' + type + '</span>' +
                     '<h3 class="serif">' + escapeHtml(data.title || 'Current offer') + '</h3>' +
                     (pricing ? '<p class="public-promo-price">' + escapeHtml(pricing) + '</p>' : '') +
+                    combo +
                     '<p>' + escapeHtml(data.description || '') + '</p>' +
                     itemRows + code + expiry +
                     '</article>';
