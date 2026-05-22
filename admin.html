@@ -624,18 +624,18 @@
                             </div>
                             <div>
                                 <label for="promotion-offer" class="block text-sm font-medium text-stone-700 mb-1">Offer Line</label>
-                                <input type="text" id="promotion-offer" maxlength="120"
+                                    <input type="text" id="promotion-offer" maxlength="120"
                                     class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
-                                    placeholder="10% off selected rice dishes">
+                                    placeholder="Starter + main + drink combo">
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                     <label for="promotion-discount-type" class="block text-sm font-medium text-stone-700 mb-1">Pricing Style</label>
                                     <select id="promotion-discount-type"
                                         class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
-                                        <option value="custom">Custom promo prices</option>
-                                        <option value="percent">Fixed percent off</option>
-                                        <option value="bundle">Combo bundle price</option>
+                                        <option value="custom">Set promo prices per dish</option>
+                                        <option value="percent">Fixed percent off combo</option>
+                                        <option value="bundle">One bundle price for the set</option>
                                     </select>
                                 </div>
                                 <div>
@@ -657,7 +657,7 @@
                                     <span id="promotion-selection-summary" class="text-xs font-semibold text-stone-500">0 selected</span>
                                 </div>
                                 <div id="promotion-dish-list" class="admin-scroll-panel"></div>
-                                <p class="text-xs text-stone-500 mt-2">Tick any dishes that belong to this deal. Add a promo price per dish, use a percent discount, or set one bundle price for the full combo.</p>
+                                <p class="text-xs text-stone-500 mt-2">Tick the dishes in this offer. You can set custom promo prices per dish, apply one percent off the full set, or give the combo a single bundle price.</p>
                             </div>
                             <div>
                                 <label for="promotion-code" class="block text-sm font-medium text-stone-700 mb-1">Code</label>
