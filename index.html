@@ -330,9 +330,9 @@
                     <span id="user-email-sidebar"></span>
                 </div>
                 <div style="display:flex;gap:0.5rem;align-items:center;">
-                    <button id="manage-account-btn" aria-label="Manage account" class="p-1 text-stone-600 hover:text-red-700" onclick="openAccountSettingsModal()">
+                    <a id="manage-account-btn" href="customer-profile.html" aria-label="Manage account" class="p-1 text-stone-600 hover:text-red-700" title="Manage profile">
                         <i data-lucide="settings" class="h-4 w-4"></i>
-                    </button>
+                    </a>
                     <button id="logout-sidebar-btn" aria-label="Sign out" class="p-1 text-stone-600 hover:text-red-700" onclick="logout()">
                         <i data-lucide="log-out" class="h-4 w-4"></i>
                     </button>
@@ -834,42 +834,7 @@
         </div>
     </div>
 
-    <!-- Account Settings Modal (collect required phone) -->
-    <div id="account-settings-modal" class="fixed inset-0 z-[90] hidden" aria-hidden="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-stone-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeAccountSettingsModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">​</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-medium text-stone-900 serif">Manage Account</h3>
-                        <button onclick="closeAccountSettingsModal()" aria-label="Close account settings" class="text-stone-500 hover:text-stone-700">
-                            <i data-lucide="x" class="h-5 w-5"></i>
-                        </button>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-stone-700 mb-2">Name</label>
-                            <input type="text" id="account-name" class="w-full px-4 py-2 border border-stone-300 rounded-md" />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                            <input type="email" id="account-email" class="w-full px-4 py-2 border border-stone-300 rounded-md" readonly />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-stone-700 mb-2">Phone Number (Ghana)</label>
-                            <input type="tel" id="account-phone" placeholder="+233501234567" class="w-full px-4 py-2 border border-stone-300 rounded-md" required />
-                        </div>
-                        <div id="account-settings-error" class="hidden text-red-700 text-sm p-2 bg-red-50 rounded-md"></div>
-                    </div>
-                </div>
-                <div class="bg-stone-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="saveAccountSettings()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-700 text-base font-medium text-white hover:bg-red-800 sm:ml-3 sm:w-auto sm:text-sm">Save</button>
-                    <button type="button" onclick="closeAccountSettingsModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-stone-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-stone-700 hover:bg-stone-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Account details are managed on customer-profile.html. -->
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
@@ -986,11 +951,10 @@
                     if (profileDoc.exists) currentUserProfile = profileDoc.data();
                 } catch (e) { console.error('Failed to load user profile:', e); }
 
-                // If the user profile is missing or has no phone, prompt them to enter it
+                // If the user profile is missing or has no phone, send them to the profile page
                 if (!currentUserProfile || !currentUserProfile.phone || (typeof currentUserProfile.phone === 'string' && currentUserProfile.phone.trim() === '')) {
-                    // Delay to allow UI to render first, then open account settings modal
                     setTimeout(() => {
-                        try { openAccountSettingsModal(user.displayName || '', user.email || ''); } catch (e) { console.error('Unable to open account settings modal:', e); }
+                        window.location.href = 'customer-profile.html?complete=phone';
                     }, 300);
                 }
             }
@@ -1290,51 +1254,17 @@
             return formatGhanaPhone(phone) !== null;
         }
 
-        // Account settings helpers (collect phone for Google/new users)
+        // Account settings helpers: legacy entry points now use the profile page.
         function openAccountSettingsModal(prefillName = '', prefillEmail = '') {
-            const modal = document.getElementById('account-settings-modal');
-            document.getElementById('account-name').value = prefillName || (currentUserProfile && currentUserProfile.name) || '';
-            document.getElementById('account-email').value = prefillEmail || (currentUser && currentUser.email) || '';
-            document.getElementById('account-phone').value = (currentUserProfile && currentUserProfile.phone) || '';
-            document.getElementById('account-settings-error').classList.add('hidden');
-            modal.classList.remove('hidden');
-            lucide.createIcons();
+            window.location.href = 'customer-profile.html';
         }
 
         function closeAccountSettingsModal() {
-            const modal = document.getElementById('account-settings-modal');
-            modal.classList.add('hidden');
+            window.location.href = 'customer-profile.html';
         }
 
         async function saveAccountSettings() {
-            const name = document.getElementById('account-name').value.trim();
-            const email = document.getElementById('account-email').value.trim();
-            const rawPhone = document.getElementById('account-phone').value.trim();
-            const errDiv = document.getElementById('account-settings-error');
-            if (!rawPhone) {
-                errDiv.textContent = 'Phone number is required.';
-                errDiv.classList.remove('hidden');
-                return;
-            }
-            const phone = formatGhanaPhone(rawPhone);
-            if (!phone) {
-                errDiv.textContent = 'Please enter a valid Ghana phone number (+233 and 9 digits, e.g., +233501234567).';
-                errDiv.classList.remove('hidden');
-                return;
-            }
-            if (!currentUser) {
-                errDiv.textContent = 'No authenticated user found.';
-                errDiv.classList.remove('hidden');
-                return;
-            }
-            try {
-                await db.collection('users').doc(currentUser.uid).set({ name: name || currentUser.displayName || '', phone, email: email || currentUser.email || '' }, { merge: true });
-                currentUserProfile = { name: name || currentUser.displayName || '', phone, email: email || currentUser.email || '' };
-                closeAccountSettingsModal();
-            } catch (e) {
-                errDiv.textContent = 'Failed to save: ' + (e.message || e);
-                errDiv.classList.remove('hidden');
-            }
+            window.location.href = 'customer-profile.html';
         }
 
         // --- Menu & Cart Logic ---
@@ -1768,7 +1698,8 @@
                 if (currentUser && !customerPhone) {
                     checkoutBtn.disabled = false;
                     checkoutBtn.textContent = 'Place Order';
-                    alert('Please add a phone number in Account Settings so we can send your order SMS.');
+                    alert('Please add a phone number on your profile page so we can send your order SMS.');
+                    window.location.href = 'customer-profile.html?complete=phone';
                     return;
                 }
 

@@ -119,6 +119,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // promotions collection - admin-managed offers shown on customer profile pages
+    match /promotions/{promotionId} {
+      // Customers only see offers that an admin has toggled on; admins can read all
+      allow read: if isAdmin() || resource.data.active == true;
+
+      // Only admins can create, update, hide, or delete promotions and deals
+      allow write: if isAdmin();
+    }
+
     // users collection – stores customer profiles (name, phone)
     match /users/{userId} {
       // Users can read their own profile; admins can read all
