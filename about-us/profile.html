@@ -61,6 +61,7 @@
         @media (min-width: 640px) { .social-links { justify-content: flex-start; } }
         .social-links a { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #fee2e2; color: #b91c1c; text-decoration: none; transition: background 0.2s; }
         .social-links a:hover { background: #b91c1c; color: #fff; }
+        .social-links svg { width: 16px; height: 16px; display: block; }
 
         .card-body { padding: 0 2rem 2rem; }
         .divider { height: 1px; background: #f5f5f4; margin: 0 -2rem 1.5rem; }
@@ -299,6 +300,15 @@
             return '';
         }
 
+        function socialIconSvg(type) {
+            var icons = {
+                linkedin: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M6.94 8.95H3.7V20h3.24V8.95zM5.32 4a1.88 1.88 0 1 0 0 3.76A1.88 1.88 0 0 0 5.32 4zM20.3 13.66c0-3.14-1.67-4.6-3.9-4.6-1.8 0-2.6.99-3.05 1.69v-1.8h-3.1c.04 1.03 0 11.05 0 11.05h3.24v-6.17c0-.33.02-.66.12-.9.26-.66.86-1.35 1.87-1.35 1.32 0 1.85 1.01 1.85 2.48V20h3.24l-.27-6.34z"/></svg>',
+                instagram: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>',
+                twitter: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>'
+            };
+            return icons[type] || '';
+        }
+
         function showNotFound() {
             document.getElementById('profile-name').textContent = 'Profile Not Found';
             document.getElementById('profile-role').textContent = '';
@@ -368,9 +378,9 @@
             var safeLinkedin = safeLinkUrl(p.linkedin);
             var safeInstagram = safeLinkUrl(p.instagram);
             var safeTwitter = safeLinkUrl(p.twitter);
-            if (safeLinkedin) socialHtml += '<a href="' + escapeAttr(safeLinkedin) + '" target="_blank" rel="noopener" title="LinkedIn"><i data-lucide="linkedin" style="width:16px;height:16px;"></i></a>';
-            if (safeInstagram) socialHtml += '<a href="' + escapeAttr(safeInstagram) + '" target="_blank" rel="noopener" title="Instagram"><i data-lucide="instagram" style="width:16px;height:16px;"></i></a>';
-            if (safeTwitter) socialHtml += '<a href="' + escapeAttr(safeTwitter) + '" target="_blank" rel="noopener" title="Twitter / X"><i data-lucide="twitter" style="width:16px;height:16px;"></i></a>';
+            if (safeLinkedin) socialHtml += '<a href="' + escapeAttr(safeLinkedin) + '" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">' + socialIconSvg('linkedin') + '</a>';
+            if (safeInstagram) socialHtml += '<a href="' + escapeAttr(safeInstagram) + '" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram">' + socialIconSvg('instagram') + '</a>';
+            if (safeTwitter) socialHtml += '<a href="' + escapeAttr(safeTwitter) + '" target="_blank" rel="noopener" title="Twitter / X" aria-label="Twitter / X">' + socialIconSvg('twitter') + '</a>';
             document.getElementById('social-links').innerHTML = socialHtml;
 
             // Facts grid

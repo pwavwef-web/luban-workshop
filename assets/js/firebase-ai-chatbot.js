@@ -207,7 +207,7 @@ function injectStyles() {
   const style = document.createElement('style');
   style.id = 'luban-ai-chatbot-styles';
   style.textContent = `
-    .luban-chatbot { position: fixed; right: 18px; bottom: 18px; z-index: 9998; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c1917; }
+    .luban-chatbot { position: fixed; right: 18px; bottom: 18px; z-index: 55; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c1917; }
     .luban-chatbot * { box-sizing: border-box; }
     .luban-chatbot__button { width: 62px; height: 62px; border: 0; border-radius: 50%; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 14px 32px rgba(28,25,23,.28); cursor: pointer; transition: transform .2s ease, background .2s ease; }
     .luban-chatbot__button:hover { background: #991b1b; transform: translateY(-2px); }
