@@ -572,18 +572,29 @@
             return 'image/jpeg';
         }
 
+        function deleteUploadedPhotoByPath(path) {
+            if (!path || !firebase.storage) return Promise.resolve();
+            return firebase.storage().ref(path).delete().catch(function(err) {
+                console.warn('Could not clean up uploaded team profile photo:', err && err.message ? err.message : err);
+            });
+        }
+
         async function uploadSelectedPhotoIfNeeded() {
-            if (!selectedPhotoFile) return '';
+            if (!selectedPhotoFile) return { url: '', storagePath: '' };
 
             var validationError = validatePhotoFile(selectedPhotoFile);
             if (validationError) throw new Error(validationError);
             if (!firebase.storage) throw new Error('Firebase Storage is not available on this page.');
 
-            var storageRef = firebase.storage().ref(buildStoragePhotoPath(selectedPhotoFile));
+            var storagePath = buildStoragePhotoPath(selectedPhotoFile);
+            var storageRef = firebase.storage().ref(storagePath);
             var snapshot = await storageRef.put(selectedPhotoFile, {
                 contentType: getPhotoContentType(selectedPhotoFile)
             });
-            return snapshot.ref.getDownloadURL();
+            return {
+                url: await snapshot.ref.getDownloadURL(),
+                storagePath: snapshot.ref.fullPath || storagePath
+            };
         }
 
         // Form submission
@@ -657,12 +668,15 @@
             // Build profile data
             var photoUrlField = pendingPhotoUrl;
             var photoData = '';
+            var photoStoragePath = '';
 
             try {
                 if (photoUrlField) {
                     photoData = photoUrlField;
                 } else {
-                    photoData = await uploadSelectedPhotoIfNeeded();
+                    var uploadedPhoto = await uploadSelectedPhotoIfNeeded();
+                    photoData = uploadedPhoto.url;
+                    photoStoragePath = uploadedPhoto.storagePath;
                 }
             } catch (err) {
                 showFormError('Photo upload failed: ' + err.message);
@@ -688,6 +702,7 @@
                 instagram: document.getElementById('instagram').value.trim(),
                 twitter: document.getElementById('twitter').value.trim(),
                 photo: photoData,
+                photoStoragePath: photoStoragePath,
                 status: 'pending',
                 submittedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -705,6 +720,7 @@
                     btn.textContent = 'Submit Profile';
                 })
                 .catch(function(err) {
+                    if (photoStoragePath) deleteUploadedPhotoByPath(photoStoragePath);
                     errorMsg.textContent = 'Submission failed: ' + err.message;
                     errorBanner.style.display = 'block';
                     errorBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });

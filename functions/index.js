@@ -1,4 +1,4 @@
-const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineString, defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
@@ -15,6 +15,9 @@ const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Workshop ws' }
 const RESTAURANT_SMS_NUMBER = defineString('RESTAURANT_SMS_NUMBER', { default: '020 543 8455' });
 const ARKESEL_URL = defineString('ARKESEL_URL', { default: 'https://sms.arkesel.com/sms/api' });
 const ARKESEL_BALANCE_URL = defineString('ARKESEL_BALANCE_URL', { default: 'https://sms.arkesel.com/sms/api' });
+const TEAM_PROFILE_STORAGE_BUCKET = defineString('TEAM_PROFILE_STORAGE_BUCKET', {
+  default: 'luban-workshop-restaurant.firebasestorage.app',
+});
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -88,6 +91,86 @@ function getAdmin() {
   }
 
   return admin;
+}
+
+const TEAM_PROFILE_STORAGE_PREFIX = 'team-profiles/';
+
+function normalizeTeamProfileStoragePath(value) {
+  const path = String(value || '').trim().replace(/^\/+/, '');
+  if (!path.startsWith(TEAM_PROFILE_STORAGE_PREFIX)) return '';
+  if (path.endsWith('/') || path.includes('..')) return '';
+  return path;
+}
+
+function getTeamProfileStoragePathFromUrl(value) {
+  const rawUrl = String(value || '').trim();
+  if (!/^https?:\/\//i.test(rawUrl)) return '';
+
+  try {
+    const parsedUrl = new URL(rawUrl);
+    const objectMarker = '/o/';
+    const markerIndex = parsedUrl.pathname.indexOf(objectMarker);
+
+    if (markerIndex !== -1) {
+      const encodedPath = parsedUrl.pathname.slice(markerIndex + objectMarker.length);
+      return normalizeTeamProfileStoragePath(decodeURIComponent(encodedPath));
+    }
+
+    if (parsedUrl.hostname === 'storage.googleapis.com') {
+      const pathParts = parsedUrl.pathname.replace(/^\/+/, '').split('/');
+      if (pathParts.length > 1) {
+        return normalizeTeamProfileStoragePath(decodeURIComponent(pathParts.slice(1).join('/')));
+      }
+    }
+  } catch (error) {
+    logger.warn('Could not parse team profile photo URL for cleanup', {
+      error: error?.message || error,
+    });
+  }
+
+  return '';
+}
+
+function getTeamProfileStoragePath(profile = {}) {
+  return normalizeTeamProfileStoragePath(profile.photoStoragePath) ||
+    normalizeTeamProfileStoragePath(profile.photoPath) ||
+    getTeamProfileStoragePathFromUrl(profile.photo);
+}
+
+async function deleteTeamProfilePhotoPath(path, context = {}) {
+  const storagePath = normalizeTeamProfileStoragePath(path);
+  if (!storagePath) return false;
+
+  const admin = getAdmin();
+  const bucketName = TEAM_PROFILE_STORAGE_BUCKET.value();
+  const bucket = bucketName ? admin.storage().bucket(bucketName) : admin.storage().bucket();
+
+  try {
+    await bucket.file(storagePath).delete();
+    logger.info('Deleted team profile photo from Firebase Storage', {
+      ...context,
+      storagePath,
+      bucket: bucket.name,
+    });
+    return true;
+  } catch (error) {
+    if (error?.code === 404) {
+      logger.info('Team profile photo was already absent from Firebase Storage', {
+        ...context,
+        storagePath,
+        bucket: bucket.name,
+      });
+      return false;
+    }
+
+    logger.error('Failed to delete team profile photo from Firebase Storage', {
+      ...context,
+      storagePath,
+      bucket: bucket.name,
+      error: error?.message || error,
+    });
+    throw error;
+  }
 }
 
 async function sendArkeselSms({ to, message, orderId, logContext }) {
@@ -962,6 +1045,53 @@ exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
       });
       // Do not throw to avoid retry storms; log and allow other notifications to proceed
     }
+  }
+);
+
+exports.cleanupTeamProfilePhotoOnUpdate = onDocumentUpdated(
+  {
+    document: 'teamProfiles/{profileId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const profileId = event.params.profileId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+    const beforePath = getTeamProfileStoragePath(beforeData);
+    const afterPath = getTeamProfileStoragePath(afterData);
+    const oldStatus = String(beforeData.status || 'pending').toLowerCase();
+    const newStatus = String(afterData.status || 'pending').toLowerCase();
+    const cleanupTargets = new Map();
+
+    if (beforePath && beforePath !== afterPath) {
+      cleanupTargets.set(beforePath, newStatus === 'rejected' ? 'rejected' : 'replaced');
+    }
+
+    if (newStatus === 'rejected' && oldStatus !== 'rejected' && afterPath) {
+      cleanupTargets.set(afterPath, 'rejected');
+    }
+
+    if (!cleanupTargets.size) return;
+
+    await Promise.all(Array.from(cleanupTargets.entries()).map(([storagePath, reason]) => (
+      deleteTeamProfilePhotoPath(storagePath, { profileId, reason })
+    )));
+  }
+);
+
+exports.cleanupTeamProfilePhotoOnDelete = onDocumentDeleted(
+  {
+    document: 'teamProfiles/{profileId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const profileId = event.params.profileId;
+    const deletedData = event.data?.data() || {};
+    const storagePath = getTeamProfileStoragePath(deletedData);
+
+    if (!storagePath) return;
+
+    await deleteTeamProfilePhotoPath(storagePath, { profileId, reason: 'profile-deleted' });
   }
 );
 

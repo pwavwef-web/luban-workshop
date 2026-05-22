@@ -380,13 +380,23 @@
 
         // ---------- Actions ----------
         function updateStatus(docId, newStatus) {
-            db.collection('teamProfiles').doc(docId).update({ status: newStatus })
+            var updates = { status: newStatus };
+            if (newStatus === 'rejected') {
+                updates.photo = '';
+                updates.photoStoragePath = '';
+                updates.photoRejectedAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
+
+            db.collection('teamProfiles').doc(docId).update(updates)
                 .then(function() {
                     var messages = {
                         approved: '✓ Profile approved and now live on the team page.',
                         rejected: '✗ Profile rejected.',
                         pending: 'Profile reset to pending.'
                     };
+                    if (newStatus === 'rejected') {
+                        messages.rejected = 'Profile rejected and uploaded photo queued for cleanup.';
+                    }
                     showToast(messages[newStatus] || 'Updated.');
                 })
                 .catch(function(err) {
