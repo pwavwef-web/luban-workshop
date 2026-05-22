@@ -27,15 +27,15 @@
   function footerHtml(chinese) {
     const labels = chinese
       ? {
-          rights: '版权所有。',
-          reservations: '预订电话',
-          terms: '使用条款',
-          privacy: '隐私政策',
-          about: '关于我们',
-          contact: '联系我们',
-          faq: '常见问题',
-          facebook: 'Luban Workshop 的 Facebook',
-          instagram: 'Luban Workshop 的 Instagram',
+          rights: '\u7248\u6743\u6240\u6709\u3002',
+          reservations: '\u9884\u8ba2\u7535\u8bdd',
+          terms: '\u4f7f\u7528\u6761\u6b3e',
+          privacy: '\u9690\u79c1\u653f\u7b56',
+          about: '\u5173\u4e8e\u6211\u4eec',
+          contact: '\u8054\u7cfb\u6211\u4eec',
+          faq: '\u5e38\u89c1\u95ee\u9898',
+          facebook: 'Luban Workshop \u7684 Facebook',
+          instagram: 'Luban Workshop \u7684 Instagram',
         }
       : {
           rights: 'All rights reserved.',

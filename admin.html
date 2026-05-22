@@ -205,6 +205,36 @@
             border-radius: 6px;
         }
 
+        .admin-scroll-panel {
+            max-height: 18rem;
+            overflow: auto;
+            border: 1px solid var(--admin-line);
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .admin-check-row {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) 7rem;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #f5f5f4;
+        }
+
+        .admin-check-row:last-child {
+            border-bottom: 0;
+        }
+
+        .admin-qr-preview {
+            width: 164px;
+            height: 164px;
+            border: 1px solid var(--admin-line);
+            border-radius: 8px;
+            background: #fff;
+            object-fit: contain;
+        }
+
         @media (max-width: 767px) {
             .admin-login-shell {
                 background: var(--admin-warm);
@@ -321,6 +351,12 @@
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="badge-percent" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Promotions &amp; Deals</span>
+                </button>
+
+                <button onclick="switchTab('special-menus')" id="tab-btn-special-menus"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="qr-code" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Special Menus</span>
                 </button>
 
                 <button onclick="switchTab('admin-users')" id="tab-btn-admin-users"
@@ -551,7 +587,7 @@
             <div id="view-promotions" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Promotions &amp; Deals</h2>
-                    <p class="text-sm text-stone-500">Create customer-facing offers and control what appears on profile pages.</p>
+                    <p class="text-sm text-stone-500">Create customer-facing offers and control what appears on the public pages.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -559,7 +595,7 @@
                         <div class="flex items-start justify-between gap-3 mb-5">
                             <div>
                                 <h3 id="promotion-form-title" class="text-base font-bold text-stone-900">New Offer</h3>
-                                <p class="text-xs text-stone-500 mt-1">Only visible offers appear on customer profile pages.</p>
+                                <p class="text-xs text-stone-500 mt-1">Visible offers appear on the home and about pages.</p>
                             </div>
                             <span id="promotion-editing-pill" class="hidden px-2 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100">Editing</span>
                         </div>
@@ -592,6 +628,37 @@
                                     class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
                                     placeholder="10% off selected rice dishes">
                             </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label for="promotion-discount-type" class="block text-sm font-medium text-stone-700 mb-1">Pricing Style</label>
+                                    <select id="promotion-discount-type"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                        <option value="custom">Custom promo prices</option>
+                                        <option value="percent">Fixed percent off</option>
+                                        <option value="bundle">Combo bundle price</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="promotion-discount-percent" class="block text-sm font-medium text-stone-700 mb-1">Percent Off</label>
+                                    <input type="number" id="promotion-discount-percent" min="0" max="100" step="1"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                        placeholder="15">
+                                </div>
+                                <div>
+                                    <label for="promotion-bundle-price" class="block text-sm font-medium text-stone-700 mb-1">Combo Price (&#8373;)</label>
+                                    <input type="number" id="promotion-bundle-price" min="0" step="1"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                        placeholder="120">
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <label class="block text-sm font-medium text-stone-700">Included Dishes</label>
+                                    <span id="promotion-selection-summary" class="text-xs font-semibold text-stone-500">0 selected</span>
+                                </div>
+                                <div id="promotion-dish-list" class="admin-scroll-panel"></div>
+                                <p class="text-xs text-stone-500 mt-2">Tick any dishes that belong to this deal. Add a promo price per dish, use a percent discount, or set one bundle price for the full combo.</p>
+                            </div>
                             <div>
                                 <label for="promotion-code" class="block text-sm font-medium text-stone-700 mb-1">Code</label>
                                 <input type="text" id="promotion-code" maxlength="40"
@@ -610,7 +677,7 @@
                             <label class="inline-flex items-center gap-3 text-sm font-medium text-stone-700">
                                 <input id="promotion-active" type="checkbox" checked
                                     class="h-4 w-4 rounded border-stone-300 text-red-700 focus:ring-red-700">
-                                <span>Show on customer profile page</span>
+                                <span>Show on home and about pages</span>
                             </label>
                             <div id="promotion-feedback" class="hidden text-sm p-3 rounded-md"></div>
                             <div class="flex flex-col sm:flex-row gap-3">
@@ -657,6 +724,113 @@
                                     <tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">Loading offers...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-special-menus" class="view-shell hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Special Menus</h2>
+                    <p class="text-sm text-stone-500">Create event menus and generate unique QR links for attendees.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6 lg:col-span-2">
+                        <div class="flex items-start justify-between gap-3 mb-5">
+                            <div>
+                                <h3 id="special-menu-form-title" class="text-base font-bold text-stone-900">New Special Menu</h3>
+                                <p class="text-xs text-stone-500 mt-1">Each saved menu gets its own scan-ready QR code.</p>
+                            </div>
+                            <span id="special-menu-editing-pill" class="hidden px-2 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100">Editing</span>
+                        </div>
+
+                        <form id="special-menu-form" class="space-y-4">
+                            <div>
+                                <label for="special-menu-title" class="block text-sm font-medium text-stone-700 mb-1">Event or Menu Name</label>
+                                <input id="special-menu-title" type="text" required maxlength="120"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                    placeholder="Graduation Dinner Menu">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="special-menu-date" class="block text-sm font-medium text-stone-700 mb-1">Event Date</label>
+                                    <input id="special-menu-date" type="date"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                                </div>
+                                <div>
+                                    <label for="special-menu-status" class="block text-sm font-medium text-stone-700 mb-1">Status</label>
+                                    <select id="special-menu-status"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                        <option value="active">Active</option>
+                                        <option value="hidden">Hidden</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="special-menu-note" class="block text-sm font-medium text-stone-700 mb-1">Guest Note</label>
+                                <textarea id="special-menu-note" rows="3" maxlength="500"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm resize-y"
+                                    placeholder="A short welcome note for attendees."></textarea>
+                            </div>
+
+                            <div class="border border-stone-200 rounded-lg p-3 bg-stone-50">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <input id="special-item-name" type="text" maxlength="120"
+                                        class="px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                        placeholder="Dish name">
+                                    <input id="special-item-price" type="number" min="0" step="1"
+                                        class="px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                        placeholder="Price">
+                                    <input id="special-item-category" type="text" maxlength="60"
+                                        class="px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                        placeholder="Category">
+                                    <button id="special-item-add-btn" type="button"
+                                        class="bg-stone-900 text-white px-4 py-2 rounded-md hover:bg-stone-800 transition-colors text-sm font-medium">
+                                        Add Item
+                                    </button>
+                                </div>
+                                <textarea id="special-item-description" rows="2" maxlength="300"
+                                    class="mt-3 w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm resize-y"
+                                    placeholder="Short item description"></textarea>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between gap-3 mb-2">
+                                    <label class="block text-sm font-medium text-stone-700">Special Menu Items</label>
+                                    <span id="special-menu-items-count" class="text-xs font-semibold text-stone-500">0 items</span>
+                                </div>
+                                <div id="special-menu-items-list" class="space-y-2"></div>
+                            </div>
+
+                            <div id="special-menu-feedback" class="hidden text-sm p-3 rounded-md"></div>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button type="submit" id="special-menu-save-btn"
+                                    class="flex-1 bg-red-700 text-white px-5 py-2 rounded-md hover:bg-red-800 transition-colors text-sm font-medium">
+                                    Save &amp; Create QR
+                                </button>
+                                <button type="button" id="special-menu-reset-btn"
+                                    class="border border-stone-300 text-stone-600 px-5 py-2 rounded-md hover:bg-stone-50 transition-colors text-sm font-medium">
+                                    Clear
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden lg:col-span-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-stone-200 bg-white">
+                            <div>
+                                <h3 class="text-base font-bold text-stone-900">Saved Special Menus</h3>
+                                <p id="special-menu-count" class="text-xs text-stone-500 mt-1">Loading menus...</p>
+                            </div>
+                            <a id="special-menu-preview-link" href="special-menu.html" target="_blank" rel="noopener"
+                                class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md hover:bg-stone-50 transition-colors text-sm font-semibold">
+                                <i data-lucide="external-link" class="h-4 w-4"></i>
+                                Preview Page
+                            </a>
+                        </div>
+                        <div id="special-menus-list" class="divide-y divide-stone-200">
+                            <p class="px-6 py-8 text-center text-stone-500 italic">Loading special menus...</p>
                         </div>
                     </div>
                 </div>
@@ -967,6 +1141,7 @@
                 listenToReservations();
                 listenToOrders();
                 listenToPromotions();
+                listenToSpecialMenus();
                 listenToAdminUsers();
                 listenToMessages();
                 listenToChatbotKnowledge();
@@ -1032,7 +1207,7 @@
             }
             
             // Hide all views
-            ['menu', 'reservations', 'orders', 'promotions', 'admin-users', 'messages', 'chatbot-knowledge', 'account'].forEach(tab => {
+            ['menu', 'reservations', 'orders', 'promotions', 'special-menus', 'admin-users', 'messages', 'chatbot-knowledge', 'account'].forEach(tab => {
                 document.getElementById('view-' + tab).classList.add('hidden');
 
                 // Reset Tab Styles
@@ -1110,6 +1285,10 @@
             { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30 },
             { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30 },
             { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40 },
+            { id: 'DR1', name: 'Coca-Cola 300ml', category: 'drinks', price: 15 },
+            { id: 'DR2', name: 'Fanta 300ml', category: 'drinks', price: 15 },
+            { id: 'DR3', name: 'Sprite 300ml', category: 'drinks', price: 15 },
+            { id: 'DR4', name: 'Water 300ml', category: 'drinks', price: 5 },
         ];
 
         // --- Real-time Listeners (Red Dot Logic) ---
@@ -1118,13 +1297,27 @@
         let menuPriceOverrides = {};
         let menuImageOverrides = {};
 
+        function getDishCurrentPrice(dish) {
+            return menuPriceOverrides[dish.id] !== undefined ? Number(menuPriceOverrides[dish.id]) : Number(dish.price || 0);
+        }
+
+        function getDishImagePath(dish) {
+            const drinkImages = {
+                DR1: 'assets/drinks/coca-cola-300ml.webp',
+                DR2: 'assets/drinks/fanta-300ml.webp',
+                DR3: 'assets/drinks/sprite-300ml.webp',
+                DR4: 'assets/drinks/water-300ml.webp'
+            };
+            return drinkImages[dish.id] || `assets/menu-items-pictures/${dish.id}.webp`;
+        }
+
         function renderMenuTable() {
             const tableBody = document.getElementById('menu-items-table');
             tableBody.innerHTML = '';
 
             HARDCODED_MENU.forEach(dish => {
                 const isHidden = menuHiddenIds.has(dish.id);
-                const currentPrice = menuPriceOverrides[dish.id] !== undefined ? menuPriceOverrides[dish.id] : dish.price;
+                const currentPrice = getDishCurrentPrice(dish);
                 const hasImageOverride = menuImageOverrides[dish.id] !== undefined;
                 const statusBadge = isHidden
                     ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Hidden</span>'
@@ -1246,7 +1439,7 @@
 
             // Show current image preview
             const dish = HARDCODED_MENU.find(d => d.id === dishId);
-            const currentSrc = menuImageOverrides[dishId] || (dish ? `assets/menu-items-pictures/${dishId}.webp` : '');
+            const currentSrc = menuImageOverrides[dishId] || (dish ? getDishImagePath(dish) : '');
             const PLACEHOLDER = 'https://placehold.co/400x300/e5e5e5/a3a3a3?text=No+Image';
             const preview = document.getElementById('image-edit-preview');
             preview.onerror = () => { if (preview.src !== PLACEHOLDER) preview.src = PLACEHOLDER; };
@@ -1672,6 +1865,105 @@
         // --- Promotions & Deals Management ---
         let promotionsCache = [];
         let editingPromotionId = null;
+        let promotionSelectedItems = [];
+
+        function formatCurrency(value) {
+            const amount = Number(value);
+            if (!Number.isFinite(amount)) return '';
+            return `GHS ${amount.toFixed(2).replace(/\.00$/, '')}`;
+        }
+
+        function getPromotionItemSummary(items) {
+            if (!Array.isArray(items) || !items.length) return '';
+            return items.map(item => item.name || item.id).filter(Boolean).join(', ');
+        }
+
+        function calculatePromotionItemPrice(dish, discountType, percent) {
+            const basePrice = getDishCurrentPrice(dish);
+            if (discountType === 'percent' && Number.isFinite(percent) && percent > 0) {
+                return Math.max(0, Math.round(basePrice * (100 - percent)) / 100);
+            }
+            const selected = promotionSelectedItems.find(item => item.id === dish.id);
+            return selected && Number.isFinite(Number(selected.promoPrice)) ? Number(selected.promoPrice) : '';
+        }
+
+        function renderPromotionDishSelector() {
+            const list = document.getElementById('promotion-dish-list');
+            if (!list) return;
+            const discountType = document.getElementById('promotion-discount-type').value;
+            const percent = parseFloat(document.getElementById('promotion-discount-percent').value);
+            const selectedIds = new Set(promotionSelectedItems.map(item => item.id));
+
+            list.innerHTML = HARDCODED_MENU.map(dish => {
+                const selected = selectedIds.has(dish.id);
+                const currentPrice = getDishCurrentPrice(dish);
+                const promoPrice = calculatePromotionItemPrice(dish, discountType, percent);
+                const disabledPrice = discountType !== 'custom' ? 'disabled' : '';
+                return `
+                    <label class="admin-check-row">
+                        <input type="checkbox" data-promotion-dish-id="${escapeHtml(dish.id)}" ${selected ? 'checked' : ''}
+                            class="h-4 w-4 rounded border-stone-300 text-red-700 focus:ring-red-700">
+                        <span class="min-w-0">
+                            <span class="block text-sm font-semibold text-stone-900 truncate">${escapeHtml(dish.name)}</span>
+                            <span class="block text-xs text-stone-500">${escapeHtml(dish.category)} - ${formatCurrency(currentPrice)}</span>
+                        </span>
+                        <input type="number" min="0" step="1" data-promotion-price-id="${escapeHtml(dish.id)}"
+                            value="${selected && promoPrice !== '' ? Number(promoPrice) : ''}" ${disabledPrice}
+                            class="w-full px-2 py-1 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm disabled:bg-stone-100"
+                            placeholder="Promo">
+                    </label>
+                `;
+            }).join('');
+
+            list.querySelectorAll('[data-promotion-dish-id]').forEach(input => {
+                input.addEventListener('change', syncPromotionSelectionFromInputs);
+            });
+            list.querySelectorAll('[data-promotion-price-id]').forEach(input => {
+                input.addEventListener('input', syncPromotionSelectionFromInputs);
+            });
+            updatePromotionSelectionSummary();
+        }
+
+        function syncPromotionSelectionFromInputs() {
+            const selected = [];
+            document.querySelectorAll('[data-promotion-dish-id]').forEach(checkbox => {
+                if (!checkbox.checked) return;
+                const dish = HARDCODED_MENU.find(item => item.id === checkbox.dataset.promotionDishId);
+                if (!dish) return;
+                const priceInput = Array.from(document.querySelectorAll('[data-promotion-price-id]'))
+                    .find(input => input.dataset.promotionPriceId === dish.id);
+                const promoPrice = priceInput && priceInput.value !== '' ? parseFloat(priceInput.value) : null;
+                selected.push({
+                    id: dish.id,
+                    name: dish.name,
+                    category: dish.category,
+                    originalPrice: getDishCurrentPrice(dish),
+                    promoPrice: Number.isFinite(promoPrice) ? promoPrice : null,
+                    image: menuImageOverrides[dish.id] || getDishImagePath(dish)
+                });
+            });
+            promotionSelectedItems = selected;
+            updatePromotionSelectionSummary();
+        }
+
+        function updatePromotionSelectionSummary() {
+            const summary = document.getElementById('promotion-selection-summary');
+            if (!summary) return;
+            summary.textContent = `${promotionSelectedItems.length} selected`;
+        }
+
+        function getPromotionPricingLine(data) {
+            const items = Array.isArray(data.items) ? data.items : [];
+            if (data.discountType === 'bundle' && data.bundlePrice !== undefined && data.bundlePrice !== null && data.bundlePrice !== '') {
+                return `Combo price ${formatCurrency(data.bundlePrice)}`;
+            }
+            if (data.discountType === 'percent' && data.discountPercent) {
+                return `${Number(data.discountPercent)}% off selected dishes`;
+            }
+            const priced = items.filter(item => item.promoPrice !== null && item.promoPrice !== undefined && item.promoPrice !== '');
+            if (priced.length) return priced.map(item => `${item.name}: ${formatCurrency(item.promoPrice)}`).join(' | ');
+            return '';
+        }
 
         function listenToPromotions() {
             db.collection('promotions').onSnapshot(snapshot => {
@@ -1738,6 +2030,10 @@
                 const title = data.title || item.id;
                 const offer = data.offer ? `<p class="text-xs text-red-700 font-semibold mt-1">${escapeHtml(data.offer)}</p>` : '';
                 const code = data.code ? `<span class="text-xs font-mono text-stone-500 ml-2">${escapeHtml(data.code)}</span>` : '';
+                const itemSummary = getPromotionItemSummary(data.items);
+                const itemLine = itemSummary ? `<p class="text-xs text-stone-600 mt-1"><span class="font-semibold">Dishes:</span> ${escapeHtml(truncateText(itemSummary, 130))}</p>` : '';
+                const pricingLine = getPromotionPricingLine(data);
+                const pricing = pricingLine ? `<p class="text-xs text-emerald-700 font-semibold mt-1">${escapeHtml(pricingLine)}</p>` : '';
 
                 return `
                     <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100${rowClass}">
@@ -1748,6 +2044,8 @@
                                 ${code}
                             </div>
                             ${offer}
+                            ${pricing}
+                            ${itemLine}
                             <p class="text-xs text-stone-500 mt-1 max-w-md">${escapeHtml(truncateText(data.description || '', 150))}</p>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap align-top">${statusBadge}</td>
@@ -1798,13 +2096,18 @@
 
         function resetPromotionForm() {
             editingPromotionId = null;
+            promotionSelectedItems = [];
             document.getElementById('promotion-form').reset();
             document.getElementById('promotion-active').checked = true;
+            document.getElementById('promotion-discount-type').value = 'custom';
+            document.getElementById('promotion-discount-percent').value = '';
+            document.getElementById('promotion-bundle-price').value = '';
             document.getElementById('promotion-form-title').textContent = 'New Offer';
             document.getElementById('promotion-editing-pill').classList.add('hidden');
             document.getElementById('promotion-save-btn').textContent = 'Save Offer';
             document.getElementById('promotion-reset-btn').textContent = 'Clear';
             updatePromotionDescriptionCount();
+            renderPromotionDishSelector();
         }
 
         function openPromotionEditor(id) {
@@ -1818,12 +2121,24 @@
             document.getElementById('promotion-offer').value = item.data.offer || '';
             document.getElementById('promotion-code').value = item.data.code || '';
             document.getElementById('promotion-description').value = item.data.description || '';
+            document.getElementById('promotion-discount-type').value = item.data.discountType || 'custom';
+            document.getElementById('promotion-discount-percent').value = item.data.discountPercent || '';
+            document.getElementById('promotion-bundle-price').value = item.data.bundlePrice || '';
+            promotionSelectedItems = Array.isArray(item.data.items) ? item.data.items.map(promoItem => ({
+                id: promoItem.id,
+                name: promoItem.name,
+                category: promoItem.category || '',
+                originalPrice: Number(promoItem.originalPrice || 0),
+                promoPrice: promoItem.promoPrice === undefined ? null : promoItem.promoPrice,
+                image: promoItem.image || ''
+            })) : [];
             document.getElementById('promotion-active').checked = isPromotionVisible(item.data);
             document.getElementById('promotion-form-title').textContent = 'Edit Offer';
             document.getElementById('promotion-editing-pill').classList.remove('hidden');
             document.getElementById('promotion-save-btn').textContent = 'Update Offer';
             document.getElementById('promotion-reset-btn').textContent = 'Cancel';
             updatePromotionDescriptionCount();
+            renderPromotionDishSelector();
             document.getElementById('promotion-title').focus();
         }
 
@@ -1835,6 +2150,9 @@
             const code = document.getElementById('promotion-code').value.trim();
             const description = document.getElementById('promotion-description').value.trim();
             const expiresAt = document.getElementById('promotion-expires').value;
+            const discountType = document.getElementById('promotion-discount-type').value;
+            const discountPercent = parseFloat(document.getElementById('promotion-discount-percent').value);
+            const bundlePrice = parseFloat(document.getElementById('promotion-bundle-price').value);
             const active = document.getElementById('promotion-active').checked;
             const user = auth.currentUser;
             const saveBtn = document.getElementById('promotion-save-btn');
@@ -1843,6 +2161,32 @@
                 showPromotionFeedback('Please add a title and description.', true);
                 return;
             }
+
+            syncPromotionSelectionFromInputs();
+            if (discountType === 'percent' && (!Number.isFinite(discountPercent) || discountPercent <= 0 || discountPercent > 100)) {
+                showPromotionFeedback('Please enter a percent discount between 1 and 100.', true);
+                return;
+            }
+            if (discountType === 'bundle' && (!Number.isFinite(bundlePrice) || bundlePrice <= 0)) {
+                showPromotionFeedback('Please enter a valid combo bundle price.', true);
+                return;
+            }
+
+            const normalizedItems = promotionSelectedItems.map(item => {
+                const dish = HARDCODED_MENU.find(menuItem => menuItem.id === item.id);
+                const basePrice = dish ? getDishCurrentPrice(dish) : Number(item.originalPrice || 0);
+                const promoPrice = discountType === 'percent'
+                    ? Math.round(basePrice * (100 - discountPercent)) / 100
+                    : (Number.isFinite(Number(item.promoPrice)) ? Number(item.promoPrice) : null);
+                return {
+                    id: item.id,
+                    name: item.name,
+                    category: item.category || '',
+                    originalPrice: basePrice,
+                    promoPrice,
+                    image: item.image || (dish ? menuImageOverrides[dish.id] || getDishImagePath(dish) : '')
+                };
+            });
 
             saveBtn.disabled = true;
             saveBtn.textContent = editingPromotionId ? 'Updating...' : 'Saving...';
@@ -1854,6 +2198,10 @@
                 code,
                 description,
                 expiresAt,
+                discountType,
+                discountPercent: discountType === 'percent' ? discountPercent : null,
+                bundlePrice: discountType === 'bundle' ? bundlePrice : null,
+                items: normalizedItems,
                 active,
                 visible: active,
                 status: active ? 'active' : 'hidden',
@@ -1924,6 +2272,315 @@
         document.getElementById('promotion-reset-btn').addEventListener('click', resetPromotionForm);
         document.getElementById('promotion-sort').addEventListener('change', renderPromotionsTable);
         document.getElementById('promotion-description').addEventListener('input', updatePromotionDescriptionCount);
+        document.getElementById('promotion-discount-type').addEventListener('change', renderPromotionDishSelector);
+        document.getElementById('promotion-discount-percent').addEventListener('input', renderPromotionDishSelector);
+        renderPromotionDishSelector();
+
+        // --- Special Menu Management ---
+        let specialMenusCache = [];
+        let editingSpecialMenuId = null;
+        let specialMenuItems = [];
+
+        function generateSpecialMenuCode() {
+            const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'event-';
+            for (let i = 0; i < 8; i++) {
+                code += alphabet[Math.floor(Math.random() * alphabet.length)].toLowerCase();
+            }
+            return code;
+        }
+
+        function getSpecialMenuUrl(id) {
+            const basePath = window.location.pathname.replace(/admin\.html.*$/, '');
+            return `${window.location.origin}${basePath}special-menu.html?menu=${encodeURIComponent(id)}`;
+        }
+
+        function getQrImageUrl(url) {
+            return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=12&data=${encodeURIComponent(url)}`;
+        }
+
+        function renderSpecialMenuItems() {
+            const list = document.getElementById('special-menu-items-list');
+            const count = document.getElementById('special-menu-items-count');
+            count.textContent = `${specialMenuItems.length} item${specialMenuItems.length === 1 ? '' : 's'}`;
+
+            if (!specialMenuItems.length) {
+                list.innerHTML = '<p class="text-sm text-stone-500 italic border border-dashed border-stone-300 rounded-lg p-4">No special items added yet.</p>';
+                return;
+            }
+
+            list.innerHTML = specialMenuItems.map((item, index) => `
+                <div class="flex items-start justify-between gap-3 border border-stone-200 rounded-lg p-3 bg-white">
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="text-sm font-semibold text-stone-900">${escapeHtml(item.name)}</p>
+                            ${item.category ? `<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">${escapeHtml(item.category)}</span>` : ''}
+                            ${item.price !== null && item.price !== undefined && item.price !== '' ? `<span class="text-xs font-bold text-red-700">${escapeHtml(formatCurrency(item.price))}</span>` : ''}
+                        </div>
+                        ${item.description ? `<p class="text-xs text-stone-500 mt-1">${escapeHtml(item.description)}</p>` : ''}
+                    </div>
+                    <button type="button" data-special-item-remove="${index}" class="text-stone-500 hover:text-red-700" aria-label="Remove special item">
+                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            list.querySelectorAll('[data-special-item-remove]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    specialMenuItems.splice(Number(btn.dataset.specialItemRemove), 1);
+                    renderSpecialMenuItems();
+                });
+            });
+            lucide.createIcons();
+        }
+
+        function addSpecialMenuItem() {
+            const nameInput = document.getElementById('special-item-name');
+            const priceInput = document.getElementById('special-item-price');
+            const categoryInput = document.getElementById('special-item-category');
+            const descriptionInput = document.getElementById('special-item-description');
+            const name = nameInput.value.trim();
+            const price = priceInput.value === '' ? null : parseFloat(priceInput.value);
+
+            if (!name) {
+                showSpecialMenuFeedback('Add a dish name first.', true);
+                return;
+            }
+            if (priceInput.value !== '' && (!Number.isFinite(price) || price < 0)) {
+                showSpecialMenuFeedback('Add a valid item price.', true);
+                return;
+            }
+
+            specialMenuItems.push({
+                name,
+                price,
+                category: categoryInput.value.trim(),
+                description: descriptionInput.value.trim()
+            });
+
+            nameInput.value = '';
+            priceInput.value = '';
+            categoryInput.value = '';
+            descriptionInput.value = '';
+            nameInput.focus();
+            renderSpecialMenuItems();
+        }
+
+        function showSpecialMenuFeedback(message, isError) {
+            const feedback = document.getElementById('special-menu-feedback');
+            feedback.textContent = message;
+            feedback.className = `text-sm p-3 rounded-md ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 5000);
+        }
+
+        function listenToSpecialMenus() {
+            db.collection('specialMenus').onSnapshot(snapshot => {
+                specialMenusCache = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() || {} }));
+                renderSpecialMenusList();
+            }, err => {
+                console.error('Special menus listener error:', err);
+                document.getElementById('special-menus-list').innerHTML =
+                    '<p class="px-6 py-8 text-center text-red-600 italic">Failed to load special menus.</p>';
+                document.getElementById('special-menu-count').textContent = 'Could not load menus.';
+            });
+        }
+
+        function renderSpecialMenusList() {
+            const list = document.getElementById('special-menus-list');
+            const count = document.getElementById('special-menu-count');
+
+            if (!specialMenusCache.length) {
+                list.innerHTML = '<p class="px-6 py-8 text-center text-stone-500 italic">No special menus yet.</p>';
+                count.textContent = '0 menus';
+                return;
+            }
+
+            const activeCount = specialMenusCache.filter(item => item.data.active === true).length;
+            count.textContent = `${activeCount} active, ${specialMenusCache.length - activeCount} hidden`;
+
+            list.innerHTML = [...specialMenusCache]
+                .sort((a, b) => getPromotionTimestamp(b.data) - getPromotionTimestamp(a.data))
+                .map(item => {
+                    const data = item.data;
+                    const url = getSpecialMenuUrl(item.id);
+                    const active = data.active === true;
+                    const statusBadge = active
+                        ? '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>'
+                        : '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">Hidden</span>';
+                    return `
+                        <article class="p-5 ${active ? '' : 'opacity-65'}">
+                            <div class="flex flex-col xl:flex-row gap-5 xl:items-start xl:justify-between">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h4 class="text-base font-bold text-stone-900">${escapeHtml(data.title || item.id)}</h4>
+                                        ${statusBadge}
+                                        ${data.eventDate ? `<span class="text-xs font-semibold text-stone-500">${escapeHtml(data.eventDate)}</span>` : ''}
+                                    </div>
+                                    <p class="text-sm text-stone-500 mt-1">${Array.isArray(data.items) ? data.items.length : 0} menu items</p>
+                                    ${data.note ? `<p class="text-sm text-stone-600 mt-2">${escapeHtml(truncateText(data.note, 180))}</p>` : ''}
+                                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                                        <a href="${escapeHtml(url)}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-800">
+                                            <i data-lucide="external-link" class="h-4 w-4"></i> Open menu
+                                        </a>
+                                        <button type="button" data-special-action="copy" data-special-url="${escapeHtml(url)}" class="inline-flex items-center gap-2 text-sm font-semibold text-stone-600 hover:text-stone-900">
+                                            <i data-lucide="copy" class="h-4 w-4"></i> Copy link
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-4 sm:items-center">
+                                    <img class="admin-qr-preview" src="${escapeHtml(getQrImageUrl(url))}" alt="QR code for ${escapeHtml(data.title || item.id)}">
+                                    <div class="flex xl:flex-col gap-3">
+                                        <button type="button" data-special-action="edit" data-special-id="${escapeHtml(item.id)}" class="text-stone-600 hover:text-blue-600" title="Edit menu" aria-label="Edit special menu"><i data-lucide="pencil" class="h-4 w-4"></i></button>
+                                        <button type="button" data-special-action="toggle" data-special-id="${escapeHtml(item.id)}" class="text-stone-600 hover:text-red-700" title="${active ? 'Hide menu' : 'Show menu'}" aria-label="${active ? 'Hide menu' : 'Show menu'}"><i data-lucide="${active ? 'eye-off' : 'eye'}" class="h-4 w-4"></i></button>
+                                        <button type="button" data-special-action="delete" data-special-id="${escapeHtml(item.id)}" class="text-stone-600 hover:text-red-700" title="Delete menu" aria-label="Delete special menu"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+            list.querySelectorAll('[data-special-action="edit"]').forEach(btn => {
+                btn.addEventListener('click', () => openSpecialMenuEditor(btn.dataset.specialId));
+            });
+            list.querySelectorAll('[data-special-action="toggle"]').forEach(btn => {
+                btn.addEventListener('click', () => toggleSpecialMenu(btn.dataset.specialId));
+            });
+            list.querySelectorAll('[data-special-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', () => deleteSpecialMenu(btn.dataset.specialId));
+            });
+            list.querySelectorAll('[data-special-action="copy"]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    try {
+                        await navigator.clipboard.writeText(btn.dataset.specialUrl);
+                        showSpecialMenuFeedback('Special menu link copied.', false);
+                    } catch (error) {
+                        showSpecialMenuFeedback('Could not copy the link. Open it and copy from the address bar.', true);
+                    }
+                });
+            });
+            lucide.createIcons();
+        }
+
+        function resetSpecialMenuForm() {
+            editingSpecialMenuId = null;
+            specialMenuItems = [];
+            document.getElementById('special-menu-form').reset();
+            document.getElementById('special-menu-status').value = 'active';
+            document.getElementById('special-menu-form-title').textContent = 'New Special Menu';
+            document.getElementById('special-menu-editing-pill').classList.add('hidden');
+            document.getElementById('special-menu-save-btn').textContent = 'Save & Create QR';
+            document.getElementById('special-menu-reset-btn').textContent = 'Clear';
+            renderSpecialMenuItems();
+        }
+
+        function openSpecialMenuEditor(id) {
+            const item = specialMenusCache.find(entry => entry.id === id);
+            if (!item) return;
+
+            editingSpecialMenuId = id;
+            specialMenuItems = Array.isArray(item.data.items) ? item.data.items.map(menuItem => ({ ...menuItem })) : [];
+            document.getElementById('special-menu-title').value = item.data.title || '';
+            document.getElementById('special-menu-date').value = item.data.eventDate || '';
+            document.getElementById('special-menu-status').value = item.data.active === false ? 'hidden' : 'active';
+            document.getElementById('special-menu-note').value = item.data.note || '';
+            document.getElementById('special-menu-form-title').textContent = 'Edit Special Menu';
+            document.getElementById('special-menu-editing-pill').classList.remove('hidden');
+            document.getElementById('special-menu-save-btn').textContent = 'Update QR Menu';
+            document.getElementById('special-menu-reset-btn').textContent = 'Cancel';
+            renderSpecialMenuItems();
+            document.getElementById('special-menu-title').focus();
+        }
+
+        async function saveSpecialMenu(event) {
+            event.preventDefault();
+            const title = document.getElementById('special-menu-title').value.trim();
+            const eventDate = document.getElementById('special-menu-date').value;
+            const note = document.getElementById('special-menu-note').value.trim();
+            const active = document.getElementById('special-menu-status').value !== 'hidden';
+            const user = auth.currentUser;
+            const saveBtn = document.getElementById('special-menu-save-btn');
+
+            if (!title) {
+                showSpecialMenuFeedback('Please add an event or menu name.', true);
+                return;
+            }
+            if (!specialMenuItems.length) {
+                showSpecialMenuFeedback('Add at least one special menu item.', true);
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = editingSpecialMenuId ? 'Updating...' : 'Creating...';
+
+            const id = editingSpecialMenuId || generateSpecialMenuCode();
+            const payload = {
+                title,
+                eventDate,
+                note,
+                items: specialMenuItems,
+                active,
+                status: active ? 'active' : 'hidden',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: user && user.email ? user.email : 'unknown'
+            };
+
+            try {
+                const existingSpecialMenu = editingSpecialMenuId ? specialMenusCache.find(entry => entry.id === id) : null;
+                const existingData = existingSpecialMenu ? existingSpecialMenu.data : {};
+                await db.collection('specialMenus').doc(id).set({
+                    ...payload,
+                    createdAt: editingSpecialMenuId ? (existingData.createdAt || firebase.firestore.FieldValue.serverTimestamp()) : firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: editingSpecialMenuId ? (existingData.createdBy || (user && user.email ? user.email : 'unknown')) : (user && user.email ? user.email : 'unknown')
+                }, { merge: true });
+                showSpecialMenuFeedback(`Special menu saved. QR link: ${getSpecialMenuUrl(id)}`, false);
+                resetSpecialMenuForm();
+            } catch (error) {
+                console.error('Failed to save special menu:', error);
+                showSpecialMenuFeedback(`Could not save special menu: ${error.message}`, true);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = editingSpecialMenuId ? 'Update QR Menu' : 'Save & Create QR';
+            }
+        }
+
+        async function toggleSpecialMenu(id) {
+            const item = specialMenusCache.find(entry => entry.id === id);
+            if (!item) return;
+            const active = item.data.active !== true;
+            const user = auth.currentUser;
+            try {
+                await db.collection('specialMenus').doc(id).update({
+                    active,
+                    status: active ? 'active' : 'hidden',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: user && user.email ? user.email : 'unknown'
+                });
+                if (editingSpecialMenuId === id) document.getElementById('special-menu-status').value = active ? 'active' : 'hidden';
+            } catch (error) {
+                console.error('Failed to toggle special menu:', error);
+                alert(`Could not update special menu: ${error.message}`);
+            }
+        }
+
+        async function deleteSpecialMenu(id) {
+            const item = specialMenusCache.find(entry => entry.id === id);
+            const title = item && item.data && item.data.title ? item.data.title : 'this special menu';
+            if (!confirm(`Delete "${title}"? The QR link will stop working.`)) return;
+            try {
+                await db.collection('specialMenus').doc(id).delete();
+                if (editingSpecialMenuId === id) resetSpecialMenuForm();
+            } catch (error) {
+                console.error('Failed to delete special menu:', error);
+                alert(`Could not delete special menu: ${error.message}`);
+            }
+        }
+
+        document.getElementById('special-menu-form').addEventListener('submit', saveSpecialMenu);
+        document.getElementById('special-menu-reset-btn').addEventListener('click', resetSpecialMenuForm);
+        document.getElementById('special-item-add-btn').addEventListener('click', addSpecialMenuItem);
+        renderSpecialMenuItems();
 
         // --- Admin Users Management ---
 

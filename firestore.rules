@@ -146,6 +146,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // specialMenus collection - private QR menus for events
+    match /specialMenus/{menuId} {
+      // QR attendees can read only active menus; admins can read hidden drafts too
+      allow read: if isAdmin() || resource.data.active == true;
+
+      // Only admins can create, update, hide, or delete event menus
+      allow write: if isAdmin();
+    }
+
     // users collection – stores customer profiles (name, phone)
     match /users/{userId} {
       // Users can read their own profile; admins can read all
