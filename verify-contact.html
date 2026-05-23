@@ -16,7 +16,7 @@
         .panel { border-radius: 8px; border: 1px solid #e7e5e4; box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08); }
         .field { width: 100%; border: 1px solid #d6d3d1; border-radius: 8px; padding: 0.8rem 0.9rem; }
         .field:focus { outline: none; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
-        .blurred-sensitive { filter: blur(7px); user-select: none; transition: filter 180ms ease; }
+        .action-disabled { opacity: 0.45; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -133,6 +133,12 @@
             el.classList.remove('hidden');
         }
 
+        function setActionButtonState(buttonId, isDisabled) {
+            const button = document.getElementById(buttonId);
+            button.disabled = isDisabled;
+            button.classList.toggle('action-disabled', isDisabled);
+        }
+
         async function loadStatus() {
             if (!currentUser) return;
             const result = await lubanClient.api('/accountStatus', { method: 'GET', user: currentUser });
@@ -141,8 +147,9 @@
             const phoneMaskEl = document.getElementById('phone-mask');
             emailMaskEl.textContent = account.emailMasked || account.email;
             phoneMaskEl.textContent = account.phoneMasked || 'No phone saved';
-            emailMaskEl.classList.toggle('blurred-sensitive', Boolean(account.emailVerified));
-            phoneMaskEl.classList.toggle('blurred-sensitive', Boolean(account.phoneVerified));
+            setActionButtonState('email-send-btn', Boolean(account.emailVerified));
+            setActionButtonState('email-refresh-btn', Boolean(account.emailVerified));
+            setActionButtonState('otp-send-btn', Boolean(account.phoneVerified));
             document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
             document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
             document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
