@@ -20149,6 +20149,9 @@ This typically indicates that your device does not have a healthy Internet conne
       );
     }
   };
+  function deleteField() {
+    return new __PRIVATE_DeleteFieldValueImpl("deleteField");
+  }
   function serverTimestamp() {
     return new __PRIVATE_ServerTimestampFieldValueImpl("serverTimestamp");
   }
@@ -22434,7 +22437,8 @@ ${this.customData.serverResponse}`;
     auth: Object.assign(() => getAuthApi(), { GoogleAuthProvider }),
     firestore: Object.assign(() => getFirestoreApi(), {
       FieldValue: {
-        serverTimestamp
+        serverTimestamp,
+        delete: deleteField
       }
     }),
     storage: () => getStorageApi()

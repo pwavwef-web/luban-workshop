@@ -301,36 +301,6 @@ function openPrintView({ title, url, subtitle } = {}) {
       position: relative;
       z-index: 1;
     }
-    .summary {
-      margin-top: 1rem;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.85rem;
-    }
-    .summary-card {
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, #ffffff 0%, #fff8ef 100%);
-      padding: 0.95rem 1rem;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-    }
-    .summary-card span {
-      display: block;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #a16207;
-      margin-bottom: 0.35rem;
-    }
-    .summary-card strong {
-      display: block;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 0.98rem;
-      color: #1c1917;
-      line-height: 1.4;
-    }
     .qr-card {
       margin-top: 1.8rem;
       border-radius: 28px;
@@ -392,32 +362,6 @@ function openPrintView({ title, url, subtitle } = {}) {
         0 0 0 1px rgba(146, 64, 14, 0.08),
         0 20px 35px rgba(28, 25, 23, 0.08);
     }
-    .instructions {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.85rem;
-    }
-    .instruction {
-      padding: 0.9rem;
-      border-radius: 18px;
-      background: #fffaf4;
-      border: 1px solid rgba(146, 64, 14, 0.12);
-      font-family: "Segoe UI", Arial, sans-serif;
-    }
-    .instruction strong {
-      display: block;
-      margin-bottom: 0.3rem;
-      color: var(--accent-dark);
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .instruction span {
-      color: #57534e;
-      font-size: 0.84rem;
-      line-height: 1.5;
-    }
     .url-box {
       width: 100%;
       padding: 1rem 1.05rem;
@@ -455,19 +399,7 @@ function openPrintView({ title, url, subtitle } = {}) {
       color: var(--ink);
       border: 1px solid var(--line);
     }
-    .footer-note {
-      margin-top: 1rem;
-      text-align: center;
-      color: #78716c;
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 0.84rem;
-      line-height: 1.6;
-    }
     @media (max-width: 640px) {
-      .summary,
-      .instructions {
-        grid-template-columns: 1fr;
-      }
       .hero {
         padding-bottom: 1.8rem;
       }
@@ -493,8 +425,7 @@ function openPrintView({ title, url, subtitle } = {}) {
         display: none;
       }
       .qr-card,
-      .summary-card,
-      .instruction {
+      .qr-frame svg {
         box-shadow: none;
       }
     }
@@ -523,20 +454,6 @@ function openPrintView({ title, url, subtitle } = {}) {
       </div>
     </section>
     <section class="body-copy">
-      <div class="summary">
-        <div class="summary-card">
-          <span>Use</span>
-          <strong>Table cards, hostess stand, and event entry</strong>
-        </div>
-        <div class="summary-card">
-          <span>Link Type</span>
-          <strong>Guest menu page with the live event selection</strong>
-        </div>
-        <div class="summary-card">
-          <span>Tip</span>
-          <strong>Print in color for the strongest brand feel</strong>
-        </div>
-      </div>
     <section class="qr-card">
       <div class="qr-card-header">
         <strong>Guest Scan Access</strong>
@@ -545,27 +462,12 @@ function openPrintView({ title, url, subtitle } = {}) {
       <div class="qr-frame">
         ${qrMarkup}
       </div>
-      <div class="instructions">
-        <div class="instruction">
-          <strong>1. Place</strong>
-          <span>Set this sheet near check-in, on dining tables, or at the event bar.</span>
-        </div>
-        <div class="instruction">
-          <strong>2. Scan</strong>
-          <span>Guests open the event menu instantly with their phone camera.</span>
-        </div>
-        <div class="instruction">
-          <strong>3. Serve</strong>
-          <span>Update the menu in admin and the same QR stays ready to use.</span>
-        </div>
-      </div>
       <div class="url-box">${safeUrl}</div>
     </section>
     <div class="actions">
       <button class="action-btn primary" onclick="window.print()">Print QR Sheet</button>
       <button class="action-btn secondary" onclick="window.location.href='${safeUrl}'">Open Guest Menu</button>
     </div>
-    <p class="footer-note">Prepared for Luban Workshop Restaurant event service. Keep this sheet flat, bright, and easy for guests to reach.</p>
     </section>
   </main>
 </body>

@@ -23,8 +23,8 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="assets/js/firebase-modular.bundle.js"></script>
-    <script src="assets/js/admin-qr.bundle.js"></script>
+    <script src="assets/js/firebase-modular.bundle.js?v=20260523-reservationfix2"></script>
+    <script src="assets/js/admin-qr.bundle.js?v=20260523-reservationfix2"></script>
 
     <style>
         :root {
@@ -1695,6 +1695,7 @@
         async function updateReservationStatus(id, status, options = {}) {
             const normalizedStatus = normalizeReservationStatus(status);
             const user = auth.currentUser;
+            const deleteFieldValue = firebase.firestore.FieldValue.delete();
             const updates = {
                 status: normalizedStatus
             };
@@ -1703,20 +1704,20 @@
                 updates.decisionAt = firebase.firestore.FieldValue.serverTimestamp();
                 updates.decisionBy = user && user.email ? user.email : 'unknown';
                 updates.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
-                updates.rejectedAt = firebase.firestore.FieldValue.delete();
-                updates.decisionReason = firebase.firestore.FieldValue.delete();
+                updates.rejectedAt = deleteFieldValue;
+                updates.decisionReason = deleteFieldValue;
             } else if (normalizedStatus === 'rejected') {
                 updates.decisionAt = firebase.firestore.FieldValue.serverTimestamp();
                 updates.decisionBy = user && user.email ? user.email : 'unknown';
                 updates.rejectedAt = firebase.firestore.FieldValue.serverTimestamp();
-                updates.confirmedAt = firebase.firestore.FieldValue.delete();
+                updates.confirmedAt = deleteFieldValue;
                 updates.decisionReason = options.reason;
             } else {
-                updates.decisionAt = firebase.firestore.FieldValue.delete();
-                updates.decisionBy = firebase.firestore.FieldValue.delete();
-                updates.confirmedAt = firebase.firestore.FieldValue.delete();
-                updates.rejectedAt = firebase.firestore.FieldValue.delete();
-                updates.decisionReason = firebase.firestore.FieldValue.delete();
+                updates.decisionAt = deleteFieldValue;
+                updates.decisionBy = deleteFieldValue;
+                updates.confirmedAt = deleteFieldValue;
+                updates.rejectedAt = deleteFieldValue;
+                updates.decisionReason = deleteFieldValue;
             }
 
             try {

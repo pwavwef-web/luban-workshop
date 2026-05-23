@@ -23,7 +23,8 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  deleteField
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -175,7 +176,8 @@ const firebase = {
   auth: Object.assign(() => getAuthApi(), { GoogleAuthProvider }),
   firestore: Object.assign(() => getFirestoreApi(), {
     FieldValue: {
-      serverTimestamp
+      serverTimestamp,
+      delete: deleteField
     }
   }),
   storage: () => getStorageApi()
