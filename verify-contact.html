@@ -78,20 +78,14 @@
                         <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 1</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Email</h2>
                         <p class="mt-3 text-stone-600">Use the button below to send a fresh verification email, then come back here and refresh your status.</p>
-                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                            <button id="email-send-btn" type="button" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Send verification email</button>
-                            <button id="email-refresh-btn" type="button" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Refresh email status</button>
-                        </div>
+                        <div id="email-action-area" class="mt-6 flex flex-col sm:flex-row gap-3"></div>
                     </div>
 
                     <div class="panel bg-white p-6 sm:p-8">
                         <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Phone</h2>
                         <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
-                        <div class="mt-5 flex flex-col sm:flex-row gap-3">
-                            <button id="otp-send-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
-                            <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50 text-center">Update phone number</a>
-                        </div>
+                        <div id="phone-action-area" class="mt-5 flex flex-col sm:flex-row gap-3"></div>
                         <form id="otp-form" class="mt-6 space-y-4">
                             <label for="otp-code" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
                             <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
@@ -133,10 +127,30 @@
             el.classList.remove('hidden');
         }
 
-        function setActionButtonState(buttonId, isDisabled) {
-            const button = document.getElementById(buttonId);
-            button.disabled = isDisabled;
-            button.classList.toggle('action-disabled', isDisabled);
+        function renderEmailActions(isVerified) {
+            const container = document.getElementById('email-action-area');
+            if (isVerified) {
+                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Email already verified</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <button id="email-send-btn" type="button" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Send verification email</button>
+                <button id="email-refresh-btn" type="button" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Refresh email status</button>
+            `;
+        }
+
+        function renderPhoneActions(isVerified) {
+            const container = document.getElementById('phone-action-area');
+            if (isVerified) {
+                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">SMS already verified</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <button id="otp-send-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
+                <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50 text-center">Update phone number</a>
+            `;
         }
 
         async function loadStatus() {
@@ -147,9 +161,8 @@
             const phoneMaskEl = document.getElementById('phone-mask');
             emailMaskEl.textContent = account.emailMasked || account.email;
             phoneMaskEl.textContent = account.phoneMasked || 'No phone saved';
-            setActionButtonState('email-send-btn', Boolean(account.emailVerified));
-            setActionButtonState('email-refresh-btn', Boolean(account.emailVerified));
-            setActionButtonState('otp-send-btn', Boolean(account.phoneVerified));
+            renderEmailActions(Boolean(account.emailVerified));
+            renderPhoneActions(Boolean(account.phoneVerified));
             document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
             document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
             document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
@@ -160,6 +173,28 @@
             document.getElementById('overall-status').className = account.verificationStatus === 'verified'
                 ? 'rounded-lg bg-green-50 p-4 text-green-800'
                 : 'rounded-lg bg-amber-50 p-4 text-amber-900';
+        }
+
+        async function sendVerificationEmail() {
+            if (!currentUser) return;
+            await auth.sendEmailVerification(currentUser);
+            showFeedback('Verification email sent. Open your inbox, verify the address, then refresh the email status here.', false);
+        }
+
+        async function refreshEmailStatus() {
+            if (!currentUser) return;
+            await auth.reload(currentUser);
+            await loadStatus();
+            showFeedback('Email status refreshed.', false);
+        }
+
+        async function sendSmsCode() {
+            if (!currentUser) return;
+            await lubanClient.api('/requestPhoneOtp', {
+                method: 'POST',
+                user: currentUser
+            });
+            showFeedback('SMS verification code sent. Enter the 6-digit code when it arrives.', false);
         }
 
         auth.onAuthStateChanged(async (user) => {
@@ -199,26 +234,12 @@
             }
         });
 
-        document.getElementById('email-send-btn').addEventListener('click', async () => {
-            if (!currentUser) return;
-            await auth.sendEmailVerification(currentUser);
-            showFeedback('Verification email sent. Open your inbox, verify the address, then refresh the email status here.', false);
-        });
-
-        document.getElementById('email-refresh-btn').addEventListener('click', async () => {
-            if (!currentUser) return;
-            await auth.reload(currentUser);
-            await loadStatus();
-            showFeedback('Email status refreshed.', false);
-        });
-
-        document.getElementById('otp-send-btn').addEventListener('click', async () => {
-            if (!currentUser) return;
-            await lubanClient.api('/requestPhoneOtp', {
-                method: 'POST',
-                user: currentUser
-            });
-            showFeedback('SMS verification code sent. Enter the 6-digit code when it arrives.', false);
+        document.addEventListener('click', async (event) => {
+            const target = event.target.closest('button');
+            if (!target) return;
+            if (target.id === 'email-send-btn') await sendVerificationEmail();
+            if (target.id === 'email-refresh-btn') await refreshEmailStatus();
+            if (target.id === 'otp-send-btn') await sendSmsCode();
         });
 
         document.getElementById('otp-form').addEventListener('submit', async (event) => {
