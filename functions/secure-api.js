@@ -75,6 +75,16 @@ function cleanPlainText(value) {
     .trim();
 }
 
+function cleanSubjectLine(value, fallback = 'Assistant report') {
+  const subject = cleanPlainText(value || fallback);
+  if (!subject) return fallback;
+  return subject.length > 96 ? `${subject.slice(0, 93)}...` : subject;
+}
+
+function cleanLimitedText(value, maxLength) {
+  return cleanPlainText(value).slice(0, maxLength);
+}
+
 function normalizePhoneNumber(phone) {
   const digits = String(phone || '').replace(/[^\d+]/g, '');
   if (!digits) return '';
@@ -999,6 +1009,62 @@ async function handleSubmitContactMessage(req, res) {
   sendJson(res, 200, { ok: true });
 }
 
+async function handleSubmitAssistantReport(req, res) {
+  const decoded = await requireUser(req);
+  const syncResult = await syncUserVerificationMetadata(decoded.uid);
+  const profile = syncResult.profile || {};
+  const authUser = syncResult.authUser || {};
+  const email = normalizeEmail(authUser.email || decoded.email || profile.email || '');
+  if (!email) throw createHttpError(400, 'Your account needs an email address before the assistant can send a report.');
+
+  const message = cleanLimitedText(req.body.message, 2000);
+  if (message.length < 10) {
+    throw createHttpError(400, 'Please include a little more detail before sending your report.');
+  }
+
+  const subject = cleanSubjectLine(req.body.subject || `Assistant report from ${profile.name || authUser.displayName || 'customer'}`);
+  const phoneE164 = normalizePhoneNumber(profile.phoneE164 || profile.phone || '');
+  const name = cleanPlainText(profile.name || authUser.displayName || decoded.name || 'Signed-in customer');
+  const preferredContact = cleanPlainText(profile.preferredContact || 'email');
+  const customerNotes = cleanLimitedText(profile.notes, 500);
+  const pageUrl = cleanLimitedText(req.body.pageUrl, 500);
+  const ip = getClientIp(req);
+
+  await enforceRateLimit('assistant_report_uid_hour', decoded.uid, 4, 60 * 60, { ipHash: hashValue(ip) });
+  await enforceRateLimit('assistant_report_email_hour', email, 6, 60 * 60, { userId: decoded.uid, ipHash: hashValue(ip) });
+  if (ip) await enforceRateLimit('assistant_report_ip_hour', ip, 10, 60 * 60, { userId: decoded.uid });
+
+  const docRef = await db().collection('contact_messages').add({
+    name,
+    email,
+    phone: phoneE164,
+    phoneMasked: maskPhone(phoneE164),
+    subject,
+    message,
+    read: false,
+    createdAt: serverTimestamp(),
+    source: 'assistant',
+    userId: decoded.uid,
+    preferredContact,
+    customerNotes,
+    verificationStatus: syncResult.verificationStatus || profile.verificationStatus || 'pending',
+    emailVerified: syncResult.emailVerified === true,
+    phoneVerified: Boolean(profile.phoneVerifiedAt),
+    pageUrl,
+    userAgentHash: hashValue(req.get('user-agent') || '')
+  });
+
+  await recordSecurityEvent('assistant_report_submitted', {
+    userId: decoded.uid,
+    email,
+    messageId: docRef.id,
+    phoneHash: hashValue(phoneE164),
+    ipHash: hashValue(ip)
+  });
+
+  sendJson(res, 200, { ok: true, messageId: docRef.id });
+}
+
 async function handleAdminFraudReview(req, res) {
   await requireAdmin(req);
   const [eventSnap, orderSnap, userSnap] = await Promise.all([
@@ -1169,6 +1235,7 @@ async function router(req, res) {
     if (path === 'verifyReservationAccessOtp' && req.method === 'POST') return await handleVerifyReservationAccessOtp(req, res);
     if (path === 'requestReservationChange' && req.method === 'POST') return await handleRequestReservationChange(req, res);
     if (path === 'submitContactMessage' && req.method === 'POST') return await handleSubmitContactMessage(req, res);
+    if (path === 'submitAssistantReport' && req.method === 'POST') return await handleSubmitAssistantReport(req, res);
     if (path === 'admin/fraud-review' && req.method === 'GET') return await handleAdminFraudReview(req, res);
     if (path === 'admin/bootstrap-chatbot-knowledge' && req.method === 'POST') return await handleBootstrapChatbotKnowledge(req, res);
     sendJson(res, 404, { error: 'Endpoint not found.' });

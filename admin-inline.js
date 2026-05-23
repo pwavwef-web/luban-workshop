@@ -1071,6 +1071,24 @@
                         const m = doc.data();
                         const date = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
                         const replyHref = buildReplyMailto(m.email, m.subject);
+                        const isAssistantReport = String(m.source || '').toLowerCase() === 'assistant';
+                        const sourceLabel = isAssistantReport ? 'Assistant report' : 'Contact form';
+                        const metaParts = [
+                            m.phoneMasked || m.phone ? `Phone: ${m.phoneMasked || m.phone}` : '',
+                            m.preferredContact ? `Preferred: ${m.preferredContact}` : '',
+                            m.verificationStatus ? `Status: ${m.verificationStatus}` : '',
+                            m.userId ? `User: ${m.userId}` : ''
+                        ].filter(Boolean);
+                        const sourcePill = `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${isAssistantReport ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-stone-100 text-stone-600 border border-stone-200'}">${escapeHtml(sourceLabel)}</span>`;
+                        const metadataLine = metaParts.length
+                            ? `<p class="mt-2 flex flex-wrap gap-1.5 text-xs text-stone-500">${sourcePill}${metaParts.map(part => `<span class="rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5">${escapeHtml(part)}</span>`).join('')}</p>`
+                            : `<p class="mt-2">${sourcePill}</p>`;
+                        const pageLine = m.pageUrl
+                            ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Page: ${escapeHtml(m.pageUrl)}</p>`
+                            : '';
+                        const notesLine = m.customerNotes
+                            ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Profile notes: ${escapeHtml(m.customerNotes)}</p>`
+                            : '';
                         const replyAction = replyHref
                             ? `<a href="${escapeHtml(replyHref)}" aria-label="Reply to ${escapeHtml(m.name || 'message sender')}" title="Reply by email"
                                 class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors whitespace-nowrap">
@@ -1093,6 +1111,7 @@
                                             ${unreadDot}${escapeHtml(m.name || 'Unknown')}
                                         </p>
                                         <p class="text-xs text-stone-500 mt-0.5" style="overflow-wrap: anywhere;">${escapeHtml(m.email || '')} &middot; ${date}</p>
+                                        ${metadataLine}
                                     </div>
                                     <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                                         ${replyAction}
@@ -1106,6 +1125,8 @@
                                 </div>
                                 <p class="text-sm font-medium text-stone-700 mb-1" style="overflow-wrap: anywhere;">Subject: ${escapeHtml(m.subject || '')}</p>
                                 <p class="text-sm text-stone-600 whitespace-pre-wrap" style="overflow-wrap: anywhere;">${escapeHtml(m.message || '')}</p>
+                                ${notesLine}
+                                ${pageLine}
                             </div>
                         `;
                     }).join('');
@@ -1177,7 +1198,7 @@
             },
             {
                 title: 'Messages',
-                description: 'Read messages submitted by customers via the Contact Us page. Mark messages as read once you have reviewed them.',
+                description: 'Read messages submitted by customers via Contact Us or the website assistant. Mark messages as read once you have reviewed them.',
                 target: 'tab-btn-messages'
             }
         ];

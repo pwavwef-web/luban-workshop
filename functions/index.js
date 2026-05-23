@@ -948,23 +948,44 @@ function buildRestaurantContactMessageEmail({ messageId, contactMessage }) {
   const submittedSubject = cleanSubjectLine(contactMessage.subject, 'No subject');
   const submittedAt = formatContactSubmittedAt(contactMessage.createdAt);
   const body = String(contactMessage.message || '').trim() || 'No message provided.';
-  const subject = `New Contact Message: ${cleanSubjectLine(contactMessage.subject, `#${messageId}`)}`;
+  const isAssistantReport = String(contactMessage.source || '').toLowerCase() === 'assistant';
+  const sourceLabel = isAssistantReport ? 'Assistant report' : 'Contact form';
+  const phone = String(contactMessage.phoneMasked || contactMessage.phone || '').trim();
+  const preferredContact = String(contactMessage.preferredContact || '').trim();
+  const customerNotes = String(contactMessage.customerNotes || '').trim();
+  const verificationStatus = String(contactMessage.verificationStatus || '').trim();
+  const pageUrl = String(contactMessage.pageUrl || '').trim();
+  const subject = `${isAssistantReport ? 'New Assistant Report' : 'New Contact Message'}: ${cleanSubjectLine(contactMessage.subject, `#${messageId}`)}`;
 
   const text = [
-    'A new contact form message was submitted.',
+    isAssistantReport ? 'A signed-in customer sent a report through the website assistant.' : 'A new contact form message was submitted.',
     `Message ID: ${messageId}`,
+    `Source: ${sourceLabel}`,
     `Name: ${name}`,
     `Email: ${email}`,
+    phone ? `Phone: ${phone}` : '',
+    preferredContact ? `Preferred contact: ${preferredContact}` : '',
+    customerNotes ? `Customer notes: ${customerNotes}` : '',
+    verificationStatus ? `Verification status: ${verificationStatus}` : '',
+    contactMessage.userId ? `User ID: ${contactMessage.userId}` : '',
+    pageUrl ? `Page: ${pageUrl}` : '',
     `Subject: ${submittedSubject}`,
     `Submitted: ${submittedAt}`,
     '',
     'Message:',
     body,
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const detailRows = buildRestaurantDetailRows([
+    { label: 'Source', value: sourceLabel },
     { label: 'Name', value: name },
     { label: 'Email', value: email },
+    { label: 'Phone', value: phone },
+    { label: 'Preferred contact', value: preferredContact },
+    { label: 'Customer notes', value: customerNotes },
+    { label: 'Verification', value: verificationStatus },
+    { label: 'User ID', value: contactMessage.userId || '' },
+    { label: 'Page', value: pageUrl },
     { label: 'Subject', value: submittedSubject },
     { label: 'Submitted', value: submittedAt },
   ]);
@@ -986,14 +1007,16 @@ function buildRestaurantContactMessageEmail({ messageId, contactMessage }) {
   `;
 
   const html = buildRestaurantEmailShell({
-    badge: 'CONTACT',
-    eyebrow: 'Guest message',
-    headline: 'New contact message',
-    intro: 'A guest has sent a message through the Contact Us form. Review the details below and follow up promptly.',
+    badge: isAssistantReport ? 'REPORT' : 'CONTACT',
+    eyebrow: isAssistantReport ? 'Assistant report' : 'Guest message',
+    headline: isAssistantReport ? 'New assistant report' : 'New contact message',
+    intro: isAssistantReport
+      ? 'A signed-in customer sent a report through the website assistant. Their saved profile details are included for follow-up.'
+      : 'A guest has sent a message through the Contact Us form. Review the details below and follow up promptly.',
     cards: [
       { label: 'Message ID', value: `#${messageId}` },
       { label: 'From', value: name },
-      { label: 'Status', value: 'Unread', tone: 'red' },
+      { label: 'Source', value: isAssistantReport ? 'Assistant' : 'Contact', tone: isAssistantReport ? 'green' : undefined },
     ],
     mainHtml,
     actionTitle: 'Next step',

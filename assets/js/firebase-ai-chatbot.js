@@ -12,6 +12,10 @@ import {
   getGenerativeModel,
   VertexAIBackend
 } from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-ai.js';
+import {
+  getAuth,
+  onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js';
 
 const SCRIPT_URL = new URL(import.meta.url);
 const SITE_ROOT = new URL('../../', SCRIPT_URL);
@@ -164,6 +168,9 @@ Answer guest questions using only the restaurant context supplied in the user pr
 Keep answers concise, warm, and practical. Prefer 1-3 short paragraphs or a short list.
 If the context does not answer the question, say you do not have that detail in the restaurant information available here and direct the guest to call 020 543 8455, email reservations@lubanrestaurant.com, or use [Contact Us](contact-us.html).
 Do not invent menu availability, prices, reservation status, dietary safety, staff names, policies, or private data.
+When signed-in customer context is supplied, use it only to make account, checkout, verification, order, and contact guidance more relevant.
+Do not reveal or repeat full private contact details. If the guest asks to contact, complain, or report an issue, explain that signed-in guests can ask you to send a report directly.
+Never claim a report has been sent unless the website reports that the assistant report submission succeeded.
 When mentioning menu prices, use the site's current cedi format such as ₵40, not GHS 40.
 For allergy, dietary, medical, legal, refund, cancellation, or event contract questions, give the known general policy and ask the guest to contact the restaurant for confirmation.
 If the guest asks in Chinese, answer in Chinese using the same factual constraints.
@@ -178,40 +185,190 @@ const state = {
   open: false,
   busy: false,
   app: null,
+  authApp: null,
+  auth: null,
   db: null,
   model: null,
+  authReadyPromise: null,
+  currentUser: null,
+  account: null,
+  accountPromise: null,
   knowledgePromise: null,
+  pendingReport: null,
   history: []
 };
 
 function initFirebase() {
-  if (state.app && state.db && state.model) return;
-
-  try {
-    state.app = getApp(CHATBOT_CONFIG.appName);
-  } catch (error) {
-    state.app = initializeApp(FIREBASE_CONFIG, CHATBOT_CONFIG.appName);
-  }
-
-  try {
-    state.db = initializeFirestore(state.app, { experimentalForceLongPolling: true });
-  } catch (error) {
-    state.db = getFirestore(state.app);
-  }
-
-  const ai = getAI(state.app, {
-    backend: new VertexAIBackend(CHATBOT_CONFIG.vertexLocation)
-  });
-
-  state.model = getGenerativeModel(ai, {
-    model: CHATBOT_CONFIG.model,
-    systemInstruction: SYSTEM_INSTRUCTION,
-    generationConfig: {
-      maxOutputTokens: CHATBOT_CONFIG.maxOutputTokens,
-      temperature: CHATBOT_CONFIG.temperature,
-      topP: 0.9
+  if (!state.app) {
+    try {
+      state.app = getApp(CHATBOT_CONFIG.appName);
+    } catch (error) {
+      state.app = initializeApp(FIREBASE_CONFIG, CHATBOT_CONFIG.appName);
     }
+  }
+
+  if (!state.authApp) {
+    try {
+      state.authApp = getApp();
+    } catch (error) {
+      state.authApp = initializeApp(FIREBASE_CONFIG);
+    }
+  }
+
+  if (!state.auth) {
+    state.auth = getAuth(state.authApp);
+    state.authReadyPromise = new Promise((resolve) => {
+      let resolved = false;
+      onAuthStateChanged(
+        state.auth,
+        (user) => {
+          const previousUid = state.currentUser && state.currentUser.uid;
+          state.currentUser = user || null;
+          if (previousUid !== (user && user.uid)) {
+            state.account = null;
+            state.accountPromise = null;
+          }
+          if (!resolved) {
+            resolved = true;
+            resolve(state.currentUser);
+          }
+        },
+        () => {
+          state.currentUser = null;
+          if (!resolved) {
+            resolved = true;
+            resolve(null);
+          }
+        }
+      );
+    });
+  }
+
+  if (!state.db) {
+    try {
+      state.db = initializeFirestore(state.app, { experimentalForceLongPolling: true });
+    } catch (error) {
+      state.db = getFirestore(state.app);
+    }
+  }
+
+  if (!state.model) {
+    const ai = getAI(state.app, {
+      backend: new VertexAIBackend(CHATBOT_CONFIG.vertexLocation)
+    });
+
+    state.model = getGenerativeModel(ai, {
+      model: CHATBOT_CONFIG.model,
+      systemInstruction: SYSTEM_INSTRUCTION,
+      generationConfig: {
+        maxOutputTokens: CHATBOT_CONFIG.maxOutputTokens,
+        temperature: CHATBOT_CONFIG.temperature,
+        topP: 0.9
+      }
+    });
+  }
+}
+
+function getApiBase() {
+  const config = window.LUBAN_SITE_CONFIG || {};
+  return String(config.apiBase || '/api').replace(/\/+$/, '');
+}
+
+async function apiRequest(path, options = {}) {
+  const opts = { method: 'GET', ...options };
+  const headers = { ...(opts.headers || {}) };
+  const user = opts.user || null;
+
+  if (user && typeof user.getIdToken === 'function') {
+    const token = await user.getIdToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (opts.body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const response = await fetch(`${getApiBase()}${path}`, {
+    method: opts.method,
+    headers,
+    body: opts.body === undefined ? undefined : JSON.stringify(opts.body)
   });
+  const rawText = await response.text();
+  let data = {};
+  try {
+    data = rawText ? JSON.parse(rawText) : {};
+  } catch (error) {
+    data = {};
+  }
+
+  if (!response.ok) {
+    const fallback = rawText && rawText.trim() ? rawText.trim() : 'Request failed';
+    throw new Error(data.error || fallback);
+  }
+
+  return data;
+}
+
+async function waitForCurrentUser() {
+  initFirebase();
+  if (state.authReadyPromise) await state.authReadyPromise;
+  return state.currentUser || (state.auth && state.auth.currentUser) || null;
+}
+
+async function getCurrentAccount(options = {}) {
+  const user = await waitForCurrentUser();
+  if (!user) {
+    state.account = null;
+    return null;
+  }
+
+  if (!options.force && state.account && state.account.uid === user.uid) {
+    return state.account;
+  }
+  if (!options.force && state.accountPromise) {
+    return state.accountPromise;
+  }
+
+  state.accountPromise = apiRequest('/accountStatus', { method: 'GET', user })
+    .then((data) => {
+      state.account = data && data.account ? data.account : buildFallbackAccount(user);
+      return state.account;
+    })
+    .catch((error) => {
+      console.warn('Could not load signed-in customer context:', error);
+      state.account = buildFallbackAccount(user);
+      return state.account;
+    })
+    .finally(() => {
+      state.accountPromise = null;
+    });
+
+  return state.accountPromise;
+}
+
+function buildFallbackAccount(user) {
+  if (!user) return null;
+  return {
+    uid: user.uid,
+    email: user.email || '',
+    emailMasked: maskEmailAddress(user.email || ''),
+    emailVerified: user.emailVerified === true,
+    phone: '',
+    phoneMasked: '',
+    phoneVerified: false,
+    verificationStatus: user.emailVerified ? 'phone_pending' : 'pending',
+    name: user.displayName || '',
+    preferredContact: 'email',
+    notes: ''
+  };
+}
+
+function maskEmailAddress(email) {
+  const value = String(email || '').trim();
+  const parts = value.split('@');
+  if (parts.length !== 2) return value;
+  const local = parts[0];
+  return `${local.slice(0, 2)}***@${parts[1]}`;
 }
 
 function injectStyles() {
@@ -286,7 +443,7 @@ function mountChatbot() {
           <span class="luban-chatbot__mark">${createIcon('sparkle')}</span>
           <div>
             <div id="luban-chatbot-title" class="luban-chatbot__name">Luban Assistant</div>
-            <div class="luban-chatbot__status">Menu, bookings, events and contact</div>
+            <div class="luban-chatbot__status">Menu, bookings, reports and account help</div>
           </div>
         </div>
         <button type="button" class="luban-chatbot__icon-btn" data-luban-close aria-label="Close chat">${createIcon('x')}</button>
@@ -351,6 +508,7 @@ function mountChatbot() {
       try {
         initFirebase();
         state.knowledgePromise = state.knowledgePromise || buildKnowledge();
+        getCurrentAccount().catch(() => null);
       } catch (error) {
         console.warn('Could not prepare Luban chatbot:', error);
       }
@@ -365,8 +523,8 @@ function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I can help with Luban Workshop's menu, hours, reservations, events, location and contact details.`);
-  appendSuggestions(['What are your hours?', 'Show me popular seafood dishes', 'How do I reserve a table?', 'Do you offer catering?']);
+  appendMessage('bot', `Hi, I can help with Luban Workshop's menu, hours, reservations, events, location, account details and reports.`);
+  appendSuggestions(['What are your hours?', 'Show me popular seafood dishes', 'How do I reserve a table?', 'Send a report']);
 }
 
 function autoSizeInput(input) {
@@ -411,7 +569,7 @@ function renderFormattedMessage(container, text) {
 }
 
 function appendFormattedInline(container, text) {
-  const combinedPattern = /((\*{2,3}|__)([^\n]+?)\2)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?\b)/g;
+  const combinedPattern = /((\*{2,3}|__)([^\n]+?)\2)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html(?:#[A-Za-z0-9_-]+)?\b)/g;
   let lastIndex = 0;
   let match;
 
@@ -471,7 +629,7 @@ function normalizeSafeHref(href) {
   if (!value) return '';
 
   if (/^(https?:\/\/|mailto:|tel:)/i.test(value)) return value;
-  if (/^(?:\/|\.{0,2}\/)?(?:contact-us|menu|faq|events-and-catering|index)\.html(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
+  if (/^(?:\/|\.{0,2}\/)?(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
     return new URL(value.replace(/^(?:\/|\.{0,2}\/)/, ''), SITE_ROOT).href;
   }
 
@@ -516,18 +674,172 @@ function showTyping() {
   return node;
 }
 
+function isReportIntent(text) {
+  if (/\b(how|where|what|which|ways?|phone|email|number)\b[\s\S]{0,80}\bcontact\b/i.test(text)) {
+    return false;
+  }
+  return /\b(report|complaint|complain|feedback|problem|issue)\b/i.test(text) ||
+    /\b(send|submit|make|file)\s+(a\s+)?(report|complaint|message)\b/i.test(text) ||
+    /\b(contact|tell|notify)\s+(the\s+)?(restaurant|team|staff|manager|admin)\b/i.test(text);
+}
+
+function isReportConfirmation(text) {
+  return /^(send|send report|submit|submit report|yes|yeah|yep|please send|confirm)$/i.test(String(text || '').trim());
+}
+
+function isReportCancellation(text) {
+  return /^(cancel|stop|never mind|nevermind|do not send|don't send)$/i.test(String(text || '').trim());
+}
+
+function extractReportMessage(text) {
+  return String(text || '')
+    .replace(/^\s*(please\s+)?(can\s+you\s+|could\s+you\s+|i\s+want\s+to\s+|i\s+need\s+to\s+)?(send|submit|make|file|contact|tell|notify)?\s*(a\s+)?(report|complaint|message|feedback)?\s*(to\s+)?(the\s+)?(restaurant|team|staff|manager|admin)?\s*(that|about|because|:|-)?\s*/i, '')
+    .trim();
+}
+
+function buildReportSubject(message) {
+  const cleaned = String(message || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const preview = cleaned.length > 58 ? `${cleaned.slice(0, 55)}...` : cleaned;
+  return preview ? `Assistant report: ${preview}` : 'Assistant report';
+}
+
+function buildReportConfirmation(message, account) {
+  const contactBits = [
+    account && account.name ? account.name : 'your saved name',
+    account && account.emailMasked ? account.emailMasked : 'your signed-in email',
+    account && account.phoneMasked ? account.phoneMasked : ''
+  ].filter(Boolean);
+
+  return [
+    'I can send this to the restaurant team now:',
+    '',
+    `"${message}"`,
+    '',
+    `I will include ${contactBits.join(', ')} from your signed-in profile so the team can follow up.`,
+    'Reply "send report" to submit it, or "cancel" to stop.'
+  ].join('\n');
+}
+
+async function handleReportFlow(question) {
+  const trimmed = String(question || '').trim();
+
+  if (state.pendingReport && isReportCancellation(trimmed)) {
+    state.pendingReport = null;
+    return 'No problem. I have not sent anything.';
+  }
+
+  if (state.pendingReport && state.pendingReport.awaitingMessage) {
+    const account = await getCurrentAccount();
+    if (!account) {
+      state.pendingReport = null;
+      return `I can send reports directly once you're signed in. Please sign in, then tell me what to send, or use [Contact Us](${CONTACT.contactPage}).`;
+    }
+
+    const message = trimmed;
+    if (message.length < 10) {
+      return 'Please include a little more detail so the team knows what happened.';
+    }
+
+    state.pendingReport = {
+      awaitingConfirmation: true,
+      message,
+      subject: buildReportSubject(message)
+    };
+    return buildReportConfirmation(message, account);
+  }
+
+  if (state.pendingReport && state.pendingReport.awaitingConfirmation) {
+    if (isReportConfirmation(trimmed)) {
+      const report = state.pendingReport;
+      const result = await submitAssistantReport(report);
+      state.pendingReport = null;
+      return result.message;
+    }
+
+    const replacement = isReportIntent(trimmed) ? extractReportMessage(trimmed) : trimmed;
+    if (replacement.length >= 10) {
+      const account = await getCurrentAccount();
+      state.pendingReport = {
+        awaitingConfirmation: true,
+        message: replacement,
+        subject: buildReportSubject(replacement)
+      };
+      return buildReportConfirmation(replacement, account);
+    }
+
+    return 'Reply "send report" to submit it, add a revised message, or type "cancel".';
+  }
+
+  if (!isReportIntent(trimmed)) return null;
+
+  const account = await getCurrentAccount();
+  if (!account) {
+    return `I can send reports directly once you're signed in. Please sign in, then tell me what to send, or use [Contact Us](${CONTACT.contactPage}).`;
+  }
+
+  const message = extractReportMessage(trimmed);
+  if (message.length < 10) {
+    state.pendingReport = { awaitingMessage: true };
+    return 'I can send that directly from your signed-in account. What should I tell the restaurant team?';
+  }
+
+  state.pendingReport = {
+    awaitingConfirmation: true,
+    message,
+    subject: buildReportSubject(message)
+  };
+  return buildReportConfirmation(message, account);
+}
+
+async function submitAssistantReport(report) {
+  const user = await waitForCurrentUser();
+  if (!user) {
+    throw new Error('Please sign in before sending a report through the assistant.');
+  }
+
+  const payload = {
+    subject: report.subject || buildReportSubject(report.message),
+    message: report.message,
+    pageUrl: window.location.href
+  };
+  const data = await apiRequest('/submitAssistantReport', {
+    method: 'POST',
+    user,
+    body: payload
+  });
+
+  await getCurrentAccount({ force: true });
+  return {
+    ok: data && data.ok === true,
+    message: 'Sent. The restaurant team will see your report with your signed-in profile details so they can follow up through your saved contact info.'
+  };
+}
+
 async function handleUserMessage(question) {
   appendMessage('user', question);
   state.history.push({ role: 'guest', text: question });
   setBusy(true);
   const typing = showTyping();
+  const reportPath = Boolean(state.pendingReport) || isReportIntent(question);
 
   try {
     initFirebase();
+    const reportResponse = await handleReportFlow(question);
+    if (reportResponse) {
+      if (typing) typing.remove();
+      appendMessage('bot', reportResponse);
+      state.history.push({ role: 'assistant', text: reportResponse });
+      state.history = state.history.slice(-8);
+      return;
+    }
+
     const knowledge = await (state.knowledgePromise || buildKnowledge());
     state.knowledgePromise = Promise.resolve(knowledge);
+    const account = await getCurrentAccount();
 
-    const prompt = buildPrompt(question, knowledge);
+    const prompt = buildPrompt(question, knowledge, account);
     const result = await state.model.generateContent(prompt);
     const answer = cleanAnswer(result.response.text());
     const safeAnswer = answer || contactFallback();
@@ -540,7 +852,9 @@ async function handleUserMessage(question) {
     console.warn('Luban chatbot error:', error);
     state.knowledgePromise = null;
     if (typing) typing.remove();
-    appendMessage('bot', connectionFallback());
+    appendMessage('bot', reportPath && error && error.message
+      ? `I couldn't send that report: ${error.message}`
+      : connectionFallback());
   } finally {
     setBusy(false);
     const input = document.querySelector('[data-luban-input]');
@@ -589,7 +903,25 @@ function formatCediPrice(value) {
   return `${CEDI_SYMBOL}${formatted}`;
 }
 
-function buildPrompt(question, knowledge) {
+function buildUserContext(account) {
+  if (!account) return 'No signed-in customer context is available.';
+
+  const lines = [
+    `- Signed-in customer: ${account.name || 'Name not saved'}`,
+    `- Email: ${account.emailMasked || maskEmailAddress(account.email || '') || 'Not available'} (${account.emailVerified ? 'verified' : 'not verified'})`,
+    `- Phone: ${account.phoneMasked || 'Not saved'} (${account.phoneVerified ? 'verified' : 'not verified'})`,
+    `- Account verification status: ${account.verificationStatus || 'pending'}`,
+    `- Preferred contact: ${account.preferredContact || 'not specified'}`
+  ];
+
+  if (account.notes) {
+    lines.push(`- Customer notes: ${String(account.notes).slice(0, 280)}`);
+  }
+
+  return lines.join('\n');
+}
+
+function buildPrompt(question, knowledge, account) {
   const history = state.history
     .slice(-7)
     .map((item) => `${item.role}: ${item.text}`)
@@ -598,6 +930,9 @@ function buildPrompt(question, knowledge) {
   return `
 Restaurant context:
 ${knowledge}
+
+Signed-in customer context:
+${buildUserContext(account)}
 
 Conversation so far:
 ${history || 'No prior conversation.'}
