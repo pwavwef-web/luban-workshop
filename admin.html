@@ -236,6 +236,118 @@
             object-fit: contain;
         }
 
+        .admin-command-grid {
+            max-width: 1180px;
+            margin: 0 auto 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .admin-metric-button {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            min-height: 5.75rem;
+            padding: 1rem;
+            border: 1px solid var(--admin-line);
+            border-radius: 8px;
+            background: #fff;
+            text-align: left;
+            box-shadow: 0 12px 28px rgba(28, 25, 23, 0.05);
+            transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+        }
+
+        .admin-metric-button:hover {
+            border-color: #fecaca;
+            box-shadow: 0 16px 34px rgba(28, 25, 23, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .admin-metric-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .admin-metric-value {
+            display: block;
+            font-size: 1.75rem;
+            line-height: 1;
+            font-weight: 900;
+            color: #1c1917;
+        }
+
+        .admin-metric-label {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            color: #44403c;
+        }
+
+        .admin-metric-subtext {
+            display: block;
+            margin-top: 0.15rem;
+            font-size: 0.75rem;
+            color: #78716c;
+        }
+
+        .admin-segmented {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border: 1px solid var(--admin-line);
+            border-radius: 8px;
+            background: #fafaf9;
+        }
+
+        .admin-segmented button {
+            min-height: 2.25rem;
+            padding: 0 0.75rem;
+            border: 0;
+            border-radius: 6px;
+            color: #57534e;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .admin-segmented button:hover,
+        .admin-segmented-active {
+            background: #fff;
+            color: #991b1b !important;
+            box-shadow: 0 8px 18px rgba(28, 25, 23, 0.08);
+        }
+
+        .admin-message-card--assistant {
+            border-left: 4px solid #0f766e !important;
+        }
+
+        .admin-message-original {
+            border: 1px solid #d6d3d1;
+            border-radius: 8px;
+            background: #fafaf9;
+            padding: 0.75rem;
+        }
+
+        @media (min-width: 640px) {
+            .admin-command-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .admin-command-grid {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+        }
+
         @media (max-width: 767px) {
             .admin-login-shell {
                 background: var(--admin-warm);
@@ -245,6 +357,11 @@
                 margin-top: 0;
             }
         }
+        /* Hide top metric buttons and actions column when requested */
+        .admin-command-grid { display: none !important; }
+        /* Hide the last column (Actions) in admin panels and tables */
+        .admin-panel th:last-child,
+        .admin-panel td:last-child { display: none !important; }
     </style>
     <script src="assets/js/cookie-consent.js" defer></script>
 </head>
@@ -370,7 +487,7 @@
                     class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <div class="flex items-center">
                         <i data-lucide="mail" class="h-5 w-5 mr-3"></i>
-                        <span class="font-medium">Messages</span>
+                        <span class="font-medium">Messages &amp; AI</span>
                     </div>
                     <span id="badge-messages"
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
@@ -444,6 +561,59 @@
                     </button>
                 </div>
             </div>
+
+            <section class="admin-command-grid" aria-label="Operations summary">
+                <button type="button" onclick="switchTab('orders')" class="admin-metric-button">
+                    <span class="admin-metric-icon bg-blue-50 text-blue-700 border border-blue-100">
+                        <i data-lucide="shopping-bag" class="h-5 w-5"></i>
+                    </span>
+                    <span class="min-w-0">
+                        <span id="metric-active-orders" class="admin-metric-value">0</span>
+                        <span class="admin-metric-label">Active orders</span>
+                        <span id="metric-orders-subtext" class="admin-metric-subtext">Pending or preparing</span>
+                    </span>
+                </button>
+                <button type="button" onclick="switchTab('reservations')" class="admin-metric-button">
+                    <span class="admin-metric-icon bg-amber-50 text-amber-700 border border-amber-100">
+                        <i data-lucide="calendar-clock" class="h-5 w-5"></i>
+                    </span>
+                    <span class="min-w-0">
+                        <span id="metric-pending-reservations" class="admin-metric-value">0</span>
+                        <span class="admin-metric-label">Pending bookings</span>
+                        <span class="admin-metric-subtext">Need a decision</span>
+                    </span>
+                </button>
+                <button type="button" onclick="switchTab('messages')" class="admin-metric-button">
+                    <span class="admin-metric-icon bg-red-50 text-red-700 border border-red-100">
+                        <i data-lucide="mail" class="h-5 w-5"></i>
+                    </span>
+                    <span class="min-w-0">
+                        <span id="metric-unread-messages" class="admin-metric-value">0</span>
+                        <span class="admin-metric-label">Unread inbox</span>
+                        <span class="admin-metric-subtext">Contact and assistant</span>
+                    </span>
+                </button>
+                <button type="button" onclick="switchTab('messages'); setMessageFilter('assistant');" class="admin-metric-button">
+                    <span class="admin-metric-icon bg-teal-50 text-teal-700 border border-teal-100">
+                        <i data-lucide="bot" class="h-5 w-5"></i>
+                    </span>
+                    <span class="min-w-0">
+                        <span id="metric-ai-reports" class="admin-metric-value">0</span>
+                        <span class="admin-metric-label">AI reports</span>
+                        <span class="admin-metric-subtext">Drafted by assistant</span>
+                    </span>
+                </button>
+                <button type="button" onclick="switchTab('chatbot-knowledge')" class="admin-metric-button">
+                    <span class="admin-metric-icon bg-stone-100 text-stone-700 border border-stone-200">
+                        <i data-lucide="book-open" class="h-5 w-5"></i>
+                    </span>
+                    <span class="min-w-0">
+                        <span id="metric-active-facts" class="admin-metric-value">0</span>
+                        <span class="admin-metric-label">Active facts</span>
+                        <span class="admin-metric-subtext">Public chatbot context</span>
+                    </span>
+                </button>
+            </section>
 
             <div id="view-menu" class="view-shell space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -846,8 +1016,15 @@
             <!-- Messages View -->
             <div id="view-messages" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Contact Messages</h2>
-                    <p class="text-sm text-stone-500">Messages submitted via Contact Us or the website assistant.</p>
+                    <div>
+                        <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Messages &amp; AI Reports</h2>
+                        <p class="text-sm text-stone-500 mt-1">Contact inbox, assistant reports, and follow-up details.</p>
+                    </div>
+                    <div class="admin-segmented" role="group" aria-label="Message filter">
+                        <button type="button" data-message-filter="all" class="admin-segmented-active">All <span id="message-count-all">0</span></button>
+                        <button type="button" data-message-filter="unread">Unread <span id="message-count-unread">0</span></button>
+                        <button type="button" data-message-filter="assistant">AI <span id="message-count-assistant">0</span></button>
+                    </div>
                 </div>
                 <div id="messages-container" class="space-y-4">
                     <p class="text-stone-500 italic text-sm">Loading messages...</p>
@@ -1064,6 +1241,18 @@
                 month: 'short',
                 day: 'numeric'
             });
+        }
+
+        function setMetricValue(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const numeric = Number(value || 0);
+            el.textContent = Number.isFinite(numeric) ? String(numeric) : String(value || '0');
+        }
+
+        function setMetricText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
         }
 
         // --- Phone Validation Utility (Ghana: +233 + 9 digits) ---
@@ -1723,6 +1912,7 @@
                 } else {
                     badge.classList.add('hidden');
                 }
+                setMetricValue('metric-pending-reservations', pendingCount);
 
                 lucide.createIcons();
             });
@@ -1902,6 +2092,8 @@
                 renderPaginationControls(false);
                 const badge = document.getElementById('badge-orders');
                 badge.classList.add('hidden');
+                setMetricValue('metric-active-orders', 0);
+                setMetricText('metric-orders-subtext', 'No open kitchen tickets');
                 return;
             }
 
@@ -1914,12 +2106,12 @@
                 const s = entry.data.status;
                 if (s === 'pending' || s === 'preparing' || !s) pendingCount++;
             });
+            setMetricValue('metric-active-orders', pendingCount);
+            setMetricText('metric-orders-subtext', pendingCount === 1 ? '1 open kitchen ticket' : `${pendingCount} open kitchen tickets`);
 
             pageOrders.forEach(entry => {
                 const order = entry.data;
                 const id = entry.id;
-
-                    if (order.status === 'pending' || order.status === 'preparing' || !order.status) pendingCount++;
 
                     let statusClass = 'bg-stone-100 text-stone-800';
                     if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
@@ -3043,102 +3235,184 @@
             }
         });
 
-        // --- Messages (Contact Us) ---
+        // --- Messages (Contact Us and assistant reports) ---
+        let messagesCache = [];
+        let messageFilter = 'all';
+
+        function isAssistantMessage(message) {
+            return String(message.source || '').toLowerCase() === 'assistant';
+        }
+
+        function getMessageCounts(items) {
+            return items.reduce((counts, item) => {
+                const message = item.data || {};
+                counts.all += 1;
+                if (!message.read) counts.unread += 1;
+                if (isAssistantMessage(message)) counts.assistant += 1;
+                return counts;
+            }, { all: 0, unread: 0, assistant: 0 });
+        }
+
+        function updateMessageFilterControls(counts) {
+            setMetricValue('message-count-all', counts.all);
+            setMetricValue('message-count-unread', counts.unread);
+            setMetricValue('message-count-assistant', counts.assistant);
+            document.querySelectorAll('[data-message-filter]').forEach(button => {
+                const active = button.dataset.messageFilter === messageFilter;
+                button.classList.toggle('admin-segmented-active', active);
+                button.setAttribute('aria-pressed', String(active));
+            });
+        }
+
+        function setMessageFilter(nextFilter) {
+            messageFilter = ['all', 'unread', 'assistant'].includes(nextFilter) ? nextFilter : 'all';
+            renderMessages();
+        }
+
+        function getFilteredMessages() {
+            if (messageFilter === 'unread') return messagesCache.filter(item => !(item.data || {}).read);
+            if (messageFilter === 'assistant') return messagesCache.filter(item => isAssistantMessage(item.data || {}));
+            return messagesCache;
+        }
+
+        function renderMessageCard(item) {
+            const m = item.data || {};
+            const date = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
+            const replyHref = buildReplyMailto(m.email, m.subject);
+            const isAssistantReport = isAssistantMessage(m);
+            const sourceLabel = isAssistantReport ? 'AI report' : 'Contact form';
+            const modeLabel = isAssistantReport
+                ? (m.preserveOriginal ? 'Original kept' : (m.reportDescriptionMode === 'structured_fallback' ? 'Structured draft' : 'AI drafted'))
+                : '';
+            const urgencyTone = String(m.reportUrgency || '').toLowerCase() === 'high'
+                ? 'border-red-200 bg-red-50 text-red-700'
+                : String(m.reportUrgency || '').toLowerCase() === 'medium'
+                    ? 'border-amber-200 bg-amber-50 text-amber-700'
+                    : 'border-stone-200 bg-stone-50 text-stone-600';
+            const metaParts = [
+                m.reportCategory ? `Category: ${m.reportCategory}` : '',
+                m.reportUrgency ? `Urgency: ${m.reportUrgency}` : '',
+                modeLabel,
+                m.phoneMasked || m.phone ? `Phone: ${m.phoneMasked || m.phone}` : '',
+                m.preferredContact ? `Preferred: ${m.preferredContact}` : '',
+                m.verificationStatus ? `Status: ${m.verificationStatus}` : '',
+                m.emailVerified === true ? 'Email verified' : '',
+                m.phoneVerified === true ? 'Phone verified' : '',
+                m.userId ? `User: ${m.userId}` : ''
+            ].filter(Boolean);
+            const sourcePill = `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${isAssistantReport ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-stone-100 text-stone-600 border border-stone-200'}">${escapeHtml(sourceLabel)}</span>`;
+            const metadataLine = metaParts.length
+                ? `<p class="mt-2 flex flex-wrap gap-1.5 text-xs text-stone-500">${sourcePill}${metaParts.map(part => `<span class="rounded-full border ${part.toLowerCase().startsWith('urgency') ? urgencyTone : 'border-stone-200 bg-stone-50 text-stone-600'} px-2 py-0.5">${escapeHtml(part)}</span>`).join('')}</p>`
+                : `<p class="mt-2">${sourcePill}</p>`;
+            const pageLine = m.pageUrl
+                ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Page: ${escapeHtml(m.pageUrl)}</p>`
+                : '';
+            const notesLine = m.customerNotes
+                ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Profile notes: ${escapeHtml(m.customerNotes)}</p>`
+                : '';
+            const originalMessage = String(m.originalMessage || '').trim();
+            const finalMessage = String(m.message || '').trim();
+            const originalLine = isAssistantReport && originalMessage && originalMessage !== finalMessage
+                ? `<details class="admin-message-original mt-3 text-xs text-stone-600">
+                    <summary class="cursor-pointer font-bold text-stone-700">Original guest wording</summary>
+                    <p class="mt-2 whitespace-pre-wrap" style="overflow-wrap:anywhere;">${escapeHtml(originalMessage)}</p>
+                </details>`
+                : '';
+            const replyAction = replyHref
+                ? `<a href="${escapeHtml(replyHref)}" aria-label="Reply to ${escapeHtml(m.name || 'message sender')}" title="Reply by email"
+                    class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors whitespace-nowrap">
+                    <i data-lucide="mail" class="h-3.5 w-3.5"></i>
+                    <span>Reply</span>
+                </a>`
+                : `<button type="button" disabled title="No sender email"
+                    class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-200 text-stone-400 bg-stone-50 disabled:cursor-not-allowed whitespace-nowrap">
+                    <i data-lucide="mail-x" class="h-3.5 w-3.5"></i>
+                    <span>No email</span>
+                </button>`;
+            const unreadDot = !m.read
+                ? '<span class="h-2 w-2 bg-red-600 rounded-full inline-block mr-2"></span>'
+                : '';
+            const descriptionLabel = isAssistantReport ? 'Issue description' : 'Message';
+            const cardClass = isAssistantReport ? 'admin-message-card--assistant' : '';
+
+            return `
+                <div class="admin-panel ${cardClass} bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                        <div class="min-w-0">
+                            <p class="font-semibold text-stone-900 flex items-center">
+                                ${unreadDot}${escapeHtml(m.name || 'Unknown')}
+                            </p>
+                            <p class="text-xs text-stone-500 mt-0.5" style="overflow-wrap: anywhere;">${escapeHtml(m.email || '')} &middot; ${date}</p>
+                            ${metadataLine}
+                        </div>
+                        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                            ${replyAction}
+                            <button data-message-id="${escapeHtml(item.id)}" onclick="markMessageRead(this)"
+                                class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap ${m.read ? 'opacity-40 cursor-default' : ''}"
+                                ${m.read ? 'disabled' : ''}>
+                                <i data-lucide="check" class="h-3.5 w-3.5"></i>
+                                <span>${m.read ? 'Read' : 'Mark as read'}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-sm font-medium text-stone-700 mb-1" style="overflow-wrap: anywhere;">Subject: ${escapeHtml(m.subject || '')}</p>
+                    <p class="text-sm font-semibold text-stone-800 mb-1">${descriptionLabel}</p>
+                    <p class="text-sm text-stone-600 whitespace-pre-wrap" style="overflow-wrap: anywhere;">${escapeHtml(finalMessage)}</p>
+                    ${originalLine}
+                    ${notesLine}
+                    ${pageLine}
+                </div>
+            `;
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messages-container');
+            const counts = getMessageCounts(messagesCache);
+            updateMessageFilterControls(counts);
+
+            if (!messagesCache.length) {
+                container.innerHTML = '<p class="text-stone-500 italic text-sm">No messages yet.</p>';
+                return;
+            }
+
+            const visibleMessages = getFilteredMessages();
+            if (!visibleMessages.length) {
+                const label = messageFilter === 'assistant' ? 'AI reports' : messageFilter;
+                container.innerHTML = `<p class="text-stone-500 italic text-sm">No ${escapeHtml(label)} messages right now.</p>`;
+                return;
+            }
+
+            container.innerHTML = visibleMessages.map(renderMessageCard).join('');
+            lucide.createIcons();
+        }
+
         function listenToMessages() {
             let knownMessageIds = null;
 
             db.collection('contact_messages')
                 .orderBy('createdAt', 'desc')
                 .onSnapshot(snapshot => {
-                    const container = document.getElementById('messages-container');
                     const badge = document.getElementById('badge-messages');
-                    const unread = snapshot.docs.filter(d => !d.data().read).length;
+                    messagesCache = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() || {} }));
+                    const counts = getMessageCounts(messagesCache);
 
-                    badge.classList.toggle('hidden', unread === 0);
+                    badge.classList.toggle('hidden', counts.unread === 0);
+                    setMetricValue('metric-unread-messages', counts.unread);
+                    setMetricValue('metric-ai-reports', counts.assistant);
 
-                    // Detect new unread messages for notifications
                     if (knownMessageIds !== null) {
                         snapshot.forEach(doc => {
-                            const m = doc.data();
+                            const m = doc.data() || {};
                             if (!knownMessageIds.has(doc.id) && !m.read) {
                                 showAdminNotification(
-                                    'New Message \uD83D\uDCAC',
-                                    `From: ${m.name || 'Unknown'} \u2013 ${m.subject || ''}`
+                                    isAssistantMessage(m) ? 'New AI report' : 'New message',
+                                    `From: ${m.name || 'Unknown'} - ${m.subject || ''}`
                                 );
                             }
                         });
                     }
                     knownMessageIds = new Set(snapshot.docs.map(d => d.id));
-
-                    if (snapshot.empty) {
-                        container.innerHTML = '<p class="text-stone-500 italic text-sm">No messages yet.</p>';
-                        return;
-                    }
-
-                    container.innerHTML = snapshot.docs.map(doc => {
-                        const m = doc.data();
-                        const date = m.createdAt ? new Date(m.createdAt.toDate()).toLocaleString() : 'N/A';
-                        const replyHref = buildReplyMailto(m.email, m.subject);
-                        const isAssistantReport = String(m.source || '').toLowerCase() === 'assistant';
-                        const sourceLabel = isAssistantReport ? 'Assistant report' : 'Contact form';
-                        const metaParts = [
-                            m.phoneMasked || m.phone ? `Phone: ${m.phoneMasked || m.phone}` : '',
-                            m.preferredContact ? `Preferred: ${m.preferredContact}` : '',
-                            m.verificationStatus ? `Status: ${m.verificationStatus}` : '',
-                            m.userId ? `User: ${m.userId}` : ''
-                        ].filter(Boolean);
-                        const sourcePill = `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${isAssistantReport ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-stone-100 text-stone-600 border border-stone-200'}">${escapeHtml(sourceLabel)}</span>`;
-                        const metadataLine = metaParts.length
-                            ? `<p class="mt-2 flex flex-wrap gap-1.5 text-xs text-stone-500">${sourcePill}${metaParts.map(part => `<span class="rounded-full border border-stone-200 bg-stone-50 px-2 py-0.5">${escapeHtml(part)}</span>`).join('')}</p>`
-                            : `<p class="mt-2">${sourcePill}</p>`;
-                        const pageLine = m.pageUrl
-                            ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Page: ${escapeHtml(m.pageUrl)}</p>`
-                            : '';
-                        const notesLine = m.customerNotes
-                            ? `<p class="mt-2 text-xs text-stone-500" style="overflow-wrap:anywhere;">Profile notes: ${escapeHtml(m.customerNotes)}</p>`
-                            : '';
-                        const replyAction = replyHref
-                            ? `<a href="${escapeHtml(replyHref)}" aria-label="Reply to ${escapeHtml(m.name || 'message sender')}" title="Reply by email"
-                                class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors whitespace-nowrap">
-                                <i data-lucide="mail" class="h-3.5 w-3.5"></i>
-                                <span>Reply</span>
-                            </a>`
-                            : `<button type="button" disabled title="No sender email"
-                                class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-200 text-stone-400 bg-stone-50 disabled:cursor-not-allowed whitespace-nowrap">
-                                <i data-lucide="mail-x" class="h-3.5 w-3.5"></i>
-                                <span>No email</span>
-                            </button>`;
-                        const unreadDot = !m.read
-                            ? '<span class="h-2 w-2 bg-red-600 rounded-full inline-block mr-2"></span>'
-                            : '';
-                        return `
-                            <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-stone-900 flex items-center">
-                                            ${unreadDot}${escapeHtml(m.name || 'Unknown')}
-                                        </p>
-                                        <p class="text-xs text-stone-500 mt-0.5" style="overflow-wrap: anywhere;">${escapeHtml(m.email || '')} &middot; ${date}</p>
-                                        ${metadataLine}
-                                    </div>
-                                    <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-                                        ${replyAction}
-                                        <button data-message-id="${escapeHtml(doc.id)}" onclick="markMessageRead(this)"
-                                            class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-md border border-stone-300 text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap ${m.read ? 'opacity-40 cursor-default' : ''}"
-                                            ${m.read ? 'disabled' : ''}>
-                                            <i data-lucide="check" class="h-3.5 w-3.5"></i>
-                                            <span>${m.read ? 'Read' : 'Mark as read'}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="text-sm font-medium text-stone-700 mb-1" style="overflow-wrap: anywhere;">Subject: ${escapeHtml(m.subject || '')}</p>
-                                <p class="text-sm text-stone-600 whitespace-pre-wrap" style="overflow-wrap: anywhere;">${escapeHtml(m.message || '')}</p>
-                                ${notesLine}
-                                ${pageLine}
-                            </div>
-                        `;
-                    }).join('');
-                    lucide.createIcons();
+                    renderMessages();
                 }, err => {
                     console.error('Messages listener error:', err);
                     document.getElementById('messages-container').innerHTML =
@@ -3377,12 +3651,14 @@
             if (!chatbotKnowledgeCache.length) {
                 tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">No chatbot facts yet.</td></tr>';
                 countEl.textContent = '0 facts';
+                setMetricValue('metric-active-facts', 0);
                 return;
             }
 
             const activeCount = chatbotKnowledgeCache.filter(item => getChatbotKnowledgeStatus(item.data) === 'active').length;
             const archivedCount = chatbotKnowledgeCache.length - activeCount;
             countEl.textContent = `${activeCount} active, ${archivedCount} archived`;
+            setMetricValue('metric-active-facts', activeCount);
 
             const rows = sortChatbotKnowledgeItems([...chatbotKnowledgeCache]).map(item => {
                 const data = item.data;
@@ -3566,6 +3842,9 @@
         document.getElementById('chatbot-knowledge-answer').addEventListener('input', updateChatbotAnswerCount);
         document.getElementById('fraud-review-refresh-btn').addEventListener('click', loadFraudReview);
         document.getElementById('seed-chatbot-facts-btn').addEventListener('click', seedSecureChatbotFacts);
+        document.querySelectorAll('[data-message-filter]').forEach(button => {
+            button.addEventListener('click', () => setMessageFilter(button.dataset.messageFilter));
+        });
 
         function escapeHtml(str) {
             return String(str)
@@ -3611,8 +3890,8 @@
                 target: 'tab-btn-admin-users'
             },
             {
-                title: 'Messages',
-                description: 'Read messages submitted by customers via Contact Us or the website assistant. Mark messages as read once you have reviewed them.',
+                title: 'Messages & AI',
+                description: 'Review contact messages, assistant-drafted reports, and the original customer wording when a report was rewritten.',
                 target: 'tab-btn-messages'
             },
             {

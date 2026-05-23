@@ -841,8 +841,12 @@
     "utensils-crossed": UtensilsCrossed,
     "x": X
   };
+  var normalizedIcons = Object.keys(icons).reduce((acc, key) => {
+    acc[toPascalCase(key)] = icons[key];
+    return acc;
+  }, {});
   window.lucide = {
-    createIcons: (attrs) => createIcons({ icons, attrs }),
+    createIcons: (attrs) => createIcons({ icons: normalizedIcons, attrs }),
     icons
   };
 })();

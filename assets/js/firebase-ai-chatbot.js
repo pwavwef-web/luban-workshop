@@ -168,8 +168,10 @@ Answer guest questions using only the restaurant context supplied in the user pr
 Keep answers concise, warm, and practical. Prefer 1-3 short paragraphs or a short list.
 If the context does not answer the question, say you do not have that detail in the restaurant information available here and direct the guest to call 020 543 8455, email reservations@lubanrestaurant.com, or use [Contact Us](contact-us.html).
 Do not invent menu availability, prices, reservation status, dietary safety, staff names, policies, or private data.
+You can help guests with menu discovery, ordering and checkout guidance, reservation paths, account verification, event/catering questions, contact paths, and issue reports.
 When signed-in customer context is supplied, use it only to make account, checkout, verification, order, and contact guidance more relevant.
 Do not reveal or repeat full private contact details. If the guest asks to contact, complain, or report an issue, explain that signed-in guests can ask you to send a report directly.
+When preparing an issue report, write a clear staff-ready description instead of copying the guest wording, unless the guest explicitly asks to keep the wording exactly the same.
 Never claim a report has been sent unless the website reports that the assistant report submission succeeded.
 When mentioning menu prices, use the site's current cedi format such as ₵40, not GHS 40.
 For allergy, dietary, medical, legal, refund, cancellation, or event contract questions, give the known general policy and ask the guest to contact the restaurant for confirmation.
@@ -523,8 +525,8 @@ function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I can help with Luban Workshop's menu, hours, reservations, events, location, account details and reports.`);
-  appendSuggestions(['What are your hours?', 'Show me popular seafood dishes', 'How do I reserve a table?', 'Send a report']);
+  appendMessage('bot', `Hi, I can help with Luban Workshop's menu, ordering, reservations, events, account checks, contact options and issue reports.`);
+  appendSuggestions(['What are your hours?', 'Show popular seafood', 'Help with checkout', 'Send a report']);
 }
 
 function autoSizeInput(input) {
@@ -691,6 +693,14 @@ function isReportCancellation(text) {
   return /^(cancel|stop|never mind|nevermind|do not send|don't send)$/i.test(String(text || '').trim());
 }
 
+function wantsOriginalReportText(text) {
+  return /\b(keep|use)\s+(it|this|my\s+words?|the\s+text)\s+(the\s+)?same\b/i.test(text) ||
+    /\b(send|submit|report|use)\s+(it|this|my\s+message|my\s+words?)\s+exactly\b/i.test(text) ||
+    /\bkeep\s+(my\s+)?wording\b/i.test(text) ||
+    /\b(word\s*for\s*word|verbatim|exact\s+words?|exactly\s+as\s+i\s+wrote|as\s+written|as\s+is)\b/i.test(text) ||
+    /\b(do\s+not|don't|dont|no)\s+(rewrite|rephrase|change|summari[sz]e)\b/i.test(text);
+}
+
 function extractReportMessage(text) {
   return String(text || '')
     .replace(/^\s*(please\s+)?(can\s+you\s+|could\s+you\s+|i\s+want\s+to\s+|i\s+need\s+to\s+)?(send|submit|make|file|contact|tell|notify)?\s*(a\s+)?(report|complaint|message|feedback)?\s*(to\s+)?(the\s+)?(restaurant|team|staff|manager|admin)?\s*(that|about|because|:|-)?\s*/i, '')
@@ -705,21 +715,152 @@ function buildReportSubject(message) {
   return preview ? `Assistant report: ${preview}` : 'Assistant report';
 }
 
-function buildReportConfirmation(message, account) {
+function inferReportCategory(message) {
+  const text = String(message || '').toLowerCase();
+  if (/\b(order|checkout|cart|payment|pay|pickup|collect|delivery)\b/.test(text)) return 'Order';
+  if (/\b(reservation|booking|table|event|catering|party)\b/.test(text)) return 'Reservation';
+  if (/\b(account|sign in|login|verify|verification|otp|code|phone|email)\b/.test(text)) return 'Account';
+  if (/\b(menu|dish|food|meal|allergy|allergic|diet|price|available)\b/.test(text)) return 'Menu';
+  if (/\b(staff|service|wait|late|rude|manager)\b/.test(text)) return 'Service';
+  return 'General';
+}
+
+function inferReportUrgency(message) {
+  const text = String(message || '').toLowerCase();
+  if (/\b(unsafe|sick|ill|allergic|allergy|medical|emergency|fraud|charged twice|double charge|wrong payment)\b/.test(text)) return 'high';
+  if (/\b(today|now|currently|waiting|cannot|can't|failed|missing|wrong order|cancel)\b/.test(text)) return 'medium';
+  return 'normal';
+}
+
+function cleanReportField(value, maxLength) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
+function parseReportDraftJson(text) {
+  const source = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+  const match = source.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+
+  try {
+    return JSON.parse(match[0]);
+  } catch (error) {
+    return null;
+  }
+}
+
+function buildFallbackReportDraft(originalMessage, options = {}) {
+  const original = cleanReportField(originalMessage, 2000);
+  const preserveOriginal = options.preserveOriginal === true;
+  const category = inferReportCategory(original);
+  const urgency = inferReportUrgency(original);
+  const description = preserveOriginal
+    ? original
+    : [
+        `A signed-in customer is reporting a ${category.toLowerCase()} issue that needs staff review.`,
+        '',
+        `Issue details: ${original}`,
+        '',
+        'Please review the saved profile contact details and follow up with the customer.'
+      ].join('\n');
+
+  return {
+    originalMessage: original,
+    message: description,
+    subject: buildReportSubject(description),
+    category,
+    urgency,
+    preserveOriginal,
+    mode: preserveOriginal ? 'original' : 'structured_fallback'
+  };
+}
+
+function buildReportDraftPrompt(originalMessage, account) {
+  return `
+Create a concise staff-ready issue report for Luban Workshop Restaurant.
+Do not copy the guest wording word for word. Rewrite it into a clear operational description unless the user asked to keep it the same.
+Preserve all concrete facts the guest gave. Do not invent dates, order numbers, dishes, names, refunds, causes, or promises.
+Use neutral restaurant operations language.
+
+Signed-in customer context:
+${buildUserContext(account)}
+
+Guest's original report text:
+${originalMessage}
+
+Return only valid JSON with these keys:
+{
+  "subject": "short admin inbox subject, max 80 characters",
+  "description": "polished issue description for staff, 2-5 sentences or short paragraphs",
+  "category": "Order|Reservation|Menu|Account|Service|General",
+  "urgency": "normal|medium|high"
+}
+`;
+}
+
+async function draftReportDetails(originalMessage, account, options = {}) {
+  const preserveOriginal = options.preserveOriginal === true || wantsOriginalReportText(originalMessage);
+  const fallback = buildFallbackReportDraft(originalMessage, { preserveOriginal });
+  if (preserveOriginal) return fallback;
+
+  try {
+    initFirebase();
+    const result = await state.model.generateContent(buildReportDraftPrompt(fallback.originalMessage, account));
+    const parsed = parseReportDraftJson(result.response.text());
+    if (!parsed || !parsed.description) return fallback;
+
+    const description = cleanAnswer(parsed.description).slice(0, 2000);
+    if (description.length < 10) return fallback;
+
+    const category = ['Order', 'Reservation', 'Menu', 'Account', 'Service', 'General'].includes(parsed.category)
+      ? parsed.category
+      : inferReportCategory(`${fallback.originalMessage} ${description}`);
+    const urgency = ['normal', 'medium', 'high'].includes(String(parsed.urgency || '').toLowerCase())
+      ? String(parsed.urgency).toLowerCase()
+      : inferReportUrgency(`${fallback.originalMessage} ${description}`);
+    const subject = cleanReportField(parsed.subject, 80) || buildReportSubject(description);
+
+    return {
+      originalMessage: fallback.originalMessage,
+      message: description,
+      subject: cleanReportField(subject, 96),
+      category,
+      urgency,
+      preserveOriginal: false,
+      mode: 'ai_drafted'
+    };
+  } catch (error) {
+    console.warn('Could not draft assistant report description:', error);
+    return fallback;
+  }
+}
+
+function buildReportConfirmation(report, account) {
   const contactBits = [
     account && account.name ? account.name : 'your saved name',
     account && account.emailMasked ? account.emailMasked : 'your signed-in email',
     account && account.phoneMasked ? account.phoneMasked : ''
   ].filter(Boolean);
+  const category = report.category ? `Category: ${report.category}` : '';
+  const urgency = report.urgency ? `Urgency: ${report.urgency}` : '';
+  const meta = [category, urgency].filter(Boolean).join(' | ');
+  const intro = report.preserveOriginal
+    ? 'I can send your wording to the restaurant team now:'
+    : 'I drafted a clearer version for the restaurant team:';
+  const finalInstruction = report.preserveOriginal
+    ? 'Reply "send report" to submit it, add a revised message, or type "cancel".'
+    : 'Reply "send report" to submit it, "keep it same" to use your exact wording, add a revised message, or type "cancel".';
 
   return [
-    'I can send this to the restaurant team now:',
+    intro,
     '',
-    `"${message}"`,
-    '',
+    report.message,
+    meta ? `\n${meta}` : '',
     `I will include ${contactBits.join(', ')} from your signed-in profile so the team can follow up.`,
-    'Reply "send report" to submit it, or "cancel" to stop.'
-  ].join('\n');
+    finalInstruction
+  ].filter(line => line !== '').join('\n');
 }
 
 async function handleReportFlow(question) {
@@ -737,17 +878,18 @@ async function handleReportFlow(question) {
       return `I can send reports directly once you're signed in. Please sign in, then tell me what to send, or use [Contact Us](${CONTACT.contactPage}).`;
     }
 
-    const message = trimmed;
-    if (message.length < 10) {
+    const originalMessage = trimmed;
+    if (originalMessage.length < 10) {
       return 'Please include a little more detail so the team knows what happened.';
     }
 
     state.pendingReport = {
       awaitingConfirmation: true,
-      message,
-      subject: buildReportSubject(message)
+      ...(await draftReportDetails(originalMessage, account, {
+        preserveOriginal: wantsOriginalReportText(originalMessage)
+      }))
     };
-    return buildReportConfirmation(message, account);
+    return buildReportConfirmation(state.pendingReport, account);
   }
 
   if (state.pendingReport && state.pendingReport.awaitingConfirmation) {
@@ -758,18 +900,31 @@ async function handleReportFlow(question) {
       return result.message;
     }
 
+    if (wantsOriginalReportText(trimmed)) {
+      const account = await getCurrentAccount();
+      state.pendingReport = {
+        ...state.pendingReport,
+        message: state.pendingReport.originalMessage || state.pendingReport.message,
+        subject: buildReportSubject(state.pendingReport.originalMessage || state.pendingReport.message),
+        preserveOriginal: true,
+        mode: 'original'
+      };
+      return buildReportConfirmation(state.pendingReport, account);
+    }
+
     const replacement = isReportIntent(trimmed) ? extractReportMessage(trimmed) : trimmed;
     if (replacement.length >= 10) {
       const account = await getCurrentAccount();
       state.pendingReport = {
         awaitingConfirmation: true,
-        message: replacement,
-        subject: buildReportSubject(replacement)
+        ...(await draftReportDetails(replacement, account, {
+          preserveOriginal: wantsOriginalReportText(trimmed)
+        }))
       };
-      return buildReportConfirmation(replacement, account);
+      return buildReportConfirmation(state.pendingReport, account);
     }
 
-    return 'Reply "send report" to submit it, add a revised message, or type "cancel".';
+    return 'Reply "send report" to submit it, "keep it same" to use your exact wording, add a revised message, or type "cancel".';
   }
 
   if (!isReportIntent(trimmed)) return null;
@@ -779,18 +934,19 @@ async function handleReportFlow(question) {
     return `I can send reports directly once you're signed in. Please sign in, then tell me what to send, or use [Contact Us](${CONTACT.contactPage}).`;
   }
 
-  const message = extractReportMessage(trimmed);
-  if (message.length < 10) {
+  const originalMessage = extractReportMessage(trimmed);
+  if (originalMessage.length < 10) {
     state.pendingReport = { awaitingMessage: true };
     return 'I can send that directly from your signed-in account. What should I tell the restaurant team?';
   }
 
   state.pendingReport = {
     awaitingConfirmation: true,
-    message,
-    subject: buildReportSubject(message)
+    ...(await draftReportDetails(originalMessage, account, {
+      preserveOriginal: wantsOriginalReportText(trimmed)
+    }))
   };
-  return buildReportConfirmation(message, account);
+  return buildReportConfirmation(state.pendingReport, account);
 }
 
 async function submitAssistantReport(report) {
@@ -802,6 +958,12 @@ async function submitAssistantReport(report) {
   const payload = {
     subject: report.subject || buildReportSubject(report.message),
     message: report.message,
+    originalMessage: report.originalMessage || report.message,
+    generatedDescription: report.preserveOriginal ? '' : report.message,
+    preserveOriginal: report.preserveOriginal === true,
+    reportCategory: report.category || inferReportCategory(report.message),
+    reportUrgency: report.urgency || inferReportUrgency(report.message),
+    reportDescriptionMode: report.mode || (report.preserveOriginal ? 'original' : 'ai_drafted'),
     pageUrl: window.location.href
   };
   const data = await apiRequest('/submitAssistantReport', {

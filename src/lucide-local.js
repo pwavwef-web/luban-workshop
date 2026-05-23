@@ -142,7 +142,18 @@ const icons = {
   'x': X
 };
 
+const normalizedIcons = Object.keys(icons).reduce((acc, key) => {
+  // Lucide v1 resolves icon names via PascalCase internally.
+  const pascalKey = key
+    .split(/[^a-zA-Z0-9]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+  acc[pascalKey] = icons[key];
+  return acc;
+}, {});
+
 window.lucide = {
-  createIcons: (attrs) => createIcons({ icons, attrs }),
+  createIcons: (attrs) => createIcons({ icons: normalizedIcons, attrs }),
   icons
 };

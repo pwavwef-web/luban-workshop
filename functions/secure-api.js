@@ -1017,12 +1017,26 @@ async function handleSubmitAssistantReport(req, res) {
   const email = normalizeEmail(authUser.email || decoded.email || profile.email || '');
   if (!email) throw createHttpError(400, 'Your account needs an email address before the assistant can send a report.');
 
-  const message = cleanLimitedText(req.body.message, 2000);
-  if (message.length < 10) {
+  const submittedMessage = cleanLimitedText(req.body.message, 2000);
+  const originalMessage = cleanLimitedText(req.body.originalMessage || req.body.message, 2000);
+  const generatedDescription = cleanLimitedText(req.body.generatedDescription, 2000);
+  const preserveOriginal = req.body.preserveOriginal === true;
+  const message = preserveOriginal
+    ? (submittedMessage || originalMessage)
+    : (generatedDescription || submittedMessage || originalMessage);
+
+  if (message.length < 10 || originalMessage.length < 10) {
     throw createHttpError(400, 'Please include a little more detail before sending your report.');
   }
 
   const subject = cleanSubjectLine(req.body.subject || `Assistant report from ${profile.name || authUser.displayName || 'customer'}`);
+  const reportCategory = cleanLimitedText(req.body.reportCategory || 'General', 40);
+  const reportUrgency = ['normal', 'medium', 'high'].includes(String(req.body.reportUrgency || '').toLowerCase())
+    ? String(req.body.reportUrgency).toLowerCase()
+    : 'normal';
+  const reportDescriptionMode = preserveOriginal
+    ? 'original'
+    : cleanLimitedText(req.body.reportDescriptionMode || (generatedDescription ? 'ai_drafted' : 'submitted'), 40);
   const phoneE164 = normalizePhoneNumber(profile.phoneE164 || profile.phone || '');
   const name = cleanPlainText(profile.name || authUser.displayName || decoded.name || 'Signed-in customer');
   const preferredContact = cleanPlainText(profile.preferredContact || 'email');
@@ -1041,6 +1055,13 @@ async function handleSubmitAssistantReport(req, res) {
     phoneMasked: maskPhone(phoneE164),
     subject,
     message,
+    originalMessage,
+    generatedDescription: preserveOriginal ? '' : generatedDescription,
+    preserveOriginal,
+    reportCategory,
+    reportUrgency,
+    reportDescriptionMode,
+    aiGeneratedDescription: !preserveOriginal && reportDescriptionMode !== 'submitted',
     read: false,
     createdAt: serverTimestamp(),
     source: 'assistant',
