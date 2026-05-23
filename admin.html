@@ -357,11 +357,7 @@
                 margin-top: 0;
             }
         }
-        /* Hide top metric buttons and actions column when requested */
-        .admin-command-grid { display: none !important; }
-        /* Hide the last column (Actions) in admin panels and tables */
-        .admin-panel th:last-child,
-        .admin-panel td:last-child { display: none !important; }
+        /* (Removed metric buttons and Actions column via markup changes) */
     </style>
     <script src="assets/js/cookie-consent.js" defer></script>
 </head>
@@ -562,58 +558,7 @@
                 </div>
             </div>
 
-            <section class="admin-command-grid" aria-label="Operations summary">
-                <button type="button" onclick="switchTab('orders')" class="admin-metric-button">
-                    <span class="admin-metric-icon bg-blue-50 text-blue-700 border border-blue-100">
-                        <i data-lucide="shopping-bag" class="h-5 w-5"></i>
-                    </span>
-                    <span class="min-w-0">
-                        <span id="metric-active-orders" class="admin-metric-value">0</span>
-                        <span class="admin-metric-label">Active orders</span>
-                        <span id="metric-orders-subtext" class="admin-metric-subtext">Pending or preparing</span>
-                    </span>
-                </button>
-                <button type="button" onclick="switchTab('reservations')" class="admin-metric-button">
-                    <span class="admin-metric-icon bg-amber-50 text-amber-700 border border-amber-100">
-                        <i data-lucide="calendar-clock" class="h-5 w-5"></i>
-                    </span>
-                    <span class="min-w-0">
-                        <span id="metric-pending-reservations" class="admin-metric-value">0</span>
-                        <span class="admin-metric-label">Pending bookings</span>
-                        <span class="admin-metric-subtext">Need a decision</span>
-                    </span>
-                </button>
-                <button type="button" onclick="switchTab('messages')" class="admin-metric-button">
-                    <span class="admin-metric-icon bg-red-50 text-red-700 border border-red-100">
-                        <i data-lucide="mail" class="h-5 w-5"></i>
-                    </span>
-                    <span class="min-w-0">
-                        <span id="metric-unread-messages" class="admin-metric-value">0</span>
-                        <span class="admin-metric-label">Unread inbox</span>
-                        <span class="admin-metric-subtext">Contact and assistant</span>
-                    </span>
-                </button>
-                <button type="button" onclick="switchTab('messages'); setMessageFilter('assistant');" class="admin-metric-button">
-                    <span class="admin-metric-icon bg-teal-50 text-teal-700 border border-teal-100">
-                        <i data-lucide="bot" class="h-5 w-5"></i>
-                    </span>
-                    <span class="min-w-0">
-                        <span id="metric-ai-reports" class="admin-metric-value">0</span>
-                        <span class="admin-metric-label">AI reports</span>
-                        <span class="admin-metric-subtext">Drafted by assistant</span>
-                    </span>
-                </button>
-                <button type="button" onclick="switchTab('chatbot-knowledge')" class="admin-metric-button">
-                    <span class="admin-metric-icon bg-stone-100 text-stone-700 border border-stone-200">
-                        <i data-lucide="book-open" class="h-5 w-5"></i>
-                    </span>
-                    <span class="min-w-0">
-                        <span id="metric-active-facts" class="admin-metric-value">0</span>
-                        <span class="admin-metric-label">Active facts</span>
-                        <span class="admin-metric-subtext">Public chatbot context</span>
-                    </span>
-                </button>
-            </section>
+            <!-- Metric buttons removed as requested -->
 
             <div id="view-menu" class="view-shell space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -636,9 +581,7 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">
-                                    Actions</th>
+                                    
                             </tr>
                         </thead>
                         <tbody id="menu-items-table" class="bg-white divide-y divide-stone-200">
@@ -671,9 +614,7 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">
-                                    Actions</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="reservations-table" class="bg-white divide-y divide-stone-200">
@@ -710,11 +651,11 @@
                                 <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Admin Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Added At</th>
                                 <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Added By</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">Actions</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="admin-users-table" class="bg-white divide-y divide-stone-200">
-                            <tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">Loading admins...</td></tr>
+                            <tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">Loading admins...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -747,14 +688,12 @@
                                 <th
                                     class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">
-                                    Actions</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="orders-table" class="bg-white divide-y divide-stone-200">
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center text-stone-500 italic">Waiting for new orders...</td>
+                                <td colspan="6" class="px-6 py-12 text-center text-stone-500 italic">Waiting for new orders...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -894,11 +833,11 @@
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Offer</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Status</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Valid Until</th>
-                                        <th class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">Actions</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody id="promotions-table" class="bg-white divide-y divide-stone-200">
-                                    <tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">Loading offers...</td></tr>
+                                    <tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">Loading offers...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1135,11 +1074,11 @@
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Fact</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Status</th>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-stone-500 uppercase tracking-wider">Updated</th>
-                                        <th class="px-6 py-3 text-right text-xs font-bold text-stone-500 uppercase tracking-wider">Actions</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody id="chatbot-knowledge-table" class="bg-white divide-y divide-stone-200">
-                                    <tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">Loading chatbot facts...</td></tr>
+                                    <tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">Loading chatbot facts...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1568,11 +1507,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${priceLabel}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">${statusBadge}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openImageModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')})" aria-label="Edit image for ${dish.name}" class="text-stone-600 hover:text-purple-600 transition-colors mr-3" title="Edit dish image"><i data-lucide="image" class="h-4 w-4"></i></button>
-                            <button onclick="openPriceModal('${dish.id}', ${JSON.stringify(dish.name).replace(/"/g, '&quot;')}, ${currentPrice})" aria-label="Edit price for ${dish.name}" class="text-stone-600 hover:text-blue-600 transition-colors mr-3" title="Edit price"><i data-lucide="pencil" class="h-4 w-4"></i></button>
-                            ${revertBtn}<button onclick="toggleDishVisibility('${dish.id}', ${isHidden})" aria-label="${toggleTitle} for ${dish.name}" class="text-stone-600 hover:text-red-700 transition-colors" title="${toggleTitle}"><i data-lucide="${toggleIcon}" class="h-4 w-4"></i></button>
-                        </td>
+                        
                     </tr>
                 `;
                 tableBody.innerHTML += row;
@@ -1827,7 +1762,7 @@
                 knownReservationIds = new Set(snapshot.docs.map(d => d.id));
 
                 if (snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-stone-500 italic">No reservations yet.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-stone-500 italic">No reservations yet.</td></tr>';
                 }
 
                 snapshot.forEach(doc => {
@@ -1845,38 +1780,7 @@
 
                     if (status === 'pending') pendingCount++;
 
-                    let actionBtn = '';
-                    if (status === 'pending') {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
-                        <i data-lucide="check" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Confirm</span>
-                    </button>
-                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Reject</span>
-                    </button>`;
-                    } else if (status === 'confirmed') {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors mr-2" title="Move Back to Pending">
-                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Pending</span>
-                    </button>
-                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Reject</span>
-                    </button>`;
-                    } else {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
-                        <i data-lucide="check" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Confirm</span>
-                    </button>
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors" title="Move Back to Pending">
-                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Pending</span>
-                    </button>`;
-                    }
+                    
 
                     const row = `
                 <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
@@ -1898,9 +1802,7 @@
                         ${rejectionReason}
                         ${decisionBy}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        ${actionBtn}
-                    </td>
+                    
                 </tr>
             `;
                     tableBody.innerHTML += row;
@@ -2031,7 +1933,7 @@
             }, err => {
                 console.error('Orders listener error:', err);
                 const tableBody = document.getElementById('orders-table');
-                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-600 italic">Failed to load orders.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-600 italic">Failed to load orders.</td></tr>';
             });
         }
 
@@ -2060,7 +1962,7 @@
             const nextDisabled = !hasNext;
             const controls = `
                 <tr id="${controlsRowId}" class="bg-stone-50">
-                    <td colspan="7" class="px-6 py-3 text-center">
+                    <td colspan="6" class="px-6 py-3 text-center">
                         <div class="flex items-center justify-center gap-3">
                             <button id="orders-prev" class="px-3 py-1 rounded border" ${prevDisabled? 'disabled':''}>Prev</button>
                             <span class="text-sm text-stone-600">Page ${ordersPageIndex + 1}</span>
@@ -2088,7 +1990,7 @@
             tableBody.innerHTML = '';
 
             if (!ordersCache.length) {
-                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-stone-500 italic">No orders received yet.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-stone-500 italic">No orders received yet.</td></tr>';
                 renderPaginationControls(false);
                 const badge = document.getElementById('badge-orders');
                 badge.classList.add('hidden');
@@ -2124,32 +2026,7 @@
                         ? order.items.map(i => `<div class="py-0.5"><span class="font-bold text-stone-600">${i.quantity}&times;</span> ${i.name}</div>`).join('')
                         : '<div class="text-stone-600 italic">No items</div>';
 
-                    let actions = '';
-                    if (order.status === 'pending' || !order.status) {
-                        actions = `
-                            <button onclick="updateOrderStatus('${id}', 'preparing')" aria-label="Mark order as preparing" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors" title="Mark as Preparing">
-                                <i data-lucide="chef-hat" class="h-4 w-4"></i>
-                            </button>
-                            <button onclick="updateOrderStatus('${id}', 'cancelled')" aria-label="Cancel order" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
-                                <i data-lucide="x" class="h-4 w-4"></i>
-                            </button>
-                        `;
-                    } else if (order.status === 'preparing') {
-                        actions = `
-                            <button onclick="updateOrderStatus('${id}', 'completed')" aria-label="Mark order as completed" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-2 transition-colors" title="Mark Completed">
-                                <i data-lucide="check" class="h-4 w-4"></i>
-                            </button>
-                            <button onclick="updateOrderStatus('${id}', 'cancelled')" aria-label="Cancel order" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
-                                <i data-lucide="x" class="h-4 w-4"></i>
-                            </button>
-                        `;
-                    } else {
-                        actions = `
-                            <button onclick="updateOrderStatus('${id}', 'pending')" aria-label="Move order back to pending" class="text-stone-600 hover:text-stone-700 p-2 rounded-full transition-colors" title="Move back to Pending">
-                                <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                            </button>
-                        `;
-                    }
+                    
 
                     const placedDate = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : null;
                     const placedDateStr = placedDate ? placedDate.toLocaleDateString() : '\u2014';
@@ -2174,12 +2051,10 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                ${actions}
-                            </td>
+                            
                         </tr>
                         <tr id="order-details-${id}" class="hidden bg-stone-50 border-b border-stone-100">
-                            <td colspan="7" class="px-6 py-3">
+                            <td colspan="6" class="px-6 py-3">
                                 <p class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">Full Order</p>
                                 <div class="text-sm text-stone-800">${itemsDetail}</div>
                             </td>
@@ -2313,7 +2188,7 @@
             }, err => {
                 console.error('Promotions listener error:', err);
                 document.getElementById('promotions-table').innerHTML =
-                    '<tr><td colspan="4" class="px-6 py-8 text-center text-red-600 italic">Failed to load promotions and deals.</td></tr>';
+                    '<tr><td colspan="3" class="px-6 py-8 text-center text-red-600 italic">Failed to load promotions and deals.</td></tr>';
                 document.getElementById('promotion-count').textContent = 'Could not load offers.';
             });
         }
@@ -2346,7 +2221,7 @@
             const countEl = document.getElementById('promotion-count');
 
             if (!promotionsCache.length) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">No promotions or deals yet.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">No promotions or deals yet.</td></tr>';
                 countEl.textContent = '0 offers';
                 return;
             }
@@ -2388,34 +2263,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap align-top">${statusBadge}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 align-top">${escapeHtml(data.expiresAt || 'No expiry')}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-top">
-                            <button type="button" data-promotion-action="edit" data-promotion-id="${escapeHtml(item.id)}"
-                                aria-label="Edit promotion" class="text-stone-600 hover:text-blue-600 transition-colors mr-3" title="Edit offer">
-                                <i data-lucide="pencil" class="h-4 w-4"></i>
-                            </button>
-                            <button type="button" data-promotion-action="toggle" data-promotion-id="${escapeHtml(item.id)}"
-                                aria-label="${toggleTitle}" class="text-stone-600 hover:text-red-700 transition-colors mr-3" title="${toggleTitle}">
-                                <i data-lucide="${toggleIcon}" class="h-4 w-4"></i>
-                            </button>
-                            <button type="button" data-promotion-action="delete" data-promotion-id="${escapeHtml(item.id)}"
-                                aria-label="Delete promotion" class="text-stone-600 hover:text-red-700 transition-colors" title="Delete offer">
-                                <i data-lucide="trash-2" class="h-4 w-4"></i>
-                            </button>
-                        </td>
+                        
                     </tr>
                 `;
             }).join('');
 
             tableBody.innerHTML = rows;
-            tableBody.querySelectorAll('[data-promotion-action="edit"]').forEach(btn => {
-                btn.addEventListener('click', () => openPromotionEditor(btn.dataset.promotionId));
-            });
-            tableBody.querySelectorAll('[data-promotion-action="toggle"]').forEach(btn => {
-                btn.addEventListener('click', () => togglePromotionVisibility(btn.dataset.promotionId));
-            });
-            tableBody.querySelectorAll('[data-promotion-action="delete"]').forEach(btn => {
-                btn.addEventListener('click', () => deletePromotion(btn.dataset.promotionId));
-            });
+            
             lucide.createIcons();
         }
 
@@ -3034,7 +2888,7 @@
                 tableBody.innerHTML = '';
 
                 if (snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">No additional admins configured.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">No additional admins configured.</td></tr>';
                     return;
                 }
 
@@ -3047,9 +2901,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${doc.id}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${addedAt}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${addedBy}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button onclick="revokeAdmin('${doc.id}')" class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-xs font-medium transition-colors">Revoke</button>
-                            </td>
+                            
                         </tr>
                     `;
                     tableBody.innerHTML += row;
@@ -3587,7 +3439,7 @@
             }, err => {
                 console.error('Chatbot knowledge listener error:', err);
                 document.getElementById('chatbot-knowledge-table').innerHTML =
-                    '<tr><td colspan="4" class="px-6 py-8 text-center text-red-600 italic">Failed to load chatbot facts.</td></tr>';
+                    '<tr><td colspan="3" class="px-6 py-8 text-center text-red-600 italic">Failed to load chatbot facts.</td></tr>';
                 document.getElementById('chatbot-knowledge-count').textContent = 'Could not load facts.';
             });
         }
@@ -3649,7 +3501,7 @@
             const countEl = document.getElementById('chatbot-knowledge-count');
 
             if (!chatbotKnowledgeCache.length) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-stone-500 italic">No chatbot facts yet.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-stone-500 italic">No chatbot facts yet.</td></tr>';
                 countEl.textContent = '0 facts';
                 setMetricValue('metric-active-facts', 0);
                 return;
@@ -3680,27 +3532,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap align-top">${statusBadge}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500 align-top">${escapeHtml(formatKnowledgeDate(data))}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium align-top">
-                            <button type="button" data-knowledge-action="edit" data-knowledge-id="${escapeHtml(item.id)}"
-                                aria-label="Edit chatbot fact" class="text-stone-600 hover:text-blue-600 transition-colors mr-3" title="Edit fact">
-                                <i data-lucide="pencil" class="h-4 w-4"></i>
-                            </button>
-                            <button type="button" data-knowledge-action="toggle" data-knowledge-id="${escapeHtml(item.id)}"
-                                aria-label="${archiveTitle}" class="text-stone-600 hover:text-red-700 transition-colors" title="${archiveTitle}">
-                                <i data-lucide="${archiveIcon}" class="h-4 w-4"></i>
-                            </button>
-                        </td>
+                        
                     </tr>
                 `;
             }).join('');
 
             tableBody.innerHTML = rows;
-            tableBody.querySelectorAll('[data-knowledge-action="edit"]').forEach(btn => {
-                btn.addEventListener('click', () => openChatbotKnowledgeEditor(btn.dataset.knowledgeId));
-            });
-            tableBody.querySelectorAll('[data-knowledge-action="toggle"]').forEach(btn => {
-                btn.addEventListener('click', () => toggleChatbotKnowledgeStatus(btn.dataset.knowledgeId));
-            });
+            
             lucide.createIcons();
         }
 
