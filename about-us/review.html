@@ -214,14 +214,15 @@
             if (!user) return;
 
             var adminVerified = false;
+            var normalizedEmail = (user.email || '').trim().toLowerCase();
             try {
                 var tokenResult = await user.getIdTokenResult();
                 if (tokenResult.claims.admin === true) adminVerified = true;
             } catch (e) {}
-            if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
-            if (!adminVerified && user.email) {
+            if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
+            if (!adminVerified && normalizedEmail) {
                 try {
-                    var adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                    var adminDoc = await db.collection('admins').doc(normalizedEmail).get();
                     if (adminDoc.exists) adminVerified = true;
                 } catch (e) {}
             }

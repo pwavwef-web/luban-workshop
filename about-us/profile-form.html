@@ -362,6 +362,7 @@
         auth.onAuthStateChanged(async function(user) {
             if (user) {
                 var adminVerified = false;
+                var normalizedEmail = (user.email || '').trim().toLowerCase();
 
                 // 1. Check Firebase Custom Claims
                 try {
@@ -370,12 +371,12 @@
                 } catch (e) { /* fall through */ }
 
                 // 2. Bootstrap email fallback
-                if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+                if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
 
                 // 3. Check Firestore admins collection
-                if (!adminVerified && user.email) {
+                if (!adminVerified && normalizedEmail) {
                     try {
-                        var adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                        var adminDoc = await db.collection('admins').doc(normalizedEmail).get();
                         if (adminDoc.exists) adminVerified = true;
                     } catch (e) { /* no permission */ }
                 }

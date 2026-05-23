@@ -71,6 +71,7 @@
             if (user) {
                 // Check if the logged-in user has admin privileges
                 let adminVerified = false;
+                const normalizedEmail = (user.email || '').trim().toLowerCase();
 
                 // 1. Check Firebase Custom Claims
                 try {
@@ -79,12 +80,12 @@
                 } catch (e) { /* token fetch failed, fall through */ }
 
                 // 2. Check bootstrap email (development fallback)
-                if (!adminVerified && user.email === 'admin@luban.com') adminVerified = true;
+                if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
 
                 // 3. Check Firestore admins collection
-                if (!adminVerified && user.email) {
+                if (!adminVerified && normalizedEmail) {
                     try {
-                        const adminDoc = await db.collection('admins').doc(user.email.toLowerCase()).get();
+                        const adminDoc = await db.collection('admins').doc(normalizedEmail).get();
                         if (adminDoc.exists) adminVerified = true;
                     } catch (e) { /* no permission or network error */ }
                 }

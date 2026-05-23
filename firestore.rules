@@ -9,8 +9,10 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && 
              (request.auth.token.admin == true || 
-              request.auth.token.email == 'admin@luban.com' ||
-              exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
+              (request.auth.token.email is string &&
+               request.auth.token.email.lower() == 'admin@luban.com') ||
+              (request.auth.token.email is string &&
+               exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()))));
     }
     
     // Helper function to check if user is authenticated
@@ -22,7 +24,10 @@ service cloud.firestore {
     match /admins/{adminEmail} {
       // Allow an authenticated user to read their own admin doc (so client-side checks work),
       // or allow existing admins to read the full list.
-      allow read: if isAdmin() || (isAuthenticated() && adminEmail == request.auth.token.email);
+      allow read: if isAdmin() ||
+                   (isAuthenticated() &&
+                    request.auth.token.email is string &&
+                    adminEmail == request.auth.token.email.lower());
       // Only admins can write to the admins list
       allow write: if isAdmin();
     }
