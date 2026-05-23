@@ -27,15 +27,40 @@
         </div>
     </nav>
 
-    <header class="pt-28 pb-12 bg-stone-900 text-white">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="relative overflow-hidden bg-stone-950 pt-28 pb-12 text-white">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(239,68,68,0.34),_transparent_36%),radial-gradient(circle_at_top_right,_rgba(251,191,36,0.18),_transparent_30%),linear-gradient(135deg,_rgba(28,25,23,0.98),_rgba(28,25,23,0.88))]"></div>
+            <div class="absolute inset-0 opacity-30 blur-[2px]">
+                <div class="mx-auto grid h-full max-w-6xl grid-cols-3 gap-3 px-4 sm:grid-cols-6 sm:gap-4 sm:px-6 lg:px-8">
+                    <div class="col-span-2 row-span-2 overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/20 sm:col-span-3 sm:row-span-2">
+                        <img src="assets/menu-items-pictures/SP1.webp" alt="Chicken and Sweet Corn Soup" class="h-full w-full object-cover">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-white/10 shadow-xl shadow-black/20">
+                        <img src="assets/menu-items-pictures/S7.webp" alt="Golden Fried Prawns" class="h-full w-full object-cover">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-white/10 shadow-xl shadow-black/20">
+                        <img src="assets/menu-items-pictures/K1.webp" alt="Sweet and Sour Chicken" class="h-full w-full object-cover">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-white/10 shadow-xl shadow-black/20 sm:col-span-2">
+                        <img src="assets/menu-items-pictures/R4.webp" alt="Shrimp Fried Rice" class="h-full w-full object-cover">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-white/10 shadow-xl shadow-black/20">
+                        <img src="assets/menu-items-pictures/F4.webp" alt="Sweet & Sour Fish Fillet" class="h-full w-full object-cover">
+                    </div>
+                    <div class="overflow-hidden rounded-3xl border border-white/10 shadow-xl shadow-black/20">
+                        <img src="assets/drinks/coca-cola-300ml.webp" alt="Coca-Cola 300ml" class="h-full w-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Order Tracking</p>
-            <h1 class="serif text-4xl font-bold mt-3">Order Status</h1>
+            <h1 class="serif text-4xl font-bold mt-3 sm:text-5xl">Order Status</h1>
             <p class="mt-4 max-w-2xl text-stone-200">Track one order at a time and manage customer-allowed actions from this page.</p>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16">
+    <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-16">
         <section id="auth-gate" class="panel bg-white p-6 sm:p-8">
             <h2 class="serif text-3xl font-bold text-stone-900">Sign in to view this order</h2>
             <p class="mt-3 text-stone-600">Only the customer account that placed the order can view this page.</p>
