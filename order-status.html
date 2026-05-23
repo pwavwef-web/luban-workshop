@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Status | Luban Workshop Restaurant</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background: #f7f3ef; color: #1c1917; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .panel { border-radius: 8px; border: 1px solid #e7e5e4; box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08); }
+    </style>
+</head>
+<body>
+    <nav class="fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-stone-900">
+                <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white">
+                <span class="serif font-bold text-lg">Luban <span class="text-red-700">Workshop</span></span>
+            </a>
+            <a href="index.html#my-orders" class="text-sm font-semibold text-stone-700 hover:text-red-700">Back to orders</a>
+        </div>
+    </nav>
+
+    <header class="pt-28 pb-12 bg-stone-900 text-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Order Tracking</p>
+            <h1 class="serif text-4xl font-bold mt-3">Order Status</h1>
+            <p class="mt-4 max-w-2xl text-stone-200">Track one order at a time and manage customer-allowed actions from this page.</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16">
+        <section id="auth-gate" class="panel bg-white p-6 sm:p-8">
+            <h2 class="serif text-3xl font-bold text-stone-900">Sign in to view this order</h2>
+            <p class="mt-3 text-stone-600">Only the customer account that placed the order can view this page.</p>
+        </section>
+
+        <section id="order-content" class="hidden space-y-6">
+            <article class="panel bg-white p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Secure Order</p>
+                        <h2 id="order-title" class="serif mt-2 text-3xl font-bold text-stone-900">Order</h2>
+                        <p id="order-created" class="mt-2 text-stone-600"></p>
+                    </div>
+                    <span id="order-status-pill" class="rounded-full bg-stone-100 px-4 py-2 text-xs font-bold text-stone-700">PENDING</span>
+                </div>
+                <div id="order-items" class="mt-6 space-y-4"></div>
+                <div class="mt-6 flex items-center justify-between border-t border-stone-100 pt-5">
+                    <span class="text-lg font-semibold text-stone-900">Total</span>
+                    <span id="order-total" class="text-lg font-bold text-stone-900">₵0.00</span>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                    <button id="cancel-btn" type="button" class="hidden rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Cancel Order</button>
+                    <button id="delete-btn" type="button" class="hidden rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Delete Order</button>
+                    <button id="refresh-btn" type="button" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Refresh Status</button>
+                </div>
+            </article>
+            <div id="order-feedback" class="hidden rounded-md p-4 text-sm"></div>
+        </section>
+    </main>
+
+    <div data-luban-footer></div>
+    <script src="assets/js/site-footer.js"></script>
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/firebase-modular.bundle.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const orderId = new URLSearchParams(window.location.search).get('order');
+        let currentUser = null;
+        let currentOrder = null;
+
+        function canCancelOrder(order) {
+            if (!order || order.status !== 'pending' || !order.createdAt || !order.createdAt.toDate) return false;
+            return (Date.now() - order.createdAt.toDate().getTime()) <= 5 * 60 * 1000;
+        }
+
+        function showFeedback(message, isError) {
+            const el = document.getElementById('order-feedback');
+            el.textContent = message;
+            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        async function loadOrder() {
+            if (!currentUser || !orderId) return;
+            const snap = await db.collection('orders').doc(orderId).get();
+            if (!snap.exists) throw new Error('Order not found.');
+            const order = snap.data() || {};
+            currentOrder = order;
+            document.getElementById('order-title').textContent = `Order #${orderId.slice(-6).toUpperCase()}`;
+            document.getElementById('order-created').textContent = order.createdAt && order.createdAt.toDate ? `Placed ${order.createdAt.toDate().toLocaleString()}` : 'Placed recently';
+            document.getElementById('order-total').textContent = lubanClient.formatMoney(order.total || 0);
+            document.getElementById('order-status-pill').textContent = (order.status || 'pending').toUpperCase();
+            document.getElementById('order-items').innerHTML = (order.items || []).map((item) => `
+                <article class="rounded-lg border border-stone-200 p-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h3 class="font-semibold text-stone-900">${item.name}</h3>
+                            <p class="mt-1 text-sm text-stone-500">Qty ${item.quantity}</p>
+                        </div>
+                        <strong>${lubanClient.formatMoney(Number(item.price || 0) * Number(item.quantity || 0))}</strong>
+                    </div>
+                </article>
+            `).join('');
+            document.getElementById('cancel-btn').classList.toggle('hidden', !canCancelOrder(order));
+            document.getElementById('delete-btn').classList.toggle('hidden', !['completed', 'cancelled'].includes(String(order.status || '').toLowerCase()));
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            document.getElementById('auth-gate').classList.toggle('hidden', Boolean(user));
+            document.getElementById('order-content').classList.toggle('hidden', !user);
+            if (!user) return;
+            if (!orderId) {
+                showFeedback('This order page is missing the order reference.', true);
+                return;
+            }
+            try {
+                await loadOrder();
+            } catch (error) {
+                showFeedback(error.message || 'Could not load this order.', true);
+            }
+        });
+
+        document.getElementById('refresh-btn').addEventListener('click', async () => {
+            try {
+                await loadOrder();
+                showFeedback('Order refreshed.', false);
+            } catch (error) {
+                showFeedback(error.message || 'Could not refresh the order.', true);
+            }
+        });
+
+        document.getElementById('cancel-btn').addEventListener('click', async () => {
+            if (!currentUser || !orderId) return;
+            if (!confirm('Cancel this order?')) return;
+            await lubanClient.api('/cancelOwnOrder', {
+                method: 'POST',
+                user: currentUser,
+                body: { orderId }
+            });
+            await loadOrder();
+            showFeedback('Order cancelled.', false);
+        });
+
+        document.getElementById('delete-btn').addEventListener('click', async () => {
+            if (!currentUser || !orderId) return;
+            if (!confirm('Delete this order permanently?')) return;
+            await lubanClient.api('/deleteOwnOrder', {
+                method: 'POST',
+                user: currentUser,
+                body: { orderId }
+            });
+            showFeedback('Order deleted. Redirecting back to the homepage...', false);
+            setTimeout(() => { window.location.href = 'index.html#my-orders'; }, 1000);
+        });
+    </script>
+</body>
+</html>

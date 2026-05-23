@@ -149,7 +149,10 @@
             <div id="profile-required-alert" class="hidden bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4">
                 <div class="flex items-start gap-3">
                     <i data-lucide="alert-circle" class="h-5 w-5 mt-0.5 flex-shrink-0"></i>
-                    <p class="text-sm font-semibold">Add a valid Ghana phone number before placing an order.</p>
+                    <div class="text-sm">
+                        <p id="profile-required-copy" class="font-semibold">Add a valid Ghana phone number before placing an order.</p>
+                        <a href="verify-contact.html" class="mt-2 inline-flex font-semibold text-red-800 underline">Open verification page</a>
+                    </div>
                 </div>
             </div>
 
@@ -182,6 +185,14 @@
                         <a href="index.html#my-orders" class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md font-semibold hover:bg-stone-50">
                             <i data-lucide="package" class="h-4 w-4"></i>
                             My Orders
+                        </a>
+                        <a href="verify-contact.html" class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md font-semibold hover:bg-stone-50">
+                            <i data-lucide="shield-check" class="h-4 w-4"></i>
+                            Verify Contact
+                        </a>
+                        <a href="account-security.html" class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md font-semibold hover:bg-stone-50">
+                            <i data-lucide="shield" class="h-4 w-4"></i>
+                            Account Security
                         </a>
                     </div>
                 </aside>
@@ -255,6 +266,8 @@
     <div data-luban-footer></div>
     <script src="assets/js/site-footer.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script>
         lucide.createIcons();
@@ -275,6 +288,7 @@
         let currentUser = null;
         let profileDocExists = false;
         let promotionsUnsubscribe = null;
+        let currentAccountStatus = null;
 
         function formatGhanaPhone(phone) {
             let cleaned = String(phone || '').replace(/[^\d+]/g, '');
@@ -323,7 +337,33 @@
             document.getElementById('summary-phone').textContent = phone || 'Not added';
             document.getElementById('summary-contact').textContent = contact === 'sms' ? 'SMS' : contact.charAt(0).toUpperCase() + contact.slice(1);
             document.getElementById('profile-hero-subtitle').textContent = phone ? 'Your order contact details are ready.' : 'Add your phone number to place orders smoothly.';
-            document.getElementById('profile-required-alert').classList.toggle('hidden', Boolean(phone));
+            updateVerificationAlert(Boolean(phone));
+        }
+
+        function updateVerificationAlert(hasPhone) {
+            const alert = document.getElementById('profile-required-alert');
+            const copy = document.getElementById('profile-required-copy');
+            let message = '';
+            if (!hasPhone) {
+                message = 'Add a valid Ghana phone number before placing an order.';
+            } else if (currentAccountStatus && !currentAccountStatus.phoneVerified) {
+                message = 'Your phone number is saved, but it still needs SMS verification before ordering.';
+            } else if (currentAccountStatus && !currentAccountStatus.emailVerified) {
+                message = 'Verify your email address before placing an order.';
+            }
+            copy.textContent = message || 'Your account details are ready.';
+            alert.classList.toggle('hidden', !message);
+        }
+
+        async function loadAccountStatus() {
+            if (!currentUser) return;
+            try {
+                currentAccountStatus = (await lubanClient.api('/accountStatus', { method: 'GET', user: currentUser })).account;
+            } catch (error) {
+                console.warn('Could not load account status:', error);
+                currentAccountStatus = null;
+            }
+            updateVerificationAlert(Boolean(document.getElementById('profile-phone').value.trim()));
         }
 
         async function loadProfile(user) {
@@ -414,6 +454,7 @@
 
             try {
                 await loadProfile(user);
+                await loadAccountStatus();
                 listenToPromotions();
             } catch (error) {
                 console.error('Failed to load profile:', error);
@@ -497,9 +538,10 @@
                 profileDocExists = true;
                 document.getElementById('profile-phone').value = phone;
                 updateSummary(payload);
-                if (currentUser.updateProfile && currentUser.displayName !== name) {
+                await loadAccountStatus();
+                if (auth.updateProfile && currentUser.displayName !== name) {
                     try {
-                        await currentUser.updateProfile({ displayName: name });
+                        await auth.updateProfile(currentUser, { displayName: name });
                     } catch (profileError) {
                         console.warn('Could not update auth display name:', profileError);
                     }

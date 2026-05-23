@@ -4,7 +4,9 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   updateProfile,
+  reload,
   signInWithPopup,
   signOut,
   GoogleAuthProvider
@@ -83,8 +85,8 @@ function createQueryApi(queryRef) {
 function createDocApi(docRef) {
   return {
     id: docRef.id,
-    async set(data) {
-      await setDoc(docRef, data);
+    async set(data, options) {
+      await setDoc(docRef, data, options);
     },
     async update(data) {
       await updateDoc(docRef, data);
@@ -117,6 +119,8 @@ function getAuthApi() {
     onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
     signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
     createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+    sendEmailVerification: (user) => sendEmailVerification(user),
+    reload: (user) => reload(user),
     updateProfile: (user, profile) => updateProfile(user, profile),
     signInWithPopup: (provider) => signInWithPopup(auth, provider),
     signOut: () => signOut(auth),

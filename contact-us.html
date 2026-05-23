@@ -131,6 +131,7 @@
                 </div>
 
                 <div id="form-error" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
+                <div id="turnstile-mount" class="min-h-[66px]"></div>
 
                 <button type="submit" id="submit-btn"
                     class="w-full bg-red-700 text-white py-3 rounded-md hover:bg-red-800 transition-colors font-medium">
@@ -154,6 +155,8 @@
     <div data-luban-footer></div>
     <script src="assets/js/site-footer.js"></script>
 
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
     <script>
         lucide.createIcons();
 
@@ -170,7 +173,7 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
-        const db = firebase.firestore();
+        let turnstileWidget = null;
 
         document.getElementById('contact-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -186,20 +189,27 @@
             const message = document.getElementById('contact-message').value.trim();
 
             try {
-                await db.collection('contact_messages').add({
+                const turnstileToken = lubanClient.getTurnstileToken(turnstileWidget);
+                if (!turnstileToken) {
+                    throw new Error('Please complete the anti-bot check before sending your message.');
+                }
+                await lubanClient.api('/submitContactMessage', {
+                    method: 'POST',
+                    body: {
                     name,
                     email,
                     subject,
                     message,
-                    read: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    turnstileToken
+                    }
                 });
+                lubanClient.resetTurnstile(turnstileWidget);
                 document.getElementById('contact-form').classList.add('hidden');
                 document.getElementById('form-success').classList.remove('hidden');
                 lucide.createIcons();
             } catch (err) {
                 console.error('Error sending message:', err);
-                errorDiv.textContent = 'Failed to send message. Please try again.';
+                errorDiv.textContent = err.message || 'Failed to send message. Please try again.';
                 errorDiv.classList.remove('hidden');
                 btn.disabled = false;
                 btn.textContent = 'Send Message';
@@ -214,6 +224,14 @@
             btn.disabled = false;
             btn.textContent = 'Send Message';
         }
+
+        lubanClient.mountTurnstile('#turnstile-mount')
+            .then(widgetId => { turnstileWidget = widgetId; })
+            .catch(err => {
+                const errorDiv = document.getElementById('form-error');
+                errorDiv.textContent = err.message || 'Could not load the anti-bot check.';
+                errorDiv.classList.remove('hidden');
+            });
     </script>
     <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260519-knowledge1"></script>
     <script src="assets/js/cookie-consent.js" defer></script>

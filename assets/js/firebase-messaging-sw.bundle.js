@@ -1,5 +1,8 @@
 (() => {
-  // node_modules/@firebase/util/dist/index.esm2017.js
+  // node_modules/@firebase/util/dist/postinstall.mjs
+  var getDefaultsFromPostinstall = () => void 0;
+
+  // node_modules/@firebase/util/dist/index.esm.js
   var stringToByteArray$1 = function(str) {
     const out = [];
     let p = 0;
@@ -285,7 +288,7 @@
   };
   var getDefaults = () => {
     try {
-      return getDefaultsFromGlobal() || getDefaultsFromEnvVariable() || getDefaultsFromCookie();
+      return getDefaultsFromPostinstall() || getDefaultsFromGlobal() || getDefaultsFromEnvVariable() || getDefaultsFromCookie();
     } catch (e) {
       console.info(`Unable to get __FIREBASE_DEFAULTS__ due to: ${e}`);
       return;
@@ -293,7 +296,7 @@
   };
   var getDefaultAppConfig = () => {
     var _a;
-    return (_a = getDefaults()) === null || _a === void 0 ? void 0 : _a.config;
+    return (_a = getDefaults()) == null ? void 0 : _a.config;
   };
   var Deferred = class {
     constructor() {
@@ -307,7 +310,7 @@
       });
     }
     /**
-     * Our API internals are not promiseified and cannot because our callback APIs have subtle expectations around
+     * Our API internals are not promisified and cannot because our callback APIs have subtle expectations around
      * invoking promises inline, which Promises are forbidden to do. This method accepts an optional node-style callback
      * and returns a node-style callback which will resolve or reject the Deferred's promise.
      */
@@ -355,7 +358,7 @@
         };
         request.onerror = () => {
           var _a;
-          reject(((_a = request.error) === null || _a === void 0 ? void 0 : _a.message) || "");
+          reject(((_a = request.error) == null ? void 0 : _a.message) || "");
         };
       } catch (error) {
         reject(error);
@@ -437,7 +440,7 @@
     }
   }
 
-  // node_modules/@firebase/component/dist/esm/index.esm2017.js
+  // node_modules/@firebase/component/dist/esm/index.esm.js
   var Component = class {
     /**
      *
@@ -483,7 +486,7 @@
       this.onInitCallbacks = /* @__PURE__ */ new Map();
     }
     /**
-     * @param identifier A provider can provide mulitple instances of a service
+     * @param identifier A provider can provide multiple instances of a service
      * if this.component.multipleInstances is true.
      */
     get(identifier) {
@@ -507,8 +510,8 @@
     }
     getImmediate(options) {
       var _a;
-      const normalizedIdentifier = this.normalizeInstanceIdentifier(options === null || options === void 0 ? void 0 : options.identifier);
-      const optional = (_a = options === null || options === void 0 ? void 0 : options.optional) !== null && _a !== void 0 ? _a : false;
+      const normalizedIdentifier = this.normalizeInstanceIdentifier(options == null ? void 0 : options.identifier);
+      const optional = (_a = options == null ? void 0 : options.optional) != null ? _a : false;
       if (this.isInitialized(normalizedIdentifier) || this.shouldAutoInitialize()) {
         try {
           return this.getOrInitializeService({
@@ -615,7 +618,7 @@
     onInit(callback, identifier) {
       var _a;
       const normalizedIdentifier = this.normalizeInstanceIdentifier(identifier);
-      const existingCallbacks = (_a = this.onInitCallbacks.get(normalizedIdentifier)) !== null && _a !== void 0 ? _a : /* @__PURE__ */ new Set();
+      const existingCallbacks = (_a = this.onInitCallbacks.get(normalizedIdentifier)) != null ? _a : /* @__PURE__ */ new Set();
       existingCallbacks.add(callback);
       this.onInitCallbacks.set(normalizedIdentifier, existingCallbacks);
       const existingInstance = this.instances.get(normalizedIdentifier);
@@ -638,7 +641,7 @@
       for (const callback of callbacks) {
         try {
           callback(instance, identifier);
-        } catch (_a) {
+        } catch {
         }
       }
     }
@@ -655,7 +658,7 @@
         if (this.component.onInstanceCreated) {
           try {
             this.component.onInstanceCreated(this.container, instanceIdentifier, instance);
-          } catch (_a) {
+          } catch {
           }
         }
       }
@@ -726,7 +729,7 @@
     }
   };
 
-  // node_modules/@firebase/logger/dist/esm/index.esm2017.js
+  // node_modules/@firebase/logger/dist/esm/index.esm.js
   var instances = [];
   var LogLevel;
   (function(LogLevel2) {
@@ -1050,7 +1053,7 @@
     has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop)
   }));
 
-  // node_modules/@firebase/app/dist/esm/index.esm2017.js
+  // node_modules/@firebase/app/dist/esm/index.esm.js
   var PlatformLoggerServiceImpl = class {
     constructor(container) {
       this.container = container;
@@ -1071,19 +1074,20 @@
   };
   function isVersionServiceProvider(provider) {
     const component = provider.getComponent();
-    return (component === null || component === void 0 ? void 0 : component.type) === "VERSION";
+    return (component == null ? void 0 : component.type) === "VERSION";
   }
-  var name$p = "@firebase/app";
-  var version$1 = "0.10.8";
+  var name$q = "@firebase/app";
+  var version$1 = "0.14.12";
   var logger = new Logger("@firebase/app");
-  var name$o = "@firebase/app-compat";
-  var name$n = "@firebase/analytics-compat";
-  var name$m = "@firebase/analytics";
-  var name$l = "@firebase/app-check-compat";
-  var name$k = "@firebase/app-check";
-  var name$j = "@firebase/auth";
-  var name$i = "@firebase/auth-compat";
-  var name$h = "@firebase/database";
+  var name$p = "@firebase/app-compat";
+  var name$o = "@firebase/analytics-compat";
+  var name$n = "@firebase/analytics";
+  var name$m = "@firebase/app-check-compat";
+  var name$l = "@firebase/app-check";
+  var name$k = "@firebase/auth";
+  var name$j = "@firebase/auth-compat";
+  var name$i = "@firebase/database";
+  var name$h = "@firebase/data-connect";
   var name$g = "@firebase/database-compat";
   var name$f = "@firebase/functions";
   var name$e = "@firebase/functions-compat";
@@ -1098,20 +1102,21 @@
   var name$5 = "@firebase/storage";
   var name$4 = "@firebase/storage-compat";
   var name$3 = "@firebase/firestore";
-  var name$2 = "@firebase/vertexai-preview";
+  var name$2 = "@firebase/ai";
   var name$1 = "@firebase/firestore-compat";
   var name = "firebase";
   var DEFAULT_ENTRY_NAME2 = "[DEFAULT]";
   var PLATFORM_LOG_STRING = {
-    [name$p]: "fire-core",
-    [name$o]: "fire-core-compat",
-    [name$m]: "fire-analytics",
-    [name$n]: "fire-analytics-compat",
-    [name$k]: "fire-app-check",
-    [name$l]: "fire-app-check-compat",
-    [name$j]: "fire-auth",
-    [name$i]: "fire-auth-compat",
-    [name$h]: "fire-rtdb",
+    [name$q]: "fire-core",
+    [name$p]: "fire-core-compat",
+    [name$n]: "fire-analytics",
+    [name$o]: "fire-analytics-compat",
+    [name$l]: "fire-app-check",
+    [name$m]: "fire-app-check-compat",
+    [name$k]: "fire-auth",
+    [name$j]: "fire-auth-compat",
+    [name$i]: "fire-rtdb",
+    [name$h]: "fire-data-connect",
     [name$g]: "fire-rtdb-compat",
     [name$f]: "fire-fn",
     [name$e]: "fire-fn-compat",
@@ -1129,6 +1134,7 @@
     [name$1]: "fire-fst-compat",
     [name$2]: "fire-vertex",
     "fire-js": "fire-js",
+    // Platform identifier for JS SDK.
     [name]: "fire-js-all"
   };
   var _apps = /* @__PURE__ */ new Map();
@@ -1225,8 +1231,8 @@
   var FirebaseAppImpl = class {
     constructor(options, config, container) {
       this._isDeleted = false;
-      this._options = Object.assign({}, options);
-      this._config = Object.assign({}, config);
+      this._options = { ...options };
+      this._config = { ...config };
       this._name = config.name;
       this._automaticDataCollectionEnabled = config.automaticDataCollectionEnabled;
       this._container = container;
@@ -1282,7 +1288,11 @@
       const name5 = rawConfig;
       rawConfig = { name: name5 };
     }
-    const config = Object.assign({ name: DEFAULT_ENTRY_NAME2, automaticDataCollectionEnabled: false }, rawConfig);
+    const config = {
+      name: DEFAULT_ENTRY_NAME2,
+      automaticDataCollectionEnabled: true,
+      ...rawConfig
+    };
     const name4 = config.name;
     if (typeof name4 !== "string" || !name4) {
       throw ERROR_FACTORY.create("bad-app-name", {
@@ -1324,7 +1334,7 @@
   }
   function registerVersion(libraryKeyOrName, version3, variant) {
     var _a;
-    let library = (_a = PLATFORM_LOG_STRING[libraryKeyOrName]) !== null && _a !== void 0 ? _a : libraryKeyOrName;
+    let library = (_a = PLATFORM_LOG_STRING[libraryKeyOrName]) != null ? _a : libraryKeyOrName;
     if (variant) {
       library += `-${variant}`;
     }
@@ -1390,7 +1400,7 @@
         logger.warn(e.message);
       } else {
         const idbGetError = ERROR_FACTORY.create("idb-get", {
-          originalErrorMessage: e === null || e === void 0 ? void 0 : e.message
+          originalErrorMessage: e == null ? void 0 : e.message
         });
         logger.warn(idbGetError.message);
       }
@@ -1408,7 +1418,7 @@
         logger.warn(e.message);
       } else {
         const idbGetError = ERROR_FACTORY.create("idb-set", {
-          originalErrorMessage: e === null || e === void 0 ? void 0 : e.message
+          originalErrorMessage: e == null ? void 0 : e.message
         });
         logger.warn(idbGetError.message);
       }
@@ -1418,7 +1428,7 @@
     return `${app2.name}!${app2.options.appId}`;
   }
   var MAX_HEADER_BYTES = 1024;
-  var STORED_HEARTBEAT_RETENTION_MAX_MILLIS = 30 * 24 * 60 * 60 * 1e3;
+  var MAX_NUM_STORED_HEARTBEATS = 30;
   var HeartbeatServiceImpl = class {
     constructor(container) {
       this.container = container;
@@ -1439,26 +1449,29 @@
      */
     async triggerHeartbeat() {
       var _a, _b;
-      const platformLogger = this.container.getProvider("platform-logger").getImmediate();
-      const agent = platformLogger.getPlatformInfoString();
-      const date = getUTCDateString();
-      if (((_a = this._heartbeatsCache) === null || _a === void 0 ? void 0 : _a.heartbeats) == null) {
-        this._heartbeatsCache = await this._heartbeatsCachePromise;
-        if (((_b = this._heartbeatsCache) === null || _b === void 0 ? void 0 : _b.heartbeats) == null) {
-          return;
+      try {
+        const platformLogger = this.container.getProvider("platform-logger").getImmediate();
+        const agent = platformLogger.getPlatformInfoString();
+        const date = getUTCDateString();
+        if (((_a = this._heartbeatsCache) == null ? void 0 : _a.heartbeats) == null) {
+          this._heartbeatsCache = await this._heartbeatsCachePromise;
+          if (((_b = this._heartbeatsCache) == null ? void 0 : _b.heartbeats) == null) {
+            return;
+          }
         }
+        if (this._heartbeatsCache.lastSentHeartbeatDate === date || this._heartbeatsCache.heartbeats.some((singleDateHeartbeat) => singleDateHeartbeat.date === date)) {
+          return;
+        } else {
+          this._heartbeatsCache.heartbeats.push({ date, agent });
+          if (this._heartbeatsCache.heartbeats.length > MAX_NUM_STORED_HEARTBEATS) {
+            const earliestHeartbeatIdx = getEarliestHeartbeatIdx(this._heartbeatsCache.heartbeats);
+            this._heartbeatsCache.heartbeats.splice(earliestHeartbeatIdx, 1);
+          }
+        }
+        return this._storage.overwrite(this._heartbeatsCache);
+      } catch (e) {
+        logger.warn(e);
       }
-      if (this._heartbeatsCache.lastSentHeartbeatDate === date || this._heartbeatsCache.heartbeats.some((singleDateHeartbeat) => singleDateHeartbeat.date === date)) {
-        return;
-      } else {
-        this._heartbeatsCache.heartbeats.push({ date, agent });
-      }
-      this._heartbeatsCache.heartbeats = this._heartbeatsCache.heartbeats.filter((singleDateHeartbeat) => {
-        const hbTimestamp = new Date(singleDateHeartbeat.date).valueOf();
-        const now = Date.now();
-        return now - hbTimestamp <= STORED_HEARTBEAT_RETENTION_MAX_MILLIS;
-      });
-      return this._storage.overwrite(this._heartbeatsCache);
     }
     /**
      * Returns a base64 encoded string which can be attached to the heartbeat-specific header directly.
@@ -1469,24 +1482,29 @@
      */
     async getHeartbeatsHeader() {
       var _a;
-      if (this._heartbeatsCache === null) {
-        await this._heartbeatsCachePromise;
-      }
-      if (((_a = this._heartbeatsCache) === null || _a === void 0 ? void 0 : _a.heartbeats) == null || this._heartbeatsCache.heartbeats.length === 0) {
+      try {
+        if (this._heartbeatsCache === null) {
+          await this._heartbeatsCachePromise;
+        }
+        if (((_a = this._heartbeatsCache) == null ? void 0 : _a.heartbeats) == null || this._heartbeatsCache.heartbeats.length === 0) {
+          return "";
+        }
+        const date = getUTCDateString();
+        const { heartbeatsToSend, unsentEntries } = extractHeartbeatsForHeader(this._heartbeatsCache.heartbeats);
+        const headerString = base64urlEncodeWithoutPadding(JSON.stringify({ version: 2, heartbeats: heartbeatsToSend }));
+        this._heartbeatsCache.lastSentHeartbeatDate = date;
+        if (unsentEntries.length > 0) {
+          this._heartbeatsCache.heartbeats = unsentEntries;
+          await this._storage.overwrite(this._heartbeatsCache);
+        } else {
+          this._heartbeatsCache.heartbeats = [];
+          void this._storage.overwrite(this._heartbeatsCache);
+        }
+        return headerString;
+      } catch (e) {
+        logger.warn(e);
         return "";
       }
-      const date = getUTCDateString();
-      const { heartbeatsToSend, unsentEntries } = extractHeartbeatsForHeader(this._heartbeatsCache.heartbeats);
-      const headerString = base64urlEncodeWithoutPadding(JSON.stringify({ version: 2, heartbeats: heartbeatsToSend }));
-      this._heartbeatsCache.lastSentHeartbeatDate = date;
-      if (unsentEntries.length > 0) {
-        this._heartbeatsCache.heartbeats = unsentEntries;
-        await this._storage.overwrite(this._heartbeatsCache);
-      } else {
-        this._heartbeatsCache.heartbeats = [];
-        void this._storage.overwrite(this._heartbeatsCache);
-      }
-      return headerString;
     }
   };
   function getUTCDateString() {
@@ -1542,7 +1560,7 @@
         return { heartbeats: [] };
       } else {
         const idbHeartbeatObject = await readHeartbeatsFromIndexedDB(this.app);
-        if (idbHeartbeatObject === null || idbHeartbeatObject === void 0 ? void 0 : idbHeartbeatObject.heartbeats) {
+        if (idbHeartbeatObject == null ? void 0 : idbHeartbeatObject.heartbeats) {
           return idbHeartbeatObject;
         } else {
           return { heartbeats: [] };
@@ -1558,7 +1576,7 @@
       } else {
         const existingHeartbeatsObject = await this.read();
         return writeHeartbeatsToIndexedDB(this.app, {
-          lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) !== null && _a !== void 0 ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
+          lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) != null ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
           heartbeats: heartbeatsObject.heartbeats
         });
       }
@@ -1572,7 +1590,7 @@
       } else {
         const existingHeartbeatsObject = await this.read();
         return writeHeartbeatsToIndexedDB(this.app, {
-          lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) !== null && _a !== void 0 ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
+          lastSentHeartbeatDate: (_a = heartbeatsObject.lastSentHeartbeatDate) != null ? _a : existingHeartbeatsObject.lastSentHeartbeatDate,
           heartbeats: [
             ...existingHeartbeatsObject.heartbeats,
             ...heartbeatsObject.heartbeats
@@ -1587,6 +1605,20 @@
       JSON.stringify({ version: 2, heartbeats: heartbeatsCache })
     ).length;
   }
+  function getEarliestHeartbeatIdx(heartbeats) {
+    if (heartbeats.length === 0) {
+      return -1;
+    }
+    let earliestHeartbeatIdx = 0;
+    let earliestHeartbeatDate = heartbeats[0].date;
+    for (let i = 1; i < heartbeats.length; i++) {
+      if (heartbeats[i].date < earliestHeartbeatDate) {
+        earliestHeartbeatDate = heartbeats[i].date;
+        earliestHeartbeatIdx = i;
+      }
+    }
+    return earliestHeartbeatIdx;
+  }
   function registerCoreComponents(variant) {
     _registerComponent(new Component(
       "platform-logger",
@@ -1600,20 +1632,20 @@
       "PRIVATE"
       /* ComponentType.PRIVATE */
     ));
-    registerVersion(name$p, version$1, variant);
-    registerVersion(name$p, version$1, "esm2017");
+    registerVersion(name$q, version$1, variant);
+    registerVersion(name$q, version$1, "esm2020");
     registerVersion("fire-js", "");
   }
   registerCoreComponents("");
 
   // node_modules/firebase/app/dist/esm/index.esm.js
   var name2 = "firebase";
-  var version = "10.12.5";
+  var version = "12.13.0";
   registerVersion(name2, version, "app");
 
-  // node_modules/@firebase/installations/dist/esm/index.esm2017.js
+  // node_modules/@firebase/installations/dist/esm/index.esm.js
   var name3 = "@firebase/installations";
-  var version2 = "0.6.8";
+  var version2 = "0.6.22";
   var PENDING_TIMEOUT_MS = 1e4;
   var PACKAGE_VERSION = `w:${version2}`;
   var INTERNAL_AUTH_VERSION = "FIS_v2";
@@ -1751,12 +1783,12 @@
   function generateFid() {
     try {
       const fidByteArray = new Uint8Array(17);
-      const crypto = self.crypto || self.msCrypto;
-      crypto.getRandomValues(fidByteArray);
+      const crypto2 = self.crypto || self.msCrypto;
+      crypto2.getRandomValues(fidByteArray);
       fidByteArray[0] = 112 + fidByteArray[0] % 16;
       const fid = encode(fidByteArray);
       return VALID_FID_PATTERN.test(fid) ? fid : INVALID_FID;
-    } catch (_a) {
+    } catch {
       return INVALID_FID;
     }
   }
@@ -2057,10 +2089,13 @@
       }
       const oldAuthToken = oldEntry.authToken;
       if (hasAuthTokenRequestTimedOut(oldAuthToken)) {
-        return Object.assign(Object.assign({}, oldEntry), { authToken: {
-          requestStatus: 0
-          /* RequestStatus.NOT_STARTED */
-        } });
+        return {
+          ...oldEntry,
+          authToken: {
+            requestStatus: 0
+            /* RequestStatus.NOT_STARTED */
+          }
+        };
       }
       return oldEntry;
     });
@@ -2068,17 +2103,23 @@
   async function fetchAuthTokenFromServer(installations, installationEntry) {
     try {
       const authToken = await generateAuthTokenRequest(installations, installationEntry);
-      const updatedInstallationEntry = Object.assign(Object.assign({}, installationEntry), { authToken });
+      const updatedInstallationEntry = {
+        ...installationEntry,
+        authToken
+      };
       await set(installations.appConfig, updatedInstallationEntry);
       return authToken;
     } catch (e) {
       if (isServerError(e) && (e.customData.serverCode === 401 || e.customData.serverCode === 404)) {
         await remove(installations.appConfig);
       } else {
-        const updatedInstallationEntry = Object.assign(Object.assign({}, installationEntry), { authToken: {
-          requestStatus: 0
-          /* RequestStatus.NOT_STARTED */
-        } });
+        const updatedInstallationEntry = {
+          ...installationEntry,
+          authToken: {
+            requestStatus: 0
+            /* RequestStatus.NOT_STARTED */
+          }
+        };
         await set(installations.appConfig, updatedInstallationEntry);
       }
       throw e;
@@ -2099,7 +2140,10 @@
       requestStatus: 1,
       requestTime: Date.now()
     };
-    return Object.assign(Object.assign({}, oldEntry), { authToken: inProgressAuthToken });
+    return {
+      ...oldEntry,
+      authToken: inProgressAuthToken
+    };
   }
   function hasAuthTokenRequestTimedOut(authToken) {
     return authToken.requestStatus === 1 && authToken.requestTime + PENDING_TIMEOUT_MS < Date.now();
@@ -2194,9 +2238,9 @@
   }
   registerInstallations();
   registerVersion(name3, version2);
-  registerVersion(name3, version2, "esm2017");
+  registerVersion(name3, version2, "esm2020");
 
-  // node_modules/@firebase/messaging/dist/esm/index.sw.esm2017.js
+  // node_modules/@firebase/messaging/dist/esm/index.sw.esm.js
   var DEFAULT_VAPID_KEY = "BDOU99-h67HcA6JeFXHbSNMu7e2yNNu3RzoMj8TM4W88jITfq7ZmPvIM1Iv-4_l2LxQcYwhqby2xGpWwzjfAnG4";
   var ENDPOINT = "https://fcmregistrations.googleapis.com/v1";
   var FCM_MSG = "FCM_MSG";
@@ -2262,7 +2306,7 @@
           }
           tokenDetails = {
             token: oldDetails.fcmToken,
-            createTime: (_a = oldDetails.createTime) !== null && _a !== void 0 ? _a : Date.now(),
+            createTime: (_a = oldDetails.createTime) != null ? _a : Date.now(),
             subscriptionOptions: {
               auth: oldDetails.auth,
               p256dh: oldDetails.p256dh,
@@ -2451,7 +2495,7 @@
       responseData = await response.json();
     } catch (err) {
       throw ERROR_FACTORY3.create("token-subscribe-failed", {
-        errorInfo: err === null || err === void 0 ? void 0 : err.toString()
+        errorInfo: err == null ? void 0 : err.toString()
       });
     }
     if (responseData.error) {
@@ -2482,7 +2526,7 @@
       responseData = await response.json();
     } catch (err) {
       throw ERROR_FACTORY3.create("token-update-failed", {
-        errorInfo: err === null || err === void 0 ? void 0 : err.toString()
+        errorInfo: err == null ? void 0 : err.toString()
       });
     }
     if (responseData.error) {
@@ -2516,7 +2560,7 @@
       }
     } catch (err) {
       throw ERROR_FACTORY3.create("token-unsubscribe-failed", {
-        errorInfo: err === null || err === void 0 ? void 0 : err.toString()
+        errorInfo: err == null ? void 0 : err.toString()
       });
     }
   }
@@ -2590,7 +2634,11 @@
   async function updateToken(messaging2, tokenDetails) {
     try {
       const updatedToken = await requestUpdateToken(messaging2.firebaseDependencies, tokenDetails);
-      const updatedTokenDetails = Object.assign(Object.assign({}, tokenDetails), { token: updatedToken, createTime: Date.now() });
+      const updatedTokenDetails = {
+        ...tokenDetails,
+        token: updatedToken,
+        createTime: Date.now()
+      };
       await dbSet(messaging2.firebaseDependencies, updatedTokenDetails);
       return updatedToken;
     } catch (e) {
@@ -2669,15 +2717,15 @@
   }
   function propagateFcmOptions(payload, messagePayloadInternal) {
     var _a, _b, _c, _d, _e;
-    if (!messagePayloadInternal.fcmOptions && !((_a = messagePayloadInternal.notification) === null || _a === void 0 ? void 0 : _a.click_action)) {
+    if (!messagePayloadInternal.fcmOptions && !((_a = messagePayloadInternal.notification) == null ? void 0 : _a.click_action)) {
       return;
     }
     payload.fcmOptions = {};
-    const link = (_c = (_b = messagePayloadInternal.fcmOptions) === null || _b === void 0 ? void 0 : _b.link) !== null && _c !== void 0 ? _c : (_d = messagePayloadInternal.notification) === null || _d === void 0 ? void 0 : _d.click_action;
+    const link = (_d = (_b = messagePayloadInternal.fcmOptions) == null ? void 0 : _b.link) != null ? _d : (_c = messagePayloadInternal.notification) == null ? void 0 : _c.click_action;
     if (!!link) {
       payload.fcmOptions.link = link;
     }
-    const analyticsLabel = (_e = messagePayloadInternal.fcmOptions) === null || _e === void 0 ? void 0 : _e.analytics_label;
+    const analyticsLabel = (_e = messagePayloadInternal.fcmOptions) == null ? void 0 : _e.analytics_label;
     if (!!analyticsLabel) {
       payload.fcmOptions.analyticsLabel = analyticsLabel;
     }
@@ -2690,7 +2738,6 @@
       setTimeout(resolve, ms);
     });
   }
-  _mergeStrings("hts/frbslgigp.ogepscmv/ieo/eaylg", "tp:/ieaeogn-agolai.o/1frlglgc/o");
   _mergeStrings("AzSCbw63g1R0nCw85jG8", "Iaya3yLKwmgvh7cF0q4");
   async function stageLog(messaging2, internalPayload) {
     const fcmEvent = createFcmEvent(internalPayload, await messaging2.firebaseDependencies.installations.getId());
@@ -2717,15 +2764,17 @@
       fcmEvent.collapse_key = internalPayload.collapse_key;
     }
     fcmEvent.event = EVENT_MESSAGE_DELIVERED.toString();
-    if (!!((_a = internalPayload.fcmOptions) === null || _a === void 0 ? void 0 : _a.analytics_label)) {
-      fcmEvent.analytics_label = (_b = internalPayload.fcmOptions) === null || _b === void 0 ? void 0 : _b.analytics_label;
+    if (!!((_a = internalPayload.fcmOptions) == null ? void 0 : _a.analytics_label)) {
+      fcmEvent.analytics_label = (_b = internalPayload.fcmOptions) == null ? void 0 : _b.analytics_label;
     }
     return fcmEvent;
   }
   function createAndEnqueueLogEvent(messaging2, fcmEvent, productId) {
     const logEvent = {};
     logEvent.event_time_ms = Math.floor(Date.now()).toString();
-    logEvent.source_extension_json_proto3 = JSON.stringify(fcmEvent);
+    logEvent.source_extension_json_proto3 = JSON.stringify({
+      messaging_client_event: fcmEvent
+    });
     if (!!productId) {
       logEvent.compliance_data = buildComplianceData(productId);
     }
@@ -2760,7 +2809,7 @@
     }
     const tokenDetails = await dbGet(messaging2.firebaseDependencies);
     await deleteTokenInternal(messaging2);
-    messaging2.vapidKey = (_b = (_a = tokenDetails === null || tokenDetails === void 0 ? void 0 : tokenDetails.subscriptionOptions) === null || _a === void 0 ? void 0 : _a.vapidKey) !== null && _b !== void 0 ? _b : DEFAULT_VAPID_KEY;
+    messaging2.vapidKey = (_b = (_a = tokenDetails == null ? void 0 : tokenDetails.subscriptionOptions) == null ? void 0 : _a.vapidKey) != null ? _b : DEFAULT_VAPID_KEY;
     await getTokenInternal(messaging2);
   }
   async function onPush(event, messaging2) {
@@ -2792,7 +2841,7 @@
   }
   async function onNotificationClick(event) {
     var _a, _b;
-    const internalPayload = (_b = (_a = event.notification) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b[FCM_MSG];
+    const internalPayload = (_b = (_a = event.notification) == null ? void 0 : _a.data) == null ? void 0 : _b[FCM_MSG];
     if (!internalPayload) {
       return;
     } else if (event.action) {
@@ -2824,7 +2873,9 @@
     return client.postMessage(internalPayload);
   }
   function wrapInternalPayload(internalPayload) {
-    const wrappedInternalPayload = Object.assign({}, internalPayload.notification);
+    const wrappedInternalPayload = {
+      ...internalPayload.notification
+    };
     wrappedInternalPayload.data = {
       [FCM_MSG]: internalPayload
     };
@@ -2878,13 +2929,13 @@
     }
     return self.registration.showNotification(
       /* title= */
-      (_a = notificationPayloadInternal.title) !== null && _a !== void 0 ? _a : "",
+      (_a = notificationPayloadInternal.title) != null ? _a : "",
       notificationPayloadInternal
     );
   }
   function getLink(payload) {
     var _a, _b, _c;
-    const link = (_b = (_a = payload.fcmOptions) === null || _a === void 0 ? void 0 : _a.link) !== null && _b !== void 0 ? _b : (_c = payload.notification) === null || _c === void 0 ? void 0 : _c.click_action;
+    const link = (_c = (_a = payload.fcmOptions) == null ? void 0 : _a.link) != null ? _c : (_b = payload.notification) == null ? void 0 : _b.click_action;
     if (link) {
       return link;
     }
@@ -3025,7 +3076,7 @@
 })();
 /*! Bundled license information:
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3043,7 +3094,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3061,7 +3112,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3079,7 +3130,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2022 Google LLC
@@ -3097,7 +3148,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3131,7 +3182,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3149,7 +3200,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3167,7 +3218,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3185,7 +3236,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3203,7 +3254,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2022 Google LLC
@@ -3221,7 +3272,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3239,7 +3290,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3257,7 +3308,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3275,7 +3326,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3293,25 +3344,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3329,7 +3362,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
@@ -3347,7 +3380,7 @@
    * limitations under the License.
    *)
 
-@firebase/util/dist/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
   (**
    * @license
    * Copyright 2021 Google LLC
@@ -3364,8 +3397,42 @@
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
+  (**
+   * @license
+   * Copyright 2025 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
 
-@firebase/component/dist/esm/index.esm2017.js:
+@firebase/util/dist/index.esm.js:
+  (**
+   * @license
+   * Copyright 2025 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+
+@firebase/component/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3383,7 +3450,7 @@
    * limitations under the License.
    *)
 
-@firebase/logger/dist/esm/index.esm2017.js:
+@firebase/logger/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3401,7 +3468,7 @@
    * limitations under the License.
    *)
 
-@firebase/app/dist/esm/index.esm2017.js:
+@firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3419,7 +3486,7 @@
    * limitations under the License.
    *)
 
-@firebase/app/dist/esm/index.esm2017.js:
+@firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3437,7 +3504,7 @@
    * limitations under the License.
    *)
 
-@firebase/app/dist/esm/index.esm2017.js:
+@firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3471,7 +3538,7 @@
    * limitations under the License.
    *)
 
-@firebase/app/dist/esm/index.esm2017.js:
+@firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3489,7 +3556,7 @@
    * limitations under the License.
    *)
 
-@firebase/app/dist/esm/index.esm2017.js:
+@firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2021 Google LLC
@@ -3541,7 +3608,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3559,7 +3626,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3577,7 +3644,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3595,7 +3662,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3613,7 +3680,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
@@ -3631,7 +3698,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/installations/dist/esm/index.esm2017.js:
+@firebase/installations/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3665,7 +3732,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/messaging/dist/esm/index.sw.esm2017.js:
+@firebase/messaging/dist/esm/index.sw.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -3729,7 +3796,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/messaging/dist/esm/index.sw.esm2017.js:
+@firebase/messaging/dist/esm/index.sw.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -3747,7 +3814,7 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/messaging/dist/esm/index.sw.esm2017.js:
+@firebase/messaging/dist/esm/index.sw.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC

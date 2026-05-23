@@ -376,6 +376,12 @@
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
 
+                <button onclick="switchTab('fraud-review')" id="tab-btn-fraud-review"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="shield-alert" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Fraud Review</span>
+                </button>
+
                 <button onclick="switchTab('chatbot-knowledge')" id="tab-btn-chatbot-knowledge"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="bot" class="h-5 w-5 mr-3"></i>
@@ -848,11 +854,35 @@
                 </div>
             </div>
 
+            <div id="view-fraud-review" class="view-shell hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Fraud Review</h2>
+                        <p class="text-sm text-stone-500 mt-1">Server-fed signals for OTP abuse, suspicious order activity, and duplicate customer details.</p>
+                    </div>
+                    <button id="fraud-review-refresh-btn" type="button"
+                        class="inline-flex items-center gap-2 rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                        <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+                        Refresh
+                    </button>
+                </div>
+                <div id="fraud-review-container" class="space-y-4">
+                    <p class="text-stone-500 italic text-sm">Loading fraud signals...</p>
+                </div>
+            </div>
+
             <!-- Chatbot Knowledge View -->
             <div id="view-chatbot-knowledge" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Chatbot Facts</h2>
-                    <p class="text-sm text-stone-500">Manage the Firestore facts used by the site chatbot.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <p class="text-sm text-stone-500">Manage the Firestore facts used by the site chatbot.</p>
+                        <button id="seed-chatbot-facts-btn" type="button"
+                            class="inline-flex items-center gap-2 rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                            <i data-lucide="sparkles" class="h-4 w-4"></i>
+                            Seed Secure Facts
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -996,7 +1026,7 @@
                     <!-- Initial State -->
                     <div id="balance-initial" class="text-center py-8 text-stone-500">
                         <i data-lucide="message-square" class="h-12 w-12 mx-auto mb-3 text-stone-300"></i>
-                        <p class="text-sm">Click "Check Balance" to view your SMS account balance</p>
+                        <p class="text-sm">Your SMS account balance loads automatically when you open this tab</p>
                     </div>
                 </div>
             </div>
@@ -1146,6 +1176,7 @@
                 listenToSpecialMenus();
                 listenToAdminUsers();
                 listenToMessages();
+                loadFraudReview();
                 listenToChatbotKnowledge();
 
                 // Request notification permission
@@ -1209,7 +1240,7 @@
             }
             
             // Hide all views
-            ['menu', 'reservations', 'orders', 'promotions', 'special-menus', 'admin-users', 'messages', 'chatbot-knowledge', 'account'].forEach(tab => {
+            ['menu', 'reservations', 'orders', 'promotions', 'special-menus', 'admin-users', 'messages', 'fraud-review', 'chatbot-knowledge', 'account'].forEach(tab => {
                 document.getElementById('view-' + tab).classList.add('hidden');
 
                 // Reset Tab Styles
@@ -1222,11 +1253,19 @@
             // Show active view
             document.getElementById('view-' + tabName).classList.remove('hidden');
 
+            if (tabName === 'account') {
+                checkSmsBalance();
+            }
+
             // Set Active Tab Style
             const activeBtn = document.getElementById('tab-btn-' + tabName);
             activeBtn.classList.add('bg-red-50', 'text-red-700', 'admin-nav-active');
             activeBtn.classList.remove('text-stone-600');
             activeBtn.setAttribute('aria-current', 'page');
+
+            if (tabName === 'fraud-review') {
+                loadFraudReview();
+            }
         }
 
         // --- Hardcoded Menu ---
@@ -3109,6 +3148,139 @@
             }
         }
 
+        async function fetchAdminApi(path, options = {}) {
+            const user = auth.currentUser;
+            if (!user) throw new Error('Not authenticated');
+            const token = await user.getIdToken();
+            const response = await fetch(path, {
+                method: options.method || 'GET',
+                headers: Object.assign({
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }, options.headers || {}),
+                body: options.body ? JSON.stringify(options.body) : undefined
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+            return data;
+        }
+
+        function renderFraudReview(data) {
+            const container = document.getElementById('fraud-review-container');
+            const duplicatePhones = Array.isArray(data.duplicatePhones) ? data.duplicatePhones : [];
+            const repeatedOtpSends = Array.isArray(data.repeatedOtpSends) ? data.repeatedOtpSends : [];
+            const repeatedOtpFailures = Array.isArray(data.repeatedOtpFailures) ? data.repeatedOtpFailures : [];
+            const repeatedCancellations = Array.isArray(data.repeatedCancellations) ? data.repeatedCancellations : [];
+            const priceMismatches = Array.isArray(data.priceMismatches) ? data.priceMismatches : [];
+            const suspiciousBursts = Array.isArray(data.suspiciousBursts) ? data.suspiciousBursts : [];
+            const recentEvents = Array.isArray(data.recentEvents) ? data.recentEvents : [];
+
+            container.innerHTML = `
+                <div class="grid gap-4 lg:grid-cols-2">
+                    <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                        <h3 class="text-base font-bold text-stone-900">Duplicate Verified Phones</h3>
+                        <p class="mt-1 text-xs text-stone-500">${duplicatePhones.length} phone numbers shared across multiple accounts.</p>
+                        <div class="mt-4 space-y-3 text-sm">
+                            ${duplicatePhones.length ? duplicatePhones.map(entry => `
+                                <div class="rounded-lg border border-stone-200 p-3">
+                                    <p class="font-semibold text-stone-900">${escapeHtml(entry.phoneMasked || '')}</p>
+                                    <p class="mt-1 text-stone-600">${entry.users.map(user => escapeHtml(user.email || user.uid || 'unknown')).join(' | ')}</p>
+                                </div>
+                            `).join('') : '<p class="text-stone-500 italic">No duplicate verified phone numbers found.</p>'}
+                        </div>
+                    </article>
+                    <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                        <h3 class="text-base font-bold text-stone-900">Repeated OTP Sends</h3>
+                        <p class="mt-1 text-xs text-stone-500">${repeatedOtpSends.length} hashed subjects crossed the send review threshold.</p>
+                        <div class="mt-4 space-y-3 text-sm">
+                            ${repeatedOtpSends.length ? repeatedOtpSends.map(entry => `
+                                <div class="rounded-lg border border-stone-200 p-3">
+                                    <p class="font-semibold text-stone-900">${escapeHtml(entry.subjectHash || '')}</p>
+                                    <p class="mt-1 text-stone-600">${entry.count} OTP sends</p>
+                                </div>
+                            `).join('') : '<p class="text-stone-500 italic">No repeated OTP send patterns found.</p>'}
+                        </div>
+                    </article>
+                    <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                        <h3 class="text-base font-bold text-stone-900">Repeated OTP Failures</h3>
+                        <p class="mt-1 text-xs text-stone-500">${repeatedOtpFailures.length} hashed subjects crossed the review threshold.</p>
+                        <div class="mt-4 space-y-3 text-sm">
+                            ${repeatedOtpFailures.length ? repeatedOtpFailures.map(entry => `
+                                <div class="rounded-lg border border-stone-200 p-3">
+                                    <p class="font-semibold text-stone-900">${escapeHtml(entry.subjectHash || '')}</p>
+                                    <p class="mt-1 text-stone-600">${entry.count} failed verifications</p>
+                                </div>
+                            `).join('') : '<p class="text-stone-500 italic">No repeated OTP failures found.</p>'}
+                        </div>
+                    </article>
+                    <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                        <h3 class="text-base font-bold text-stone-900">Repeated Customer Cancellations</h3>
+                        <p class="mt-1 text-xs text-stone-500">${repeatedCancellations.length} customers cancelled multiple recent orders.</p>
+                        <div class="mt-4 space-y-3 text-sm">
+                            ${repeatedCancellations.length ? repeatedCancellations.map(entry => `
+                                <div class="rounded-lg border border-stone-200 p-3">
+                                    <p class="font-semibold text-stone-900">${escapeHtml(entry.customerName || entry.userId || 'Unknown customer')}</p>
+                                    <p class="mt-1 text-stone-600">${entry.count} cancellations ${entry.customerPhone ? `• ${escapeHtml(entry.customerPhone)}` : ''}</p>
+                                </div>
+                            `).join('') : '<p class="text-stone-500 italic">No repeated cancellation patterns found.</p>'}
+                        </div>
+                    </article>
+                    <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                        <h3 class="text-base font-bold text-stone-900">Price Mismatch Attempts</h3>
+                        <p class="mt-1 text-xs text-stone-500">${priceMismatches.length} recent orders had client totals that did not match server pricing.</p>
+                        <div class="mt-4 space-y-3 text-sm">
+                            ${priceMismatches.length ? priceMismatches.map(entry => `
+                                <div class="rounded-lg border border-stone-200 p-3">
+                                    <p class="font-semibold text-stone-900">${escapeHtml(entry.userId || 'Unknown user')}</p>
+                                    <p class="mt-1 text-stone-600">Client ${escapeHtml(String(entry.suppliedTotal))} vs server ${escapeHtml(String(entry.authoritativeTotal))}</p>
+                                </div>
+                            `).join('') : '<p class="text-stone-500 italic">No recent pricing mismatch attempts found.</p>'}
+                        </div>
+                    </article>
+                </div>
+                <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                    <h3 class="text-base font-bold text-stone-900">Rate-Limit Bursts</h3>
+                    <p class="mt-1 text-xs text-stone-500">${suspiciousBursts.length} recent server-side burst events.</p>
+                    <div class="mt-4 space-y-3 text-sm">
+                        ${suspiciousBursts.length ? suspiciousBursts.map(entry => `
+                            <div class="rounded-lg border border-stone-200 p-3">
+                                <p class="font-semibold text-stone-900">${escapeHtml(entry.scope || 'Unknown scope')}</p>
+                                <p class="mt-1 text-stone-600">${escapeHtml(entry.subjectHash || '')}</p>
+                                <p class="mt-1 text-xs text-stone-500">${escapeHtml(entry.createdAt || '')}</p>
+                            </div>
+                        `).join('') : '<p class="text-stone-500 italic">No rate-limit bursts recorded.</p>'}
+                    </div>
+                </article>
+                <article class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+                    <h3 class="text-base font-bold text-stone-900">Recent Security Events</h3>
+                    <div class="mt-4 space-y-3 text-sm">
+                        ${recentEvents.length ? recentEvents.map(entry => `
+                            <div class="rounded-lg border border-stone-200 p-3">
+                                <p class="font-semibold text-stone-900">${escapeHtml(entry.kind || 'event')}</p>
+                                <p class="mt-1 text-stone-600">${escapeHtml(entry.createdAt || '')}</p>
+                                <p class="mt-1 text-xs text-stone-500">${escapeHtml(entry.orderId || entry.reservationId || entry.userId || '')}</p>
+                            </div>
+                        `).join('') : '<p class="text-stone-500 italic">No recent events available.</p>'}
+                    </div>
+                </article>
+            `;
+        }
+
+        async function loadFraudReview() {
+            const container = document.getElementById('fraud-review-container');
+            container.innerHTML = '<p class="text-stone-500 italic text-sm">Loading fraud signals...</p>';
+            try {
+                const data = await fetchAdminApi('/api/admin/fraud-review');
+                renderFraudReview(data);
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Failed to load fraud review:', error);
+                container.innerHTML = `<p class="text-red-600 text-sm">${escapeHtml(error.message || 'Failed to load fraud review.')}</p>`;
+            }
+        }
+
         // --- Chatbot Knowledge Management ---
         let chatbotKnowledgeCache = [];
         let editingChatbotKnowledgeId = null;
@@ -3356,10 +3528,26 @@
             }
         }
 
+        async function seedSecureChatbotFacts() {
+            const button = document.getElementById('seed-chatbot-facts-btn');
+            button.disabled = true;
+            try {
+                const result = await fetchAdminApi('/api/admin/bootstrap-chatbot-knowledge', { method: 'POST' });
+                showChatbotKnowledgeFeedback(`Seeded ${result.count || 0} secure chatbot facts.`, false);
+            } catch (error) {
+                console.error('Failed to seed chatbot facts:', error);
+                showChatbotKnowledgeFeedback(error.message || 'Could not seed chatbot facts.', true);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
         document.getElementById('chatbot-knowledge-form').addEventListener('submit', saveChatbotKnowledge);
         document.getElementById('chatbot-knowledge-reset-btn').addEventListener('click', resetChatbotKnowledgeForm);
         document.getElementById('chatbot-knowledge-sort').addEventListener('change', renderChatbotKnowledgeTable);
         document.getElementById('chatbot-knowledge-answer').addEventListener('input', updateChatbotAnswerCount);
+        document.getElementById('fraud-review-refresh-btn').addEventListener('click', loadFraudReview);
+        document.getElementById('seed-chatbot-facts-btn').addEventListener('click', seedSecureChatbotFacts);
 
         function escapeHtml(str) {
             return String(str)

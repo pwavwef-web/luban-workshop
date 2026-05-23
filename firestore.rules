@@ -82,55 +82,26 @@ service cloud.firestore {
       // Admins can read all orders; customers can read their own
       allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
 
-      // Authenticated users can place orders (userId must match their own UID)
-      // Require that the placing user has a phone number recorded in their `/users/{uid}` document
-      allow create: if isAuthenticated() &&
-                      request.resource.data.userId == request.auth.uid &&
-                      (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone is string &&
-                        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.phone.size() > 0);
-      
-      // Admins can update/delete any order.
-      // Customers can update (cancel) their own orders; they may delete their own orders
-      // only when the order is finished (completed) or cancelled to prevent accidental removal.
-      allow update: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.userId);
-      allow delete: if isAdmin() || (
-        isAuthenticated() &&
-        request.auth.uid == resource.data.userId &&
-        (resource.data.status == 'completed' || resource.data.status == 'cancelled')
-      );
+      // Orders are created and mutated by trusted server code only.
+      allow create, update, delete: if isAdmin();
     }
 
     // reservations collection rules
     match /reservations/{reservation} {
       // Only admins can read reservations
       allow read: if isAdmin();
-      
-      // Authenticated users can create new reservations.
-      // Allow unauthenticated users to create reservations only when
-      // the request includes the required fields (basic validation)
-      allow create: if isAuthenticated() || (
-        request.resource.data.name is string && request.resource.data.name.size() > 0 &&
-        request.resource.data.phone is string && request.resource.data.phone.size() > 0 &&
-        request.resource.data.date is string && request.resource.data.date.size() > 0 &&
-        request.resource.data.time is string && request.resource.data.time.size() > 0 &&
-        request.resource.data.guests is string && request.resource.data.guests.size() > 0 &&
-        request.resource.data.status == 'pending'
-      );
-      
-      // Only admins can update or delete reservations
-      allow update, delete: if isAdmin();
+
+      // Reservation submissions and guest requests are handled by server code.
+      allow create, update, delete: if isAdmin();
     }
 
     // contact_messages collection – submitted via the Contact Us page
     match /contact_messages/{messageId} {
-      // Anyone can submit a contact message (no auth required)
-      allow create: if true;
-
       // Only admins can read or update (e.g. mark as read) messages
       allow read, update: if isAdmin();
 
-      // Only admins can delete messages
-      allow delete: if isAdmin();
+      // Contact submissions are handled by trusted server code.
+      allow create, delete: if isAdmin();
     }
 
     // chatbotKnowledge collection - public, admin-managed facts for the site chatbot
@@ -165,19 +136,44 @@ service cloud.firestore {
       // Users can read their own profile; admins can read all
       allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
 
+      function isValidProfileWrite() {
+        return request.resource.data.name is string &&
+               request.resource.data.name.size() > 0 &&
+               request.resource.data.email is string &&
+               request.resource.data.email.size() > 0 &&
+               request.resource.data.phone is string &&
+               request.resource.data.phone.matches('^\\+233[0-9]{9}$') &&
+               (!('preferredContact' in request.resource.data) ||
+                 request.resource.data.preferredContact in ['phone', 'sms', 'email']) &&
+               (!('notes' in request.resource.data) ||
+                 (request.resource.data.notes is string && request.resource.data.notes.size() <= 500));
+      }
+
       // Enforce that newly created user profiles include a properly formatted Ghana phone number
       // Phone must be +233 followed by exactly 9 digits (e.g., +233501234567)
       allow create: if isAuthenticated() && request.auth.uid == userId &&
-                      request.resource.data.phone is string && 
-                      request.resource.data.phone.matches('^\\+233[0-9]{9}$');
+                      isValidProfileWrite() &&
+                      !request.resource.data.keys().hasAny(['phoneE164', 'phoneVerifiedAt', 'phoneVerificationMethod', 'emailVerifiedAt', 'verificationStatus']);
 
       // Allow updates to the user's own profile (including adding/updating phone)
       allow update: if isAuthenticated() && request.auth.uid == userId &&
-                      request.resource.data.phone is string &&
-                      request.resource.data.phone.matches('^\\+233[0-9]{9}$');
+                      isValidProfileWrite() &&
+                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['phoneE164', 'phoneVerifiedAt', 'phoneVerificationMethod', 'emailVerifiedAt', 'verificationStatus']);
 
       // Allow delete only for the user themself or admins
       allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+    }
+
+    match /reservationRequests/{requestId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /securityEvents/{eventId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /rateLimitBuckets/{bucketId} {
+      allow read, write: if isAdmin();
     }
 
     // teamProfiles collection – staff profiles submitted via the profile form

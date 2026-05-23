@@ -1405,3 +1405,5 @@ exports.checkSmsBalance = onRequest(
     }
   }
 );
+
+Object.assign(exports, require('./secure-api'));

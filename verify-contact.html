@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Contact | Luban Workshop Restaurant</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background: #f7f3ef; color: #1c1917; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .panel { border-radius: 8px; border: 1px solid #e7e5e4; box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08); }
+        .field { width: 100%; border: 1px solid #d6d3d1; border-radius: 8px; padding: 0.8rem 0.9rem; }
+        .field:focus { outline: none; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
+    </style>
+</head>
+<body>
+    <nav class="fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-stone-900">
+                <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white">
+                <span class="serif font-bold text-lg">Luban <span class="text-red-700">Workshop</span></span>
+            </a>
+            <a href="customer-profile.html" class="text-sm font-semibold text-stone-700 hover:text-red-700">Back to profile</a>
+        </div>
+    </nav>
+
+    <header class="pt-28 pb-12 bg-stone-900 text-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Secure Ordering</p>
+            <h1 class="serif text-4xl font-bold mt-3">Verify Contact Details</h1>
+            <p class="mt-4 text-stone-200 max-w-2xl">Orders now require a verified email address and a verified Ghana phone number. This helps prevent fake orders and stops someone else using your details.</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16">
+        <section id="auth-gate" class="panel bg-white p-6 sm:p-8">
+            <h2 class="serif text-3xl font-bold text-stone-900">Sign in to continue</h2>
+            <p class="mt-3 text-stone-600">Use your Luban Workshop account to verify your contact details.</p>
+            <form id="login-form" class="mt-6 grid gap-4 sm:grid-cols-2">
+                <input id="login-email" type="email" class="field" placeholder="Email" required>
+                <input id="login-password" type="password" class="field" placeholder="Password" required>
+                <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Sign in</button>
+                    <button id="google-btn" type="button" class="inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Continue with Google</button>
+                </div>
+                <div id="login-error" class="hidden sm:col-span-2 rounded-md bg-red-50 p-3 text-sm text-red-800"></div>
+            </form>
+        </section>
+
+        <section id="verify-content" class="hidden space-y-6">
+            <div class="grid gap-6 lg:grid-cols-[0.95fr_1.25fr]">
+                <aside class="panel bg-white p-6">
+                    <p class="text-xs font-bold uppercase tracking-widest text-red-700">Current Status</p>
+                    <h2 class="serif text-3xl font-bold text-stone-900 mt-2">Account Checks</h2>
+                    <div class="mt-6 space-y-4 text-sm">
+                        <div class="rounded-lg border border-stone-200 p-4">
+                            <p class="font-semibold text-stone-900">Email</p>
+                            <p id="email-mask" class="mt-1 text-stone-600"></p>
+                            <p id="email-status" class="mt-2 font-semibold text-amber-700">Pending</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 p-4">
+                            <p class="font-semibold text-stone-900">Phone</p>
+                            <p id="phone-mask" class="mt-1 text-stone-600"></p>
+                            <p id="phone-status" class="mt-2 font-semibold text-amber-700">Pending</p>
+                        </div>
+                        <div id="overall-status" class="rounded-lg bg-stone-50 p-4 text-stone-700">Checking account status...</div>
+                    </div>
+                </aside>
+
+                <section class="space-y-6">
+                    <div class="panel bg-white p-6 sm:p-8">
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 1</p>
+                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Email</h2>
+                        <p class="mt-3 text-stone-600">Use the button below to send a fresh verification email, then come back here and refresh your status.</p>
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                            <button id="email-send-btn" type="button" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Send verification email</button>
+                            <button id="email-refresh-btn" type="button" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Refresh email status</button>
+                        </div>
+                    </div>
+
+                    <div class="panel bg-white p-6 sm:p-8">
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
+                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Phone</h2>
+                        <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
+                        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+                            <button id="otp-send-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
+                            <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50 text-center">Update phone number</a>
+                        </div>
+                        <form id="otp-form" class="mt-6 space-y-4">
+                            <label for="otp-code" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
+                            <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
+                            <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
+                        </form>
+                    </div>
+
+                    <div id="page-feedback" class="hidden rounded-md p-4 text-sm"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div data-luban-footer></div>
+    <script src="assets/js/site-footer.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/firebase-modular.bundle.js"></script>
+    <script src="assets/js/cookie-consent.js" defer></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
+            authDomain: "luban-workshop-restaurant.firebaseapp.com",
+            projectId: "luban-workshop-restaurant",
+            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
+            messagingSenderId: "360623290287",
+            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        let currentUser = null;
+
+        function showFeedback(message, isError) {
+            const el = document.getElementById('page-feedback');
+            el.textContent = message;
+            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        async function loadStatus() {
+            if (!currentUser) return;
+            const result = await lubanClient.api('/accountStatus', { method: 'GET', user: currentUser });
+            const account = result.account;
+            document.getElementById('email-mask').textContent = account.emailMasked || account.email;
+            document.getElementById('phone-mask').textContent = account.phoneMasked || 'No phone saved';
+            document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
+            document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
+            document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
+            document.getElementById('phone-status').className = account.phoneVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
+            document.getElementById('overall-status').textContent = account.verificationStatus === 'verified'
+                ? 'Your account is ready for secure online orders.'
+                : 'Finish both checks above before placing an order.';
+            document.getElementById('overall-status').className = account.verificationStatus === 'verified'
+                ? 'rounded-lg bg-green-50 p-4 text-green-800'
+                : 'rounded-lg bg-amber-50 p-4 text-amber-900';
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            document.getElementById('auth-gate').classList.toggle('hidden', Boolean(user));
+            document.getElementById('verify-content').classList.toggle('hidden', !user);
+            if (!user) return;
+            await loadStatus();
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const error = document.getElementById('login-error');
+            error.classList.add('hidden');
+            try {
+                await auth.signInWithEmailAndPassword(
+                    document.getElementById('login-email').value.trim(),
+                    document.getElementById('login-password').value
+                );
+                event.target.reset();
+            } catch (err) {
+                error.textContent = err.message || 'Sign in failed.';
+                error.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('google-btn').addEventListener('click', async () => {
+            const error = document.getElementById('login-error');
+            error.classList.add('hidden');
+            try {
+                await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+                    error.textContent = err.message || 'Google sign-in failed.';
+                    error.classList.remove('hidden');
+                }
+            }
+        });
+
+        document.getElementById('email-send-btn').addEventListener('click', async () => {
+            if (!currentUser) return;
+            await auth.sendEmailVerification(currentUser);
+            showFeedback('Verification email sent. Open your inbox, verify the address, then refresh the email status here.', false);
+        });
+
+        document.getElementById('email-refresh-btn').addEventListener('click', async () => {
+            if (!currentUser) return;
+            await auth.reload(currentUser);
+            await loadStatus();
+            showFeedback('Email status refreshed.', false);
+        });
+
+        document.getElementById('otp-send-btn').addEventListener('click', async () => {
+            if (!currentUser) return;
+            await lubanClient.api('/requestPhoneOtp', {
+                method: 'POST',
+                user: currentUser
+            });
+            showFeedback('SMS verification code sent. Enter the 6-digit code when it arrives.', false);
+        });
+
+        document.getElementById('otp-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!currentUser) return;
+            const result = await lubanClient.api('/verifyPhoneOtp', {
+                method: 'POST',
+                user: currentUser,
+                body: { code: document.getElementById('otp-code').value.trim() }
+            });
+            document.getElementById('otp-code').value = '';
+            await loadStatus();
+            showFeedback(result.account.phoneVerified ? 'Phone number verified successfully.' : 'Verification status updated.', false);
+        });
+    </script>
+</body>
+</html>

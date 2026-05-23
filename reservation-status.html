@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Status | Luban Workshop Restaurant</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="tailwind.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background: #f7f3ef; color: #1c1917; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .panel { border-radius: 8px; border: 1px solid #e7e5e4; box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08); }
+        .field { width: 100%; border: 1px solid #d6d3d1; border-radius: 8px; padding: 0.8rem 0.9rem; }
+        .field:focus { outline: none; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
+    </style>
+</head>
+<body>
+    <nav class="fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 text-stone-900">
+                <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white">
+                <span class="serif font-bold text-lg">Luban <span class="text-red-700">Workshop</span></span>
+            </a>
+            <a href="contact-us.html" class="text-sm font-semibold text-stone-700 hover:text-red-700">Need help?</a>
+        </div>
+    </nav>
+
+    <header class="pt-28 pb-12 bg-stone-900 text-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Guest Reservation Access</p>
+            <h1 class="serif text-4xl font-bold mt-3">Reservation Status</h1>
+            <p class="mt-4 max-w-2xl text-stone-200">Use the secure link from Luban Workshop, verify the phone number on the reservation, and then submit a change or cancellation request if needed.</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16 space-y-6">
+        <section class="panel bg-white p-6 sm:p-8">
+            <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 1</p>
+            <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Request Access Code</h2>
+            <p class="mt-3 text-stone-600">We will send a one-time SMS code to the phone number used when this reservation was submitted.</p>
+            <div id="turnstile-mount" class="mt-5"></div>
+            <button id="send-code-btn" type="button" class="mt-5 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
+        </section>
+
+        <section class="panel bg-white p-6 sm:p-8">
+            <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
+            <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Access Code</h2>
+            <form id="code-form" class="mt-5 space-y-4">
+                <input id="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
+                <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
+            </form>
+        </section>
+
+        <section id="reservation-content" class="hidden panel bg-white p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-red-700">Reservation Details</p>
+                    <h2 id="reservation-title" class="serif mt-2 text-3xl font-bold text-stone-900">Reservation</h2>
+                </div>
+                <span id="reservation-status" class="rounded-full bg-stone-100 px-4 py-2 text-xs font-bold text-stone-700">PENDING</span>
+            </div>
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 text-sm">
+                <div class="rounded-lg border border-stone-200 p-4"><strong>Date:</strong> <span id="reservation-date"></span></div>
+                <div class="rounded-lg border border-stone-200 p-4"><strong>Time:</strong> <span id="reservation-time"></span></div>
+                <div class="rounded-lg border border-stone-200 p-4"><strong>Guests:</strong> <span id="reservation-guests"></span></div>
+                <div class="rounded-lg border border-stone-200 p-4"><strong>Phone:</strong> <span id="reservation-phone"></span></div>
+            </div>
+            <div class="mt-6 rounded-lg bg-stone-50 p-4 text-sm text-stone-700">
+                The restaurant still confirms or declines reservation changes manually. Use the form below to send a request to the team.
+            </div>
+            <form id="request-form" class="mt-6 space-y-4">
+                <div>
+                    <label for="request-type" class="block text-sm font-semibold text-stone-700 mb-1">What do you need?</label>
+                    <select id="request-type" class="field">
+                        <option value="change">Request a change</option>
+                        <option value="cancel">Request cancellation</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="request-message" class="block text-sm font-semibold text-stone-700 mb-1">Message</label>
+                    <textarea id="request-message" class="field" rows="5" placeholder="Tell us what should change or confirm that you need to cancel this reservation."></textarea>
+                </div>
+                <button type="submit" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send request to the restaurant</button>
+            </form>
+        </section>
+
+        <div id="page-feedback" class="hidden rounded-md p-4 text-sm"></div>
+    </main>
+
+    <div data-luban-footer></div>
+    <script src="assets/js/site-footer.js"></script>
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
+    <script>
+        const token = new URLSearchParams(window.location.search).get('token');
+        let turnstileWidget = null;
+        let accessGrant = '';
+        let reservation = null;
+
+        function showFeedback(message, isError) {
+            const el = document.getElementById('page-feedback');
+            el.textContent = message;
+            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
+            el.classList.remove('hidden');
+        }
+
+        function renderReservation(data) {
+            reservation = data;
+            document.getElementById('reservation-content').classList.remove('hidden');
+            document.getElementById('reservation-title').textContent = `Reservation #${data.id.slice(-6).toUpperCase()}`;
+            document.getElementById('reservation-status').textContent = String(data.status || 'pending').toUpperCase();
+            document.getElementById('reservation-date').textContent = data.date || '';
+            document.getElementById('reservation-time').textContent = data.time || '';
+            document.getElementById('reservation-guests').textContent = data.guests || '';
+            document.getElementById('reservation-phone').textContent = data.phoneMasked || '';
+            if (data.guestRequestPending) {
+                showFeedback('A guest request is already pending for this reservation. You can still send an updated message if needed.', false);
+            }
+        }
+
+        async function ensureTurnstile() {
+            if (turnstileWidget !== null) return;
+            turnstileWidget = await lubanClient.mountTurnstile('#turnstile-mount');
+        }
+
+        async function requestAccessCode() {
+            if (!token) throw new Error('This reservation link is missing its access token.');
+            const turnstileToken = lubanClient.getTurnstileToken(turnstileWidget);
+            if (!turnstileToken) {
+                throw new Error('Please complete the anti-bot check before requesting an SMS code.');
+            }
+            const result = await lubanClient.api('/beginReservationAccess', {
+                method: 'POST',
+                body: { token, turnstileToken }
+            });
+            lubanClient.resetTurnstile(turnstileWidget);
+            renderReservation(result.reservation);
+            showFeedback('SMS access code sent. Enter it below to continue.', false);
+        }
+
+        document.getElementById('send-code-btn').addEventListener('click', async () => {
+            try {
+                await requestAccessCode();
+            } catch (error) {
+                showFeedback(error.message || 'Could not send the access code.', true);
+            }
+        });
+
+        document.getElementById('code-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            try {
+                const result = await lubanClient.api('/verifyReservationAccessOtp', {
+                    method: 'POST',
+                    body: {
+                        token,
+                        code: document.getElementById('code-input').value.trim()
+                    }
+                });
+                accessGrant = result.accessGrant;
+                renderReservation(result.reservation);
+                document.getElementById('code-input').value = '';
+                showFeedback('Reservation access granted.', false);
+            } catch (error) {
+                showFeedback(error.message || 'Could not verify that code.', true);
+            }
+        });
+
+        document.getElementById('request-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!accessGrant) {
+                showFeedback('Verify the SMS code before sending a change request.', true);
+                return;
+            }
+            try {
+                await lubanClient.api('/requestReservationChange', {
+                    method: 'POST',
+                    body: {
+                        token,
+                        accessGrant,
+                        requestType: document.getElementById('request-type').value,
+                        message: document.getElementById('request-message').value.trim()
+                    }
+                });
+                document.getElementById('request-message').value = '';
+                showFeedback('Your request has been sent to the restaurant for manual review.', false);
+            } catch (error) {
+                showFeedback(error.message || 'Could not send your request.', true);
+            }
+        });
+
+        ensureTurnstile().catch((error) => showFeedback(error.message || 'Could not load the security check.', true));
+        if (!token) {
+            document.getElementById('send-code-btn').disabled = true;
+            document.getElementById('code-input').disabled = true;
+            document.getElementById('request-type').disabled = true;
+            document.getElementById('request-message').disabled = true;
+            showFeedback('This reservation link is missing its access token.', true);
+        }
+    </script>
+</body>
+</html>

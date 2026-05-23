@@ -852,6 +852,8 @@
     <!-- Account details are managed on customer-profile.html. -->
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/site-config.js"></script>
+    <script src="assets/js/luban-client.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
 
     <script>
@@ -947,7 +949,7 @@
 
         // Global variables
         let menuItems = [];
-        let cart = [];
+        let cart = lubanClient.readCart();
         let currentUser = null; // NEW: Track the logged-in user
         let currentUserProfile = null; // Stores name & phone from Firestore
         let menuHiddenIds = new Set();
@@ -1215,9 +1217,13 @@
                 const uid = userCredential.user.uid;
                 // Save name + phone to Firestore user profile
                 await db.collection('users').doc(uid).set({ name, phone, email });
+                if (auth.sendEmailVerification) {
+                    await auth.sendEmailVerification(userCredential.user);
+                }
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
                 document.getElementById('signup-form-modal').reset();
+                alert('Account created. Please verify your email, then open Verify Contact to confirm your phone number before ordering.');
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
@@ -1398,10 +1404,12 @@
                 if (badgeDesktop) badgeDesktop.classList.remove('hidden');
                 if (badgeMobile) { badgeMobile.classList.remove('hidden'); badgeMobile.classList.add('inline-flex'); }
                 checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Continue to Checkout';
             } else {
                 if (badgeDesktop) badgeDesktop.classList.add('hidden');
                 if (badgeMobile) { badgeMobile.classList.add('hidden'); badgeMobile.classList.remove('inline-flex'); }
                 checkoutBtn.disabled = true;
+                checkoutBtn.textContent = 'Continue to Checkout';
             }
 
             cartList.innerHTML = '';
@@ -1435,6 +1443,7 @@
                 });
                 totalEl.innerText = '₵' + subtotal.toFixed(2);
             }
+            lubanClient.writeCart(cart);
             lucide.createIcons();
         }
 
@@ -1634,7 +1643,11 @@
                                 
                                 <div class="flex flex-col md:flex-row md:items-center md:justify-between pt-4 border-t border-stone-200">
                                     <p class="text-lg font-bold text-stone-900">Total: ₵${(order.total || 0).toFixed(2)}</p>
-                                    <div class="mt-3 md:mt-0">
+                                    <div class="mt-3 md:mt-0 flex flex-wrap gap-2">
+                                        <a href="order-status.html?order=${encodeURIComponent(orderId)}"
+                                            class="px-4 py-2 bg-stone-900 text-white rounded-md hover:bg-stone-800 transition-colors text-sm">
+                                            View Order
+                                        </a>
                                         ${cancelButton}
                                         ${deleteButton}
                                     </div>
@@ -1667,13 +1680,15 @@
             }
             
             try {
-                await db.collection('orders').doc(orderId).update({
-                    status: 'cancelled'
+                await lubanClient.api('/cancelOwnOrder', {
+                    method: 'POST',
+                    user: auth.currentUser,
+                    body: { orderId }
                 });
                 alert('Order cancelled successfully!');
             } catch (error) {
                 console.error('Error cancelling order:', error);
-                alert('Failed to cancel order. Please try again.');
+                alert(error.message || 'Failed to cancel order. Please try again.');
             }
         }
 
@@ -1681,72 +1696,25 @@
         async function deleteMyOrder(orderId) {
             if (!confirm('Permanently delete this order? This cannot be undone.')) return;
             try {
-                await db.collection('orders').doc(orderId).delete();
+                await lubanClient.api('/deleteOwnOrder', {
+                    method: 'POST',
+                    user: auth.currentUser,
+                    body: { orderId }
+                });
                 alert('Order deleted.');
             } catch (err) {
                 console.error('Failed to delete order:', err);
-                alert('Could not delete order. If you see a permissions error, please contact support.');
+                alert(err.message || 'Could not delete order. Please contact support if the issue continues.');
             }
         }
 
         // --- REAL CHECKOUT LOGIC ---
         async function checkout() {
-            const checkoutBtn = document.getElementById('checkout-btn');
-            checkoutBtn.disabled = true;
-            checkoutBtn.textContent = 'Processing...';
-
-            try {
-                // 1. Prepare Order Data
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-                // Ensure user profile is loaded (handles race condition on first page load)
-                if (currentUser && !currentUserProfile) {
-                    try {
-                        const profileDoc = await db.collection('users').doc(currentUser.uid).get();
-                        if (profileDoc.exists) currentUserProfile = profileDoc.data();
-                    } catch (e) { console.error('Failed to load user profile at checkout:', e); }
-                }
-
-                const customerName = currentUserProfile ? currentUserProfile.name : (currentUser ? currentUser.displayName || '' : '');
-                const customerPhone = (currentUserProfile && currentUserProfile.phone) || (currentUser && currentUser.phoneNumber) || '';
-
-                if (currentUser && !customerPhone) {
-                    checkoutBtn.disabled = false;
-                    checkoutBtn.textContent = 'Place Order';
-                    alert('Please add a phone number on your profile page so we can send your order SMS.');
-                    window.location.href = 'customer-profile.html?complete=phone';
-                    return;
-                }
-
-                const orderData = {
-                    items: cart,
-                    total: total,
-                    status: 'pending', // This triggers the red dot in admin
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    userEmail: currentUser ? currentUser.email : 'Guest',
-                    userId: currentUser ? currentUser.uid : null,
-                    customerName,
-                    customerPhone
-                };
-
-                // 2. Send to Firebase
-                await db.collection('orders').add(orderData);
-
-                // 3. Success Handling
-                toggleCart(); // Close drawer
-                cart = []; // Clear local cart
-                updateCartUI(); // Reset UI
-                const successModal = document.getElementById('success-modal');
-                successModal.classList.remove('hidden');
-                _trapFocus(successModal);
-
-            } catch (error) {
-                console.error("Order failed", error);
-                alert("Failed to place order. Please try again.");
-            } finally {
-                checkoutBtn.disabled = false;
-                checkoutBtn.textContent = 'Place Order';
+            if (!cart.length) {
+                alert('Your cart is empty.');
+                return;
             }
+            window.location.href = 'checkout.html';
         }
 
         // --- Public Promotions ---

@@ -4625,6 +4625,12 @@
   async function signInWithPassword(auth, request) {
     return _performSignInRequest(auth, "POST", "/v1/accounts:signInWithPassword", _addTidIfNecessary(auth, request));
   }
+  async function sendOobCode(auth, request) {
+    return _performApiRequest(auth, "POST", "/v1/accounts:sendOobCode", _addTidIfNecessary(auth, request));
+  }
+  async function sendEmailVerification$1(auth, request) {
+    return sendOobCode(auth, request);
+  }
   async function signInWithEmailLink$1(auth, request) {
     return _performSignInRequest(auth, "POST", "/v1/accounts:signInWithEmailLink", _addTidIfNecessary(auth, request));
   }
@@ -5541,6 +5547,51 @@
   async function signInWithCredential(auth, credential) {
     return _signInWithCredential(_castAuth(auth), credential);
   }
+  function _setActionCodeSettingsOnRequest(auth, request, actionCodeSettings) {
+    var _a;
+    _assert(
+      ((_a = actionCodeSettings.url) == null ? void 0 : _a.length) > 0,
+      auth,
+      "invalid-continue-uri"
+      /* AuthErrorCode.INVALID_CONTINUE_URI */
+    );
+    _assert(
+      typeof actionCodeSettings.dynamicLinkDomain === "undefined" || actionCodeSettings.dynamicLinkDomain.length > 0,
+      auth,
+      "invalid-dynamic-link-domain"
+      /* AuthErrorCode.INVALID_DYNAMIC_LINK_DOMAIN */
+    );
+    _assert(
+      typeof actionCodeSettings.linkDomain === "undefined" || actionCodeSettings.linkDomain.length > 0,
+      auth,
+      "invalid-hosting-link-domain"
+      /* AuthErrorCode.INVALID_HOSTING_LINK_DOMAIN */
+    );
+    request.continueUrl = actionCodeSettings.url;
+    request.dynamicLinkDomain = actionCodeSettings.dynamicLinkDomain;
+    request.linkDomain = actionCodeSettings.linkDomain;
+    request.canHandleCodeInApp = actionCodeSettings.handleCodeInApp;
+    if (actionCodeSettings.iOS) {
+      _assert(
+        actionCodeSettings.iOS.bundleId.length > 0,
+        auth,
+        "missing-ios-bundle-id"
+        /* AuthErrorCode.MISSING_IOS_BUNDLE_ID */
+      );
+      request.iOSBundleId = actionCodeSettings.iOS.bundleId;
+    }
+    if (actionCodeSettings.android) {
+      _assert(
+        actionCodeSettings.android.packageName.length > 0,
+        auth,
+        "missing-android-pkg-name"
+        /* AuthErrorCode.MISSING_ANDROID_PACKAGE_NAME */
+      );
+      request.androidInstallApp = actionCodeSettings.android.installApp;
+      request.androidMinimumVersionCode = actionCodeSettings.android.minimumVersion;
+      request.androidPackageName = actionCodeSettings.android.packageName;
+    }
+  }
   async function recachePasswordPolicy(auth) {
     const authInternal = _castAuth(auth);
     if (authInternal._getPasswordPolicyInternal()) {
@@ -5587,6 +5638,21 @@
       }
       throw error;
     });
+  }
+  async function sendEmailVerification(user, actionCodeSettings) {
+    const userInternal = getModularInstance(user);
+    const idToken = await user.getIdToken();
+    const request = {
+      requestType: "VERIFY_EMAIL",
+      idToken
+    };
+    if (actionCodeSettings) {
+      _setActionCodeSettingsOnRequest(userInternal.auth, request, actionCodeSettings);
+    }
+    const { email } = await sendEmailVerification$1(userInternal.auth, request);
+    if (email !== user.email) {
+      await user.reload();
+    }
   }
   async function updateProfile$1(auth, request) {
     return _performApiRequest(auth, "POST", "/v1/accounts:update", request);
@@ -22350,8 +22416,8 @@ ${this.customData.serverResponse}`;
   function createDocApi(docRef) {
     return {
       id: docRef.id,
-      async set(data) {
-        await setDoc(docRef, data);
+      async set(data, options) {
+        await setDoc(docRef, data, options);
       },
       async update(data) {
         await updateDoc(docRef, data);
@@ -22382,6 +22448,8 @@ ${this.customData.serverResponse}`;
       onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
       signInWithEmailAndPassword: (email, password) => signInWithEmailAndPassword(auth, email, password),
       createUserWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+      sendEmailVerification: (user) => sendEmailVerification(user),
+      reload: (user) => reload(user),
       updateProfile: (user, profile) => updateProfile(user, profile),
       signInWithPopup: (provider) => signInWithPopup(auth, provider),
       signOut: () => signOut(auth),
@@ -23310,24 +23378,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
   (**
    * @license
    * Copyright 2020 Google LLC
