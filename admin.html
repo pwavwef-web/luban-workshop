@@ -474,7 +474,7 @@
             <div id="view-reservations" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Reservations</h2>
-                    <p class="text-sm text-stone-500">Review bookings and keep front-of-house decisions moving.</p>
+                    <p class="text-sm text-stone-500">Confirm or decline requests and notify guests right away.</p>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -1550,7 +1550,7 @@
         }
 
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closePriceModal(); closeImageModal(); }
+            if (e.key === 'Escape') { closePriceModal(); closeImageModal(); closeReservationRejectModal(); }
         });
 
         async function toggleDishVisibility(id, currentlyHidden) {
@@ -1562,6 +1562,23 @@
             }
         }
 
+        function normalizeReservationStatus(status) {
+            const normalized = String(status || 'pending').trim().toLowerCase();
+            if (normalized === 'completed') return 'confirmed';
+            if (normalized === 'confirmed' || normalized === 'rejected' || normalized === 'pending') return normalized;
+            return 'pending';
+        }
+
+        function getReservationStatusMeta(status) {
+            if (status === 'confirmed') {
+                return { label: 'Confirmed', classes: 'bg-green-100 text-green-800' };
+            }
+            if (status === 'rejected') {
+                return { label: 'Rejected', classes: 'bg-red-100 text-red-800' };
+            }
+            return { label: 'Pending', classes: 'bg-yellow-100 text-yellow-800' };
+        }
+
         function listenToReservations() {
             let knownReservationIds = null;
 
@@ -1571,7 +1588,6 @@
 
                 let pendingCount = 0;
 
-                // Detect new pending reservations for notifications
                 if (knownReservationIds !== null) {
                     snapshot.forEach(doc => {
                         const res = doc.data();
@@ -1591,41 +1607,71 @@
 
                 snapshot.forEach(doc => {
                     const res = doc.data();
-                    const id = doc.id; // We need the ID to update it
+                    const id = doc.id;
+                    const status = normalizeReservationStatus(res.status);
+                    const statusMeta = getReservationStatusMeta(status);
+                    const specialRequests = res.notes ? `<div class="mt-1 text-xs text-stone-500">Requests: ${escapeHtml(truncateText(res.notes, 100))}</div>` : '';
+                    const rejectionReason = res.decisionReason && status === 'rejected'
+                        ? `<div class="mt-1 text-xs text-red-700">Reason: ${escapeHtml(truncateText(res.decisionReason, 100))}</div>`
+                        : '';
+                    const decisionBy = res.decisionBy
+                        ? `<div class="mt-1 text-xs text-stone-400">Updated by ${escapeHtml(res.decisionBy)}</div>`
+                        : '';
 
-                    if (res.status === 'pending') pendingCount++;
+                    if (status === 'pending') pendingCount++;
 
-                    const statusColor = res.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-                    const displayStatus = res.status ? res.status.charAt(0).toUpperCase() + res.status.slice(1) : 'Pending';
-
-                    // Logic: If pending, show "Check" button. If completed, show "Undo" button.
                     let actionBtn = '';
-                    if (res.status !== 'completed') {
+                    if (status === 'pending') {
                         actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'completed')" aria-label="Mark reservation as completed" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full transition-colors" title="Mark Completed">
+                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
                         <i data-lucide="check" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Confirm</span>
+                    </button>
+                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Reject</span>
+                    </button>`;
+                    } else if (status === 'confirmed') {
+                        actionBtn = `
+                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors mr-2" title="Move Back to Pending">
+                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Pending</span>
+                    </button>
+                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Reject</span>
                     </button>`;
                     } else {
                         actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Mark reservation as pending" class="text-stone-600 hover:text-stone-700 p-2 rounded-full transition-colors" title="Mark Pending">
+                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
+                        <i data-lucide="check" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Confirm</span>
+                    </button>
+                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors" title="Move Back to Pending">
                         <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                        <span class="text-xs font-semibold">Pending</span>
                     </button>`;
                     }
 
                     const row = `
                 <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">${res.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                        <div>${res.phone}</div>
-                        <div class="text-xs text-stone-600">${res.email}</div>
+                    <td class="px-6 py-4 text-sm font-medium text-stone-900">
+                        <div>${escapeHtml(res.name || 'Guest')}</div>
+                        ${specialRequests}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-stone-500">
+                        <div>${escapeHtml(res.phone || 'No phone')}</div>
+                        <div class="text-xs text-stone-600">${escapeHtml(res.email || 'No email provided')}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                        <div class="font-medium">${res.date}</div>
-                        <div class="text-xs">${res.time}</div>
+                        <div class="font-medium">${escapeHtml(res.date || 'No date')}</div>
+                        <div class="text-xs">${escapeHtml(res.time || 'No time')}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${res.guests} Ppl</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${displayStatus}</span>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${escapeHtml(res.guests || '?')} Ppl</td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusMeta.classes}">${statusMeta.label}</span>
+                        ${rejectionReason}
+                        ${decisionBy}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         ${actionBtn}
@@ -1635,7 +1681,6 @@
                     tableBody.innerHTML += row;
                 });
 
-                // Toggle Red Dot
                 const badge = document.getElementById('badge-reservations');
                 if (pendingCount > 0) {
                     badge.classList.remove('hidden');
@@ -1643,21 +1688,83 @@
                     badge.classList.add('hidden');
                 }
 
-                // Re-initialize icons for the new buttons
                 lucide.createIcons();
             });
         }
 
-        async function updateReservationStatus(id, status) {
+        async function updateReservationStatus(id, status, options = {}) {
+            const normalizedStatus = normalizeReservationStatus(status);
+            const user = auth.currentUser;
+            const updates = {
+                status: normalizedStatus
+            };
+
+            if (normalizedStatus === 'confirmed') {
+                updates.decisionAt = firebase.firestore.FieldValue.serverTimestamp();
+                updates.decisionBy = user && user.email ? user.email : 'unknown';
+                updates.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
+                updates.rejectedAt = firebase.firestore.FieldValue.delete();
+                updates.decisionReason = firebase.firestore.FieldValue.delete();
+            } else if (normalizedStatus === 'rejected') {
+                updates.decisionAt = firebase.firestore.FieldValue.serverTimestamp();
+                updates.decisionBy = user && user.email ? user.email : 'unknown';
+                updates.rejectedAt = firebase.firestore.FieldValue.serverTimestamp();
+                updates.confirmedAt = firebase.firestore.FieldValue.delete();
+                updates.decisionReason = options.reason;
+            } else {
+                updates.decisionAt = firebase.firestore.FieldValue.delete();
+                updates.decisionBy = firebase.firestore.FieldValue.delete();
+                updates.confirmedAt = firebase.firestore.FieldValue.delete();
+                updates.rejectedAt = firebase.firestore.FieldValue.delete();
+                updates.decisionReason = firebase.firestore.FieldValue.delete();
+            }
+
             try {
-                await db.collection('reservations').doc(id).update({
-                    status: status
-                });
-                // No need to reload page; onSnapshot will automatically update the UI!
-                console.log(`Reservation ${id} updated to ${status}`);
+                await db.collection('reservations').doc(id).update(updates);
+                console.log(`Reservation ${id} updated to ${normalizedStatus}`);
             } catch (error) {
                 console.error("Error updating status:", error);
                 alert("Failed to update status. Check your internet connection.");
+                throw error;
+            }
+        }
+
+        function openReservationRejectModal(id, guestName) {
+            const modal = document.getElementById('reservation-reject-modal');
+            modal.dataset.reservationId = id;
+            document.getElementById('reservation-reject-guest').textContent = guestName || 'this guest';
+            document.getElementById('reservation-reject-reason').value = '';
+            document.getElementById('reservation-reject-error').classList.add('hidden');
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('reservation-reject-reason').focus(), 40);
+        }
+
+        function closeReservationRejectModal() {
+            const modal = document.getElementById('reservation-reject-modal');
+            modal.classList.add('hidden');
+            modal.dataset.reservationId = '';
+            document.getElementById('reservation-reject-reason').value = '';
+            document.getElementById('reservation-reject-error').classList.add('hidden');
+        }
+
+        async function submitReservationRejection() {
+            const modal = document.getElementById('reservation-reject-modal');
+            const reservationId = modal.dataset.reservationId;
+            const reason = document.getElementById('reservation-reject-reason').value.trim();
+            const errorDiv = document.getElementById('reservation-reject-error');
+
+            if (!reason) {
+                errorDiv.textContent = 'Please add a clear reason before rejecting the reservation.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                await updateReservationStatus(reservationId, 'rejected', { reason });
+                closeReservationRejectModal();
+            } catch (error) {
+                errorDiv.textContent = 'Could not reject this reservation right now.';
+                errorDiv.classList.remove('hidden');
             }
         }
 
@@ -3455,6 +3562,33 @@
                 <button id="image-save-btn" onclick="saveImageEdit()"
                     class="flex-1 bg-purple-700 text-white py-2 rounded-md text-sm font-medium hover:bg-purple-800 transition-colors">
                     Save Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation Rejection Modal -->
+    <div id="reservation-reject-modal" data-reservation-id="" class="hidden fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="reservation-reject-title">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeReservationRejectModal()"></div>
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 z-10">
+            <h3 id="reservation-reject-title" class="text-lg font-bold text-stone-900 mb-1">Reject Reservation Request</h3>
+            <p class="text-sm text-stone-500 mb-4">Tell <span id="reservation-reject-guest" class="font-semibold text-stone-700">this guest</span> why the restaurant cannot accommodate the request.</p>
+
+            <label for="reservation-reject-reason" class="block text-sm font-medium text-stone-700 mb-2">Reason for rejection</label>
+            <textarea id="reservation-reject-reason" rows="4" maxlength="500"
+                class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm resize-y"
+                placeholder="Example: We are fully booked for that time and cannot seat a party of this size."></textarea>
+            <p class="mt-2 text-xs text-stone-500">This reason will be sent to the guest by SMS and email when available.</p>
+            <div id="reservation-reject-error" class="hidden mt-3 text-sm p-3 rounded-md bg-red-50 text-red-800"></div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeReservationRejectModal()"
+                    class="flex-1 border border-stone-300 text-stone-600 py-2 rounded-md text-sm font-medium hover:bg-stone-50 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="submitReservationRejection()"
+                    class="flex-1 bg-red-700 text-white py-2 rounded-md text-sm font-medium hover:bg-red-800 transition-colors">
+                    Reject & Notify Guest
                 </button>
             </div>
         </div>

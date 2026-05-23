@@ -663,7 +663,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
 
 function buildRestaurantReservationEmail({ reservationId, reservation }) {
   const subject = `New Reservation Received (#${reservationId})`;
-  const status = reservation.status || 'pending';
+  const status = normalizeReservationStatus(reservation.status);
   const guests = reservation.guests || 'Not provided';
   const date = reservation.date || 'Not provided';
   const time = reservation.time || 'Not provided';
@@ -720,10 +720,192 @@ function buildRestaurantReservationEmail({ reservationId, reservation }) {
     ],
     mainHtml,
     actionTitle: 'Next step',
-    actionText: 'Confirm availability, prepare the floor plan, and mark the reservation complete once the visit is handled.',
+    actionText: 'Review availability, then confirm or reject the request in admin so the guest receives the right follow-up.',
   });
 
   return { subject, text, html };
+}
+
+function normalizeReservationStatus(status) {
+  const normalized = String(status || 'pending').trim().toLowerCase();
+  if (normalized === 'completed') return 'confirmed';
+  if (normalized === 'confirmed' || normalized === 'rejected' || normalized === 'pending') return normalized;
+  return 'pending';
+}
+
+function getReservationEmail(reservation = {}) {
+  return normalizeEmail(reservation.email);
+}
+
+function getReservationDecisionReason(reservation = {}) {
+  return cleanPlainText(reservation.decisionReason || reservation.rejectionReason || '');
+}
+
+function truncateForSms(value, maxLength = 120) {
+  const text = cleanPlainText(value);
+  if (!text) return '';
+  return text.length > maxLength ? `${text.slice(0, maxLength - 3)}...` : text;
+}
+
+function buildCustomerReservationEmail({ reservationId, reservation, type }) {
+  const isConfirmed = type === 'confirmed';
+  const customerName = cleanPlainText(reservation.name || 'there');
+  const escapedName = escapeHtml(customerName);
+  const date = cleanPlainText(reservation.date || 'Not provided');
+  const time = cleanPlainText(reservation.time || 'Not provided');
+  const guests = cleanPlainText(reservation.guests || 'Not provided');
+  const reason = getReservationDecisionReason(reservation);
+  const subject = isConfirmed
+    ? `Your Luban Workshop reservation is confirmed (#${reservationId})`
+    : `Update on your Luban Workshop reservation request (#${reservationId})`;
+  const headline = isConfirmed ? 'Your reservation is confirmed' : 'Your reservation request could not be accepted';
+  const eyebrow = isConfirmed ? 'Reservation confirmed' : 'Reservation update';
+  const badge = isConfirmed ? 'CONFIRMED' : 'UNAVAILABLE';
+  const intro = isConfirmed
+    ? 'We are happy to confirm your table request. We look forward to welcoming you to Luban Workshop Restaurant.'
+    : 'Thank you for your reservation request. Unfortunately, we are not able to accommodate it as requested.';
+  const nextStep = isConfirmed
+    ? 'If your plans change, please call 020 543 8455 as early as possible so we can help.'
+    : `Reason: ${reason || 'The requested slot is unavailable.'} Please call 020 543 8455 if you would like to try another time or date.`;
+
+  const text = [
+    `Hi ${customerName},`,
+    '',
+    intro,
+    '',
+    `Reservation ID: ${reservationId}`,
+    `Date: ${date}`,
+    `Time: ${time}`,
+    `Guests: ${guests}`,
+    `Status: ${isConfirmed ? 'confirmed' : 'rejected'}`,
+    !isConfirmed ? `Reason: ${reason || 'The requested slot is unavailable.'}` : null,
+    '',
+    nextStep,
+    '',
+    'Luban Workshop Restaurant',
+    'Cape Coast, Ghana',
+  ].filter(Boolean).join('\n');
+
+  const detailRows = buildRestaurantDetailRows([
+    { label: 'Reservation ID', value: `#${reservationId}` },
+    { label: 'Date', value: date },
+    { label: 'Time', value: time },
+    { label: 'Guests', value: guests },
+    { label: 'Status', value: isConfirmed ? 'Confirmed' : 'Rejected' },
+  ]);
+
+  const reasonBlock = !isConfirmed
+    ? `
+      <div style="margin-top:18px;background:#fff1f2;border:1px solid #fecdd3;border-radius:16px;padding:18px;">
+        <p style="margin:0 0 8px;color:#9f1239;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:800;">Reason provided</p>
+        <p style="margin:0;color:#1c1917;font-size:15px;line-height:1.7;">${escapeHtml(reason || 'The requested slot is unavailable.')}</p>
+      </div>
+    `
+    : '';
+
+  const html = `
+    <!doctype html>
+    <html>
+      <body style="margin:0;padding:0;background:#fafaf9;font-family:Arial,Helvetica,sans-serif;color:#1c1917;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fafaf9;padding:28px 12px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 18px 45px rgba(28,25,23,0.12);">
+                <tr>
+                  <td style="background:#1c1917;background-image:linear-gradient(135deg,#1c1917 0%,#7f1d1d 62%,#b91c1c 100%);padding:34px 28px;color:#ffffff;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <img src="https://lubanrestaurant.com/logo.png" width="58" height="58" alt="Luban Workshop" style="display:block;border-radius:999px;background:#ffffff;border:2px solid rgba(255,255,255,0.75);">
+                        </td>
+                        <td align="right" style="vertical-align:middle;">
+                          <span style="display:inline-block;border:1px solid rgba(255,255,255,0.35);border-radius:999px;padding:8px 12px;font-size:12px;letter-spacing:0.14em;font-weight:700;">${badge}</span>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin:26px 0 8px;color:#fca5a5;text-transform:uppercase;letter-spacing:0.18em;font-size:12px;font-weight:700;">${eyebrow}</p>
+                    <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.12;color:#ffffff;">${headline}</h1>
+                    <p style="margin:14px 0 0;color:#fee2e2;font-size:16px;line-height:1.7;">Hi ${escapedName}, ${escapeHtml(intro)}</p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:28px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #f5f5f4;border-radius:18px;overflow:hidden;margin-bottom:22px;">
+                      <tr>
+                        <td style="padding:20px;background:#fff9f9;">
+                          <h2 style="font-family:Georgia,'Times New Roman',serif;margin:0 0 12px;font-size:22px;color:#1c1917;">Reservation details</h2>
+                          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${detailRows}</table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    ${reasonBlock}
+
+                    <div style="margin-top:22px;background:#fef2f2;border-left:4px solid #b91c1c;border-radius:14px;padding:18px;">
+                      <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
+                      <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">${escapeHtml(nextStep)}</p>
+                    </div>
+
+                    <p style="margin:24px 0 0;color:#78716c;font-size:13px;line-height:1.7;text-align:center;">
+                      Luban Workshop Restaurant<br>
+                      Authentic Chinese Cuisine - Cape Coast, Ghana<br>
+                      Mon-Fri 11:00-17:30
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+
+  return { subject, text, html };
+}
+
+async function sendCustomerReservationEmail({ reservationId, reservation, type }) {
+  const to = getReservationEmail(reservation);
+  if (!to) {
+    logger.info('Reservation has no customer email; skipping customer email', { reservationId, type });
+    return;
+  }
+
+  const message = buildCustomerReservationEmail({ reservationId, reservation, type });
+  await sendNotificationMail({ to, ...message });
+  logger.info('Customer reservation email sent', { reservationId, type, to });
+}
+
+async function sendCustomerReservationStatusSms(reservationId, reservation, newStatus) {
+  const to = normalizePhoneNumber(reservation.phone);
+  if (!to) {
+    logger.info('Reservation has no customer phone; skipping reservation SMS', { reservationId, newStatus });
+    return;
+  }
+
+  const guestName = cleanPlainText(reservation.name || 'Guest');
+  const date = cleanPlainText(reservation.date || 'your date');
+  const time = cleanPlainText(reservation.time || 'your time');
+  const guests = cleanPlainText(reservation.guests || 'your party');
+  const reason = truncateForSms(getReservationDecisionReason(reservation), 110);
+
+  let message = '';
+  if (newStatus === 'confirmed') {
+    message = `Hi ${guestName}, your Luban Workshop reservation for ${date} at ${time} for ${guests} guest(s) is confirmed. If plans change, call 020 543 8455.`;
+  } else if (newStatus === 'rejected') {
+    const reasonText = reason || 'we cannot accommodate the requested slot';
+    message = `Hi ${guestName}, we are sorry but your Luban Workshop reservation request for ${date} at ${time} could not be accepted because ${reasonText}. Please call 020 543 8455 to try another option.`;
+  }
+
+  if (!message) return;
+
+  await sendArkeselSms({
+    to,
+    message,
+    orderId: reservationId,
+    logContext: 'SMS sent to reservation guest',
+  });
 }
 
 function formatContactSubmittedAt(value) {
@@ -980,6 +1162,36 @@ exports.notifyCustomerOnOrderCompleted = onDocumentUpdated(
   }
 );
 
+exports.notifyCustomerOnReservationDecision = onDocumentUpdated(
+  {
+    document: 'reservations/{reservationId}',
+    region: 'us-central1',
+    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM],
+  },
+  async (event) => {
+    const reservationId = event.params.reservationId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    const oldStatus = normalizeReservationStatus(beforeData.status);
+    const newStatus = normalizeReservationStatus(afterData.status);
+
+    if (oldStatus === newStatus || !['confirmed', 'rejected'].includes(newStatus)) {
+      return;
+    }
+
+    try {
+      await sendCustomerReservationEmail({ reservationId, reservation: afterData, type: newStatus });
+    } catch (error) {
+      logger.error('Failed to send customer reservation status email', {
+        reservationId,
+        newStatus,
+        error: error?.message || error,
+      });
+    }
+  }
+);
+
 // --- SMS via Arkesel: send SMS to customer when a new order is created ---
 exports.sendSmsOnNewOrder = onDocumentCreated(
   {
@@ -1044,6 +1256,37 @@ exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
         response: err?.response?.data,
       });
       // Do not throw to avoid retry storms; log and allow other notifications to proceed
+    }
+  }
+);
+
+exports.sendSmsOnReservationDecision = onDocumentUpdated(
+  {
+    document: 'reservations/{reservationId}',
+    region: 'us-central1',
+    secrets: [ARKESEL_API_KEY],
+  },
+  async (event) => {
+    const reservationId = event.params.reservationId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    const oldStatus = normalizeReservationStatus(beforeData.status);
+    const newStatus = normalizeReservationStatus(afterData.status);
+
+    if (oldStatus === newStatus || !['confirmed', 'rejected'].includes(newStatus)) {
+      return;
+    }
+
+    try {
+      await sendCustomerReservationStatusSms(reservationId, afterData, newStatus);
+    } catch (err) {
+      logger.error('Failed to send reservation decision SMS', {
+        reservationId,
+        newStatus,
+        error: err?.message || err,
+        response: err?.response?.data,
+      });
     }
   }
 );
