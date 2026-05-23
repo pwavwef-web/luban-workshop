@@ -4,13 +4,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // Helper function to check if user is admin.
-    // Checks custom claim (recommended), hardcoded bootstrap email, or
-    // membership in the Firestore `admins` collection (managed via Admin tab).
+    // Checks custom claim (recommended) or membership in the Firestore
+    // `admins` collection (managed via Admin tab).
     function isAdmin() {
       return request.auth != null && 
              (request.auth.token.admin == true || 
-              (request.auth.token.email is string &&
-               request.auth.token.email.lower() == 'admin@luban.com') ||
               (request.auth.token.email is string &&
                exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()))));
     }

@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/lucide.bundle.js"></script>
     <script src="../assets/js/firebase-firestore.bundle.js"></script>
 
     <style>
@@ -170,81 +170,8 @@
 
     <script>
         lucide.createIcons();
-        // Sample profile data – in production this would come from a CMS or database
-        var profiles = {
-            'gm': {
-                name: 'General Manager',
-                role: 'Restaurant Director',
-                dept: 'Management',
-                since: 'January 2024',
-                shortBio: 'Overseeing all restaurant operations and ensuring the highest standards of service and cuisine at Luban Workshop.',
-                fullBio: 'With years of experience in hospitality management, our General Manager leads the team at Luban Workshop with a focus on excellence, consistency and creating an unforgettable dining experience for every guest.',
-                funFact: 'Has visited over 12 countries to study different culinary traditions.',
-                favouriteDish: 'Special Seafood in Sichuan Sauce',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            },
-            'chef': {
-                name: 'Head Chef',
-                role: 'Executive Chef',
-                dept: 'Kitchen',
-                since: 'March 2023',
-                shortBio: 'Bringing authentic Chinese culinary traditions to Cape Coast with creative flair and technical precision.',
-                fullBio: 'Our Executive Chef trained in Beijing before bringing their expertise to Ghana. Every dish on the Luban Workshop menu reflects their dedication to authentic flavour, quality ingredients and beautiful presentation.',
-                funFact: 'Can name over 50 types of Chinese noodle from memory.',
-                favouriteDish: 'Squid in Luban Chilli Sauce',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            },
-            'souschef': {
-                name: 'Sous Chef',
-                role: 'Sous Chef',
-                dept: 'Kitchen',
-                since: 'July 2023',
-                shortBio: 'Specialising in seafood and dim sum, ensuring consistent quality in every dish that leaves the kitchen.',
-                fullBio: 'Passionate about the art of dim sum and fresh seafood preparation, our Sous Chef works alongside the Executive Chef to maintain Luban Workshop\'s exacting standards every single day.',
-                funFact: 'Folds over 300 dumplings on a busy Friday service.',
-                favouriteDish: 'Steamed Pork Dumpling',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            },
-            'floor': {
-                name: 'Floor Supervisor',
-                role: 'Senior Waitstaff',
-                dept: 'Service',
-                since: 'February 2024',
-                shortBio: 'Leading the front-of-house team to deliver warm, attentive service to every guest.',
-                fullBio: 'Our Floor Supervisor ensures that every guest feels welcomed and well looked after from the moment they arrive. With a warm personality and sharp attention to detail, they set the standard for service excellence at Luban Workshop.',
-                funFact: 'Speaks three languages fluently.',
-                favouriteDish: 'Sweet & Sour Chicken',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            },
-            'chair': {
-                name: 'Committee Chair',
-                role: 'Committee Chairperson',
-                dept: 'Committee',
-                since: 'January 2023',
-                shortBio: 'Guiding the strategic direction of Luban Workshop Restaurant and supporting professional development of the team.',
-                fullBio: 'The Committee Chair provides strategic leadership and governance for Luban Workshop Restaurant, ensuring the restaurant fulfils its educational mission while delivering an exceptional dining experience to the Cape Coast community.',
-                funFact: 'Organised the inaugural Luban culinary showcase event.',
-                favouriteDish: 'Beef in Sichuan Sauce',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            },
-            'member': {
-                name: 'Committee Member',
-                role: 'Advisory Member',
-                dept: 'Committee',
-                since: 'April 2023',
-                shortBio: 'Providing expertise and oversight to ensure Luban Workshop maintains its standards of excellence.',
-                fullBio: 'As an Advisory Member of the committee, this individual brings valuable expertise to the governance of Luban Workshop Restaurant, helping shape policy and supporting the long-term vision of the restaurant.',
-                funFact: 'An avid food historian with a special interest in West African cuisine.',
-                favouriteDish: 'Mongolian Shallot Lamb',
-                photo: null,
-                linkedin: null, instagram: null, twitter: null
-            }
-        };
+        // Approved profiles are loaded from Firestore; static examples are intentionally avoided.
+        var profiles = {};
 
         var deptColours = {
             'Kitchen': '#fee2e2',
@@ -402,7 +329,7 @@
 
         function loadProfile() {
             var params = new URLSearchParams(window.location.search);
-            var id = params.get('id') || 'gm';
+            var id = params.get('id') || '';
 
             if (profiles[id]) {
                 renderProfile(profiles[id]);

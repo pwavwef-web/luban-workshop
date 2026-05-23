@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/lucide.bundle.js"></script>
     <script src="../assets/js/firebase-firestore.bundle.js"></script>
 
     <style>
@@ -283,90 +283,66 @@
     <!-- Team Grid -->
     <div class="team-grid" id="team-grid">
 
-        <!-- Placeholder profiles – shown only until real approved profiles load -->
+        <!-- Team area cards shown until real approved profiles load -->
         <div id="placeholder-profiles">
 
-        <!-- Example: Management -->
         <div class="team-card placeholder-card" data-dept="management">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../og-preview.png" alt="Luban Workshop Restaurant team setting" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Management</span>
-                <h3 class="serif">General Manager</h3>
-                <p class="role">Restaurant Director</p>
-                <p class="bio">Overseeing all restaurant operations and ensuring the highest standards of service and cuisine at Luban Workshop.</p>
-                <a href="profile.html?id=gm" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Operations Team</h3>
+                <p class="role">Daily Coordination</p>
+                <p class="bio">Coordinating bookings, service flow, guest communication and the details that keep each lunch service running smoothly.</p>
             </div>
         </div>
 
-        <!-- Example: Kitchen -->
         <div class="team-card placeholder-card" data-dept="kitchen">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../assets/menu-items-pictures/K1.webp" alt="Sweet and sour chicken from the Luban kitchen" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Kitchen</span>
-                <h3 class="serif">Head Chef</h3>
-                <p class="role">Executive Chef</p>
-                <p class="bio">Bringing authentic Chinese culinary traditions to Cape Coast with creative flair and technical precision.</p>
-                <a href="profile.html?id=chef" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Kitchen Team</h3>
+                <p class="role">Preparation &amp; Cooking</p>
+                <p class="bio">Preparing Chinese dishes with practical training, careful station work and attention to consistency across the menu.</p>
             </div>
         </div>
 
-        <!-- Example: Kitchen 2 -->
         <div class="team-card placeholder-card" data-dept="kitchen">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../assets/menu-items-pictures/D1.webp" alt="Steamed dumplings prepared at Luban Workshop" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Kitchen</span>
-                <h3 class="serif">Sous Chef</h3>
-                <p class="role">Sous Chef</p>
-                <p class="bio">Specialising in seafood and dim sum, ensuring consistent quality in every dish that leaves the kitchen.</p>
-                <a href="profile.html?id=souschef" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Training Stations</h3>
+                <p class="role">Hands-On Learning</p>
+                <p class="bio">Supporting students as they practise prep, timing, plating and the discipline of a live restaurant environment.</p>
             </div>
         </div>
 
-        <!-- Example: Service -->
         <div class="team-card placeholder-card" data-dept="service">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../assets/menu-items-pictures/R3.webp" alt="A plated rice dish served at Luban Workshop" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Service</span>
-                <h3 class="serif">Floor Supervisor</h3>
-                <p class="role">Senior Waitstaff</p>
-                <p class="bio">Leading the front-of-house team to deliver warm, attentive service to every guest who walks through our doors.</p>
-                <a href="profile.html?id=floor" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Service Team</h3>
+                <p class="role">Guest Experience</p>
+                <p class="bio">Welcoming guests, confirming orders, coordinating pickup and keeping communication clear from arrival to departure.</p>
             </div>
         </div>
 
-        <!-- Example: Committee -->
         <div class="team-card placeholder-card" data-dept="committee">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../assets/ucc-logo.png" alt="University of Cape Coast logo" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Committee</span>
-                <h3 class="serif">Committee Chair</h3>
-                <p class="role">Committee Chairperson</p>
-                <p class="bio">Guiding the strategic direction of Luban Workshop Restaurant and supporting the professional development of our team.</p>
-                <a href="profile.html?id=chair" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Advisory Team</h3>
+                <p class="role">Academic Oversight</p>
+                <p class="bio">Helping the restaurant serve its training mission while maintaining a reliable, guest-ready dining experience.</p>
             </div>
         </div>
 
-        <!-- Example: Committee 2 -->
         <div class="team-card placeholder-card" data-dept="committee">
-            <div class="avatar-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
+            <img class="avatar" src="../assets/menu-items-pictures/S7.webp" alt="Golden fried prawns served at Luban Workshop" loading="lazy">
             <div class="card-body">
                 <span class="dept-badge">Committee</span>
-                <h3 class="serif">Committee Member</h3>
-                <p class="role">Advisory Member</p>
-                <p class="bio">Providing expertise and oversight to ensure Luban Workshop maintains its standards of excellence and community engagement.</p>
-                <a href="profile.html?id=member" class="profile-link">View Profile <i data-lucide="arrow-right" style="width:14px;height:14px;"></i></a>
+                <h3 class="serif">Workshop Support</h3>
+                <p class="role">Quality &amp; Community</p>
+                <p class="bio">Supporting service standards, learning outcomes and the restaurant's connection with the Cape Coast community.</p>
             </div>
         </div>
 

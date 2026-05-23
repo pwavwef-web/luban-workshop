@@ -964,7 +964,7 @@
                         <h3><span class="dot"></span>Three Ways to Be Recognised as Admin</h3>
                         <ul class="pts">
                             <li>🔑 <strong>Firebase Custom Claims</strong> — <code>admin: true</code> set via the Firebase Admin SDK (recommended for production; most secure).</li>
-                            <li>📧 <strong>Bootstrap email</strong> — account with email <code>admin@luban.com</code> (for quick development/testing).</li>
+                            <li>👥 <strong>Admin collection</strong> — lowercased email stored in Firestore <code>admins</code> after the first admin is established.</li>
                             <li>📋 <strong>Firestore admins collection</strong> — email present in the <code>/admins</code> database collection (manageable via the Admin Users tab).</li>
                         </ul>
                     </div>
@@ -1664,7 +1664,7 @@
 
                 cardBox(s, 0.6, 4.5, 5.8, 1.85, 'Three Ways to Be Recognised as Admin', [
                     '🔑 Firebase Custom Claims — admin:true (recommended for production; most secure).',
-                    '📧 Bootstrap email — account with admin@luban.com (for quick development).',
+                    '👥 Admin collection — lowercased email stored in Firestore admins after first-admin setup.',
                     '📋 Firestore admins collection — email present in /admins (managed via Admin Users tab).'
                 ], false);
 

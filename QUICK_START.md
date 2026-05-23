@@ -1,70 +1,41 @@
 # Quick Start Guide
 
-## For the Firebase Console (Copy & Paste)
+## Local Verification
 
-### Production Deployment (RECOMMENDED)
-**File to use**: `firestore.rules.production`
+```bash
+npm ci
+npm run build
+npm run check
+npm --prefix functions ci
+node --check functions/index.js
+node --check functions/secure-api.js
+```
 
-1. Copy the entire content of `firestore.rules.production`
-2. Paste into Firebase Console → Firestore Database → Rules
-3. Click "Publish"
-4. Set up admin user with Custom Claims (see FIRESTORE_RULES_README.md)
+## Firebase Rules
 
-**Advantages**:
-- ✅ Secure - cannot be spoofed
-- ✅ Production-ready
-- ✅ Best practice
+Both `firestore.rules` and `firestore.rules.production` use the same hardened admin model:
 
-**Requirements**:
-- Must set up Firebase Custom Claims for admin user
-- See FIRESTORE_RULES_README.md for setup instructions
+- Firebase Auth custom claim `admin: true`
+- Firestore document `admins/{lowercaseEmail}`
 
----
+Order, reservation, contact, verification, and rate-limit writes are handled by trusted Cloud Functions where required.
 
-### Quick Testing/Development
-**File to use**: `firestore.rules`
+## First Admin
 
-1. Copy the entire content of `firestore.rules`
-2. Paste into Firebase Console → Firestore Database → Rules
-3. Click "Publish"
-4. Create a user with email `admin@luban.com` in Firebase Authentication
+Set the first admin claim with the Functions helper:
 
-**Advantages**:
-- ✅ Quick setup
-- ✅ No Custom Claims needed
-- ✅ Good for testing
+```bash
+npm --prefix functions run set-admin-claim -- <UID-or-email>
+```
 
-**Disadvantages**:
-- ⚠️ Less secure - anyone can create admin@luban.com account
-- ⚠️ Not recommended for production
+Then sign in to `admin.html` and manage additional admins from the Admin Users tab.
 
----
+## Deployment
 
-## What the Rules Do
+Manual deploy:
 
-Both files implement these exact requirements:
+```bash
+firebase deploy --project luban-workshop-restaurant --only hosting,functions,firestore,storage
+```
 
-1. ✅ **Anyone can read the menuItems collection**
-   - No login required to view the restaurant menu
-
-2. ✅ **Only admins can write to menuItems**
-   - Only the admin user can add, edit, or delete menu items
-
-3. ✅ **Authenticated users can create reservations**
-   - Any logged-in user can book a table
-
-4. ✅ **Only admins can read reservations**
-   - Only the admin user can view all reservations
-
-5. ✅ **Only admins can update/delete reservations**
-   - Only the admin user can modify or cancel reservations
-
----
-
-## Need Help?
-
-See `FIRESTORE_RULES_README.md` for detailed instructions on:
-- Setting up Firebase Custom Claims
-- Deploying via Firebase CLI
-- Testing the rules
-- Security best practices
+Automated deploys run from GitHub Actions on pushes to `main` after `FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT` is added as a repository secret.

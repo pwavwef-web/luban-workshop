@@ -79,10 +79,7 @@
                     if (tokenResult.claims.admin === true) adminVerified = true;
                 } catch (e) { /* token fetch failed, fall through */ }
 
-                // 2. Check bootstrap email (development fallback)
-                if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
-
-                // 3. Check Firestore admins collection
+                // 2. Check Firestore admins collection
                 if (!adminVerified && normalizedEmail) {
                     try {
                         const adminDoc = await db.collection('admins').doc(normalizedEmail).get();

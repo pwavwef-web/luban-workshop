@@ -302,7 +302,7 @@ async function requireUser(req) {
 
 async function isAuthorizedAdmin(decodedToken) {
   const email = normalizeEmail(decodedToken?.email || '');
-  if (decodedToken?.admin === true || email === 'admin@luban.com') return true;
+  if (decodedToken?.admin === true) return true;
   if (!email) return false;
   const adminDoc = await db().collection('admins').doc(email).get();
   return adminDoc.exists;

@@ -285,7 +285,7 @@ async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
   if (newStatus === 'preparing') {
     message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
   } else if (newStatus === 'completed') {
-    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, your order is ready! Please come pick it up or look for delivery. - Luban Restaurant`;
+    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, your order is ready for pickup. Please pay at the counter when you collect it. - Luban Restaurant`;
   }
 
   if (!message) return;
@@ -388,7 +388,7 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     ? 'Your meal has been marked complete. Thank you for choosing Luban Workshop Restaurant.'
     : 'Thank you for ordering from Luban Workshop Restaurant. Our team has received your order and will prepare it with care.';
   const nextStep = isCompleted
-    ? 'Please collect your order or look out for delivery handoff if that was arranged.'
+    ? 'Please collect your order at the counter. Payment is completed at pickup unless our team has arranged otherwise with you directly.'
     : 'We will let you know when your order moves forward. For quick help, call 020 543 8455.';
 
   const text = [
@@ -1368,7 +1368,7 @@ function extractBearerToken(authorizationHeader = '') {
 
 async function isAuthorizedAdmin(decodedToken) {
   const email = String(decodedToken?.email || '').trim().toLowerCase();
-  if (decodedToken?.admin === true || email === 'admin@luban.com') {
+  if (decodedToken?.admin === true) {
     return true;
   }
 

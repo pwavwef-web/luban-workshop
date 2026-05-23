@@ -5,11 +5,14 @@
   "scripts": {
     "build": "npm run build:css && npm run build:js",
     "build:css": "tailwindcss -i src/tailwind.css -o tailwind.css --minify",
-    "build:js": "esbuild src/firebase-modular-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-modular.bundle.js && esbuild src/firebase-firestore-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-firestore.bundle.js && esbuild src/firebase-messaging-sw-entry.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-messaging-sw.bundle.js && esbuild src/admin-qr.js --bundle --format=iife --target=es2019 --outfile=assets/js/admin-qr.bundle.js",
+    "build:js": "esbuild src/firebase-modular-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-modular.bundle.js && esbuild src/firebase-firestore-bridge.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-firestore.bundle.js && esbuild src/firebase-messaging-sw-entry.js --bundle --format=iife --target=es2019 --outfile=assets/js/firebase-messaging-sw.bundle.js && esbuild src/admin-qr.js --bundle --format=iife --target=es2019 --outfile=assets/js/admin-qr.bundle.js && esbuild src/lucide-local.js --bundle --format=iife --target=es2019 --outfile=assets/js/lucide.bundle.js && esbuild src/html2canvas-local.js --bundle --format=iife --target=es2019 --outfile=assets/js/html2canvas.bundle.js",
+    "check": "node tools/check-launch-readiness.js && node --check functions/index.js && node --check functions/secure-api.js",
     "watch:css": "tailwindcss -i src/tailwind.css -o tailwind.css --watch"
   },
   "dependencies": {
     "firebase": "^12.13.0",
+    "html2canvas": "^1.4.1",
+    "lucide": "^1.16.0",
     "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {

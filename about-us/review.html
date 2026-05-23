@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/lucide.bundle.js"></script>
     <script src="../assets/js/firebase-modular.bundle.js"></script>
 
     <style>
@@ -219,7 +219,6 @@
                 var tokenResult = await user.getIdTokenResult();
                 if (tokenResult.claims.admin === true) adminVerified = true;
             } catch (e) {}
-            if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
             if (!adminVerified && normalizedEmail) {
                 try {
                     var adminDoc = await db.collection('admins').doc(normalizedEmail).get();

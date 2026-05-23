@@ -22,7 +22,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/lucide.bundle.js"></script>
     <script src="assets/js/firebase-modular.bundle.js?v=20260523-reservationfix2"></script>
     <script src="assets/js/admin-qr.bundle.js?v=20260523-reservationfix2"></script>
 
@@ -409,7 +409,7 @@
 
                     <div class="ml-3">
                         <p class="text-sm font-bold text-stone-900">Admin</p>
-                        <p id="user-email" class="text-xs text-stone-500 truncate w-32">admin@luban.com</p>
+                        <p id="user-email" class="text-xs text-stone-500 truncate w-32">Signed in</p>
                     </div>
                 </div>
 
@@ -1124,10 +1124,7 @@
                     if (tokenResult.claims.admin === true) adminVerified = true;
                 } catch (e) { /* token fetch failed, fall through */ }
 
-                // 2. Check bootstrap email (development fallback)
-                if (!adminVerified && normalizedEmail === 'admin@luban.com') adminVerified = true;
-
-                // 3. Check Firestore admins collection
+                // 2. Check Firestore admins collection
                 if (!adminVerified && normalizedEmail) {
                     try {
                         const adminDoc = await db.collection('admins').doc(normalizedEmail).get();
