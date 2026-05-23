@@ -17,6 +17,7 @@
         .field { width: 100%; border: 1px solid #d6d3d1; border-radius: 8px; padding: 0.8rem 0.9rem; }
         .field:focus { outline: none; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
         .action-disabled { opacity: 0.45; cursor: not-allowed; }
+        .state-muted { opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -85,12 +86,15 @@
                         <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Phone</h2>
                         <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
-                        <div id="phone-action-area" class="mt-5 flex flex-col sm:flex-row gap-3"></div>
-                        <form id="otp-form" class="mt-6 space-y-4">
-                            <label for="otp-code" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
-                            <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
-                            <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
-                        </form>
+                        <div id="phone-otp-area" class="mt-5 space-y-4">
+                            <div id="phone-action-area" class="flex flex-col sm:flex-row gap-3"></div>
+                            <p id="phone-otp-status" class="text-sm text-stone-600"></p>
+                            <form id="otp-form" class="space-y-4">
+                                <label for="otp-code" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
+                                <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
+                                <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
+                            </form>
+                        </div>
                     </div>
 
                     <div id="page-feedback" class="hidden rounded-md p-4 text-sm"></div>
@@ -119,12 +123,86 @@
 
         const auth = firebase.auth();
         let currentUser = null;
+        const PHONE_OTP_COOLDOWN_MS = 5 * 60 * 1000;
+        let phoneOtpCooldownTimer = null;
 
         function showFeedback(message, isError) {
             const el = document.getElementById('page-feedback');
             el.textContent = message;
             el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
             el.classList.remove('hidden');
+        }
+
+        function getPhoneOtpCooldownKey() {
+            return currentUser ? `verify-contact-phone-otp-cooldown:${currentUser.uid}` : null;
+        }
+
+        function getPhoneOtpCooldownUntil() {
+            const key = getPhoneOtpCooldownKey();
+            if (!key) return 0;
+            const stored = Number(window.localStorage.getItem(key) || 0);
+            return Number.isFinite(stored) ? stored : 0;
+        }
+
+        function setPhoneOtpCooldown(until) {
+            const key = getPhoneOtpCooldownKey();
+            if (!key) return;
+            if (until > Date.now()) {
+                window.localStorage.setItem(key, String(until));
+            } else {
+                window.localStorage.removeItem(key);
+            }
+        }
+
+        function formatCooldownText(remainingMs) {
+            const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function stopPhoneOtpCooldownTimer() {
+            if (phoneOtpCooldownTimer) {
+                window.clearInterval(phoneOtpCooldownTimer);
+                phoneOtpCooldownTimer = null;
+            }
+        }
+
+        function updatePhoneOtpCooldownUi() {
+            const sendBtn = document.getElementById('otp-send-btn');
+            const status = document.getElementById('phone-otp-status');
+            const until = getPhoneOtpCooldownUntil();
+            const remainingMs = until - Date.now();
+
+            if (!sendBtn || !status) return;
+
+            if (remainingMs > 0) {
+                sendBtn.disabled = true;
+                sendBtn.classList.add('action-disabled');
+                sendBtn.textContent = `Wait ${formatCooldownText(remainingMs)} to resend`;
+                status.textContent = 'We have sent your code. It should arrive shortly. Keep this page open and enter the code within 5 minutes.';
+                stopPhoneOtpCooldownTimer();
+                phoneOtpCooldownTimer = window.setInterval(updatePhoneOtpCooldownUi, 1000);
+                return;
+            }
+
+            stopPhoneOtpCooldownTimer();
+            sendBtn.disabled = false;
+            sendBtn.classList.remove('action-disabled');
+            sendBtn.textContent = 'Send SMS code';
+            status.textContent = 'Request a new code when you are ready. The latest code expires after 5 minutes.';
+            setPhoneOtpCooldown(0);
+        }
+
+        function setPhoneVerifiedState(isVerified) {
+            const phoneOtpArea = document.getElementById('phone-otp-area');
+            if (!phoneOtpArea) return;
+            phoneOtpArea.classList.toggle('hidden', isVerified);
+            phoneOtpArea.classList.toggle('state-muted', false);
+            if (isVerified) {
+                stopPhoneOtpCooldownTimer();
+                setPhoneOtpCooldown(0);
+            }
         }
 
         function renderEmailActions(isVerified) {
@@ -151,6 +229,7 @@
                 <button id="otp-send-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
                 <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50 text-center">Update phone number</a>
             `;
+            updatePhoneOtpCooldownUi();
         }
 
         async function loadStatus() {
@@ -167,6 +246,7 @@
             document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
             document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
             document.getElementById('phone-status').className = account.phoneVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
+            setPhoneVerifiedState(Boolean(account.phoneVerified));
             document.getElementById('overall-status').textContent = account.verificationStatus === 'verified'
                 ? 'Your account is ready for secure online orders.'
                 : 'Finish both checks above before placing an order.';
@@ -194,7 +274,9 @@
                 method: 'POST',
                 user: currentUser
             });
-            showFeedback('SMS verification code sent. Enter the 6-digit code when it arrives.', false);
+            setPhoneOtpCooldown(Date.now() + PHONE_OTP_COOLDOWN_MS);
+            updatePhoneOtpCooldownUi();
+            showFeedback('SMS verification code sent. It can take a moment to arrive. Enter the 6-digit code within 5 minutes.', false);
         }
 
         auth.onAuthStateChanged(async (user) => {
@@ -245,15 +327,28 @@
         document.getElementById('otp-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!currentUser) return;
-            const result = await lubanClient.api('/verifyPhoneOtp', {
-                method: 'POST',
-                user: currentUser,
-                body: { code: document.getElementById('otp-code').value.trim() }
-            });
-            document.getElementById('otp-code').value = '';
-            await loadStatus();
-            showFeedback(result.account.phoneVerified ? 'Phone number verified successfully.' : 'Verification status updated.', false);
+            try {
+                const result = await lubanClient.api('/verifyPhoneOtp', {
+                    method: 'POST',
+                    user: currentUser,
+                    body: { code: document.getElementById('otp-code').value.trim() }
+                });
+                document.getElementById('otp-code').value = '';
+                await loadStatus();
+                if (result.account.phoneVerified) {
+                    showFeedback('Phone number verified successfully. The verification form has been hidden.', false);
+                } else {
+                    showFeedback('Verification status updated.', false);
+                }
+            } catch (error) {
+                showFeedback(error.message || 'Could not verify that code.', true);
+            }
         });
+
+        const existingPhoneOtpCooldown = getPhoneOtpCooldownUntil();
+        if (existingPhoneOtpCooldown > Date.now()) {
+            updatePhoneOtpCooldownUi();
+        }
     </script>
 </body>
 </html>

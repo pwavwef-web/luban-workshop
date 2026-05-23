@@ -53,6 +53,17 @@
                     </div>
                     <div id="empty-state" class="hidden mt-6 rounded-lg bg-stone-50 p-6 text-stone-600">Your cart is empty. Add dishes from the menu before checking out.</div>
                     <div id="cart-lines" class="mt-6 space-y-4"></div>
+                    <section class="mt-8 rounded-xl border border-stone-200 bg-stone-50 p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-red-700">Add a drink</p>
+                                <h3 class="serif mt-2 text-2xl font-bold text-stone-900">Want something to go with it?</h3>
+                                <p class="mt-2 text-sm text-stone-600">A quick drink can round out the order before you place it.</p>
+                            </div>
+                            <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-stone-600">Suggested</span>
+                        </div>
+                        <div id="drink-suggestions" class="mt-5 grid gap-3 sm:grid-cols-2"></div>
+                    </section>
                 </section>
 
                 <aside class="space-y-6">
@@ -60,11 +71,11 @@
                         <p class="text-xs font-bold uppercase tracking-widest text-red-700">Verification</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Ready to Order?</h2>
                         <div class="mt-5 space-y-3 text-sm">
-                            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                            <div id="email-status-row" class="flex items-center justify-between border-b border-stone-100 pb-3">
                                 <span class="text-stone-500">Email</span>
                                 <span id="email-ready" class="font-semibold text-amber-700">Pending</span>
                             </div>
-                            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                            <div id="phone-status-row" class="flex items-center justify-between border-b border-stone-100 pb-3">
                                 <span class="text-stone-500">Phone</span>
                                 <span id="phone-ready" class="font-semibold text-amber-700">Pending</span>
                             </div>
@@ -76,7 +87,7 @@
                         <div id="checkout-warning" class="mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900">Checking your account status...</div>
                         <div class="mt-6 flex flex-col gap-3">
                             <button id="place-order-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50">Place Order</button>
-                            <a href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify contact details</a>
+                            <a id="verify-contact-link" href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify contact details</a>
                         </div>
                     </section>
                     <div id="checkout-feedback" class="hidden rounded-md p-4 text-sm"></div>
@@ -103,6 +114,12 @@
         const auth = firebase.auth();
         let currentUser = null;
         let currentAccount = null;
+        const drinkSuggestions = [
+            { id: 'DR1', name: 'Coca-Cola 300ml', price: 15, description: 'Refreshing classic cola.' },
+            { id: 'DR2', name: 'Fanta 300ml', price: 15, description: 'Bright citrus soda.' },
+            { id: 'DR3', name: 'Sprite 300ml', price: 15, description: 'Light lemon-lime fizz.' },
+            { id: 'DR4', name: 'Water 300ml', price: 5, description: 'Simple still mineral water.' }
+        ];
 
         function setFeedback(message, isError) {
             const el = document.getElementById('checkout-feedback');
@@ -131,16 +148,63 @@
                     </div>
                 </article>
             `).join('');
+            renderDrinkSuggestions(items);
             return { items, total };
         }
 
+        function renderDrinkSuggestions(cartItems) {
+            const container = document.getElementById('drink-suggestions');
+            const cart = Array.isArray(cartItems) ? cartItems : lubanClient.readCart();
+            container.innerHTML = drinkSuggestions.map((drink) => {
+                const inCart = cart.some((item) => item.id === drink.id);
+                return `
+                    <article class="rounded-lg border border-stone-200 bg-white p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h4 class="font-semibold text-stone-900">${drink.name}</h4>
+                                <p class="mt-1 text-xs text-stone-500">${drink.description}</p>
+                            </div>
+                            <strong class="text-sm text-stone-900">${lubanClient.formatMoney(drink.price)}</strong>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between gap-3">
+                            <span class="text-xs font-medium text-stone-500">${inCart ? 'Already in cart' : 'Popular add-on'}</span>
+                            <button type="button" data-drink-id="${drink.id}" class="drink-add-btn rounded-md border border-stone-300 px-3 py-1.5 text-sm font-semibold text-stone-800 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50" ${inCart ? 'disabled' : ''}>
+                                ${inCart ? 'Added' : 'Add'}
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            container.querySelectorAll('.drink-add-btn').forEach((button) => {
+                button.addEventListener('click', () => addDrinkToCart(button.getAttribute('data-drink-id')));
+            });
+        }
+
+        function addDrinkToCart(drinkId) {
+            const drink = drinkSuggestions.find((item) => item.id === drinkId);
+            if (!drink) return;
+            const items = lubanClient.readCart();
+            const existing = items.find((item) => item.id === drink.id);
+            if (existing) {
+                existing.quantity = Number(existing.quantity || 0) + 1;
+            } else {
+                items.push({ id: drink.id, name: drink.name, price: drink.price, quantity: 1 });
+            }
+            lubanClient.writeCart(items);
+        }
+
         function renderVerificationStatus(account) {
+            const ready = account.emailVerified && account.phoneVerified;
+            const needsVerification = !ready;
+            document.getElementById('email-status-row').classList.toggle('hidden', !needsVerification);
+            document.getElementById('phone-status-row').classList.toggle('hidden', !needsVerification);
+            document.getElementById('verify-contact-link').classList.toggle('hidden', !needsVerification);
             document.getElementById('email-ready').textContent = account.emailVerified ? 'Verified' : 'Pending';
             document.getElementById('email-ready').className = account.emailVerified ? 'font-semibold text-green-700' : 'font-semibold text-amber-700';
             document.getElementById('phone-ready').textContent = account.phoneVerified ? 'Verified' : 'Pending';
             document.getElementById('phone-ready').className = account.phoneVerified ? 'font-semibold text-green-700' : 'font-semibold text-amber-700';
             const placeBtn = document.getElementById('place-order-btn');
-            const ready = account.emailVerified && account.phoneVerified;
             placeBtn.disabled = !ready || lubanClient.readCart().length === 0;
             document.getElementById('checkout-warning').textContent = ready
                 ? 'Both checks are complete. Your order will be priced again on the server before it is saved.'

@@ -16,6 +16,8 @@
         .panel { border-radius: 8px; border: 1px solid #e7e5e4; box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08); }
         .field { width: 100%; border: 1px solid #d6d3d1; border-radius: 8px; padding: 0.8rem 0.9rem; }
         .field:focus { outline: none; border-color: #b91c1c; box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12); }
+        .action-disabled { opacity: 0.45; cursor: not-allowed; }
+        .state-muted { opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -44,9 +46,10 @@
             <p class="mt-3 text-stone-600">We will send a one-time SMS code to the phone number used when this reservation was submitted.</p>
             <div id="turnstile-mount" class="mt-5"></div>
             <button id="send-code-btn" type="button" class="mt-5 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
+            <p id="access-code-status" class="mt-3 text-sm text-stone-600"></p>
         </section>
 
-        <section class="panel bg-white p-6 sm:p-8">
+        <section id="code-step" class="panel bg-white p-6 sm:p-8">
             <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
             <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Access Code</h2>
             <form id="code-form" class="mt-5 space-y-4">
@@ -100,12 +103,86 @@
         let turnstileWidget = null;
         let accessGrant = '';
         let reservation = null;
+        const ACCESS_CODE_COOLDOWN_MS = 5 * 60 * 1000;
+        let accessCodeCooldownTimer = null;
 
         function showFeedback(message, isError) {
             const el = document.getElementById('page-feedback');
             el.textContent = message;
             el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
             el.classList.remove('hidden');
+        }
+
+        function getAccessCodeCooldownKey() {
+            return token ? `reservation-status-access-code-cooldown:${token}` : null;
+        }
+
+        function getAccessCodeCooldownUntil() {
+            const key = getAccessCodeCooldownKey();
+            if (!key) return 0;
+            const stored = Number(window.localStorage.getItem(key) || 0);
+            return Number.isFinite(stored) ? stored : 0;
+        }
+
+        function setAccessCodeCooldown(until) {
+            const key = getAccessCodeCooldownKey();
+            if (!key) return;
+            if (until > Date.now()) {
+                window.localStorage.setItem(key, String(until));
+            } else {
+                window.localStorage.removeItem(key);
+            }
+        }
+
+        function formatCooldownText(remainingMs) {
+            const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function stopAccessCodeCooldownTimer() {
+            if (accessCodeCooldownTimer) {
+                window.clearInterval(accessCodeCooldownTimer);
+                accessCodeCooldownTimer = null;
+            }
+        }
+
+        function updateAccessCodeCooldownUi() {
+            const sendBtn = document.getElementById('send-code-btn');
+            const status = document.getElementById('access-code-status');
+            const until = getAccessCodeCooldownUntil();
+            const remainingMs = until - Date.now();
+
+            if (!sendBtn || !status) return;
+
+            if (remainingMs > 0) {
+                sendBtn.disabled = true;
+                sendBtn.classList.add('action-disabled');
+                sendBtn.textContent = `Wait ${formatCooldownText(remainingMs)} to resend`;
+                status.textContent = 'Your access code was sent. It should arrive shortly and will only work for 5 minutes. Keep this page open while you wait.';
+                stopAccessCodeCooldownTimer();
+                accessCodeCooldownTimer = window.setInterval(updateAccessCodeCooldownUi, 1000);
+                return;
+            }
+
+            stopAccessCodeCooldownTimer();
+            sendBtn.disabled = false;
+            sendBtn.classList.remove('action-disabled');
+            sendBtn.textContent = 'Send SMS code';
+            status.textContent = 'Request a new access code whenever you need one.';
+            setAccessCodeCooldown(0);
+        }
+
+        function hideCodeStepWhenVerified(isVerified) {
+            const codeStep = document.getElementById('code-step');
+            if (!codeStep) return;
+            codeStep.classList.toggle('hidden', isVerified);
+            codeStep.classList.toggle('state-muted', false);
+            if (isVerified) {
+                stopAccessCodeCooldownTimer();
+                setAccessCodeCooldown(0);
+            }
         }
 
         function renderReservation(data) {
@@ -139,7 +216,9 @@
             });
             lubanClient.resetTurnstile(turnstileWidget);
             renderReservation(result.reservation);
-            showFeedback('SMS access code sent. Enter it below to continue.', false);
+            setAccessCodeCooldown(Date.now() + ACCESS_CODE_COOLDOWN_MS);
+            updateAccessCodeCooldownUi();
+            showFeedback('SMS access code sent. It can take a moment to arrive. Enter the code within 5 minutes.', false);
         }
 
         document.getElementById('send-code-btn').addEventListener('click', async () => {
@@ -163,7 +242,8 @@
                 accessGrant = result.accessGrant;
                 renderReservation(result.reservation);
                 document.getElementById('code-input').value = '';
-                showFeedback('Reservation access granted.', false);
+                hideCodeStepWhenVerified(true);
+                showFeedback('Reservation access granted. The code entry area has been hidden.', false);
             } catch (error) {
                 showFeedback(error.message || 'Could not verify that code.', true);
             }
@@ -199,6 +279,11 @@
             document.getElementById('request-type').disabled = true;
             document.getElementById('request-message').disabled = true;
             showFeedback('This reservation link is missing its access token.', true);
+        } else {
+            const existingCooldown = getAccessCodeCooldownUntil();
+            if (existingCooldown > Date.now()) {
+                updateAccessCodeCooldownUi();
+            }
         }
     </script>
 </body>
