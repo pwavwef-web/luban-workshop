@@ -13,7 +13,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>联系我们 | 鲁班工坊餐厅</title>
   <meta name="description" content="联系鲁班工坊餐厅。电话 020 543 8455，或通过表单留言。营业时间：周一至周五 11:00–17:30。">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lubanrestaurant.com/chinese/contact-us.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://lubanrestaurant.com/chinese/contact-us.html">
+    <link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/contact-us.html">
+    <link rel="alternate" hreflang="x-default" href="https://lubanrestaurant.com/contact-us.html">
   <link rel="icon" type="image/png" href="../logo.png">
   <link rel="stylesheet" href="../tailwind.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +25,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <script src="../assets/js/lucide.bundle.js"></script>
   <script src="../assets/js/firebase-firestore.bundle.js"></script>
+
+    <!-- Structured Data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lubanrestaurant.com/chinese/contact-us.html#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "首页",
+              "item": "https://lubanrestaurant.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "联系我们",
+              "item": "https://lubanrestaurant.com/chinese/contact-us.html"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://lubanrestaurant.com/chinese/contact-us.html#webpage",
+          "url": "https://lubanrestaurant.com/chinese/contact-us.html",
+          "name": "联系我们 | 鲁班工坊餐厅",
+          "description": "联系加纳海岸角鲁班工坊餐厅，获取电话、邮箱、营业时间、地址与留言表单。",
+          "inLanguage": "zh-Hans",
+          "isPartOf": {
+            "@id": "https://lubanrestaurant.com/#website"
+          },
+          "about": {
+            "@id": "https://lubanrestaurant.com/#restaurant"
+          },
+          "breadcrumb": {
+            "@id": "https://lubanrestaurant.com/chinese/contact-us.html#breadcrumb"
+          }
+        }
+      ]
+    }
+    </script>
+
   <style>
     body { font-family: 'Noto Sans SC', sans-serif; }
     h1, h2, h3, .serif { font-family: 'Noto Serif SC', serif; }

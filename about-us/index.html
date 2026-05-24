@@ -17,6 +17,9 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://lubanrestaurant.com/about-us/">
 
+    <link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/about-us/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://lubanrestaurant.com/chinese/about-us.html">
+    <link rel="alternate" hreflang="x-default" href="https://lubanrestaurant.com/about-us/">
     <link rel="icon" type="image/png" href="../logo.png">
     <link rel="stylesheet" href="../tailwind.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +27,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.bundle.js"></script>
     <script src="../assets/js/firebase-firestore.bundle.js"></script>
+
+    <!-- Structured Data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lubanrestaurant.com/about-us/#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://lubanrestaurant.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "About Us",
+              "item": "https://lubanrestaurant.com/about-us/"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://lubanrestaurant.com/about-us/#webpage",
+          "url": "https://lubanrestaurant.com/about-us/",
+          "name": "About Us | Luban Workshop Restaurant",
+          "description": "Learn about Luban Workshop Restaurant in Cape Coast, Ghana, including its story, Chinese cuisine, hospitality training mission, guest experience, and team.",
+          "inLanguage": "en-GB",
+          "isPartOf": {
+            "@id": "https://lubanrestaurant.com/#website"
+          },
+          "about": {
+            "@id": "https://lubanrestaurant.com/#restaurant"
+          },
+          "breadcrumb": {
+            "@id": "https://lubanrestaurant.com/about-us/#breadcrumb"
+          }
+        }
+      ]
+    }
+    </script>
+
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }

@@ -38,6 +38,53 @@
 
     <link rel="icon" type="image/png" href="logo.png">
     <meta name="theme-color" content="#b91c1c">
+
+    <!-- Structured Data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lubanrestaurant.com/flyers.html#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://lubanrestaurant.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Flyers and Promotions",
+              "item": "https://lubanrestaurant.com/flyers.html"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://lubanrestaurant.com/flyers.html#webpage",
+          "url": "https://lubanrestaurant.com/flyers.html",
+          "name": "Flyers and Promotions | Luban Workshop Restaurant",
+          "description": "Download and share promotional flyers for Luban Workshop Restaurant in Cape Coast, Ghana.",
+          "inLanguage": "en-GB",
+          "isPartOf": {
+            "@id": "https://lubanrestaurant.com/#website"
+          },
+          "about": {
+            "@id": "https://lubanrestaurant.com/#restaurant"
+          },
+          "breadcrumb": {
+            "@id": "https://lubanrestaurant.com/flyers.html#breadcrumb"
+          }
+        }
+      ]
+    }
+    </script>
+
     <link rel="manifest" href="manifest.json">
 
     <link rel="stylesheet" href="tailwind.css">

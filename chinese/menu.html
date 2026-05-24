@@ -14,7 +14,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>菜单 | 鲁班工坊餐厅</title>
     <meta name="description" content="鲁班工坊餐厅完整菜单——汤品、前菜、牛羊肉、猪肉、鸡肉、海鲜、米饭、面条及饺子。">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lubanrestaurant.com/chinese/menu.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://lubanrestaurant.com/chinese/menu.html">
+    <link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/menu.html">
+    <link rel="alternate" hreflang="x-default" href="https://lubanrestaurant.com/menu.html">
     <link rel="icon" type="image/png" href="../logo.png">
 
     <link rel="stylesheet" href="../tailwind.css">
@@ -22,6 +26,53 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.bundle.js"></script>
+
+    <!-- Structured Data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lubanrestaurant.com/chinese/menu.html#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "首页",
+              "item": "https://lubanrestaurant.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "菜单",
+              "item": "https://lubanrestaurant.com/chinese/menu.html"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://lubanrestaurant.com/chinese/menu.html#webpage",
+          "url": "https://lubanrestaurant.com/chinese/menu.html",
+          "name": "菜单 | 鲁班工坊餐厅",
+          "description": "浏览鲁班工坊餐厅完整菜单，包括汤品、前菜、牛羊肉、猪肉、鸡肉、海鲜、米饭、面条、饺子、蔬菜与饮品。",
+          "inLanguage": "zh-Hans",
+          "isPartOf": {
+            "@id": "https://lubanrestaurant.com/#website"
+          },
+          "about": {
+            "@id": "https://lubanrestaurant.com/#restaurant"
+          },
+          "breadcrumb": {
+            "@id": "https://lubanrestaurant.com/chinese/menu.html#breadcrumb"
+          }
+        }
+      ]
+    }
+    </script>
+
 
     <style>
         body { font-family: 'Noto Sans SC', 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }

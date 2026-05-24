@@ -61,8 +61,7 @@ function assertLegalPagesIndexable() {
 function assertSitemapNoindexConsistency() {
   const sitemap = read(path.join(root, 'sitemap.xml'));
   const locs = Array.from(sitemap.matchAll(/<loc>https:\/\/lubanrestaurant\.com\/([^<]*)<\/loc>/g))
-    .map((match) => match[1] || 'index.html')
-    .filter((loc) => !loc.startsWith('chinese/'));
+    .map((match) => match[1] || 'index.html');
 
   for (const loc of locs) {
     const page = loc.endsWith('/') ? `${loc}index.html` : loc;
@@ -74,6 +73,84 @@ function assertSitemapNoindexConsistency() {
 
     if (isNoindex(read(file))) {
       fail(`sitemap.xml includes noindex page ${loc}.`);
+    }
+  }
+}
+
+function assertValidJsonLd(files) {
+  for (const file of files) {
+    if (path.extname(file) !== '.html') continue;
+    const html = read(file);
+    const blocks = html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+
+    for (const block of blocks) {
+      try {
+        JSON.parse(block[1].trim());
+      } catch (error) {
+        fail(`${rel(file)} contains invalid JSON-LD: ${error.message}`);
+      }
+    }
+  }
+}
+
+function assertSearchResultSignals() {
+  const home = read(path.join(root, 'index.html'));
+  if (!home.includes('"@type": "WebSite"')) {
+    fail('index.html is missing WebSite structured data for Google site name signals.');
+  }
+  if (!home.includes('#site-navigation')) {
+    fail('index.html is missing primary navigation structured data for sitelink signals.');
+  }
+
+  const breadcrumbPages = [
+    'menu.html',
+    'faq.html',
+    'contact-us.html',
+    'events-and-catering.html',
+    'about-us/index.html',
+    'privacy-policy.html',
+    'terms-of-use.html',
+    'flyers.html',
+    'chinese/index.html',
+    'chinese/menu.html',
+    'chinese/faq.html',
+    'chinese/contact-us.html',
+    'chinese/events-and-catering.html',
+    'chinese/about-us.html',
+    'chinese/privacy-policy.html'
+  ];
+
+  for (const page of breadcrumbPages) {
+    const html = read(path.join(root, page));
+    if (!html.includes('"@type": "BreadcrumbList"')) {
+      fail(`${page} is missing BreadcrumbList structured data.`);
+    }
+    if (!/<link\s+rel=["']canonical["']/i.test(html)) {
+      fail(`${page} is missing a canonical link.`);
+    }
+  }
+
+  const translatedPages = [
+    'index.html',
+    'menu.html',
+    'faq.html',
+    'contact-us.html',
+    'events-and-catering.html',
+    'about-us/index.html',
+    'privacy-policy.html',
+    'chinese/index.html',
+    'chinese/menu.html',
+    'chinese/faq.html',
+    'chinese/contact-us.html',
+    'chinese/events-and-catering.html',
+    'chinese/about-us.html',
+    'chinese/privacy-policy.html'
+  ];
+
+  for (const page of translatedPages) {
+    const html = read(path.join(root, page));
+    if (!html.includes('hreflang="x-default"')) {
+      fail(`${page} is missing an x-default hreflang link.`);
     }
   }
 }
@@ -125,6 +202,8 @@ const files = walk(root);
 assertNoBootstrapAdminFallback(files);
 assertLegalPagesIndexable();
 assertSitemapNoindexConsistency();
+assertValidJsonLd(files);
+assertSearchResultSignals();
 assertHomepageDirections();
 assertNoStockFlyerAssets();
 assertEnglishLocalLinks(files);

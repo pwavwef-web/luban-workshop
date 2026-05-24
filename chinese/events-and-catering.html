@@ -13,7 +13,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>活动与餐饮服务 | 鲁班工坊餐厅</title>
   <meta name="description" content="鲁班工坊提供私人活动与外烩服务。填写预约表单，安排您的聚会、企业活动或团体用餐。">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://lubanrestaurant.com/chinese/events-and-catering.html">
+    <link rel="alternate" hreflang="zh-Hans" href="https://lubanrestaurant.com/chinese/events-and-catering.html">
+    <link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/events-and-catering.html">
+    <link rel="alternate" hreflang="x-default" href="https://lubanrestaurant.com/events-and-catering.html">
   <link rel="icon" type="image/png" href="../logo.png">
   <link rel="stylesheet" href="../tailwind.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +25,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <script src="../assets/js/lucide.bundle.js"></script>
   <script src="../assets/js/firebase-firestore.bundle.js"></script>
+
+    <!-- Structured Data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "@id": "https://lubanrestaurant.com/chinese/events-and-catering.html#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "首页",
+              "item": "https://lubanrestaurant.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "活动与餐饮服务",
+              "item": "https://lubanrestaurant.com/chinese/events-and-catering.html"
+            }
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://lubanrestaurant.com/chinese/events-and-catering.html#webpage",
+          "url": "https://lubanrestaurant.com/chinese/events-and-catering.html",
+          "name": "活动与餐饮服务 | 鲁班工坊餐厅",
+          "description": "鲁班工坊餐厅提供私人活动、企业活动、团体预订与外烩服务。",
+          "inLanguage": "zh-Hans",
+          "isPartOf": {
+            "@id": "https://lubanrestaurant.com/#website"
+          },
+          "about": {
+            "@id": "https://lubanrestaurant.com/#restaurant"
+          },
+          "breadcrumb": {
+            "@id": "https://lubanrestaurant.com/chinese/events-and-catering.html#breadcrumb"
+          }
+        }
+      ]
+    }
+    </script>
+
   <style>
     body { font-family: 'Noto Sans SC', sans-serif; }
     h1, h2, h3, .serif { font-family: 'Noto Serif SC', serif; }
