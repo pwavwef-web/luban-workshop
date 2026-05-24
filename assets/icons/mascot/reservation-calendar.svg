@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title" fill="none" stroke="#7c2d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <title id="title">Reservation calendar</title>
+  <rect x="4.5" y="5" width="15" height="15" rx="2.2" fill="#fff6e8"/>
+  <path fill="#b91c1c" d="M4.5 8h15v3h-15z"/>
+  <path d="M8 3.5v3M16 3.5v3"/>
+  <path fill="#fff1d7" d="M9 15.2c0-1.7 1.2-2.9 3-2.9s3 1.2 3 2.9c0 1.4-1.1 2.3-3 2.3s-3-.9-3-2.3Z"/>
+  <path d="M10.7 14.9c.3-.3.6-.3.9 0M12.4 14.9c.3-.3.6-.3.9 0M11 16.1c.5.4 1.5.4 2 0"/>
+</svg>

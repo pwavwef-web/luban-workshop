@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title" fill="none" stroke="#7c2d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <title id="title">Mascot chef hat</title>
+  <path fill="#fff6e8" d="M6.8 10.8A3.2 3.2 0 0 1 8.7 5c.8-1.4 2-2.2 3.3-2.2s2.5.8 3.3 2.2a3.2 3.2 0 0 1 1.9 5.8v5.4H6.8v-5.4Z"/>
+  <path d="M8.7 5c.2 1.4.9 2.3 1.9 2.8M15.3 5c-.2 1.4-.9 2.3-1.9 2.8"/>
+  <path fill="#b91c1c" d="M6.8 14.1h10.4v2.1H6.8z"/>
+  <path d="M8 19h8"/>
+</svg>

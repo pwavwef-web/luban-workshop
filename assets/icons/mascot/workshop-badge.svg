@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title" fill="none" stroke="#7c2d1f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <title id="title">Workshop badge</title>
+  <circle cx="12" cy="12" r="8.5" fill="#fff6e8"/>
+  <path fill="#b91c1c" d="M8 16.4h8l-.9 2.2H8.9L8 16.4Z"/>
+  <path fill="#fff1d7" d="M8.5 11.5c.2-2.1 1.5-3.6 3.5-3.6s3.3 1.5 3.5 3.6c-.3 2.1-1.6 3.5-3.5 3.5s-3.2-1.4-3.5-3.5Z"/>
+  <path d="M10.5 11.4c.3-.4.7-.4 1 0M12.5 11.4c.3-.4.7-.4 1 0M10.7 13c.7.5 1.9.5 2.6 0"/>
+  <path d="M5.5 12h-2M20.5 12h-2M12 3.5v2M12 18.5v2"/>
+</svg>

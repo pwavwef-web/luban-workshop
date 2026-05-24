@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title" fill="none" stroke="#7c2d1f" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+  <title id="title">Chopsticks</title>
+  <path d="M7.8 3.5 17 20.5"/>
+  <path d="M11.1 3.2 14.3 21"/>
+  <path fill="#fff1d7" d="M5.5 17c2.8-1.1 4.9-.6 6.5 1.6-1.8 1.3-4.6 1.6-7 .4"/>
+  <path d="M6.8 18.1c1.2-.4 2.3-.3 3.3.4"/>
+  <circle cx="18.2" cy="5.8" r="1.2" fill="#b91c1c"/>
+</svg>
