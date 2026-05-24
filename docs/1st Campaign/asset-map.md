@@ -65,6 +65,46 @@ Sticker PNGs are transparent, 1024 x 1024 px, with a white sticker-style outline
 | Group catering | `flyers/bao-flyer-04-group-catering.png` |
 | Reserve table | `flyers/bao-flyer-05-reserve-table.png` |
 
+## GIF Assets
+
+| Type | File |
+| --- | --- |
+| Sticker: wave | `gifs/stickers/bao-wave-loop.gif` |
+| Sticker: bounce | `gifs/stickers/bao-bounce-loop.gif` |
+| Sticker: point | `gifs/stickers/bao-point-loop.gif` |
+| Sticker: celebrate | `gifs/stickers/bao-celebrate-loop.gif` |
+| Social: meet Bao | `gifs/social-posts/bao-social-meet-bao.gif` |
+| Social: order today | `gifs/social-posts/bao-social-order-today.gif` |
+| Social: catering | `gifs/social-posts/bao-social-catering.gif` |
+| Story: scan menu | `gifs/stories/bao-story-scan-menu.gif` |
+| Story: lunch break | `gifs/stories/bao-story-lunch-break.gif` |
+| Story: reserve or cater | `gifs/stories/bao-story-reserve-or-cater.gif` |
+| Reaction: hello | `gifs/reactions/bao-reaction-hello.gif` |
+| Reaction: order now | `gifs/reactions/bao-reaction-order-now.gif` |
+| Reaction: thank you | `gifs/reactions/bao-reaction-thank-you.gif` |
+| Reaction: spicy pick | `gifs/reactions/bao-reaction-spicy-pick.gif` |
+
+## GIF Assets V2
+
+These are the preferred GIF files for publishing because they include animated hand, prop, and body motion.
+
+| Type | File |
+| --- | --- |
+| Sticker: waving hand | `gifs-v2/stickers/bao-wave-hand-v2.gif` |
+| Sticker: thumbs-up hand | `gifs-v2/stickers/bao-thumbs-up-hand-v2.gif` |
+| Sticker: pointing arm | `gifs-v2/stickers/bao-point-arm-v2.gif` |
+| Sticker: celebration body | `gifs-v2/stickers/bao-celebrate-body-v2.gif` |
+| Social: meet Bao | `gifs-v2/social-posts/bao-social-meet-bao-v2.gif` |
+| Social: order today | `gifs-v2/social-posts/bao-social-order-today-v2.gif` |
+| Social: catering | `gifs-v2/social-posts/bao-social-catering-v2.gif` |
+| Story: scan menu | `gifs-v2/stories/bao-story-scan-menu-v2.gif` |
+| Story: lunch break | `gifs-v2/stories/bao-story-lunch-break-v2.gif` |
+| Story: reserve or cater | `gifs-v2/stories/bao-story-reserve-or-cater-v2.gif` |
+| Reaction: hello | `gifs-v2/reactions/bao-reaction-hello-v2.gif` |
+| Reaction: order now | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
+| Reaction: thank you | `gifs-v2/reactions/bao-reaction-thank-you-v2.gif` |
+| Reaction: spicy pick | `gifs-v2/reactions/bao-reaction-spicy-pick-v2.gif` |
+
 ## SVG Icons
 
 Use these for app UI, story stickers, campaign badges, and small visual accents:

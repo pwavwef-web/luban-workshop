@@ -34,5 +34,9 @@ Folder contents:
 - [asset-map.md](asset-map.md): mascot PNG and SVG asset references
 - [launch-checklist.md](launch-checklist.md): steps before publishing
 - [bao-caption-emojis.md](bao-caption-emojis.md): paste-ready emoji combinations and custom sticker aliases
+- [gif-pack.md](gif-pack.md): animated Bao GIF catalog
+- [gif-pack-v2.md](gif-pack-v2.md): improved Bao GIFs with hand, prop, and body motion
 - [flyers/](flyers/): five ready-to-use campaign flyer PNGs
+- [gifs/](gifs/): sticker, social-post, story, and reaction GIFs
+- [gifs-v2/](gifs-v2/): improved sticker, social-post, story, and reaction GIFs
 - [sticker-sheets/](sticker-sheets/): sticker pack preview sheet
