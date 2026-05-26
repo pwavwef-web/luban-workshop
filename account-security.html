@@ -130,9 +130,9 @@
             document.getElementById('phone-verified').className = account.phoneVerified ? 'font-semibold text-green-700' : 'font-semibold text-amber-700';
             document.getElementById('phone-method').textContent = account.phoneVerificationMethod || 'Not verified yet';
             document.getElementById('phone-verified-at').textContent = account.phoneVerifiedAt ? new Date(account.phoneVerifiedAt).toLocaleString() : 'Not recorded yet';
-            document.getElementById('security-summary').textContent = account.verificationStatus === 'verified'
-                ? 'Both checks are complete. Your account can use secure checkout, order updates, and phone-protected reservation access.'
-                : 'Complete both email and phone verification before placing an online order.';
+            document.getElementById('security-summary').textContent = account.phoneVerified
+                ? 'Phone verification is complete. Your account can use secure checkout, order updates, and phone-protected reservation access. Email verification is optional.'
+                : 'Verify your phone number before placing an online order. Email verification is optional.';
         });
     </script>
 </body>

@@ -348,8 +348,6 @@
                 message = 'Add a valid Ghana phone number before placing an order.';
             } else if (currentAccountStatus && !currentAccountStatus.phoneVerified) {
                 message = 'Your phone number is saved, but it still needs SMS verification before ordering.';
-            } else if (currentAccountStatus && !currentAccountStatus.emailVerified) {
-                message = 'Verify your email address before placing an order.';
             }
             copy.textContent = message || 'Your account details are ready.';
             alert.classList.toggle('hidden', !message);

@@ -35,7 +35,7 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Secure Ordering</p>
             <h1 class="serif text-4xl font-bold mt-3">Verify Contact Details</h1>
-            <p class="mt-4 text-stone-200 max-w-2xl">Orders now require a verified email address and a verified Ghana phone number. This helps prevent fake orders and stops someone else using your details.</p>
+            <p class="mt-4 text-stone-200 max-w-2xl">Orders require a verified Ghana phone number. Email verification is optional, so checkout still works if the verification email is delayed or filtered.</p>
         </div>
     </header>
 
@@ -76,14 +76,14 @@
 
                 <section class="space-y-6">
                     <div class="panel bg-white p-6 sm:p-8">
-                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 1</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Optional</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Email</h2>
-                        <p class="mt-3 text-stone-600">Use the button below to send a fresh verification email, then come back here and refresh your status.</p>
+                        <p class="mt-3 text-stone-600">Use the button below if you want to verify your email address. It is not required for checkout.</p>
                         <div id="email-action-area" class="mt-6 flex flex-col sm:flex-row gap-3"></div>
                     </div>
 
                     <div class="panel bg-white p-6 sm:p-8">
-                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Required for orders</p>
                         <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Phone</h2>
                         <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
                         <div id="phone-otp-area" class="mt-5 space-y-4">
@@ -242,15 +242,15 @@
             phoneMaskEl.textContent = account.phoneMasked || 'No phone saved';
             renderEmailActions(Boolean(account.emailVerified));
             renderPhoneActions(Boolean(account.phoneVerified));
-            document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
-            document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
+            document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Optional, not required for orders';
+            document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-stone-500';
             document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
             document.getElementById('phone-status').className = account.phoneVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
             setPhoneVerifiedState(Boolean(account.phoneVerified));
-            document.getElementById('overall-status').textContent = account.verificationStatus === 'verified'
+            document.getElementById('overall-status').textContent = account.phoneVerified
                 ? 'Your account is ready for secure online orders.'
-                : 'Finish both checks above before placing an order.';
-            document.getElementById('overall-status').className = account.verificationStatus === 'verified'
+                : 'Verify your phone number above before placing an order. Email verification is optional.';
+            document.getElementById('overall-status').className = account.phoneVerified
                 ? 'rounded-lg bg-green-50 p-4 text-green-800'
                 : 'rounded-lg bg-amber-50 p-4 text-amber-900';
         }

@@ -425,13 +425,11 @@ async function syncUserVerificationMetadata(uid) {
 
   const emailVerified = authUser.emailVerified === true;
   const phoneVerified = Boolean(finalPhoneVerifiedAt);
-  const verificationStatus = emailVerified && phoneVerified
+  const verificationStatus = phoneVerified
     ? 'verified'
     : emailVerified
       ? 'phone_pending'
-      : phoneVerified
-        ? 'email_pending'
-        : 'pending';
+      : 'pending';
 
   if (verificationStatus !== data.verificationStatus) {
     updates.verificationStatus = verificationStatus;
@@ -615,7 +613,7 @@ async function handleVerifyPhoneOtp(req, res) {
     phoneE164,
     phoneVerifiedAt: serverTimestamp(),
     phoneVerificationMethod: 'arkesel_sms',
-    verificationStatus: syncResult.emailVerified ? 'verified' : 'email_pending'
+    verificationStatus: 'verified'
   }, { merge: true });
   const usersWithSamePhone = await db().collection('users').where('phoneE164', '==', phoneE164).get();
   if (usersWithSamePhone.size > 1) {
@@ -638,7 +636,6 @@ async function handleCreateOrder(req, res) {
   const decoded = await requireUser(req);
   const syncResult = await syncUserVerificationMetadata(decoded.uid);
   const profile = syncResult.profile || {};
-  if (!syncResult.emailVerified) throw createHttpError(412, 'Please verify your email before placing an order.');
   if (!profile.phoneVerifiedAt) throw createHttpError(412, 'Please verify your phone number before placing an order.');
   const phoneE164 = normalizePhoneNumber(profile.phoneE164 || profile.phone || '');
   if (!phoneE164) throw createHttpError(400, 'Please add a valid phone number to your profile first.');
@@ -1186,8 +1183,8 @@ async function handleBootstrapChatbotKnowledge(req, res) {
   const defaults = [
     {
       id: 'secure-ordering-verification',
-      title: 'Why do I need verified email and phone before ordering?',
-      answer: 'Luban Workshop requires both a verified email address and a verified phone number before an online order can be placed. This helps stop fake orders, prevents someone else using your details, and lets the restaurant send accurate order updates.',
+      title: 'Why do I need phone verification before ordering?',
+      answer: 'Luban Workshop requires a verified Ghana phone number before an online order can be placed. This helps stop fake orders, prevents someone else using your details, and lets the restaurant send accurate order updates. Email verification is optional.',
     },
     {
       id: 'phone-otp-help',

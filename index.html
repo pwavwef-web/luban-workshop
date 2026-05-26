@@ -1352,7 +1352,7 @@
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
                 document.getElementById('signup-form-modal').reset();
-                alert('Account created. Please verify your email, then open Verify Contact to confirm your phone number before ordering.');
+                alert('Account created. Please open Verify Contact to confirm your phone number before ordering. Email verification is optional.');
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
