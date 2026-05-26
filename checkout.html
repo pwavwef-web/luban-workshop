@@ -92,6 +92,10 @@
                             </div>
                         </div>
                         <div id="checkout-warning" class="mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900">Checking your account status...</div>
+                        <div id="closed-banner" class="hidden mt-5 rounded-md bg-stone-900 p-4 text-sm text-white">
+                            <p class="font-bold">We're currently closed</p>
+                            <p class="mt-1 opacity-80">Online orders are accepted Monday–Friday, 11:00 AM – 5:30 PM. Please come back during opening hours.</p>
+                        </div>
                         <div class="mt-6 flex flex-col gap-3">
                             <button id="place-order-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50">Place Order</button>
                             <a id="verify-contact-link" href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify contact details</a>
@@ -127,6 +131,38 @@
             { id: 'DR3', name: 'Sprite 300ml', price: 15, description: 'Light lemon-lime fizz.' },
             { id: 'DR4', name: 'Water 300ml', price: 5, description: 'Simple still mineral water.' }
         ];
+
+        function isWithinBusinessHours() {
+            // Ghana uses Africa/Accra (UTC+0, no DST).
+            // Business hours: Monday–Friday, 11:00 AM – 5:30 PM.
+            const now = new Date();
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Africa/Accra',
+                weekday: 'short',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false
+            }).formatToParts(now);
+            const get = (type) => parts.find(p => p.type === type)?.value;
+            const weekday = get('weekday'); // 'Mon', 'Tue', …, 'Sun'
+            const hour = parseInt(get('hour'), 10);
+            const minute = parseInt(get('minute'), 10);
+            const isWeekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(weekday);
+            const totalMins = hour * 60 + minute;
+            return isWeekday && totalMins >= 11 * 60 && totalMins < 17 * 60 + 30;
+        }
+
+        function applyBusinessHoursGate() {
+            const open = isWithinBusinessHours();
+            const banner = document.getElementById('closed-banner');
+            banner.classList.toggle('hidden', open);
+            const placeBtn = document.getElementById('place-order-btn');
+            if (!open) {
+                placeBtn.disabled = true;
+            }
+            // Re-enable is handled by renderVerificationStatus when open
+            return open;
+        }
 
         function setFeedback(message, isError) {
             const el = document.getElementById('checkout-feedback');
@@ -203,6 +239,7 @@
 
         function renderVerificationStatus(account) {
             const ready = account.phoneVerified;
+            const open = isWithinBusinessHours();
             document.getElementById('email-status-row').classList.remove('hidden');
             document.getElementById('phone-status-row').classList.remove('hidden');
             document.getElementById('verify-contact-link').classList.toggle('hidden', ready);
@@ -211,13 +248,14 @@
             document.getElementById('phone-ready').textContent = account.phoneVerified ? 'Verified' : 'Pending';
             document.getElementById('phone-ready').className = account.phoneVerified ? 'font-semibold text-green-700' : 'font-semibold text-amber-700';
             const placeBtn = document.getElementById('place-order-btn');
-            placeBtn.disabled = !ready || lubanClient.readCart().length === 0;
+            placeBtn.disabled = !ready || lubanClient.readCart().length === 0 || !open;
             document.getElementById('checkout-warning').textContent = ready
                 ? 'Phone verification is complete. Your order will be priced again on the server before it is saved.'
                 : 'Verify your phone number before placing an order. Email verification is optional.';
             document.getElementById('checkout-warning').className = ready
                 ? 'mt-5 rounded-md bg-green-50 p-4 text-sm text-green-800'
                 : 'mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900';
+            document.getElementById('closed-banner').classList.toggle('hidden', open);
         }
 
         async function loadAccountStatus() {
@@ -264,6 +302,12 @@
         });
 
         renderCart();
+        applyBusinessHoursGate();
+        // Re-check every minute so the button state stays current
+        setInterval(() => {
+            if (currentAccount) renderVerificationStatus(currentAccount);
+            else applyBusinessHoursGate();
+        }, 60 * 1000);
     </script>
 </body>
 </html>

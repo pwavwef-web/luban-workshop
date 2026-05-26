@@ -35,6 +35,24 @@ const RESERVATION_ACCESS_TTL_MS = 1000 * 60 * 15;
 const ORDER_CANCEL_WINDOW_MS = 1000 * 60 * 5;
 const DUPLICATE_ORDER_WINDOW_MS = 1000 * 60 * 3;
 
+// Business hours: Monday–Friday, 11:00 AM – 5:30 PM (Africa/Accra, UTC+0)
+function isWithinBusinessHours(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Africa/Accra',
+    weekday: 'short',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  }).formatToParts(now);
+  const get = (type) => parts.find((p) => p.type === type)?.value;
+  const weekday = get('weekday');
+  const hour = parseInt(get('hour'), 10);
+  const minute = parseInt(get('minute'), 10);
+  const isWeekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(weekday);
+  const totalMins = hour * 60 + minute;
+  return isWeekday && totalMins >= 11 * 60 && totalMins < 17 * 60 + 30;
+}
+
 function getAdmin() {
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
@@ -698,7 +716,8 @@ async function handleCreateOrder(req, res) {
     customerPhone: phoneE164,
     customerNotes: cleanPlainText(profile.notes || ''),
     basketFingerprint,
-    source: 'secure_api'
+    source: 'secure_api',
+    receivedOutsideHours: !isWithinBusinessHours(),
   };
   await orderRef.set(orderPayload);
   await recordSecurityEvent('order_created', {

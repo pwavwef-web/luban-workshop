@@ -213,7 +213,19 @@ async function sendCustomerOrderPlacedSms(orderId, order) {
         .join(', ')
     : 'Your order';
 
-  const message = `Hi ${customerName},
+  let message;
+  if (order.receivedOutsideHours) {
+    message = `Hi ${customerName},
+
+We received your Luban Workshop order (${itemsList} - Total: GHS ${total}), but our kitchen is currently closed.
+
+We are open Mon-Fri 11:00 AM - 5:30 PM. Your order has been saved and our team will review it when we reopen.
+
+Questions? Call us: 020 543 8455
+
+- Luban Restaurant`;
+  } else {
+    message = `Hi ${customerName},
 
 Thank you for ordering from Luban Workshop!
 
@@ -228,6 +240,7 @@ Questions? Call us: 020 543 8455
 Hours: Mon-Fri 11:00-17:30
 
 - Luban Restaurant`;
+  }
 
   await sendArkeselSms({
     to,
@@ -254,6 +267,10 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
         .join(', ')
     : 'Your order';
 
+  const outsideHoursNote = order.receivedOutsideHours
+    ? '\n\n⚠️ This order was placed outside business hours. Review and confirm when you reopen.'
+    : '';
+
   const message = `New order received at Luban Workshop.
 
 Customer: ${customerName}
@@ -264,7 +281,7 @@ ${itemsList}
 
 Total: GHS ${total}
 
-Please prepare this order.`;
+Please prepare this order.${outsideHoursNote}`;
 
   await sendArkeselSms({
     to,
@@ -375,6 +392,7 @@ function formatCustomerOrderRows(items = []) {
 
 function buildCustomerOrderEmail({ orderId, order, type }) {
   const isCompleted = type === 'completed';
+  const isOutsideHours = !isCompleted && order.receivedOutsideHours === true;
   const customerName = order.customerName || 'there';
   const escapedName = escapeHtml(customerName);
   const total = formatMoney(order.total);
@@ -382,13 +400,17 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     ? `Your Luban Workshop order is complete (#${orderId})`
     : `We received your Luban Workshop order (#${orderId})`;
   const headline = isCompleted ? 'Your order is ready' : 'Order received';
-  const eyebrow = isCompleted ? 'Completed order' : 'Order confirmation';
-  const badge = isCompleted ? 'READY' : 'CONFIRMED';
+  const eyebrow = isCompleted ? 'Completed order' : isOutsideHours ? 'Outside business hours' : 'Order confirmation';
+  const badge = isCompleted ? 'READY' : isOutsideHours ? 'RECEIVED' : 'CONFIRMED';
   const intro = isCompleted
     ? 'Your meal has been marked complete. Thank you for choosing Luban Workshop Restaurant.'
+    : isOutsideHours
+    ? 'We have received your order, but our kitchen is currently closed. We are open Monday–Friday, 11:00 AM – 5:30 PM. Our team will review your order when we reopen.'
     : 'Thank you for ordering from Luban Workshop Restaurant. Our team has received your order and will prepare it with care.';
   const nextStep = isCompleted
     ? 'Please collect your order at the counter. Payment is completed at pickup unless our team has arranged otherwise with you directly.'
+    : isOutsideHours
+    ? 'Your order has been saved. We will be in touch when we open. For questions, call 020 543 8455.'
     : 'We will let you know when your order moves forward. For quick help, call 020 543 8455.';
 
   const text = [
@@ -469,6 +491,12 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
                       <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
                       <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">${nextStep}</p>
                     </div>
+
+                    ${isOutsideHours ? `
+                    <div style="margin-top:14px;background:#fefce8;border-left:4px solid #ca8a04;border-radius:14px;padding:18px;">
+                      <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">Kitchen is currently closed</p>
+                      <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">Your order was received outside our opening hours (Mon–Fri 11:00 AM – 5:30 PM). We have saved it and will review it when we reopen.</p>
+                    </div>` : ''}
 
                     <p style="margin:24px 0 0;color:#78716c;font-size:13px;line-height:1.7;text-align:center;">
                       Luban Workshop Restaurant<br>
