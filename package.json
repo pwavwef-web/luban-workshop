@@ -2,6 +2,26 @@
   "name": "luban-workshop",
   "version": "1.0.0",
   "private": true,
+  "author": {
+    "name": "Francis Pwavwe",
+    "company": "AZ Learner",
+    "companyUrl": "https://azlearner.me",
+    "url": "https://francis.azlearner.me",
+    "email": "francis@azlearner.me"
+  },
+  "contributors": [
+    {
+      "name": "Francis Pwavwe",
+      "company": "AZ Learner",
+      "companyUrl": "https://azlearner.me",
+      "url": "https://francis.azlearner.me",
+      "email": "francis@azlearner.me"
+    },
+    {
+      "name": "Chinedum Okwonkwo Udeaja",
+      "email": "udeajachinedum19@gmail.com"
+    }
+  ],
   "scripts": {
     "build": "npm run build:css && npm run build:js",
     "build:css": "tailwindcss -i src/tailwind.css -o tailwind.css --minify",

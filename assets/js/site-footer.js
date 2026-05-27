@@ -1,9 +1,69 @@
 (function () {
   const script = document.currentScript;
   const rootUrl = script ? new URL('../../', script.src) : new URL('/', window.location.href);
+  const siteConfig = window.LUBAN_SITE_CONFIG || {};
+  const siteCredits = siteConfig.siteCredits || {};
+  const leadDeveloper = siteCredits.leadDeveloper || {
+    name: 'Francis Pwavwe',
+    company: 'AZ Learner',
+    companyUrl: 'https://azlearner.me',
+    url: 'https://francis.azlearner.me',
+    email: 'francis@azlearner.me'
+  };
+  const coDeveloper = siteCredits.coDeveloper || {
+    name: 'Chinedum Okwonkwo Udeaja',
+    email: 'udeajachinedum19@gmail.com'
+  };
 
   function siteUrl(path) {
     return new URL(path, rootUrl).href;
+  }
+
+  function fullNameList() {
+    return [leadDeveloper.name, coDeveloper.name].filter(Boolean).join(', ');
+  }
+
+  function leadDeveloperDisplayName() {
+    return leadDeveloper.company ? `${leadDeveloper.name} (${leadDeveloper.company})` : leadDeveloper.name;
+  }
+
+  function injectAuthorMetadata() {
+    const head = document.head;
+    if (!head || head.querySelector('meta[name="author"][data-luban-author]')) {
+      return;
+    }
+
+    const authorMeta = document.createElement('meta');
+    authorMeta.name = 'author';
+    authorMeta.content = fullNameList();
+    authorMeta.setAttribute('data-luban-author', 'true');
+    head.appendChild(authorMeta);
+
+    const jsonLd = document.createElement('script');
+    jsonLd.type = 'application/ld+json';
+    jsonLd.setAttribute('data-luban-author', 'true');
+    jsonLd.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Person',
+          name: leadDeveloper.name,
+          url: leadDeveloper.url,
+          email: leadDeveloper.email,
+          worksFor: leadDeveloper.company ? {
+            '@type': 'Organization',
+            name: leadDeveloper.company,
+            url: leadDeveloper.companyUrl || 'https://azlearner.me'
+          } : undefined
+        },
+        {
+          '@type': 'Person',
+          name: coDeveloper.name,
+          email: coDeveloper.email
+        }
+      ]
+    });
+    head.appendChild(jsonLd);
   }
 
   function isChinesePage(mount) {
@@ -65,6 +125,10 @@
           ['faq.html', labels.faq],
         ];
 
+      const creditLine = chinese
+        ? `由 ${leadDeveloperDisplayName()} 与 ${coDeveloper.name} 共同开发。`
+        : `Developed by ${leadDeveloperDisplayName()} and ${coDeveloper.name}.`;
+
     const navLinks = links
       .map(([href, label]) => `<a href="${siteUrl(href)}" class="hover:text-white transition-colors">${label}</a>`)
       .join('');
@@ -86,12 +150,15 @@
             <a href="https://www.facebook.com/profile.php/?id=61583678376642" aria-label="${labels.facebook}" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors">${socialIcon('facebook')}</a>
             <a href="https://www.instagram.com/lubanworkshoprestaurant/" aria-label="${labels.instagram}" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors">${socialIcon('instagram')}</a>
           </div>
+          <p class="mt-6 text-xs text-stone-500">${creditLine}</p>
         </div>
       </footer>
     `;
   }
 
   function renderFooters() {
+    injectAuthorMetadata();
+
     document.querySelectorAll('[data-luban-footer]').forEach((mount) => {
       mount.outerHTML = footerHtml(isChinesePage(mount));
     });

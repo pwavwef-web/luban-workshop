@@ -18,6 +18,16 @@ node --check functions/index.js
 node --check functions/secure-api.js
 ```
 
+## Project Ownership
+
+- Lead developer: Francis Pwavwe
+	- Company: AZ Learner
+	- Website: azlearner.me
+	- Website: francis.azlearner.me
+	- Email: francis@azlearner.me
+- Co-developer: Chinedum Okwonkwo Udeaja
+	- Email: udeajachinedum19@gmail.com
+
 ## Admin Access
 
 Admin access is production hardened. A user is considered an admin only when one of these is true:
