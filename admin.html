@@ -22,7 +22,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
-    <script src="assets/js/lucide.bundle.js"></script>
+    <script src="assets/js/admin-bao-icons.js?v=20260527-bao-admin"></script>
     <script src="assets/js/firebase-modular.bundle.js?v=20260523-reservationfix2"></script>
     <script src="assets/js/admin-qr.bundle.js?v=20260523-reservationfix2"></script>
 
@@ -91,6 +91,18 @@
             background: #fff1f1;
             border: 1px solid #fecaca;
             color: var(--admin-red);
+        }
+
+        .bao-icon {
+            display: inline-block;
+            flex-shrink: 0;
+            object-fit: contain;
+            vertical-align: middle;
+        }
+
+        .admin-brand-mark .bao-icon,
+        .admin-user-avatar .bao-icon {
+            filter: drop-shadow(0 2px 4px rgba(127, 29, 29, 0.16));
         }
 
         .admin-brand-mark {

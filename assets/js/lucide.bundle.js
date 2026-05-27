@@ -842,7 +842,8 @@
     "x": X
   };
   var normalizedIcons = Object.keys(icons).reduce((acc, key) => {
-    acc[toPascalCase(key)] = icons[key];
+    const pascalKey = key.split(/[^a-zA-Z0-9]+/).filter(Boolean).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+    acc[pascalKey] = icons[key];
     return acc;
   }, {});
   window.lucide = {
