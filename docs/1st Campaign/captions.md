@@ -18,7 +18,7 @@ Bao's pick today: a bowl made for comfort, flavor, and a proper lunch break.
 
 If noodles are your kind of happiness, this is your sign to check the menu.
 
-CTA: Order your noodle favorite from Luban Workshop Restaurant.
+CTA: Open the menu and order your noodle favorite. Verified Ghana phone required; email verification optional.
 
 Hashtags: #LubanWorkshopRestaurant #Noodles #CapeCoastEats #ChineseCuisine
 
@@ -28,7 +28,7 @@ Soft, warm, and made for sharing.
 
 Bao thinks dumplings deserve a place on every table. Bring a friend, choose your favorites, and make the meal a little more fun.
 
-CTA: Add dumplings to your next order.
+CTA: Add dumplings to your next pickup order. Verified Ghana phone required; email verification optional.
 
 Hashtags: #Dumplings #MeetBao #LubanWorkshopRestaurant #UCCCampus
 
@@ -36,7 +36,7 @@ Hashtags: #Dumplings #MeetBao #LubanWorkshopRestaurant #UCCCampus
 
 Busy day on campus?
 
-Bao has the pickup reminder covered: choose your meal, place your order, and keep your day moving.
+Bao has the pickup reminder covered: choose your meal, verify your Ghana phone once, and keep your day moving. Email verification is optional.
 
 CTA: View the menu and order for pickup.
 
@@ -101,4 +101,3 @@ Keep an eye out for him whenever there is a menu pick, order reminder, event upd
 CTA: Follow us and view the menu today.
 
 Hashtags: #MeetBao #LubanWorkshopRestaurant #CapeCoastEats #UCCCampus
-

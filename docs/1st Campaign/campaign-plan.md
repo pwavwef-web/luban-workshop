@@ -6,7 +6,7 @@ Launch the Luban Workshop Restaurant mascot as a recognizable social media chara
 
 ## Campaign Idea
 
-Bao appears as a warm, helpful dumpling chef who guides customers through Luban's food experience: what to try, where to order, how to reserve, and why the restaurant is built around both Chinese cooking and hands-on hospitality training.
+Bao appears as a warm, helpful dumpling chef who guides customers through Luban's food experience: what to try, how verified-phone pickup ordering works, how to reserve, and why the restaurant is built around both Chinese cooking and hands-on hospitality training.
 
 ## Key Message Pillars
 
@@ -17,7 +17,7 @@ Bao appears as a warm, helpful dumpling chef who guides customers through Luban'
    Bao highlights noodles, dumplings, fried rice, steamer baskets, and signature dishes.
 
 3. **Campus Convenience**
-   Bao makes pickup, lunch breaks, group meals, and quick menu browsing feel easy.
+   Bao makes pickup, lunch breaks, group meals, and quick menu browsing feel easy while keeping the rule clear: online orders require a verified Ghana phone number, and email verification is optional.
 
 4. **Workshop Craft**
    Bao connects the food to careful preparation, service practice, and hospitality learning.
@@ -42,7 +42,7 @@ Duration: 14 days
 
 Main phases:
 - Days 1-3: mascot introduction
-- Days 4-8: menu discovery and ordering prompts
+- Days 4-8: menu discovery and verified-phone ordering prompts
 - Days 9-11: reservations, group meals, and catering
 - Days 12-14: reminder push and engagement
 
@@ -62,7 +62,7 @@ Main phases:
 
 Track:
 - Menu page clicks
-- WhatsApp/order enquiries
+- Verified-phone order starts and WhatsApp/order enquiries
 - Reservation enquiries
 - Catering enquiries
 - Saves and shares
@@ -74,10 +74,9 @@ Track:
 
 - Mascot intro: `luban-mascot-pose-01-wave.png`
 - Menu reminder: `luban-mascot-pose-10-menu-card.png`
-- Pickup/order prompt: `luban-mascot-pose-05-takeout.png`
+- Verified pickup/order prompt: `luban-mascot-pose-05-takeout.png`
 - Food highlight: `luban-mascot-pose-03-noodles.png`
 - Customer appreciation: `luban-mascot-pose-09-thank-you.png`
 - Reservation prompt: `reservation-calendar.svg`
 - Catering prompt: `catering-tray.svg`
 - QR/menu prompt: `qr-plate.svg`
-

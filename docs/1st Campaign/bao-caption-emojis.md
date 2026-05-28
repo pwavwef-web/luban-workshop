@@ -14,7 +14,7 @@ Note: custom image emojis cannot be typed as real Unicode unless a platform supp
 | Noodle post | 🍜🥢 |
 | Fried rice / full meal | 🍚🥟🥢 |
 | Pickup reminder | 🥡🏃 |
-| Order online | 📲🥟 |
+| Phone-verified pickup | 📲🥟 |
 | Reservation | 📅🥟 |
 | Catering | 🍱🎉 |
 | Spicy menu | 🌶️🔥 |
@@ -58,9 +58,8 @@ Use these if uploading Bao stickers into a platform that supports custom emoji o
 
 Bao says: 🥟👋 lunch is warmer when noodles are involved. 🍜🥢
 
-Bao-approved pickup reminder: 📲🥟 order ahead and keep your day moving.
+Bao-approved pickup reminder: 📲🥟 order ahead with a verified Ghana phone and keep your day moving. Email verification is optional.
 
 Planning a group meal? Bao is ready. 🍱🎉
 
 Spicy cravings today? 🌶️🔥 Bao has a menu pick for you.
-

@@ -37,7 +37,7 @@
             <div class="max-w-2xl">
                 <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Secure Order Flow</p>
                 <h1 class="serif text-4xl font-bold mt-3 sm:text-5xl">Checkout</h1>
-                <p class="mt-4 max-w-2xl text-stone-200">Review your cart, explore a few drink pairings, and place the order once your phone number is verified. Email verification is optional.</p>
+                <p class="mt-4 max-w-2xl text-stone-200">Review your cart, explore a few drink pairings, and place the order once your Ghana phone number is verified by SMS. Email verification is optional.</p>
             </div>
         </div>
     </header>
@@ -45,7 +45,7 @@
     <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-16">
         <section id="auth-gate" class="panel bg-white p-6 sm:p-8">
             <h2 class="serif text-3xl font-bold text-stone-900">Sign in to continue</h2>
-            <p class="mt-3 text-stone-600">You need a Luban Workshop account before you can place an online order.</p>
+            <p class="mt-3 text-stone-600">You need a Luban Workshop account and a verified Ghana phone number before you can place an online order.</p>
         </section>
 
         <section id="checkout-content" class="hidden space-y-6">
@@ -83,7 +83,7 @@
                                 <span id="email-ready" class="font-semibold text-amber-700">Pending</span>
                             </div>
                             <div id="phone-status-row" class="flex items-center justify-between border-b border-stone-100 pb-3">
-                                <span class="text-stone-500">Phone</span>
+                                <span class="text-stone-500">Ghana phone <span class="text-stone-400">(required)</span></span>
                                 <span id="phone-ready" class="font-semibold text-amber-700">Pending</span>
                             </div>
                             <div class="flex items-center justify-between pt-2 text-base font-bold text-stone-900">
@@ -94,7 +94,7 @@
                         <div id="checkout-warning" class="mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900">Checking your account status...</div>
                         <div class="mt-6 flex flex-col gap-3">
                             <button id="place-order-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50">Place Order</button>
-                            <a id="verify-contact-link" href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify contact details</a>
+                            <a id="verify-contact-link" href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify Ghana phone</a>
                         </div>
                     </section>
                     <div id="checkout-feedback" class="hidden rounded-md p-4 text-sm"></div>
@@ -213,8 +213,8 @@
             const placeBtn = document.getElementById('place-order-btn');
             placeBtn.disabled = !ready || lubanClient.readCart().length === 0;
             document.getElementById('checkout-warning').textContent = ready
-                ? 'Phone verification is complete. Your order will be priced again on the server before it is saved.'
-                : 'Verify your phone number before placing an order. Email verification is optional.';
+                ? 'Ghana phone verification is complete. Your order will be priced again on the server before it is saved.'
+                : 'Verify your Ghana phone number before placing an order. Email verification is optional.';
             document.getElementById('checkout-warning').className = ready
                 ? 'mt-5 rounded-md bg-green-50 p-4 text-sm text-green-800'
                 : 'mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900';

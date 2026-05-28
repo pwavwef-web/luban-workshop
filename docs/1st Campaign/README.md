@@ -2,7 +2,7 @@
 
 Campaign name: **Meet Bao, Your Luban Guide**
 
-Purpose: introduce the new Luban Workshop Restaurant mascot, make the brand more recognizable on social media, and drive people toward the menu, pickup orders, reservations, and catering enquiries.
+Purpose: introduce the new Luban Workshop Restaurant mascot, make the brand more recognizable on social media, and drive people toward the menu, verified-phone pickup orders, reservations, and catering enquiries.
 
 Primary audience:
 - UCC students and staff looking for lunch, dinner, and group meals
@@ -14,7 +14,7 @@ Core message:
 Bao is the friendly guide to warm Chinese meals, practical hospitality, and the craft of the Luban Workshop kitchen.
 
 Primary CTA:
-View the menu and order from Luban Workshop Restaurant.
+View the menu and start a pickup order. Online orders require a verified Ghana phone number; email verification is optional.
 
 Secondary CTA:
 Reserve a table or ask about catering.

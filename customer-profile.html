@@ -103,7 +103,7 @@
             <div class="max-w-2xl text-white">
                 <p class="text-red-100 text-xs font-bold uppercase tracking-widest">Customer Account</p>
                 <h1 class="serif text-4xl sm:text-5xl font-bold mt-3">Customer Profile</h1>
-                <p id="profile-hero-subtitle" class="mt-4 text-stone-100 text-lg">Keep your order contact details current.</p>
+                <p id="profile-hero-subtitle" class="mt-4 text-stone-100 text-lg">Keep your Ghana phone ready for online orders.</p>
             </div>
         </div>
     </header>
@@ -114,7 +114,7 @@
                 <div>
                     <p class="text-xs font-bold uppercase tracking-widest text-red-700">Sign in required</p>
                     <h2 class="serif text-3xl font-bold text-stone-900 mt-2">Access your profile</h2>
-                    <p class="text-stone-600 mt-3">Your profile stores the phone number used for order updates and pickup coordination.</p>
+                    <p class="text-stone-600 mt-3">Your profile stores the Ghana phone number used for order updates and pickup coordination. Verify it by SMS before checkout; email verification is optional.</p>
                 </div>
                 <div class="bg-stone-50 border border-stone-200 rounded-lg p-5">
                     <form id="profile-login-form" class="space-y-4">
@@ -150,7 +150,7 @@
                 <div class="flex items-start gap-3">
                     <i data-lucide="alert-circle" class="h-5 w-5 mt-0.5 flex-shrink-0"></i>
                     <div class="text-sm">
-                        <p id="profile-required-copy" class="font-semibold">Add a valid Ghana phone number before placing an order.</p>
+                        <p id="profile-required-copy" class="font-semibold">Add and verify a valid Ghana phone number before placing an order.</p>
                         <a href="verify-contact.html" class="mt-2 inline-flex font-semibold text-red-800 underline">Open verification page</a>
                     </div>
                 </div>
@@ -188,7 +188,7 @@
                         </a>
                         <a href="verify-contact.html" class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md font-semibold hover:bg-stone-50">
                             <i data-lucide="shield-check" class="h-4 w-4"></i>
-                            Verify Contact
+                            Verify Ghana Phone
                         </a>
                         <a href="account-security.html" class="inline-flex items-center justify-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-md font-semibold hover:bg-stone-50">
                             <i data-lucide="shield" class="h-4 w-4"></i>
@@ -336,7 +336,7 @@
             document.getElementById('summary-email').textContent = email;
             document.getElementById('summary-phone').textContent = phone || 'Not added';
             document.getElementById('summary-contact').textContent = contact === 'sms' ? 'SMS' : contact.charAt(0).toUpperCase() + contact.slice(1);
-            document.getElementById('profile-hero-subtitle').textContent = phone ? 'Your order contact details are ready.' : 'Add your phone number to place orders smoothly.';
+            document.getElementById('profile-hero-subtitle').textContent = phone ? 'Your Ghana phone is saved for order updates.' : 'Add your Ghana phone number to place orders smoothly.';
             updateVerificationAlert(Boolean(phone));
         }
 
@@ -345,9 +345,9 @@
             const copy = document.getElementById('profile-required-copy');
             let message = '';
             if (!hasPhone) {
-                message = 'Add a valid Ghana phone number before placing an order.';
+                message = 'Add a valid Ghana phone number, then verify it by SMS before placing an order. Email verification is optional.';
             } else if (currentAccountStatus && !currentAccountStatus.phoneVerified) {
-                message = 'Your phone number is saved, but it still needs SMS verification before ordering.';
+                message = 'Your Ghana phone number is saved, but it still needs SMS verification before ordering. Email verification is optional.';
             }
             copy.textContent = message || 'Your account details are ready.';
             alert.classList.toggle('hidden', !message);

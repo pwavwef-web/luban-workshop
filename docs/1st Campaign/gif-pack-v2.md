@@ -25,7 +25,7 @@ Size: 720 x 720 px
 | Use | Motion | File |
 | --- | --- | --- |
 | Mascot introduction | Bao waves inside the post layout | `gifs-v2/social-posts/bao-social-meet-bao-v2.gif` |
-| Order prompt | Phone hand moves with tap cues | `gifs-v2/social-posts/bao-social-order-today-v2.gif` |
+| Verified-phone order prompt | Phone hand moves with tap cues | `gifs-v2/social-posts/bao-social-order-today-v2.gif` |
 | Catering prompt | Catering tray and body tilt move | `gifs-v2/social-posts/bao-social-catering-v2.gif` |
 
 ## Story GIFs
@@ -45,7 +45,6 @@ Size: 512 x 512 px
 | Use | Motion | File |
 | --- | --- | --- |
 | Hello | Waving hand moves | `gifs-v2/reactions/bao-reaction-hello-v2.gif` |
-| Order now | Phone hand moves | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
+| Phone-verified order | Phone hand moves | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
 | Thank you | Heart/hand region pulses | `gifs-v2/reactions/bao-reaction-thank-you-v2.gif` |
 | Spicy pick | Chili sauce hand shakes | `gifs-v2/reactions/bao-reaction-spicy-pick-v2.gif` |
-

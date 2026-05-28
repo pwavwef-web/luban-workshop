@@ -3,12 +3,19 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://lubanrestaurant.com/</loc>
-    <lastmod>2026-05-24</lastmod>
+    <lastmod>2026-05-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://lubanrestaurant.com/"/>
     <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://lubanrestaurant.com/chinese/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://lubanrestaurant.com/"/>
+  </url>
+
+  <url>
+    <loc>https://lubanrestaurant.com/meet-bao.html</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <url>

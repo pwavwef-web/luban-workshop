@@ -636,7 +636,7 @@ async function handleCreateOrder(req, res) {
   const decoded = await requireUser(req);
   const syncResult = await syncUserVerificationMetadata(decoded.uid);
   const profile = syncResult.profile || {};
-  if (!profile.phoneVerifiedAt) throw createHttpError(412, 'Please verify your phone number before placing an order.');
+  if (!profile.phoneVerifiedAt) throw createHttpError(412, 'Please verify your Ghana phone number before placing an order. Email verification is optional.');
   const phoneE164 = normalizePhoneNumber(profile.phoneE164 || profile.phone || '');
   if (!phoneE164) throw createHttpError(400, 'Please add a valid phone number to your profile first.');
   const items = Array.isArray(req.body.items) ? req.body.items : [];

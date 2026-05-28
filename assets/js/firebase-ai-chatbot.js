@@ -41,6 +41,7 @@ const CHATBOT_CONFIG = {
   ...DEFAULT_CHATBOT_CONFIG,
   ...(window.LUBAN_CHATBOT_CONFIG || {})
 };
+const SUPPORT_CHAT_ICON_URL = new URL('../icons/mascot/support-chat.svg', import.meta.url).href;
 
 const CONTACT = {
   restaurant: 'Luban Workshop Restaurant',
@@ -384,13 +385,13 @@ function injectStyles() {
     .luban-chatbot__button { width: 62px; height: 62px; border: 0; border-radius: 50%; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 14px 32px rgba(28,25,23,.28); cursor: pointer; transition: transform .2s ease, background .2s ease; }
     .luban-chatbot__button:hover { background: #991b1b; transform: translateY(-2px); }
     .luban-chatbot__button:focus-visible, .luban-chatbot button:focus-visible, .luban-chatbot textarea:focus-visible { outline: 3px solid rgba(185,28,28,.25); outline-offset: 3px; }
-    .luban-chatbot__button svg { width: 28px; height: 28px; }
+    .luban-chatbot__button svg, .luban-chatbot__button img { width: 28px; height: 28px; display: block; }
     .luban-chatbot__panel { position: absolute; right: 0; bottom: 78px; width: min(390px, calc(100vw - 28px)); max-height: min(680px, calc(100vh - 118px)); background: #fff; border: 1px solid #e7e5e4; border-radius: 8px; box-shadow: 0 24px 70px rgba(28,25,23,.32); overflow: hidden; display: grid; grid-template-rows: auto minmax(220px, 1fr) auto; transform-origin: bottom right; opacity: 0; pointer-events: none; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease; }
     .luban-chatbot--open .luban-chatbot__panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
     .luban-chatbot__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 12px; background: #1c1917; color: #fff; }
     .luban-chatbot__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .luban-chatbot__mark { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: #b91c1c; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .luban-chatbot__mark svg { width: 19px; height: 19px; }
+    .luban-chatbot__mark svg, .luban-chatbot__mark img { width: 19px; height: 19px; display: block; }
     .luban-chatbot__name { font-weight: 800; font-size: 15px; line-height: 1.2; }
     .luban-chatbot__status { color: #d6d3d1; font-size: 12px; line-height: 1.2; margin-top: 2px; }
     .luban-chatbot__icon-btn { border: 0; width: 34px; height: 34px; border-radius: 6px; background: rgba(255,255,255,.08); color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
@@ -422,9 +423,11 @@ function injectStyles() {
 
 function createIcon(name) {
   const icons = {
+    supportChat: `<img src="${SUPPORT_CHAT_ICON_URL}" alt="" aria-hidden="true">`,
     message: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>',
+      .luban-chatbot__button svg, .luban-chatbot__button img { width: 28px; height: 28px; display: block; }
     sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"></path></svg>'
   };
   return icons[name] || '';
@@ -442,9 +445,9 @@ function mountChatbot() {
     <section class="luban-chatbot__panel" role="dialog" aria-modal="false" aria-labelledby="luban-chatbot-title" hidden>
       <div class="luban-chatbot__header">
         <div class="luban-chatbot__title">
-          <span class="luban-chatbot__mark">${createIcon('sparkle')}</span>
+          <span class="luban-chatbot__mark">${createIcon('supportChat')}</span>
           <div>
-            <div id="luban-chatbot-title" class="luban-chatbot__name">Luban Assistant</div>
+            <div id="luban-chatbot-title" class="luban-chatbot__name">Bao</div>
             <div class="luban-chatbot__status">Menu, bookings, reports and account help</div>
           </div>
         </div>
@@ -452,11 +455,11 @@ function mountChatbot() {
       </div>
       <div class="luban-chatbot__messages" data-luban-messages></div>
       <form class="luban-chatbot__form" data-luban-form>
-        <textarea class="luban-chatbot__input" data-luban-input rows="1" placeholder="Ask about the restaurant..." aria-label="Ask Luban Workshop Restaurant"></textarea>
+        <textarea class="luban-chatbot__input" data-luban-input rows="1" placeholder="Ask Bao about the restaurant..." aria-label="Ask Bao about the restaurant"></textarea>
         <button type="submit" class="luban-chatbot__send" data-luban-send aria-label="Send message">${createIcon('send')}</button>
       </form>
     </section>
-    <button type="button" class="luban-chatbot__button" data-luban-toggle aria-label="Open restaurant chat" aria-expanded="false">${createIcon('message')}</button>
+    <button type="button" class="luban-chatbot__button" data-luban-toggle aria-label="Open Bao chat" aria-expanded="false">${createIcon('supportChat')}</button>
   `;
 
   document.body.appendChild(root);
@@ -504,6 +507,7 @@ function mountChatbot() {
     panel.hidden = !open;
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Close restaurant chat' : 'Open restaurant chat');
+  toggle.setAttribute('aria-label', open ? 'Close Bao chat' : 'Open Bao chat');
 
     if (open) {
       ensureGreeting();

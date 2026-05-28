@@ -193,6 +193,49 @@
         'mail-x': 'noEmail'
     };
 
+    const iconFiles = {
+        brand: 'brand.svg',
+        menuToggle: 'menu-toggle.svg',
+        close: 'close.svg',
+        dashboard: 'dashboard.svg',
+        menuManager: 'menu-manager.svg',
+        reservations: 'reservations.svg',
+        orders: 'orders.svg',
+        promotions: 'promotions.svg',
+        specialMenus: 'special-menus.svg',
+        adminUsers: 'admin-users.svg',
+        messages: 'messages.svg',
+        fraudReview: 'fraud-review.svg',
+        chatbot: 'chatbot.svg',
+        settings: 'settings.svg',
+        profileReview: 'profile-review.svg',
+        chef: 'chef.svg',
+        logout: 'logout.svg',
+        edit: 'edit.svg',
+        image: 'image.svg',
+        show: 'show.svg',
+        hide: 'hide.svg',
+        approve: 'approve.svg',
+        reject: 'reject.svg',
+        revert: 'revert.svg',
+        delete: 'delete.svg',
+        openLink: 'open-link.svg',
+        copy: 'copy.svg',
+        download: 'download.svg',
+        print: 'print.svg',
+        refresh: 'refresh.svg',
+        sparkles: 'sparkles.svg',
+        loader: 'loader.svg',
+        map: 'map.svg',
+        archive: 'archive.svg',
+        noEmail: 'no-email.svg'
+    };
+
+    const iconBaseUrl = (() => {
+        const scriptUrl = document.currentScript && document.currentScript.src;
+        return scriptUrl ? new URL('../icons/admin-bao/', scriptUrl).href : 'assets/icons/admin-bao/';
+    })();
+
     function resolveIconName(name) {
         const raw = String(name || '').trim();
         return aliases[raw] || (accents[raw] ? raw : 'brand');
@@ -204,11 +247,23 @@
     }
 
     function createIconElement(name, className) {
-        const template = document.createElement('template');
-        template.innerHTML = svgMarkup(name).trim();
-        const svg = template.content.firstElementChild;
-        svg.setAttribute('class', `bao-icon ${className || ''}`.trim());
-        return svg;
+        const key = resolveIconName(name);
+        const fileName = iconFiles[key];
+        const img = document.createElement('img');
+        img.src = `${iconBaseUrl}${fileName}`;
+        img.alt = '';
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.setAttribute('aria-hidden', 'true');
+        img.setAttribute('class', `bao-icon ${className || ''}`.trim());
+        img.addEventListener('error', () => {
+            const template = document.createElement('template');
+            template.innerHTML = svgMarkup(name).trim();
+            const svg = template.content.firstElementChild;
+            svg.setAttribute('class', img.getAttribute('class') || 'bao-icon');
+            img.replaceWith(svg);
+        }, { once: true });
+        return img;
     }
 
     function render(root) {
@@ -221,7 +276,9 @@
     }
 
     window.adminBaoIcons = {
-        mode: 'inline',
+        mode: 'svg-assets',
+        assetBase: iconBaseUrl,
+        iconFiles,
         render,
         svgMarkup
     };

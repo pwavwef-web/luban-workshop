@@ -19,7 +19,7 @@ Primary colors:
 
 Layout guidance:
 - Keep the mascot large enough to recognize.
-- Leave clean negative space for menu/order/reservation text.
+- Leave clean negative space for menu, verified-phone order, or reservation text.
 - Use warm ivory or stone backgrounds.
 - Use red-brown seal-inspired accents sparingly.
 - Use one clear CTA per design.
@@ -69,6 +69,7 @@ Suggested flyer copy:
 Meet Bao at Luban Workshop Restaurant
 Chinese cuisine, warm hospitality, and meals made for sharing.
 Scan to view menu.
+Online pickup orders require a verified Ghana phone number. Email verification is optional.
 
 ## Design Rules
 
@@ -78,4 +79,3 @@ Scan to view menu.
 - Do not put the mascot on very busy photos.
 - Keep shadows subtle if added by designers.
 - Keep all icons at consistent stroke weight when used together.
-

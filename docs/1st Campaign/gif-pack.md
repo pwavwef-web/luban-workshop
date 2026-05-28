@@ -26,7 +26,7 @@ Size: 720 x 720 px
 | Use | File |
 | --- | --- |
 | Mascot introduction | `gifs/social-posts/bao-social-meet-bao.gif` |
-| Order prompt | `gifs/social-posts/bao-social-order-today.gif` |
+| Verified-phone order prompt | `gifs/social-posts/bao-social-order-today.gif` |
 | Catering prompt | `gifs/social-posts/bao-social-catering.gif` |
 
 ## Story GIFs
@@ -46,11 +46,10 @@ Size: 512 x 512 px
 | Use | File |
 | --- | --- |
 | Hello | `gifs/reactions/bao-reaction-hello.gif` |
-| Order now | `gifs/reactions/bao-reaction-order-now.gif` |
+| Phone-verified order | `gifs/reactions/bao-reaction-order-now.gif` |
 | Thank you | `gifs/reactions/bao-reaction-thank-you.gif` |
 | Spicy pick | `gifs/reactions/bao-reaction-spicy-pick.gif` |
 
 ## Notes
 
 GIFs are intentionally optimized for manageable campaign file sizes. For sharper large-screen motion assets, export the same concepts as MP4 or animated WebP.
-

@@ -91,7 +91,7 @@
                 <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Secure Order Access</h2>
                 <p id="security-summary" class="mt-4 text-stone-700">Checking your account status...</p>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <a href="verify-contact.html" class="rounded-md bg-red-700 px-5 py-3 text-center font-semibold text-white hover:bg-red-800">Verify contact details</a>
+                    <a href="verify-contact.html" class="rounded-md bg-red-700 px-5 py-3 text-center font-semibold text-white hover:bg-red-800">Verify Ghana phone</a>
                     <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Edit profile</a>
                 </div>
             </section>
@@ -132,7 +132,7 @@
             document.getElementById('phone-verified-at').textContent = account.phoneVerifiedAt ? new Date(account.phoneVerifiedAt).toLocaleString() : 'Not recorded yet';
             document.getElementById('security-summary').textContent = account.phoneVerified
                 ? 'Phone verification is complete. Your account can use secure checkout, order updates, and phone-protected reservation access. Email verification is optional.'
-                : 'Verify your phone number before placing an online order. Email verification is optional.';
+                : 'Verify your Ghana phone number before placing an online order. Email verification is optional.';
         });
     </script>
 </body>

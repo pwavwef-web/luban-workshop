@@ -4,10 +4,12 @@
 
 - Confirm campaign start date.
 - Confirm current menu/order link.
+- Confirm the Verify Contact link works before running order CTAs.
 - Confirm reservation/contact link.
 - Confirm catering contact process.
 - Pick the final hashtag set.
 - Check all captions for price or availability changes.
+- Check every order CTA says a verified Ghana phone number is required and email verification is optional.
 - Export feed graphics at 1080 x 1080 px.
 - Export story graphics at 1080 x 1920 px.
 - Add alt text for accessibility.
@@ -33,4 +35,3 @@
 - Count order, reservation, and catering enquiries.
 - Identify the top three posts by reach and engagement.
 - Reuse the best-performing pose in future ads.
-

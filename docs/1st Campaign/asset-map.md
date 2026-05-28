@@ -80,7 +80,7 @@ Sticker PNGs are transparent, 1024 x 1024 px, with a white sticker-style outline
 | Story: lunch break | `gifs/stories/bao-story-lunch-break.gif` |
 | Story: reserve or cater | `gifs/stories/bao-story-reserve-or-cater.gif` |
 | Reaction: hello | `gifs/reactions/bao-reaction-hello.gif` |
-| Reaction: order now | `gifs/reactions/bao-reaction-order-now.gif` |
+| Reaction: phone-verified order | `gifs/reactions/bao-reaction-order-now.gif` |
 | Reaction: thank you | `gifs/reactions/bao-reaction-thank-you.gif` |
 | Reaction: spicy pick | `gifs/reactions/bao-reaction-spicy-pick.gif` |
 
@@ -101,7 +101,7 @@ These are the preferred GIF files for publishing because they include animated h
 | Story: lunch break | `gifs-v2/stories/bao-story-lunch-break-v2.gif` |
 | Story: reserve or cater | `gifs-v2/stories/bao-story-reserve-or-cater-v2.gif` |
 | Reaction: hello | `gifs-v2/reactions/bao-reaction-hello-v2.gif` |
-| Reaction: order now | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
+| Reaction: phone-verified order | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
 | Reaction: thank you | `gifs-v2/reactions/bao-reaction-thank-you-v2.gif` |
 | Reaction: spicy pick | `gifs-v2/reactions/bao-reaction-spicy-pick-v2.gif` |
 

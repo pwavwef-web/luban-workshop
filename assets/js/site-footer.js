@@ -102,6 +102,7 @@
           reservations: 'For reservations',
           terms: 'Terms of Use',
           privacy: 'Privacy Policy',
+          meetBao: 'Meet Bao',
           about: 'About Us',
           contact: 'Contact Us',
           faq: 'FAQ',
@@ -120,6 +121,7 @@
       : [
           ['terms-of-use.html', labels.terms],
           ['privacy-policy.html', labels.privacy],
+          ['meet-bao.html', labels.meetBao],
           ['about-us/', labels.about],
           ['contact-us.html', labels.contact],
           ['faq.html', labels.faq],

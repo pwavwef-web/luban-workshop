@@ -84,7 +84,7 @@
 
                     <div class="panel bg-white p-6 sm:p-8">
                         <p class="text-xs font-bold uppercase tracking-widest text-red-700">Required for orders</p>
-                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Phone</h2>
+                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Your Ghana Phone</h2>
                         <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
                         <div id="phone-otp-area" class="mt-5 space-y-4">
                             <div id="phone-action-area" class="flex flex-col sm:flex-row gap-3"></div>
@@ -221,7 +221,7 @@
         function renderPhoneActions(isVerified) {
             const container = document.getElementById('phone-action-area');
             if (isVerified) {
-                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">SMS already verified</div>';
+                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Ghana phone already verified</div>';
                 return;
             }
 
@@ -249,7 +249,7 @@
             setPhoneVerifiedState(Boolean(account.phoneVerified));
             document.getElementById('overall-status').textContent = account.phoneVerified
                 ? 'Your account is ready for secure online orders.'
-                : 'Verify your phone number above before placing an order. Email verification is optional.';
+                : 'Verify your Ghana phone number above before placing an order. Email verification is optional.';
             document.getElementById('overall-status').className = account.phoneVerified
                 ? 'rounded-lg bg-green-50 p-4 text-green-800'
                 : 'rounded-lg bg-amber-50 p-4 text-amber-900';
@@ -336,7 +336,7 @@
                 document.getElementById('otp-code').value = '';
                 await loadStatus();
                 if (result.account.phoneVerified) {
-                    showFeedback('Phone number verified successfully. The verification form has been hidden.', false);
+                    showFeedback('Ghana phone number verified successfully. The verification form has been hidden.', false);
                 } else {
                     showFeedback('Verification status updated.', false);
                 }

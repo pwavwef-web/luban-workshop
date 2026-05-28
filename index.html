@@ -170,13 +170,22 @@
               "position": 2,
               "item": {
                 "@type": "SiteNavigationElement",
+                "name": "Meet Bao",
+                "url": "https://lubanrestaurant.com/meet-bao.html"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "SiteNavigationElement",
                 "name": "Menu",
                 "url": "https://lubanrestaurant.com/menu.html"
               }
             },
             {
               "@type": "ListItem",
-              "position": 3,
+              "position": 4,
               "item": {
                 "@type": "SiteNavigationElement",
                 "name": "Reservations and Catering",
@@ -185,7 +194,7 @@
             },
             {
               "@type": "ListItem",
-              "position": 4,
+              "position": 5,
               "item": {
                 "@type": "SiteNavigationElement",
                 "name": "Contact Us",
@@ -194,7 +203,7 @@
             },
             {
               "@type": "ListItem",
-              "position": 5,
+              "position": 6,
               "item": {
                 "@type": "SiteNavigationElement",
                 "name": "About Us",
@@ -203,7 +212,7 @@
             },
             {
               "@type": "ListItem",
-              "position": 6,
+              "position": 7,
               "item": {
                 "@type": "SiteNavigationElement",
                 "name": "FAQ",
@@ -424,6 +433,9 @@
         </div>
         <!-- Drawer nav links -->
         <div class="flex-1 overflow-y-auto p-4 space-y-1">
+            <a href="meet-bao.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="sparkles" class="h-5 w-5 flex-shrink-0"></i> Meet Bao
+            </a>
             <a href="#menu" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="utensils" class="h-5 w-5 flex-shrink-0"></i> Our Menu
             </a>
@@ -494,15 +506,49 @@
             <div class="flex justify-center gap-4">
                 <a href="#menu"
                     class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-stone-900 bg-white hover:bg-stone-100 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
-                    Order Now
+                    View Menu &amp; Order
                 </a>
                 <a href="#location"
                     class="px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white/10 md:py-4 md:text-lg md:px-10 shadow-lg transition-transform active:scale-95">
                     Find Us
                 </a>
             </div>
+            <p class="mt-4 text-sm font-semibold text-stone-300">Online pickup orders require a verified Ghana phone number. Email verification is optional.</p>
         </div>
     </header>
+
+    <section class="py-14 bg-[#fff6e8] border-y border-[#ead8bd]" aria-labelledby="meet-bao-home-title">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_0.58fr] gap-10 items-center">
+                <div>
+                    <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">New Campaign</span>
+                    <h2 id="meet-bao-home-title" class="mt-2 serif text-4xl sm:text-5xl font-bold text-stone-900 leading-tight">
+                        Meet Bao, your Luban guide.
+                    </h2>
+                    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">
+                        Bao is here for warm welcomes, fresh menu picks, dumplings, noodles, rice bowls, and group meals made easier.
+                    </p>
+                    <div class="mt-7 flex flex-col sm:flex-row gap-3">
+                        <a href="meet-bao.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-semibold shadow-md">
+                            <i data-lucide="sparkles" class="h-5 w-5"></i>
+                            Meet Bao
+                        </a>
+                        <a href="menu.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-800 border border-red-100 rounded-md hover:bg-red-50 transition-colors font-semibold">
+                            <i data-lucide="book-open" class="h-5 w-5"></i>
+                            View Menu
+                        </a>
+                        <a href="events-and-catering.html#reservation" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-800 border border-stone-200 rounded-md hover:bg-stone-50 transition-colors font-semibold">
+                            <i data-lucide="calendar-check" class="h-5 w-5"></i>
+                            Reserve
+                        </a>
+                    </div>
+                </div>
+                <div class="relative min-h-64 overflow-hidden rounded-lg border border-[#ead8bd] bg-white">
+                    <img src="assets/bao-campaign/bao-flyer-01-meet-bao.png" alt="Meet Bao campaign flyer for Luban Workshop Restaurant" class="absolute inset-0 h-full w-full object-cover object-top">
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section id="public-promotions-section" class="hidden py-14 bg-stone-950 text-white border-y border-stone-800">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -810,11 +856,11 @@
                     <p>Subtotal</p>
                     <p id="cart-total">₵0.00</p>
                 </div>
-                <p class="mt-0.5 text-sm text-stone-500 mb-6">Pay at counter upon pickup.</p>
+                <p class="mt-0.5 text-sm text-stone-500 mb-6">Pickup orders require a verified Ghana phone number. Email verification is optional; pay at the counter when you collect.</p>
                 <div class="space-y-3">
                     <button onclick="checkout()" id="checkout-btn"
                         class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                        Place Order
+                        Continue to Checkout
                     </button>
                     <button onclick="toggleCart()"
                         class="w-full flex justify-center items-center px-6 py-3 border border-stone-300 rounded-md shadow-sm text-base font-medium text-stone-700 bg-white hover:bg-stone-50 transition-colors">
@@ -935,12 +981,14 @@
                                 class="block text-sm font-medium text-stone-700 mb-2">Phone Number (Ghana)</label>
                             <input type="tel" id="signup-phone" placeholder="+233501234567" required
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <p class="text-xs text-stone-500 mt-1">Required for online orders; verify it by SMS before checkout.</p>
                         </div>
                         <div>
                             <label for="signup-email"
-                                class="block text-sm font-medium text-stone-700 mb-2">Email</label>
+                                class="block text-sm font-medium text-stone-700 mb-2">Email <span class="text-stone-400">(verification optional)</span></label>
                             <input type="email" id="signup-email" required
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <p class="text-xs text-stone-500 mt-1">Needed for your account; email verification is not required for checkout.</p>
                         </div>
                         <div>
                             <label for="signup-password"
@@ -1352,7 +1400,7 @@
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
                 document.getElementById('signup-form-modal').reset();
-                alert('Account created. Please open Verify Contact to confirm your phone number before ordering. Email verification is optional.');
+                alert('Account created. Please verify your Ghana phone number before ordering. Email verification is optional.');
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');

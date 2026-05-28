@@ -17,13 +17,13 @@ Use `luban-mascot-pose-01-wave.png` with a warm ivory background and a small men
 ## Ad Set 2: Menu Discovery
 
 Primary text:
-Craving noodles, dumplings, fried rice, or a table full of flavor? Bao has a pick for every appetite.
+Craving noodles, dumplings, fried rice, or a table full of flavor? Bao has a pick for every appetite. Online pickup orders require a verified Ghana phone; email verification can wait.
 
 Headline:
 What Will You Try Today?
 
 CTA:
-Order Now
+View Menu
 
 Creative:
 Use `luban-mascot-pose-03-noodles.png` or `luban-mascot-pose-07-serving-tray.png`.
@@ -31,13 +31,13 @@ Use `luban-mascot-pose-03-noodles.png` or `luban-mascot-pose-07-serving-tray.png
 ## Ad Set 3: Pickup Convenience
 
 Primary text:
-Busy day around UCC or Cape Coast? Choose your meal, place your order, and let Bao remind you that lunch can still be easy.
+Busy day around UCC or Cape Coast? Choose your meal, verify your Ghana phone once for pickup orders, and let Bao keep lunch easy. Email verification is optional.
 
 Headline:
 Easy Pickup, Warm Food
 
 CTA:
-Order Now
+Order for Pickup
 
 Creative:
 Use `luban-mascot-pose-05-takeout.png`.
@@ -75,6 +75,6 @@ Use `luban-mascot-pose-07-serving-tray.png` with `catering-tray.svg`.
 - Bao has a menu pick for you today.
 - Your lunch break just got warmer.
 - Dumplings, noodles, rice, and a friendly guide to help you choose.
+- Pickup orders need a verified Ghana phone number. Email verification is optional.
 - Planning food for a group? Start with Luban Workshop Restaurant.
 - Follow Bao for menu picks and restaurant updates.
-
