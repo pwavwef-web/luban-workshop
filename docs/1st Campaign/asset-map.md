@@ -84,26 +84,36 @@ Sticker PNGs are transparent, 1024 x 1024 px, with a white sticker-style outline
 | Reaction: thank you | `gifs/reactions/bao-reaction-thank-you.gif` |
 | Reaction: spicy pick | `gifs/reactions/bao-reaction-spicy-pick.gif` |
 
+## Public Campaign Copies
+
+Use these files for website/page references. GIFs are flattened under the public folder even though the source handoff groups them by type.
+
+| Asset | Public file |
+| --- | --- |
+| Flyer: meet Bao | `../../assets/bao-campaign/bao-flyer-01-meet-bao.png` |
+| Flyer: noodle lunch | `../../assets/bao-campaign/bao-flyer-02-noodle-lunch.png` |
+| Flyer: dumplings to share | `../../assets/bao-campaign/bao-flyer-03-dumplings-to-share.png` |
+| Flyer: group catering | `../../assets/bao-campaign/bao-flyer-04-group-catering.png` |
+| Flyer: reserve table | `../../assets/bao-campaign/bao-flyer-05-reserve-table.png` |
+| Sticker sheet | `../../assets/bao-campaign/bao-sticker-sheet.png` |
+| Sticker GIF: wave | `../../assets/bao-campaign/gifs/bao-wave-loop.gif` |
+| Sticker GIF: bounce | `../../assets/bao-campaign/gifs/bao-bounce-loop.gif` |
+| Sticker GIF: point | `../../assets/bao-campaign/gifs/bao-point-loop.gif` |
+| Sticker GIF: celebrate | `../../assets/bao-campaign/gifs/bao-celebrate-loop.gif` |
+| Social GIF: meet Bao | `../../assets/bao-campaign/gifs/bao-social-meet-bao.gif` |
+| Social GIF: order today | `../../assets/bao-campaign/gifs/bao-social-order-today.gif` |
+| Social GIF: catering | `../../assets/bao-campaign/gifs/bao-social-catering.gif` |
+| Story GIF: scan menu | `../../assets/bao-campaign/gifs/bao-story-scan-menu.gif` |
+| Story GIF: lunch break | `../../assets/bao-campaign/gifs/bao-story-lunch-break.gif` |
+| Story GIF: reserve or cater | `../../assets/bao-campaign/gifs/bao-story-reserve-or-cater.gif` |
+| Reaction GIF: hello | `../../assets/bao-campaign/gifs/bao-reaction-hello.gif` |
+| Reaction GIF: phone-verified order | `../../assets/bao-campaign/gifs/bao-reaction-order-now.gif` |
+| Reaction GIF: thank you | `../../assets/bao-campaign/gifs/bao-reaction-thank-you.gif` |
+| Reaction GIF: spicy pick | `../../assets/bao-campaign/gifs/bao-reaction-spicy-pick.gif` |
+
 ## GIF Assets V2
 
-These are the preferred GIF files for publishing because they include animated hand, prop, and body motion.
-
-| Type | File |
-| --- | --- |
-| Sticker: waving hand | `gifs-v2/stickers/bao-wave-hand-v2.gif` |
-| Sticker: thumbs-up hand | `gifs-v2/stickers/bao-thumbs-up-hand-v2.gif` |
-| Sticker: pointing arm | `gifs-v2/stickers/bao-point-arm-v2.gif` |
-| Sticker: celebration body | `gifs-v2/stickers/bao-celebrate-body-v2.gif` |
-| Social: meet Bao | `gifs-v2/social-posts/bao-social-meet-bao-v2.gif` |
-| Social: order today | `gifs-v2/social-posts/bao-social-order-today-v2.gif` |
-| Social: catering | `gifs-v2/social-posts/bao-social-catering-v2.gif` |
-| Story: scan menu | `gifs-v2/stories/bao-story-scan-menu-v2.gif` |
-| Story: lunch break | `gifs-v2/stories/bao-story-lunch-break-v2.gif` |
-| Story: reserve or cater | `gifs-v2/stories/bao-story-reserve-or-cater-v2.gif` |
-| Reaction: hello | `gifs-v2/reactions/bao-reaction-hello-v2.gif` |
-| Reaction: phone-verified order | `gifs-v2/reactions/bao-reaction-order-now-v2.gif` |
-| Reaction: thank you | `gifs-v2/reactions/bao-reaction-thank-you-v2.gif` |
-| Reaction: spicy pick | `gifs-v2/reactions/bao-reaction-spicy-pick-v2.gif` |
+No v2 GIF export files are currently checked into the repository. Treat `gif-pack-v2.md` as the motion brief for a future improved animation pass, and publish from the original GIF assets above until generated v2 files are added.
 
 ## SVG Icons
 

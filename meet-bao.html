@@ -688,11 +688,13 @@
 
         .moments {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 1rem;
         }
 
         .moment-card {
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             background: #fff;
             border: 1px solid var(--bao-line);
@@ -709,11 +711,112 @@
         }
 
         .moment-card-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            gap: 0.7rem;
             padding: 1rem;
         }
 
+        .moment-card-body p {
+            margin: 0;
+        }
+
         .moment-card .icon-link {
-            margin-top: 1rem;
+            margin-top: auto;
+        }
+
+        .campaign-pack {
+            display: grid;
+            grid-template-columns: minmax(17rem, 0.7fr) minmax(0, 1.3fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .sticker-preview,
+        .asset-thumb {
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid var(--bao-line);
+            border-radius: 0.5rem;
+            box-shadow: 0 16px 35px rgba(41, 37, 36, 0.08);
+        }
+
+        .sticker-preview img,
+        .asset-thumb img {
+            display: block;
+            width: 100%;
+            background: #fff1d7;
+        }
+
+        .sticker-preview img {
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+        }
+
+        .sticker-preview-body {
+            padding: 1rem;
+        }
+
+        .sticker-preview-body h3,
+        .asset-group h3 {
+            margin: 0;
+            color: #1c1917;
+            font-size: 1.2rem;
+            line-height: 1.15;
+        }
+
+        .sticker-preview-body p {
+            margin: 0.6rem 0 0;
+            color: var(--bao-muted);
+            line-height: 1.55;
+        }
+
+        .asset-groups {
+            display: grid;
+            gap: 1.15rem;
+        }
+
+        .asset-group {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .asset-grid.social {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .asset-grid.story {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .asset-thumb {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asset-thumb img {
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+
+        .asset-grid.story .asset-thumb img {
+            aspect-ratio: 9 / 16;
+        }
+
+        .asset-thumb figcaption {
+            min-height: 2.6rem;
+            padding: 0.58rem 0.65rem;
+            color: #5c5048;
+            font-size: 0.78rem;
+            font-weight: 900;
+            line-height: 1.25;
         }
 
         .social-strip {
@@ -810,6 +913,7 @@
 
             .section-heading,
             .story-band,
+            .campaign-pack,
             .social-strip,
             .final-cta-inner {
                 grid-template-columns: 1fr;
@@ -827,6 +931,12 @@
 
             .social-strip {
                 padding: 1.35rem;
+            }
+
+            .asset-grid,
+            .asset-grid.social,
+            .asset-grid.story {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             .final-mascot {
@@ -905,6 +1015,9 @@
             .cta-grid,
             .pick-grid,
             .moments,
+            .asset-grid,
+            .asset-grid.social,
+            .asset-grid.story,
             .gif-row {
                 grid-template-columns: 1fr;
             }
@@ -1133,6 +1246,28 @@
                         </div>
                     </article>
                     <article class="moment-card">
+                        <img src="assets/bao-campaign/bao-flyer-02-noodle-lunch.png" alt="Noodle lunch campaign flyer featuring Bao" loading="lazy">
+                        <div class="moment-card-body">
+                            <h3 class="serif">Noodle lunch</h3>
+                            <p>A quick lunch nudge for students, staff, and anyone ready for a warm bowl.</p>
+                            <a class="icon-link" href="menu.html">
+                                Find noodles
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                    <article class="moment-card">
+                        <img src="assets/bao-campaign/bao-flyer-03-dumplings-to-share.png" alt="Dumplings to share campaign flyer featuring Bao" loading="lazy">
+                        <div class="moment-card-body">
+                            <h3 class="serif">Dumplings to share</h3>
+                            <p>A friendly reminder to build the table around something everyone can reach for.</p>
+                            <a class="icon-link" href="menu.html">
+                                Pick dumplings
+                                <i data-lucide="arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                    <article class="moment-card">
                         <img src="assets/bao-campaign/bao-flyer-05-reserve-table.png" alt="Reserve a table campaign flyer featuring Bao" loading="lazy">
                         <div class="moment-card-body">
                             <h3 class="serif">Reserve your table</h3>
@@ -1154,6 +1289,92 @@
                             </a>
                         </div>
                     </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">Bao asset pack</span>
+                        <h2>Stickers, stories, replies, and feed loops are ready to share.</h2>
+                    </div>
+                    <p>The public campaign folder now includes every checked-in Bao flyer and GIF, so the page can preview the same set used for social posts, story placements, comments, and quick customer replies.</p>
+                </div>
+
+                <div class="campaign-pack">
+                    <article class="sticker-preview">
+                        <img src="assets/bao-campaign/bao-sticker-sheet.png" alt="Bao campaign sticker sheet with multiple mascot expressions" loading="lazy">
+                        <div class="sticker-preview-body">
+                            <h3 class="serif">Sticker sheet</h3>
+                            <p>Wave, point, celebrate, thank guests, highlight spicy picks, and keep Bao consistent across campaign replies.</p>
+                        </div>
+                    </article>
+
+                    <div class="asset-groups">
+                        <section class="asset-group" aria-labelledby="bao-sticker-gifs">
+                            <h3 id="bao-sticker-gifs" class="serif">Sticker GIFs</h3>
+                            <div class="asset-grid">
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-wave-loop.gif" alt="Animated Bao waving sticker" loading="lazy">
+                                    <figcaption>Wave hello</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-bounce-loop.gif" alt="Animated Bao bouncing approval sticker" loading="lazy">
+                                    <figcaption>Bouncy approval</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-point-loop.gif" alt="Animated Bao pointing sticker" loading="lazy">
+                                    <figcaption>Pointing CTA</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-celebrate-loop.gif" alt="Animated Bao celebration sticker" loading="lazy">
+                                    <figcaption>Celebrate</figcaption>
+                                </figure>
+                            </div>
+                        </section>
+
+                        <section class="asset-group" aria-labelledby="bao-story-gifs">
+                            <h3 id="bao-story-gifs" class="serif">Story GIFs</h3>
+                            <div class="asset-grid story">
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-story-scan-menu.gif" alt="Animated Bao story inviting guests to scan the menu" loading="lazy">
+                                    <figcaption>Scan menu</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-story-lunch-break.gif" alt="Animated Bao lunch break story" loading="lazy">
+                                    <figcaption>Lunch break</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-story-reserve-or-cater.gif" alt="Animated Bao story for reservations and catering" loading="lazy">
+                                    <figcaption>Reserve or cater</figcaption>
+                                </figure>
+                            </div>
+                        </section>
+
+                        <section class="asset-group" aria-labelledby="bao-reaction-gifs">
+                            <h3 id="bao-reaction-gifs" class="serif">Reaction GIFs</h3>
+                            <div class="asset-grid">
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-reaction-hello.gif" alt="Animated Bao hello reaction" loading="lazy">
+                                    <figcaption>Hello</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-reaction-order-now.gif" alt="Animated Bao order now reaction" loading="lazy">
+                                    <figcaption>Order now</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-reaction-thank-you.gif" alt="Animated Bao thank you reaction" loading="lazy">
+                                    <figcaption>Thank you</figcaption>
+                                </figure>
+                                <figure class="asset-thumb">
+                                    <img src="assets/bao-campaign/gifs/bao-reaction-spicy-pick.gif" alt="Animated Bao spicy pick reaction" loading="lazy">
+                                    <figcaption>Spicy pick</figcaption>
+                                </figure>
+                            </div>
+                        </section>
+                    </div>
                 </div>
             </div>
         </section>

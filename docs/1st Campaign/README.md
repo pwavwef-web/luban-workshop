@@ -35,8 +35,13 @@ Folder contents:
 - [launch-checklist.md](launch-checklist.md): steps before publishing
 - [bao-caption-emojis.md](bao-caption-emojis.md): paste-ready emoji combinations and custom sticker aliases
 - [gif-pack.md](gif-pack.md): animated Bao GIF catalog
-- [gif-pack-v2.md](gif-pack-v2.md): improved Bao GIFs with hand, prop, and body motion
+- [gif-pack-v2.md](gif-pack-v2.md): motion spec for a future improved GIF export pass
 - [flyers/](flyers/): five ready-to-use campaign flyer PNGs
 - [gifs/](gifs/): sticker, social-post, story, and reaction GIFs
-- [gifs-v2/](gifs-v2/): improved sticker, social-post, story, and reaction GIFs
 - [sticker-sheets/](sticker-sheets/): sticker pack preview sheet
+
+Public web copies:
+- `../../assets/bao-campaign/`: public copies of all five flyers and the sticker sheet
+- `../../assets/bao-campaign/gifs/`: public copies of the original GIF pack, flattened into one folder for page references
+
+Note: v2 GIF export files are not currently checked into the repository. Use the original GIF pack for publishing until a v2 export pass is generated and added.
