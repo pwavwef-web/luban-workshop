@@ -1,0 +1,8 @@
+/* Flyer page-only overrides kept out of the HTML document. */
+.flyers-hero {
+    background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 60%, #b91c1c 100%);
+}
+
+.flyers-website {
+    font-size: 0.8rem;
+}
