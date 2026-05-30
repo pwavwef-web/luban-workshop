@@ -397,6 +397,21 @@ function buildFallbackAccount(user) {
   };
 }
 
+function getAccountDisplayName(account, user) {
+  const accountName = account && typeof account.name === 'string' ? account.name.trim() : '';
+  if (accountName) return accountName;
+
+  const displayName = user && typeof user.displayName === 'string' ? user.displayName.trim() : '';
+  if (displayName) return displayName;
+
+  const email = user && typeof user.email === 'string' ? user.email.trim() : '';
+  if (!email) return '';
+
+  const localPart = email.split('@')[0] || '';
+  const cleaned = localPart.replace(/[._-]+/g, ' ').trim();
+  return cleaned || '';
+}
+
 function maskEmailAddress(email) {
   const value = String(email || '').trim();
   const parts = value.split('@');
@@ -555,11 +570,22 @@ function mountChatbot() {
   }
 }
 
-function ensureGreeting() {
+async function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`);
+  let greeting = `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`;
+  try {
+    const user = await waitForCurrentUser();
+    const guestName = getAccountDisplayName(null, user);
+    if (guestName) {
+      greeting = `Hi ${guestName}, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`;
+    }
+  } catch (error) {
+    console.warn('Could not personalize chatbot greeting:', error);
+  }
+
+  appendMessage('bot', greeting);
   appendSuggestions(ELECTION_WEEK_SUGGESTIONS);
 }
 
