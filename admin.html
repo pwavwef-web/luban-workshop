@@ -15,6 +15,7 @@
     <title>Admin Dashboard - Luban Workshop</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#b91c1c">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
     <link rel="manifest" href="admin-manifest.json">
     <link rel="stylesheet" href="tailwind.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -649,6 +650,7 @@
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
                     <h3 class="text-base font-bold text-stone-800 mb-4">Promote a User to Admin</h3>
                     <form id="promote-form" class="flex flex-col sm:flex-row gap-3">
+                        <label for="promote-email" class="sr-only">User email address</label>
                         <input type="email" id="promote-email" placeholder="Enter user email address" required
                             class="flex-1 px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
                         <button type="submit"
@@ -2197,6 +2199,7 @@
                 return `
                     <label class="admin-check-row">
                         <input type="checkbox" data-promotion-dish-id="${escapeHtml(dish.id)}" ${selected ? 'checked' : ''}
+                            aria-label="Include ${escapeHtml(dish.name)} in promotion"
                             class="h-4 w-4 rounded border-stone-300 text-red-700 focus:ring-red-700">
                         <span class="min-w-0">
                             <span class="block text-sm font-semibold text-stone-900 truncate">${escapeHtml(dish.name)}</span>
@@ -2204,6 +2207,7 @@
                         </span>
                         <input type="number" min="0" step="1" data-promotion-price-id="${escapeHtml(dish.id)}"
                             value="${selected && promoPrice !== '' ? Number(promoPrice) : ''}" ${disabledPrice}
+                            aria-label="Promotion price for ${escapeHtml(dish.name)}"
                             class="w-full px-2 py-1 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm disabled:bg-stone-100"
                             placeholder="Promo">
                     </label>
@@ -3939,7 +3943,7 @@
         <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10">
             <h3 id="price-edit-title" class="text-lg font-bold text-stone-900 mb-1">Edit Dish Price</h3>
             <p id="price-edit-dish-name" class="text-sm text-stone-500 mb-5"></p>
-            <label class="block text-sm font-medium text-stone-700 mb-2">New Price (&#8373;)</label>
+            <label for="price-edit-input" class="block text-sm font-medium text-stone-700 mb-2">New Price (&#8373;)</label>
             <input type="number" id="price-edit-input" min="0" step="1"
                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-base"
                 placeholder="Enter new price">
@@ -3972,7 +3976,7 @@
 
             <!-- URL input -->
             <div class="mb-4">
-                <label class="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
+                <label for="image-url-input" class="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
                 <input type="url" id="image-url-input" oninput="onImageUrlInput()"
                     class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-purple-600 focus:outline-none text-sm"
                     placeholder="https://example.com/image.jpg">
@@ -3987,7 +3991,7 @@
 
             <!-- File upload -->
             <div class="mb-2">
-                <label class="block text-sm font-medium text-stone-700 mb-1">Upload Image File</label>
+                <label for="image-file-input" class="block text-sm font-medium text-stone-700 mb-1">Upload Image File</label>
                 <input type="file" id="image-file-input" accept="image/*" onchange="onImageFileChange()"
                     class="w-full text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
                 <p class="text-xs text-stone-600 mt-1">Max 700 KB. Replaces the URL field when selected.</p>

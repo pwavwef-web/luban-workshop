@@ -6,6 +6,7 @@
     <title>Verify Contact | Luban Workshop Restaurant</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
     <link rel="stylesheet" href="tailwind.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +45,9 @@
             <h2 class="serif text-3xl font-bold text-stone-900">Sign in to continue</h2>
             <p class="mt-3 text-stone-600">Use your Luban Workshop account to verify your contact details.</p>
             <form id="login-form" class="mt-6 grid gap-4 sm:grid-cols-2">
+                <label for="login-email" class="sr-only">Email</label>
                 <input id="login-email" type="email" class="field" placeholder="Email" required>
+                <label for="login-password" class="sr-only">Password</label>
                 <input id="login-password" type="password" class="field" placeholder="Password" required>
                 <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3">
                     <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Sign in</button>

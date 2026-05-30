@@ -6,6 +6,7 @@
     <title>Reservation Status | Luban Workshop Restaurant</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
     <link rel="stylesheet" href="tailwind.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +54,7 @@
             <p class="text-xs font-bold uppercase tracking-widest text-red-700">Step 2</p>
             <h2 class="serif mt-2 text-3xl font-bold text-stone-900">Verify Access Code</h2>
             <form id="code-form" class="mt-5 space-y-4">
+                <label for="code-input" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
                 <input id="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
                 <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
             </form>
