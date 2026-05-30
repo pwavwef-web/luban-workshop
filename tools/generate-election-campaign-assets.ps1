@@ -391,7 +391,7 @@ function Draw-SquarePost {
     $orb.Dispose()
 
     Draw-BrandHeader $g 1080 1080
-    Draw-Label $g $Badge 70 190 330 $Accent
+    Draw-Label $g $Badge 70 190 420 $Accent
 
     $headlineBrush = [System.Drawing.SolidBrush]::new((Color-Hex "#1c1917"))
     $bodyBrush = [System.Drawing.SolidBrush]::new((Color-Hex "#57534e"))
@@ -495,6 +495,9 @@ function Draw-FlyerPost {
     $bg.Dispose()
     Draw-CoverImage $g (Join-Path $Root "assets\luban-noodle-spread.jpg") (New-RectF 0 770 1080 580) 0 0.45
 
+    $logoBack = [System.Drawing.SolidBrush]::new((Color-Hex "#fff6e8" 238))
+    $g.FillEllipse($logoBack, 62, 54, 104, 104)
+    $logoBack.Dispose()
     $logoRect = New-RectF 70 62 88 88
     Draw-ContainedImage $g (Join-Path $Root "logo.png") $logoRect
     $white = [System.Drawing.SolidBrush]::new((Color-Hex "#ffffff"))
