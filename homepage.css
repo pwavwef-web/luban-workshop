@@ -1,0 +1,150 @@
+.home-user-info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.home-user-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.home-hero-image-wrap {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+}
+
+.home-hero-image {
+    object-position: bottom;
+}
+
+.home-map-frame {
+    border: 0;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+h1,
+h2,
+h3,
+.serif {
+    font-family: 'Playfair Display', serif;
+}
+
+.scroll-smooth {
+    scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#menu-loading-screen {
+    transition: opacity 0.5s ease;
+}
+
+#menu-loading-screen.hiding {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes logoPulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.85;
+    }
+}
+
+#menu-loading-screen img {
+    animation: logoPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes progressSlide {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(300%);
+    }
+}
+
+.loading-bar-inner {
+    width: 40%;
+    animation: progressSlide 1.4s ease-in-out infinite;
+}
+
+.auth-btn-force-hidden {
+    display: none !important;
+}
+
+.btn-added {
+    background-color: #16a34a !important;
+}
+
+.btn-added:hover {
+    background-color: #15803d !important;
+}
+
+@keyframes cartBounce {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.35);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+}
+
+.cart-bounce {
+    animation: cartBounce 0.4s ease;
+}
+
+main section {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 760px;
+}
