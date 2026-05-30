@@ -45,6 +45,7 @@ const SUPPORT_CHAT_ICON_URL = new URL('../icons/mascot/support-chat.svg', import
 
 const CONTACT = {
   restaurant: 'Luban Workshop Restaurant',
+  siteUrl: 'https://lubanrestaurant.com',
   phone: '020 543 8455',
   email: 'reservations@lubanrestaurant.com',
   address: 'Cafe Roof Top, Casford Street, University of Cape Coast (UCC), Cape Coast, Ghana',
@@ -52,6 +53,8 @@ const CONTACT = {
   contactPage: 'contact-us.html',
   reservationPage: 'events-and-catering.html#reservation',
   menuPage: 'menu.html',
+  qrPage: 'assets/qr-codes/index.html',
+  qrImage: 'assets/qr-codes/lubanrestaurant-com.png',
   instagram: 'https://www.instagram.com/lubanworkshoprestaurant/',
   facebook: 'https://www.facebook.com/profile.php/?id=61583678376642'
 };
@@ -77,6 +80,29 @@ const CORE_KNOWLEDGE = [
   'Private parties, corporate events, and external catering are available. Private parties can support groups of up to 50 guests.',
   'Events can include custom set menus, table arrangements, corporate menus, delivery, setup, buffet or plated service, and an events coordinator.',
   'Guests with allergies or dietary requirements should tell staff when ordering or making a reservation because ingredients and preparation can vary.'
+];
+
+const ELECTION_WEEK_KNOWLEDGE = [
+  'During student election season, Bao may help with food-focused, nonpartisan guest needs around Hall, SRC, and LNUGS campaign traffic.',
+  'Election-week campaign materials position Luban Workshop Restaurant as a neutral meal stop for campaign teams, voters, volunteers, delegates, supporters, and friends.',
+  'Bao can answer practical restaurant questions for menu scans, quick meal planning, group meals, manifesto-night gatherings, election-day stops, results-night gatherings, reservations, and catering.',
+  'Bao must not endorse, oppose, rank, compare, campaign for, predict, congratulate, criticize, or write political/candidate/hall/party messaging. Keep responses neutral, welcoming, and focused on food, logistics, reservations, verified links, and contact paths.',
+  `For menu scans, send guests to the verified site menu at ${CONTACT.menuPage} or the official website at ${CONTACT.siteUrl}. Mention that menu availability and prices should be checked on the current site and staff can confirm rush-period details.`,
+  'For group meals, suggest shareable starters, rice, noodles, proteins, seafood, drinks, reservation/catering enquiries, and asking staff to confirm allergies, timing, table setup, and large-order availability.',
+  'For manifesto night, suggest planning ahead with warm food before or after the event, using the menu link, placing verified-phone pickup orders where suitable, or reserving a table for groups.',
+  'For results night, keep language calm and inclusive. Suggest reserving early, planning a group table, using pickup ordering with a verified Ghana phone, and letting staff know group size and timing.',
+  `For reservations, direct guests to ${CONTACT.reservationPage}, explain that the restaurant follows up manually, and remind them that Reservation Status links use a one-time SMS code before showing details or accepting change/cancellation requests.`,
+  `Verified QR details: the corrected QR code is ${CONTACT.qrImage} and it points to ${CONTACT.siteUrl}. The old mainpage.png and menu.png QR images were removed because they were not reliable for current campaign materials.`,
+  `For QR guidance, tell guests and campaign helpers to use only the verified QR, keep the quiet zone, print at high contrast, avoid stretching or cropping it, and use a platform link sticker to ${CONTACT.siteUrl} when possible.`
+];
+
+const ELECTION_WEEK_SUGGESTIONS = [
+  'Scan the menu now',
+  'Plan a group meal',
+  'Manifesto night food ideas',
+  'Results night table help',
+  'Reserve for a group',
+  'Show the verified QR'
 ];
 
 const MENU = [
@@ -154,6 +180,7 @@ const PAGE_PATHS = [
   { title: 'Reservation Status', path: 'reservation-status.html' },
   { title: 'Account Security', path: 'account-security.html' },
   { title: 'Customer Profile', path: 'customer-profile.html' },
+  { title: 'Verified QR', path: 'assets/qr-codes/index.html' },
   { title: 'Team', path: 'about-us/index.html' },
   { title: 'Chinese Home', path: 'chinese/index.html' },
   { title: 'Chinese Menu', path: 'chinese/menu.html' },
@@ -170,6 +197,10 @@ Keep answers concise, warm, and practical. Prefer 1-3 short paragraphs or a shor
 If the context does not answer the question, say you do not have that detail in the restaurant information available here and direct the guest to call 020 543 8455, email reservations@lubanrestaurant.com, or use [Contact Us](contact-us.html).
 Do not invent menu availability, prices, reservation status, dietary safety, staff names, policies, or private data.
 You can help guests with menu discovery, ordering and checkout guidance, reservation paths, account verification, event/catering questions, contact paths, and issue reports.
+During election-week or campaign-season questions, treat political terms as event context only. Keep the answer neutral, food-first, and practical.
+Never endorse, oppose, rank, compare, campaign for, predict, congratulate, criticize, or write persuasive political messaging for any candidate, hall, party, campaign team, or election outcome.
+If the guest asks for candidate advice, campaign strategy, vote appeals, slogans, manifestos, or results commentary, politely explain that Bao can only help with restaurant menu, QR, ordering, reservation, and group-meal logistics.
+For menu scans, group meals, manifesto night, results night, reservations, and verified QR questions, lead with the most useful restaurant next step and link.
 When signed-in customer context is supplied, use it only to make account, checkout, verification, order, and contact guidance more relevant.
 Do not reveal or repeat full private contact details. If the guest asks to contact, complain, or report an issue, explain that signed-in guests can ask you to send a report directly.
 When preparing an issue report, write a clear staff-ready description instead of copying the guest wording, unless the guest explicitly asks to keep the wording exactly the same.
@@ -393,7 +424,7 @@ function injectStyles() {
     .luban-chatbot__mark { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: #b91c1c; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .luban-chatbot__mark svg, .luban-chatbot__mark img { width: 19px; height: 19px; display: block; }
     .luban-chatbot__name { font-weight: 800; font-size: 15px; line-height: 1.2; }
-    .luban-chatbot__status { color: #d6d3d1; font-size: 12px; line-height: 1.2; margin-top: 2px; }
+    .luban-chatbot__status { color: #d6d3d1; font-size: 12px; line-height: 1.2; margin-top: 2px; max-width: 260px; }
     .luban-chatbot__icon-btn { border: 0; width: 34px; height: 34px; border-radius: 6px; background: rgba(255,255,255,.08); color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .luban-chatbot__icon-btn:hover { background: rgba(255,255,255,.16); }
     .luban-chatbot__icon-btn svg { width: 18px; height: 18px; }
@@ -447,7 +478,7 @@ function mountChatbot() {
           <span class="luban-chatbot__mark">${createIcon('supportChat')}</span>
           <div>
             <div id="luban-chatbot-title" class="luban-chatbot__name">Bao</div>
-            <div class="luban-chatbot__status">Menu, bookings, reports and account help</div>
+            <div class="luban-chatbot__status">Menu, bookings, QR, reports and account help</div>
           </div>
         </div>
         <button type="button" class="luban-chatbot__icon-btn" data-luban-close aria-label="Close chat">${createIcon('x')}</button>
@@ -528,8 +559,8 @@ function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I can help with Luban Workshop's menu, ordering, reservations, events, account checks, contact options and issue reports.`);
-  appendSuggestions(['What are your hours?', 'Show popular seafood', 'Help with checkout', 'Send a report']);
+  appendMessage('bot', `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`);
+  appendSuggestions(ELECTION_WEEK_SUGGESTIONS);
 }
 
 function autoSizeInput(input) {
@@ -574,7 +605,7 @@ function renderFormattedMessage(container, text) {
 }
 
 function appendFormattedInline(container, text) {
-  const combinedPattern = /((\*{2,3}|__)([^\n]+?)\2)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html(?:#[A-Za-z0-9_-]+)?\b)/g;
+  const combinedPattern = /((\*{2,3}|__)([^\n]+?)\2)|((?:https?:\/\/|mailto:|tel:)[^\s<>()]+)|(\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b)|(\b(?:\+233|0)\s?\d{2}\s?\d{3}\s?\d{4}\b)|(\b(?:(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html|assets\/qr-codes\/(?:index\.html|lubanrestaurant-com\.png))(?:#[A-Za-z0-9_-]+)?\b)/g;
   let lastIndex = 0;
   let match;
 
@@ -634,7 +665,7 @@ function normalizeSafeHref(href) {
   if (!value) return '';
 
   if (/^(https?:\/\/|mailto:|tel:)/i.test(value)) return value;
-  if (/^(?:\/|\.{0,2}\/)?(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
+  if (/^(?:\/|\.{0,2}\/)?(?:(?:contact-us|menu|faq|events-and-catering|verify-contact|checkout|order-status|reservation-status|account-security|customer-profile|index)\.html|assets\/qr-codes\/(?:index\.html|lubanrestaurant-com\.png))(?:#[A-Za-z0-9_-]+)?$/i.test(value)) {
     return new URL(value.replace(/^(?:\/|\.{0,2}\/)/, ''), SITE_ROOT).href;
   }
 
@@ -1121,10 +1152,15 @@ async function buildKnowledge() {
     'Core restaurant facts:',
     CORE_KNOWLEDGE.map((line) => `- ${line}`).join('\n'),
     '',
+    'Election-week traffic guidance:',
+    ELECTION_WEEK_KNOWLEDGE.map((line) => `- ${line}`).join('\n'),
+    '',
     'Useful links:',
     `- Contact: ${CONTACT.contactPage}`,
     `- Menu: ${CONTACT.menuPage}`,
     `- Reservations and events: ${CONTACT.reservationPage}`,
+    `- Verified QR information: ${CONTACT.qrPage}`,
+    `- Verified QR image: ${CONTACT.qrImage}`,
     `- Instagram: ${CONTACT.instagram}`,
     `- Facebook: ${CONTACT.facebook}`,
     '',
