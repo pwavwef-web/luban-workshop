@@ -38,4 +38,4 @@ Manual deploy:
 firebase deploy --project luban-workshop-restaurant --only hosting,functions,firestore,storage
 ```
 
-Automated deploys run from GitHub Actions on pushes to `main` after `FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT` is added as a repository secret.
+Automated deploys run from GitHub Actions on pushes to `main` after `FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT` is added as a repository secret. Before that secret exists, pushes to `main` still run the build checks and the deploy job logs a clean skip.

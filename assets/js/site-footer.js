@@ -19,6 +19,17 @@
     return new URL(path, rootUrl).href;
   }
 
+  function loadAssistantButton() {
+    if (document.querySelector('script[src*="firebase-ai-chatbot.js"]')) return;
+    if (window.__lubanAiChatbotLoading) return;
+
+    window.__lubanAiChatbotLoading = true;
+    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260530-assistant-button')).catch((error) => {
+      window.__lubanAiChatbotLoading = false;
+      console.warn('Could not load Luban assistant button:', error);
+    });
+  }
+
   function fullNameList() {
     return [leadDeveloper.name, coDeveloper.name].filter(Boolean).join(', ');
   }
@@ -160,6 +171,7 @@
 
   function renderFooters() {
     injectAuthorMetadata();
+    loadAssistantButton();
 
     document.querySelectorAll('[data-luban-footer]').forEach((mount) => {
       mount.outerHTML = footerHtml(isChinesePage(mount));

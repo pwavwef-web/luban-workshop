@@ -47,7 +47,7 @@ After at least one admin can sign in, additional admins can be managed from the 
 
 The Firebase project is `luban-workshop-restaurant`. `firebase.json` deploys Hosting, Functions, Firestore rules/indexes, and Storage rules from this repository.
 
-GitHub Actions runs builds and launch checks on pull requests. Pushes to `main` deploy through Firebase CLI when the repository secret `FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT` is configured with a Firebase service account JSON.
+GitHub Actions runs builds and launch checks on pull requests and pushes to `main`. Pushes to `main` deploy through Firebase CLI when the repository secret `FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT` is configured with a Firebase service account JSON; until then, the deploy job logs an explicit skip after the build checks pass.
 
 ## Troubleshooting Admin Permissions
 

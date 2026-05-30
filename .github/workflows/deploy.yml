@@ -48,10 +48,25 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
+      - name: Check Firebase deploy secret
+        id: firebase_secret
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "::notice::Skipping Firebase deploy because FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT is not configured. Build checks already passed."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Firebase deploy secret is configured; continuing with deployment."
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Check out repository
+        if: steps.firebase_secret.outputs.configured == 'true'
         uses: actions/checkout@v6
 
       - name: Set up Node.js
+        if: steps.firebase_secret.outputs.configured == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -61,28 +76,30 @@ jobs:
             functions/package-lock.json
 
       - name: Install website dependencies
+        if: steps.firebase_secret.outputs.configured == 'true'
         run: npm ci
 
       - name: Install functions dependencies
+        if: steps.firebase_secret.outputs.configured == 'true'
         run: npm --prefix functions ci
 
       - name: Build website assets
+        if: steps.firebase_secret.outputs.configured == 'true'
         run: npm run build
 
       - name: Run launch checks
+        if: steps.firebase_secret.outputs.configured == 'true'
         run: npm run check
 
       - name: Write Firebase service account
+        if: steps.firebase_secret.outputs.configured == 'true'
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT }}
         run: |
-          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
-            echo "Missing FIREBASE_SERVICE_ACCOUNT_LUBAN_WORKSHOP_RESTAURANT secret." >&2
-            exit 1
-          fi
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
 
       - name: Deploy to Firebase
+        if: steps.firebase_secret.outputs.configured == 'true'
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
         run: npx firebase-tools@latest deploy --project luban-workshop-restaurant --only hosting,functions,firestore,storage --non-interactive

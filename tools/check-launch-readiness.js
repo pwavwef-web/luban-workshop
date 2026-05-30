@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const failures = [];
@@ -169,6 +170,28 @@ function assertNoStockFlyerAssets() {
   }
 }
 
+function assertJavaScriptParses(relativePath, module = false) {
+  const file = path.join(root, relativePath);
+  const args = module ? ['--input-type=module', '--check'] : ['--check'];
+  if (!module) args.push(file);
+
+  const result = spawnSync(process.execPath, args, {
+    cwd: root,
+    input: read(file),
+    encoding: 'utf8'
+  });
+
+  if (result.status !== 0) {
+    const detail = String(result.stderr || result.stdout || '').trim().split('\n')[0];
+    fail(`${relativePath} has a JavaScript syntax error${detail ? `: ${detail}` : '.'}`);
+  }
+}
+
+function assertSharedScriptsParse() {
+  assertJavaScriptParses('assets/js/site-footer.js');
+  assertJavaScriptParses('assets/js/firebase-ai-chatbot.js', true);
+}
+
 function assertEnglishLocalLinks(files) {
   const htmlFiles = files.filter((file) => {
     const name = rel(file);
@@ -206,6 +229,7 @@ assertValidJsonLd(files);
 assertSearchResultSignals();
 assertHomepageDirections();
 assertNoStockFlyerAssets();
+assertSharedScriptsParse();
 assertEnglishLocalLinks(files);
 
 if (failures.length) {

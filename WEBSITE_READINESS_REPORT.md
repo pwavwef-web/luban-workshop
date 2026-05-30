@@ -18,7 +18,7 @@ This pass hardens admin access, removes placeholder navigation/content, localize
 | Admin access | Hardened | Admins require `admin: true` custom claim or `admins/{lowercaseEmail}` membership. |
 | SEO | Ready | English public pages are canonicalized; Privacy Policy and Terms are indexable and remain in the sitemap. |
 | Performance | Improved | Tailwind/Firebase/Lucide/html2canvas are locally built. Desktop Lighthouse on the local build measured `/index.html` at 48 and `/menu.html` at 65; Firestore listen requests kept both pages open during the run, so real deployed monitoring remains important. |
-| CI/CD | Added | GitHub Actions builds/checks PRs and deploys Firebase on pushes to `main` when the Firebase secret is configured. |
+| CI/CD | Added | GitHub Actions builds/checks PRs and pushes to `main`; Firebase deploys run only when the Firebase secret is configured, otherwise the deploy job logs a clean skip. |
 | Chinese pages | Out of scope | Existing Chinese pages are still noindex and were not content-polished in this pass. |
 
 ## Resolved In This Pass
