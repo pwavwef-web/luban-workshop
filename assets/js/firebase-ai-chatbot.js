@@ -194,6 +194,7 @@ const SYSTEM_INSTRUCTION = `
 You are the official website chat assistant for Luban Workshop Restaurant in Cape Coast, Ghana.
 Answer guest questions using only the restaurant context supplied in the user prompt.
 Keep answers concise, warm, and practical. Prefer 1-3 short paragraphs or a short list.
+Do not start every reply with a greeting. Greet only once at chat start, then answer directly unless the guest greets you again.
 If the context does not answer the question, say you do not have that detail in the restaurant information available here and direct the guest to call 020 543 8455, email reservations@lubanrestaurant.com, or use [Contact Us](contact-us.html).
 Do not invent menu availability, prices, reservation status, dietary safety, staff names, policies, or private data.
 You can help guests with menu discovery, ordering and checkout guidance, reservation paths, account verification, event/catering questions, contact paths, and issue reports.
@@ -574,18 +575,7 @@ async function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  let greeting = `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`;
-  try {
-    const user = await waitForCurrentUser();
-    const guestName = getAccountDisplayName(null, user);
-    if (guestName) {
-      greeting = `Hi ${guestName}, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`;
-    }
-  } catch (error) {
-    console.warn('Could not personalize chatbot greeting:', error);
-  }
-
-  appendMessage('bot', greeting);
+  appendMessage('bot', `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`);
   appendSuggestions(ELECTION_WEEK_SUGGESTIONS);
 }
 
@@ -1053,7 +1043,6 @@ async function handleUserMessage(question) {
       if (typing) typing.remove();
       appendMessage('bot', reportResponse);
       state.history.push({ role: 'assistant', text: reportResponse });
-      state.history = state.history.slice(-8);
       return;
     }
 
@@ -1064,12 +1053,11 @@ async function handleUserMessage(question) {
     const prompt = buildPrompt(question, knowledge, account);
     const result = await state.model.generateContent(prompt);
     const answer = cleanAnswer(result.response.text());
-    const safeAnswer = answer || contactFallback();
+    const safeAnswer = removeRepeatedGreeting(answer) || contactFallback();
 
     if (typing) typing.remove();
     appendMessage('bot', safeAnswer);
     state.history.push({ role: 'assistant', text: safeAnswer });
-    state.history = state.history.slice(-8);
   } catch (error) {
     console.warn('Luban chatbot error:', error);
     state.knowledgePromise = null;
@@ -1091,6 +1079,15 @@ function cleanAnswer(text) {
     .slice(0, 2200);
 
   return normalizeCediFormatting(cleaned);
+}
+
+function removeRepeatedGreeting(answer) {
+  const hasPriorAssistantReply = state.history.some((item) => item.role === 'assistant');
+  if (!hasPriorAssistantReply) return answer;
+
+  const text = String(answer || '').trim();
+  const stripped = text.replace(/^\s*(?:hi|hello|hey)\b[^\n.!?]{0,90}[,!:.\-]\s*/i, '');
+  return stripped.trim() || text;
 }
 
 function contactFallback() {
@@ -1145,7 +1142,6 @@ function buildUserContext(account) {
 
 function buildPrompt(question, knowledge, account) {
   const history = state.history
-    .slice(-7)
     .map((item) => `${item.role}: ${item.text}`)
     .join('\n');
 
