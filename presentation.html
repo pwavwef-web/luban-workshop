@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luban Workshop — Site Features Overview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #b91c1c;
+    --gold: #d4a017;
+    --dark: #1a1a2e;
+    --darker: #0f0f1a;
+    --light: #f5f0e8;
+    --gray: #a0a0b0;
+  }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--darker);
+    color: var(--light);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  /* Slide container */
+  .deck { position: relative; width: 100%; height: 100%; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 30% 20%, rgba(185,28,28,0.15) 0%, transparent 60%),
+                var(--darker);
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* Typography */
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--gold);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: var(--gold);
+    text-align: center;
+    border-bottom: 2px solid rgba(212,160,23,0.3);
+    padding-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  p, li {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--light);
+  }
+
+  .subtitle {
+    font-size: 1.3rem;
+    color: var(--gray);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .tagline {
+    font-size: 1rem;
+    color: var(--gray);
+    margin-top: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Layout helpers */
+  .content { width: 100%; max-width: 1100px; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    width: 100%;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 22px;
+    transition: border-color 0.3s;
+  }
+
+  .card:hover { border-color: rgba(212,160,23,0.4); }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card li {
+    padding: 4px 0;
+    padding-left: 18px;
+    position: relative;
+    font-size: 1rem;
+  }
+
+  .card li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  ul { list-style: none; padding: 0; }
+  ul li { padding: 5px 0 5px 22px; position: relative; }
+  ul li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 1.2rem;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 16px 0;
+  }
+
+  .flow-step {
+    background: rgba(185,28,28,0.25);
+    border: 1px solid rgba(185,28,28,0.5);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .flow-arrow {
+    color: var(--gold);
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 16px;
+  }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .logo-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 3px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark);
+  }
+
+  .logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Agenda numbering */
+  .agenda-list { counter-reset: agenda; }
+  .agenda-list li {
+    counter-increment: agenda;
+    padding: 8px 0 8px 40px;
+    font-size: 1.15rem;
+    position: relative;
+  }
+  .agenda-list li::before {
+    content: counter(agenda);
+    position: absolute;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: white;
+    top: 6px;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* Slide counter */
+  .slide-counter {
+    position: fixed;
+    bottom: 16px;
+    right: 24px;
+    font-size: 0.85rem;
+    color: var(--gray);
+    z-index: 100;
+    font-family: 'Lato', sans-serif;
+  }
+
+  /* Nav hint */
+  .nav-hint {
+    position: fixed;
+    bottom: 16px;
+    left: 24px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.25);
+    z-index: 100;
+  }
+
+  /* Click zones */
+  .click-left, .click-right {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    z-index: 50;
+    cursor: pointer;
+  }
+  .click-left { left: 0; }
+  .click-right { right: 0; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .slide { padding: 40px 30px; }
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.7rem; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+  }
+
+  /* Title slide special */
+  .slide-title { text-align: center; }
+  .slide-title h1 { font-size: 3.4rem; }
+
+  .two-col { display: flex; gap: 40px; align-items: flex-start; width: 100%; }
+  .two-col > div { flex: 1; }
+
+  @media (max-width: 900px) {
+    .two-col { flex-direction: column; }
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(185,28,28,0.3);
+    border: 1px solid rgba(185,28,28,0.5);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #f87171;
+    margin: 2px 3px;
+  }
+
+  .highlight { color: var(--gold); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide slide-title active" data-slide="0">
+    <div class="logo-container">
+      <img src="../03_Codebase/luban-workshop/logo.png" alt="Luban Workshop Logo">
+    </div>
+    <h1>Luban Workshop Restaurant</h1>
+    <p class="subtitle">Digital Platform — Features Overview</p>
+    <p class="tagline">For the Development Team</p>
+    <p style="margin-top:32px;color:var(--gray);font-size:0.9rem;">lubanrestaurant.com</p>
+  </div>
+
+  <!-- SLIDE 2: Agenda -->
+  <div class="slide" data-slide="1">
+    <div class="content">
+      <h2>Agenda</h2>
+      <ol class="agenda-list">
+        <li>Site Overview & Tech Stack</li>
+        <li>Customer-Facing Features</li>
+        <li>Online Ordering & Checkout</li>
+        <li>Reservations</li>
+        <li>AI Chatbot & Promotions</li>
+        <li>Admin Dashboard</li>
+        <li>Notifications, Security & PWA</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Tech Stack -->
+  <div class="slide" data-slide="2">
+    <div class="content">
+      <h2>Site Overview & Tech Stack</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Frontend</h3>
+          <ul>
+            <li>Vanilla HTML / CSS / JS</li>
+            <li>Tailwind CSS 3.4</li>
+            <li>Playfair Display + Lato fonts</li>
+            <li>Lucide Icons</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Backend</h3>
+          <ul>
+            <li>Firebase Cloud Functions v2</li>
+            <li>Cloud Firestore</li>
+            <li>Firebase Auth</li>
+            <li>Cloud Storage</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Integrations</h3>
+          <ul>
+            <li>Arkesel SMS (OTP + notifications)</li>
+            <li>Nodemailer / Gmail SMTP</li>
+            <li>Cloudflare Turnstile</li>
+            <li>Google Analytics 4</li>
+            <li>Firebase AI (Gemini)</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:24px;text-align:center;color:var(--gray);font-size:0.95rem;">
+        Multi-page static site on <span class="highlight">Firebase Hosting</span> with serverless Cloud Functions backend.
+        Zero frontend frameworks — pure vanilla JS.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Customer Pages -->
+  <div class="slide" data-slide="3">
+    <div class="content">
+      <h2>Customer-Facing Pages</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Core Pages</h3>
+          <ul>
+            <li><strong>Homepage</strong> — Hero, menu preview, map, Instagram feed, promotions</li>
+            <li><strong>Menu</strong> — 12 categories, card & table views, sticky nav</li>
+            <li><strong>About Us</strong> — Restaurant story, team profiles from Firestore</li>
+            <li><strong>FAQ</strong> — Accordion sections covering 5 topics</li>
+            <li><strong>Contact Us</strong> — Form with Turnstile anti-bot</li>
+            <li><strong>Events & Catering</strong> — Private parties, corporate events, external catering</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Utility Pages</h3>
+          <ul>
+            <li><strong>Checkout</strong> — Secure order placement</li>
+            <li><strong>Order Status</strong> — Real-time tracking</li>
+            <li><strong>Reservation Status</strong> — SMS-secure access</li>
+            <li><strong>Customer Profile</strong> — Account management</li>
+            <li><strong>Special Menu</strong> — QR-scannable event menus</li>
+            <li><strong>Privacy Policy / Terms</strong> — Legal pages</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Menu Categories -->
+  <div class="slide" data-slide="4">
+    <div class="content">
+      <h2>Menu Browsing</h2>
+      <div class="grid-2">
+        <div>
+          <h3>12 Categories</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+            <span class="badge">All</span>
+            <span class="badge">Soups</span>
+            <span class="badge">Starters</span>
+            <span class="badge">Beef & Lamb</span>
+            <span class="badge">Pork</span>
+            <span class="badge">Chicken</span>
+            <span class="badge">Seafood</span>
+            <span class="badge">Rice</span>
+            <span class="badge">Noodles</span>
+            <span class="badge">Dumplings</span>
+            <span class="badge">Vegetable</span>
+            <span class="badge">Drinks</span>
+          </div>
+          <ul>
+            <li>Card view with dish photos (WebP)</li>
+            <li>Table view toggle</li>
+            <li>Sticky category navigation</li>
+            <li>Animated 3D logo hero</li>
+            <li>Hover effects with gold border glow</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Key Details</h3>
+          <ul>
+            <li>50+ dishes across all categories</li>
+            <li>Price range: GHS 25 – 155</li>
+            <li>Searchable & filterable</li>
+            <li>Responsive on all devices</li>
+            <li>Chinese-language menu version available</li>
+            <li>Admin can toggle dish visibility & update prices</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Online Ordering -->
+  <div class="slide" data-slide="5">
+    <div class="content">
+      <h2>Online Ordering & Checkout</h2>
+      <div class="flow">
+        <div class="flow-step">Browse Menu</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Add to Cart</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Sign In</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Verify Phone (SMS OTP)</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Place Order</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">Track & Pickup</div>
+      </div>
+      <div class="grid-2" style="margin-top:24px;">
+        <div class="card">
+          <h3>Features</h3>
+          <ul>
+            <li>Cart persists in localStorage</li>
+            <li>Drink suggestions at checkout</li>
+            <li>Pay at counter model</li>
+            <li>6-digit SMS OTP verification</li>
+            <li>Optional email verification</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Safeguards</h3>
+          <ul>
+            <li>Duplicate order prevention (3-min window)</li>
+            <li>Order cancellation within 5 minutes</li>
+            <li>Status tracking: pending &rarr; preparing &rarr; completed</li>
+            <li>Order history on homepage</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Reservations -->
+  <div class="slide" data-slide="6">
+    <div class="content">
+      <h2>Reservation System</h2>
+      <div class="grid-2">
+        <div>
+          <h3>Customer Flow</h3>
+          <ul>
+            <li>Date picker (up to 3 months ahead)</li>
+            <li>Time selection</li>
+            <li>Guest count (1 – 8+)</li>
+            <li>Special requests field</li>
+            <li>Cloudflare Turnstile anti-bot</li>
+          </ul>
+          <h3 style="margin-top:20px;">Status Access</h3>
+          <ul>
+            <li>SMS-based secure link (one-time code)</li>
+            <li>Change / cancellation request form</li>
+            <li>15-minute access code TTL</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Admin Flow</h3>
+          <div class="flow" style="justify-content:flex-start;">
+            <div class="flow-step">New Request</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Review</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Confirm / Reject</div>
+          </div>
+          <ul style="margin-top:16px;">
+            <li>Real-time badge notifications in admin</li>
+            <li>Rejection with reason</li>
+            <li>SMS + email notifications to customer</li>
+            <li>Email notification to restaurant on new request</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: AI Chatbot & Meet Bao -->
+  <div class="slide" data-slide="7">
+    <div class="content">
+      <h2>AI Chatbot & "Meet Bao" Campaign</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>AI Chatbot</h3>
+          <ul>
+            <li>Powered by <strong>Gemini 3.1 Flash Lite</strong> (Firebase AI)</li>
+            <li>Floating chat widget on public pages</li>
+            <li>Suggestion chips for quick actions</li>
+            <li>Signed-in user context for personalized responses</li>
+            <li>Hardcoded restaurant knowledge base</li>
+            <li>Firestore-backed chatbot facts (admin-managed)</li>
+            <li>Report submission to Firestore for follow-up</li>
+            <li>Election-week awareness (nonpartisan responses)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>"Meet Bao" Campaign</h3>
+          <ul>
+            <li>Mascot character "Bao" — friendly restaurant guide</li>
+            <li>Dedicated campaign landing page</li>
+            <li>Homepage campaign banner with CTA</li>
+            <li>Campaign flyer visuals</li>
+            <li>Marketing asset documentation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Promotions & Special Menus -->
+  <div class="slide" data-slide="8">
+    <div class="content">
+      <h2>Promotions & Special Menus</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Promotions & Deals</h3>
+          <ul>
+            <li>Admin-created offers (Promotion or Deal type)</li>
+            <li>3 pricing styles:
+              <ul>
+                <li>Custom per-dish prices</li>
+                <li>Fixed percent off</li>
+                <li>Bundle price</li>
+              </ul>
+            </li>
+            <li>Dish selection from menu catalog</li>
+            <li>Validity date range</li>
+            <li>Visibility toggle (home + about pages)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Special Menus</h3>
+          <ul>
+            <li>Event-specific menus created by admin</li>
+            <li>Auto-generated QR codes</li>
+            <li>Guest note field</li>
+            <li>Print sheet & download functionality</li>
+            <li>Shareable link via URL parameter</li>
+            <li>Status management (active / hidden)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: Staff Profiles -->
+  <div class="slide" data-slide="9">
+    <div class="content">
+      <h2>Staff Profiles</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Profile System</h3>
+          <ul>
+            <li>Firestore-driven team profiles</li>
+            <li>Photo, name, role, department, bio</li>
+            <li>Individual profile pages</li>
+            <li>Photo uploads via Firebase Storage</li>
+            <li>Profile edit form for staff</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Review Workflow</h3>
+          <ul>
+            <li>Staff submit profile changes</li>
+            <li>Admin reviews & approves</li>
+            <li>Photo cleanup on deletion</li>
+            <li>Profiles displayed on About Us page</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: Multi-Language & PWA -->
+  <div class="slide" data-slide="10">
+    <div class="content">
+      <h2>Multi-Language & PWA</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Multi-Language Support</h3>
+          <ul>
+            <li>English (primary) + Chinese</li>
+            <li>7 Chinese-language pages</li>
+            <li>Chinese pages marked <code>noindex</code></li>
+            <li>hreflang alternates for SEO</li>
+            <li>Full menu, FAQ, contact, about, events in Chinese</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Progressive Web App</h3>
+          <ul>
+            <li>Installable on mobile & desktop</li>
+            <li>Service Worker (network-first caching)</li>
+            <li>Offline support for static assets</li>
+            <li>Firebase Cloud Messaging for push</li>
+            <li>Separate admin PWA manifest</li>
+            <li>Custom app icons & theme color</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: Admin Dashboard -->
+  <div class="slide" data-slide="11">
+    <div class="content">
+      <h2>Admin Dashboard — 11 Tabs</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Operations</h3>
+          <ul>
+            <li><strong>Menu Manager</strong> — Toggle visibility, update prices</li>
+            <li><strong>Reservations</strong> — View, confirm, decline</li>
+            <li><strong>Orders</strong> — Track, update status, cancel</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Marketing</h3>
+          <ul>
+            <li><strong>Promotions</strong> — Create/edit/delete offers</li>
+            <li><strong>Special Menus</strong> — QR codes, print sheets</li>
+            <li><strong>Chatbot Facts</strong> — Manage AI knowledge base</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Administration</h3>
+          <ul>
+            <li><strong>Admin Users</strong> — Promote/manage access</li>
+            <li><strong>Messages & AI</strong> — Contact inbox + AI reports</li>
+            <li><strong>Fraud Review</strong> — Suspicious activity</li>
+            <li><strong>Account Settings</strong> — Admin config</li>
+            <li><strong>Profile Review</strong> — Staff profile approvals</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: Notifications -->
+  <div class="slide" data-slide="12">
+    <div class="content">
+      <h2>Notification Pipeline</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Email Notifications</h3>
+          <ul>
+            <li>New order placed (to restaurant)</li>
+            <li>Order cancelled (to restaurant)</li>
+            <li>Order confirmation (to customer)</li>
+            <li>Order completed (to customer)</li>
+            <li>New reservation (to restaurant)</li>
+            <li>Reservation confirmed / rejected (to customer)</li>
+            <li>New contact message (to restaurant)</li>
+          </ul>
+          <p style="margin-top:12px;color:var(--gray);font-size:0.9rem;">
+            HTML-formatted responsive templates via Nodemailer / Gmail SMTP
+          </p>
+        </div>
+        <div class="card">
+          <h3>SMS Notifications</h3>
+          <ul>
+            <li>Order placed (customer + restaurant)</li>
+            <li>Order status updates (preparing, completed)</li>
+            <li>Reservation confirmed / rejected (customer)</li>
+          </ul>
+          <p style="margin-top:12px;color:var(--gray);font-size:0.9rem;">
+            Sent via <strong>Arkesel SMS API</strong> — Ghana +233 format normalization
+          </p>
+        </div>
+      </div>
+      <p style="margin-top:16px;text-align:center;color:var(--gray);font-size:0.9rem;">
+        All notifications triggered by <span class="highlight">Cloud Functions</span> on Firestore document writes
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 14: Security -->
+  <div class="slide" data-slide="13">
+    <div class="content">
+      <h2>Security & Compliance</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Authentication</h3>
+          <ul>
+            <li>Firebase Auth (email/password, Google, phone OTP)</li>
+            <li>Dual admin model: custom claim + Firestore doc</li>
+            <li>Server-side verification in Cloud Functions</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Protection</h3>
+          <ul>
+            <li>Cloudflare Turnstile on forms</li>
+            <li>Firestore security rules</li>
+            <li>Server-mediated write policy</li>
+            <li>Token-based API authentication</li>
+            <li>Reservation access codes with TTL</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Compliance</h3>
+          <ul>
+            <li>GDPR cookie consent banner</li>
+            <li>Deferred GA4 analytics until consent</li>
+            <li>noindex on sensitive pages</li>
+            <li>HTML escaping in email templates</li>
+            <li>Privacy Policy & Terms of Use pages</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15: Summary -->
+  <div class="slide" data-slide="14">
+    <div class="content">
+      <h2>Summary</h2>
+      <div class="grid-3" style="margin-bottom:32px;">
+        <div class="stat">
+          <div class="stat-number">15+</div>
+          <div class="stat-label">Public Pages</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Menu Dishes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">11</div>
+          <div class="stat-label">Admin Tabs</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What's Live</h3>
+          <ul>
+            <li>Full online ordering with SMS verification</li>
+            <li>Table reservation system</li>
+            <li>AI chatbot (Gemini)</li>
+            <li>Admin dashboard with 11 management tabs</li>
+            <li>Email + SMS notification pipelines</li>
+            <li>PWA with offline support</li>
+            <li>Multi-language (English + Chinese)</li>
+            <li>Promotions & special menu system</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Key Differentiators</h3>
+          <ul>
+            <li>Zero frontend frameworks — pure vanilla JS</li>
+            <li>Enterprise-level functionality via Firebase</li>
+            <li>Phone verification for order security</li>
+            <li>AI-powered customer assistance</li>
+            <li>QR-code driven special menus</li>
+            <li>Full GDPR compliance</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:24px;text-align:center;color:var(--gray);font-size:0.9rem;">
+        <span class="highlight">lubanrestaurant.com</span> — Built by Francis Pwavwe & Chinedum Okwonkwo
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Slide counter -->
+<div class="slide-counter" id="slideCounter">1 / 15</div>
+
+<!-- Nav hint -->
+<div class="nav-hint">Arrow keys or click to navigate</div>
+
+<!-- Click zones for navigation -->
+<div class="click-left" id="clickPrev"></div>
+<div class="click-right" id="clickNext"></div>
+
+<script>
+(function () {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current === index ? current : current].classList.remove('exit'), 450);
+
+    const prev = current;
+    current = index;
+    slides[current].classList.add('active');
+
+    // Update progress
+    const pct = ((current) / (total - 1)) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('slideCounter').textContent = (current + 1) + ' / ' + total;
+
+    // Clean up exit class on previous slide after transition
+    setTimeout(() => slides[prev].classList.remove('exit'), 500);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+  });
+
+  // Click navigation
+  document.getElementById('clickNext').addEventListener('click', next);
+  document.getElementById('clickPrev').addEventListener('click', prev);
+
+  // Touch/swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+  });
+
+  // Init progress
+  document.getElementById('progressBar').style.width = '0%';
+})();
+</script>
+</body>
+</html>
