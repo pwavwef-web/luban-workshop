@@ -1,5 +1,5 @@
 // Luban Workshop Restaurant - Main Page Service Worker
-const CACHE_NAME = 'luban-main-v6';
+const CACHE_NAME = 'luban-main-v7';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
     '/tailwind.css',
     '/script.js',
     '/assets/js/lucide.bundle.js',
+    '/assets/js/menu-data.js',
     '/assets/js/html2canvas.bundle.js',
     '/assets/js/firebase-ai-chatbot.js'
 ];

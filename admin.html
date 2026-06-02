@@ -29,6 +29,7 @@
     <script src="assets/js/admin-bao-icons.js?v=20260527-bao-admin"></script>
     <script src="assets/js/firebase-modular.bundle.js?v=20260523-reservationfix2"></script>
     <script src="assets/js/admin-qr.bundle.js?v=20260523-reservationfix2"></script>
+    <script src="assets/js/menu-data.js"></script>
 
     <style>
         :root {
@@ -573,6 +574,17 @@
                     </button>
                 </div>
             </div>
+            <details class="text-xs text-stone-500">
+                <summary class="cursor-pointer select-none font-semibold text-stone-600">Keyboard shortcuts</summary>
+                <ul class="mt-2 list-disc pl-5 space-y-1">
+                    <li>Alt+1 Menu</li>
+                    <li>Alt+2 Reservations</li>
+                    <li>Alt+3 Orders</li>
+                    <li>Ctrl/Cmd+Enter advance first order</li>
+                    <li>Ctrl/Cmd+Y approve first reservation</li>
+                    <li>Ctrl/Cmd+Shift+Y reject first reservation</li>
+                </ul>
+            </details>
 
             <!-- Metric buttons removed as requested -->
 
@@ -580,6 +592,34 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
                     <p class="text-sm text-stone-500">Toggle dish visibility and update prices on the main website.</p>
+                </div>
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Search dish</span>
+                            <input id="menu-search" type="search" placeholder="Name, ID, category"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Status</span>
+                            <select id="menu-status-filter"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="all">All statuses</option>
+                                <option value="visible">Visible only</option>
+                                <option value="hidden">Hidden only</option>
+                            </select>
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Sort</span>
+                            <select id="menu-sort"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="name-asc">Name A–Z</option>
+                                <option value="name-desc">Name Z–A</option>
+                                <option value="price-asc">Price low to high</option>
+                                <option value="price-desc">Price high to low</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -612,6 +652,34 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Reservations</h2>
                     <p class="text-sm text-stone-500">Confirm or decline requests and notify guests right away.</p>
+                </div>
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Search guest</span>
+                            <input id="reservations-search" type="search" placeholder="Name, phone, email"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Status</span>
+                            <select id="reservations-status-filter"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="all">All statuses</option>
+                                <option value="pending">Pending only</option>
+                                <option value="confirmed">Confirmed only</option>
+                                <option value="rejected">Rejected only</option>
+                            </select>
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Sort</span>
+                            <select id="reservations-sort"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="guest-asc">Guest A–Z</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -686,6 +754,36 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Incoming Orders</h2>
                     <p class="text-sm text-stone-500">Track incoming orders and move them through preparation.</p>
+                </div>
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Search order</span>
+                            <input id="orders-search" type="search" placeholder="Order ID, customer, phone"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Status</span>
+                            <select id="orders-status-filter"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="all">All statuses</option>
+                                <option value="pending">Pending only</option>
+                                <option value="preparing">Preparing only</option>
+                                <option value="completed">Completed only</option>
+                                <option value="cancelled">Cancelled only</option>
+                            </select>
+                        </label>
+                        <label class="text-sm text-stone-600">
+                            <span class="block text-xs font-bold uppercase tracking-wider mb-1">Sort</span>
+                            <select id="orders-sort"
+                                class="w-full px-3 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                <option value="newest">Newest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="total-desc">Highest total</option>
+                                <option value="total-asc">Lowest total</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -1235,6 +1333,12 @@
 
         // --- Push Notification helpers ---
         let notificationsEnabled = false;
+        const initializedTabs = new Set();
+        const TYPING_ELEMENT_TAGS = ['INPUT', 'TEXTAREA', 'SELECT'];
+        const MENU_TABLE_COLUMNS = 5;
+        const RESERVATIONS_TABLE_COLUMNS = 6;
+        const ORDERS_TABLE_COLUMNS = 7;
+        let activeAdminTab = 'menu';
 
         async function requestNotificationPermission() {
             if (!('Notification' in window)) return;
@@ -1316,17 +1420,6 @@
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 document.getElementById('user-email').textContent = user.email;
 
-                // Initialize Listeners
-                listenToMenu();
-                listenToReservations();
-                listenToOrders();
-                listenToPromotions();
-                listenToSpecialMenus();
-                listenToAdminUsers();
-                listenToMessages();
-                loadFraudReview();
-                listenToChatbotKnowledge();
-
                 // Request notification permission
                 requestNotificationPermission();
 
@@ -1350,6 +1443,8 @@
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('admin-dashboard').classList.add('hidden');
+                initializedTabs.clear();
+                activeAdminTab = 'menu';
             }
         });
 
@@ -1381,7 +1476,30 @@
             }
         }
 
+        function ensureTabInitialized(tabName) {
+            if (initializedTabs.has(tabName)) return;
+
+            const initializers = {
+                menu: listenToMenu,
+                reservations: listenToReservations,
+                orders: listenToOrders,
+                promotions: listenToPromotions,
+                'special-menus': listenToSpecialMenus,
+                'admin-users': listenToAdminUsers,
+                messages: listenToMessages,
+                'fraud-review': loadFraudReview,
+                'chatbot-knowledge': listenToChatbotKnowledge
+            };
+
+            const initializer = initializers[tabName];
+            if (typeof initializer === 'function') {
+                initializer();
+                initializedTabs.add(tabName);
+            }
+        }
+
         function switchTab(tabName) {
+            activeAdminTab = tabName;
             // Close mobile sidebar when switching tabs (only if it's open)
             if (window.innerWidth < MOBILE_BREAKPOINT && isMobileSidebarOpen) {
                 toggleMobileSidebar();
@@ -1400,6 +1518,7 @@
 
             // Show active view
             document.getElementById('view-' + tabName).classList.remove('hidden');
+            ensureTabInitialized(tabName);
 
             if (tabName === 'account') {
                 checkSmsBalance();
@@ -1411,80 +1530,99 @@
             activeBtn.classList.remove('text-stone-600');
             activeBtn.setAttribute('aria-current', 'page');
 
-            if (tabName === 'fraud-review') {
-                loadFraudReview();
+        }
+
+        function getActiveTabName() {
+            return activeAdminTab;
+        }
+
+        function isTypingContext(event) {
+            const target = event.target;
+            if (!target) return false;
+            return TYPING_ELEMENT_TAGS.includes(target.tagName) || target.isContentEditable;
+        }
+
+        async function advanceFirstActionableOrder() {
+            const candidate = getFilteredOrders().find(entry => {
+                const status = String((entry.data || {}).status || 'pending').toLowerCase();
+                return status === 'pending' || status === 'preparing';
+            });
+            if (!candidate) return;
+            const status = String((candidate.data || {}).status || 'pending').toLowerCase();
+            await updateOrderStatus(candidate.id, status === 'pending' ? 'preparing' : 'completed');
+        }
+
+        async function approveFirstPendingReservation() {
+            const candidate = getFilteredReservations().find(entry => normalizeReservationStatus((entry.data || {}).status) === 'pending');
+            if (!candidate) return;
+            await updateReservationStatus(candidate.id, 'confirmed');
+        }
+
+        function rejectFirstPendingReservation() {
+            const candidate = getFilteredReservations().find(entry => normalizeReservationStatus((entry.data || {}).status) === 'pending');
+            if (!candidate) return;
+            openReservationRejectModal(candidate.id, (candidate.data || {}).name || 'Guest');
+        }
+
+        function handleAdminShortcuts(event) {
+            if (isTypingContext(event) && event.key !== 'Escape') return;
+
+            if (event.altKey && !event.ctrlKey && !event.metaKey) {
+                const tabByNumber = {
+                    '1': 'menu',
+                    '2': 'reservations',
+                    '3': 'orders',
+                    '4': 'promotions',
+                    '5': 'messages'
+                };
+                const tabName = tabByNumber[event.key];
+                if (tabName) {
+                    event.preventDefault();
+                    switchTab(tabName);
+                    return;
+                }
+            }
+
+            const isPrimaryModifier = event.ctrlKey || event.metaKey;
+            if (!isPrimaryModifier) return;
+            const activeTab = getActiveTabName();
+
+            if (event.key === 'Enter' && activeTab === 'orders') {
+                event.preventDefault();
+                advanceFirstActionableOrder().catch(err => console.error('Shortcut order advance failed:', err));
+                return;
+            }
+
+            if (event.key.toLowerCase() === 'y' && activeTab === 'reservations') {
+                event.preventDefault();
+                if (event.shiftKey) {
+                    rejectFirstPendingReservation();
+                } else {
+                    approveFirstPendingReservation().catch(err => console.error('Shortcut reservation approve failed:', err));
+                }
             }
         }
 
         // --- Hardcoded Menu ---
-        const HARDCODED_MENU = [
-            { id: 'SP1', name: 'Chicken & Sweet Corn Soup', category: 'soups', price: 40 },
-            { id: 'SP2', name: 'Hot & Sour Soup', category: 'soups', price: 40 },
-            { id: 'S1', name: 'Beef Spring Rolls (3 pcs)', category: 'starters', price: 30 },
-            { id: 'S2', name: 'Vegetable Spring Rolls (3 pcs)', category: 'starters', price: 25 },
-            { id: 'S3', name: 'Beef Samosa (5 pcs)', category: 'starters', price: 30 },
-            { id: 'S4', name: 'Fish Samosa (5 pcs)', category: 'starters', price: 30 },
-            { id: 'S5', name: 'Fried Chicken Pieces (6 pcs)', category: 'starters', price: 65 },
-            { id: 'S6', name: 'Special Chicken Wings', category: 'starters', price: 65 },
-            { id: 'S7', name: 'Golden Fried Prawns', category: 'starters', price: 90 },
-            { id: 'S8', name: 'Fried Squid in Spicy Salt', category: 'starters', price: 85 },
-            { id: 'B1', name: 'Shredded Beef with Green Pepper & Onion', category: 'beef-lamb', price: 110 },
-            { id: 'B2', name: 'Beef in Sichuan Sauce', category: 'beef-lamb', price: 110 },
-            { id: 'B3', name: 'Sliced Beef in Curry Sauce', category: 'beef-lamb', price: 110 },
-            { id: 'B4', name: 'Beef in Oyster Sauce', category: 'beef-lamb', price: 110 },
-            { id: 'B5', name: 'Crispy Chilli Beef', category: 'beef-lamb', price: 85 },
-            { id: 'B6', name: 'Mongolian Shallot Lamb', category: 'beef-lamb', price: 115 },
-            { id: 'B7', name: 'Lamb Chops', category: 'beef-lamb', price: 85 },
-            { id: 'P1', name: 'Sweet & Sour Pork', category: 'pork', price: 90 },
-            { id: 'P2', name: 'Pork Sichuan Style', category: 'pork', price: 90 },
-            { id: 'P3', name: 'Pork in Chilli Sauce', category: 'pork', price: 90 },
-            { id: 'P4', name: 'Pork in Oyster Sauce', category: 'pork', price: 90 },
-            { id: 'P5', name: 'Fried Pork Ribs', category: 'pork', price: 75 },
-            { id: 'K1', name: 'Sweet & Sour Chicken', category: 'chicken', price: 100 },
-            { id: 'K2', name: 'Chicken Sichuan Sauce', category: 'chicken', price: 100 },
-            { id: 'K3', name: 'Chicken in Curry Sauce', category: 'chicken', price: 100 },
-            { id: 'K4', name: 'Chicken in Oyster Sauce', category: 'chicken', price: 100 },
-            { id: 'Q1', name: 'Squid in Luban Chilli Sauce', category: 'seafood', price: 120 },
-            { id: 'Q2', name: 'Squid in Sichuan Sauce', category: 'seafood', price: 120 },
-            { id: 'Q3', name: 'Squid in Garlic Sauce', category: 'seafood', price: 120 },
-            { id: 'F1', name: 'Fish Fillet in Chilli Sauce', category: 'seafood', price: 115 },
-            { id: 'F2', name: 'Fish Fillet in Vegetable Sauce', category: 'seafood', price: 115 },
-            { id: 'F3', name: 'Fish Fillet in Sichuan Sauce', category: 'seafood', price: 115 },
-            { id: 'F4', name: 'Sweet & Sour Fish Fillet', category: 'seafood', price: 115 },
-            { id: 'PR1', name: 'Prawns in Chilli Sauce', category: 'seafood', price: 155 },
-            { id: 'PR2', name: 'Prawns in Curry Sauce', category: 'seafood', price: 155 },
-            { id: 'PR3', name: 'Prawns in Sichuan Sauce', category: 'seafood', price: 155 },
-            { id: 'SF1', name: 'Special Seafood in Sichuan Sauce', category: 'seafood', price: 170 },
-            { id: 'R1', name: 'Steamed Rice', category: 'rice', price: 29 },
-            { id: 'R2', name: 'Special Jollof Rice', category: 'rice', price: 50 },
-            { id: 'R3', name: 'Combo Fried Rice', category: 'rice', price: 50 },
-            { id: 'R4', name: 'Shrimp Fried Rice', category: 'rice', price: 50 },
-            { id: 'R5', name: 'Egg Fried Rice', category: 'rice', price: 40 },
-            { id: 'R6', name: 'Beef Fried Rice', category: 'rice', price: 45 },
-            { id: 'R7', name: 'Chicken Fried Rice', category: 'rice', price: 45 },
-            { id: 'R8', name: 'Seafood Fried Rice', category: 'rice', price: 85 },
-            { id: 'R9', name: 'Pork Fried Rice', category: 'rice', price: 45 },
-            { id: 'N1', name: 'Vegetable Noodles', category: 'noodles', price: 45 },
-            { id: 'N2', name: 'Special Noodles', category: 'noodles', price: 80 },
-            { id: 'N4', name: 'Singapore Noodles', category: 'noodles', price: 80 },
-            { id: 'N5', name: 'Seafood Noodles', category: 'noodles', price: 100 },
-            { id: 'N6', name: 'Chicken Noodles', category: 'noodles', price: 60 },
-            { id: 'D1', name: 'Steamed Pork Dumpling', category: 'dumplings', price: 30 },
-            { id: 'D2', name: 'Fried Pork Dumpling', category: 'dumplings', price: 30 },
-            { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30 },
-            { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30 },
-            { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40 },
-            { id: 'DR1', name: 'Coca-Cola 300ml', category: 'drinks', price: 15 },
-            { id: 'DR2', name: 'Fanta 300ml', category: 'drinks', price: 15 },
-            { id: 'DR3', name: 'Sprite 300ml', category: 'drinks', price: 15 },
-            { id: 'DR4', name: 'Water 300ml', category: 'drinks', price: 5 },
-        ];
+        const HARDCODED_MENU = Array.isArray(window.LUBAN_MENU)
+            ? window.LUBAN_MENU.map(item => ({ ...item }))
+            : [];
 
         // --- Real-time Listeners (Red Dot Logic) ---
 
         let menuHiddenIds = new Set();
         let menuPriceOverrides = {};
         let menuImageOverrides = {};
+        let menuSearchQuery = '';
+        let menuStatusFilter = 'all';
+        let menuSortMode = 'name-asc';
+        let reservationsCache = [];
+        let reservationsSearchQuery = '';
+        let reservationsStatusFilter = 'all';
+        let reservationsSortMode = 'newest';
+        let ordersSearchQuery = '';
+        let ordersStatusFilter = 'all';
+        let ordersSortMode = 'newest';
 
         function getDishCurrentPrice(dish) {
             return menuPriceOverrides[dish.id] !== undefined ? Number(menuPriceOverrides[dish.id]) : Number(dish.price || 0);
@@ -1503,8 +1641,29 @@
         function renderMenuTable() {
             const tableBody = document.getElementById('menu-items-table');
             tableBody.innerHTML = '';
+            const normalizedQuery = menuSearchQuery.toLowerCase();
+            const menuRows = HARDCODED_MENU
+                .filter(dish => {
+                    const isHidden = menuHiddenIds.has(dish.id);
+                    if (menuStatusFilter === 'visible' && isHidden) return false;
+                    if (menuStatusFilter === 'hidden' && !isHidden) return false;
+                    if (!normalizedQuery) return true;
+                    const haystack = `${dish.id} ${dish.name} ${dish.category}`.toLowerCase();
+                    return haystack.includes(normalizedQuery);
+                })
+                .sort((a, b) => {
+                    if (menuSortMode === 'name-desc') return (b.name || '').localeCompare(a.name || '');
+                    if (menuSortMode === 'price-asc') return getDishCurrentPrice(a) - getDishCurrentPrice(b) || (a.name || '').localeCompare(b.name || '');
+                    if (menuSortMode === 'price-desc') return getDishCurrentPrice(b) - getDishCurrentPrice(a) || (a.name || '').localeCompare(b.name || '');
+                    return (a.name || '').localeCompare(b.name || '');
+                });
 
-            HARDCODED_MENU.forEach(dish => {
+            if (!menuRows.length) {
+                tableBody.innerHTML = `<tr><td colspan="${MENU_TABLE_COLUMNS}" class="px-6 py-8 text-center text-stone-500 italic">No dishes match your current filters.</td></tr>`;
+                return;
+            }
+
+            menuRows.forEach(dish => {
                 const isHidden = menuHiddenIds.has(dish.id);
                 const currentPrice = getDishCurrentPrice(dish);
                 const hasImageOverride = menuImageOverrides[dish.id] !== undefined;
@@ -1738,6 +1897,7 @@
 
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') { closePriceModal(); closeImageModal(); closeReservationRejectModal(); }
+            handleAdminShortcuts(e);
         });
 
         async function toggleDishVisibility(id, currentlyHidden) {
@@ -1766,15 +1926,126 @@
             return { label: 'Pending', classes: 'bg-yellow-100 text-yellow-800' };
         }
 
+        function getReservationTimestamp(reservation) {
+            const createdAt = reservation && reservation.createdAt;
+            return createdAt && typeof createdAt.toDate === 'function'
+                ? createdAt.toDate().getTime()
+                : 0;
+        }
+
+        function getFilteredReservations() {
+            const query = reservationsSearchQuery.toLowerCase();
+            return reservationsCache
+                .filter(entry => {
+                    const res = entry.data || {};
+                    const status = normalizeReservationStatus(res.status);
+                    if (reservationsStatusFilter !== 'all' && status !== reservationsStatusFilter) return false;
+                    if (!query) return true;
+                    const haystack = `${entry.id} ${res.name || ''} ${res.phone || ''} ${res.email || ''} ${res.date || ''} ${res.time || ''}`.toLowerCase();
+                    return haystack.includes(query);
+                })
+                .sort((a, b) => {
+                    if (reservationsSortMode === 'oldest') return getReservationTimestamp(a.data) - getReservationTimestamp(b.data);
+                    if (reservationsSortMode === 'guest-asc') return String((a.data || {}).name || '').localeCompare(String((b.data || {}).name || ''));
+                    return getReservationTimestamp(b.data) - getReservationTimestamp(a.data);
+                });
+        }
+
+        function renderReservationsTable() {
+            const tableBody = document.getElementById('reservations-table');
+            tableBody.innerHTML = '';
+
+            const pendingCount = reservationsCache.filter(item => normalizeReservationStatus((item.data || {}).status) === 'pending').length;
+            const badge = document.getElementById('badge-reservations');
+            badge.classList.toggle('hidden', pendingCount === 0);
+            setMetricValue('metric-pending-reservations', pendingCount);
+
+            const visibleReservations = getFilteredReservations();
+            if (!visibleReservations.length) {
+                tableBody.innerHTML = `<tr><td colspan="${RESERVATIONS_TABLE_COLUMNS}" class="px-6 py-8 text-center text-stone-500 italic">No reservations match your current filters.</td></tr>`;
+                return;
+            }
+
+            visibleReservations.forEach(entry => {
+                const res = entry.data || {};
+                const id = entry.id;
+                const status = normalizeReservationStatus(res.status);
+                const statusMeta = getReservationStatusMeta(status);
+                const specialRequests = res.notes ? `<div class="mt-1 text-xs text-stone-500">Requests: ${escapeHtml(truncateText(res.notes, 100))}</div>` : '';
+                const rejectionReason = res.decisionReason && status === 'rejected'
+                    ? `<div class="mt-1 text-xs text-red-700">Reason: ${escapeHtml(truncateText(res.decisionReason, 100))}</div>`
+                    : '';
+                const decisionBy = res.decisionBy
+                    ? `<div class="mt-1 text-xs text-stone-400">Updated by ${escapeHtml(res.decisionBy)}</div>`
+                    : '';
+
+                let actionBtn = '';
+                if (status === 'pending') {
+                    actionBtn = `
+                <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
+                    <i data-lucide="check" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Confirm</span>
+                </button>
+                <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Reject</span>
+                </button>`;
+                } else if (status === 'confirmed') {
+                    actionBtn = `
+                <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors mr-2" title="Move Back to Pending">
+                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Pending</span>
+                </button>
+                <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Reject</span>
+                </button>`;
+                } else {
+                    actionBtn = `
+                <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
+                    <i data-lucide="check" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Confirm</span>
+                </button>
+                <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors" title="Move Back to Pending">
+                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                    <span class="text-xs font-semibold">Pending</span>
+                </button>`;
+                }
+
+                const row = `
+            <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
+                <td class="px-6 py-4 text-sm font-medium text-stone-900">
+                    <div>${escapeHtml(res.name || 'Guest')}</div>
+                    ${specialRequests}
+                </td>
+                <td class="px-6 py-4 text-sm text-stone-500">
+                    <div>${escapeHtml(res.phone || 'No phone')}</div>
+                    <div class="text-xs text-stone-600">${escapeHtml(res.email || 'No email provided')}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
+                    <div class="font-medium">${escapeHtml(res.date || 'No date')}</div>
+                    <div class="text-xs">${escapeHtml(res.time || 'No time')}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${escapeHtml(res.guests || '?')} Ppl</td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusMeta.classes}">${statusMeta.label}</span>
+                    ${rejectionReason}
+                    ${decisionBy}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    ${actionBtn}
+                </td>
+            </tr>
+        `;
+                tableBody.innerHTML += row;
+            });
+            lucide.createIcons();
+        }
+
         function listenToReservations() {
             let knownReservationIds = null;
 
             db.collection('reservations').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
-                const tableBody = document.getElementById('reservations-table');
-                tableBody.innerHTML = '';
-
-                let pendingCount = 0;
-
                 if (knownReservationIds !== null) {
                     snapshot.forEach(doc => {
                         const res = doc.data();
@@ -1787,96 +2058,12 @@
                     });
                 }
                 knownReservationIds = new Set(snapshot.docs.map(d => d.id));
-
-                if (snapshot.empty) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-stone-500 italic">No reservations yet.</td></tr>';
-                }
-
-                snapshot.forEach(doc => {
-                    const res = doc.data();
-                    const id = doc.id;
-                    const status = normalizeReservationStatus(res.status);
-                    const statusMeta = getReservationStatusMeta(status);
-                    const specialRequests = res.notes ? `<div class="mt-1 text-xs text-stone-500">Requests: ${escapeHtml(truncateText(res.notes, 100))}</div>` : '';
-                    const rejectionReason = res.decisionReason && status === 'rejected'
-                        ? `<div class="mt-1 text-xs text-red-700">Reason: ${escapeHtml(truncateText(res.decisionReason, 100))}</div>`
-                        : '';
-                    const decisionBy = res.decisionBy
-                        ? `<div class="mt-1 text-xs text-stone-400">Updated by ${escapeHtml(res.decisionBy)}</div>`
-                        : '';
-
-                    if (status === 'pending') pendingCount++;
-
-                    let actionBtn = '';
-                    if (status === 'pending') {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
-                        <i data-lucide="check" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Confirm</span>
-                    </button>
-                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Reject</span>
-                    </button>`;
-                    } else if (status === 'confirmed') {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors mr-2" title="Move Back to Pending">
-                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Pending</span>
-                    </button>
-                    <button onclick="openReservationRejectModal('${id}', ${JSON.stringify(res.name || 'Guest').replace(/"/g, '&quot;')})" aria-label="Reject reservation" class="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-red-700 hover:bg-red-100 transition-colors" title="Reject Reservation">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Reject</span>
-                    </button>`;
-                    } else {
-                        actionBtn = `
-                    <button onclick="updateReservationStatus('${id}', 'confirmed')" aria-label="Confirm reservation" class="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-2 text-green-700 hover:bg-green-100 transition-colors mr-2" title="Confirm Reservation">
-                        <i data-lucide="check" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Confirm</span>
-                    </button>
-                    <button onclick="updateReservationStatus('${id}', 'pending')" aria-label="Move reservation back to pending" class="inline-flex items-center gap-2 rounded-full bg-stone-100 px-3 py-2 text-stone-700 hover:bg-stone-200 transition-colors" title="Move Back to Pending">
-                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
-                        <span class="text-xs font-semibold">Pending</span>
-                    </button>`;
-                    }
-
-                    const row = `
-                <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100">
-                    <td class="px-6 py-4 text-sm font-medium text-stone-900">
-                        <div>${escapeHtml(res.name || 'Guest')}</div>
-                        ${specialRequests}
-                    </td>
-                    <td class="px-6 py-4 text-sm text-stone-500">
-                        <div>${escapeHtml(res.phone || 'No phone')}</div>
-                        <div class="text-xs text-stone-600">${escapeHtml(res.email || 'No email provided')}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
-                        <div class="font-medium">${escapeHtml(res.date || 'No date')}</div>
-                        <div class="text-xs">${escapeHtml(res.time || 'No time')}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">${escapeHtml(res.guests || '?')} Ppl</td>
-                    <td class="px-6 py-4 text-sm">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusMeta.classes}">${statusMeta.label}</span>
-                        ${rejectionReason}
-                        ${decisionBy}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        ${actionBtn}
-                    </td>
-                </tr>
-            `;
-                    tableBody.innerHTML += row;
-                });
-
-                const badge = document.getElementById('badge-reservations');
-                if (pendingCount > 0) {
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-                setMetricValue('metric-pending-reservations', pendingCount);
-
-                lucide.createIcons();
+                reservationsCache = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() || {} }));
+                renderReservationsTable();
+            }, err => {
+                console.error('Reservations listener error:', err);
+                const tableBody = document.getElementById('reservations-table');
+                tableBody.innerHTML = `<tr><td colspan="${RESERVATIONS_TABLE_COLUMNS}" class="px-6 py-8 text-center text-red-600 italic">Failed to load reservations.</td></tr>`;
             });
         }
 
@@ -1986,14 +2173,14 @@
                 ordersCache = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
 
                 // If current page no longer exists after updates, move back one page.
-                const maxPage = Math.max(0, Math.ceil(ordersCache.length / ORDERS_PAGE_SIZE) - 1);
+                const maxPage = Math.max(0, Math.ceil(getFilteredOrders().length / ORDERS_PAGE_SIZE) - 1);
                 if (ordersPageIndex > maxPage) ordersPageIndex = maxPage;
 
                 loadOrdersPage(ordersPageIndex);
             }, err => {
                 console.error('Orders listener error:', err);
                 const tableBody = document.getElementById('orders-table');
-                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-600 italic">Failed to load orders.</td></tr>';
+                tableBody.innerHTML = `<tr><td colspan="${ORDERS_TABLE_COLUMNS}" class="px-6 py-8 text-center text-red-600 italic">Failed to load orders.</td></tr>`;
             });
         }
 
@@ -2011,6 +2198,34 @@
             }
         }
 
+        function getOrderTimestamp(order) {
+            const createdAt = order && order.createdAt;
+            return createdAt && typeof createdAt.toDate === 'function'
+                ? createdAt.toDate().getTime()
+                : 0;
+        }
+
+        function getFilteredOrders() {
+            const query = ordersSearchQuery.toLowerCase();
+            return ordersCache
+                .filter(entry => {
+                    const order = entry.data || {};
+                    const status = String(order.status || 'pending').toLowerCase();
+                    if (ordersStatusFilter !== 'all' && status !== ordersStatusFilter) return false;
+                    if (!query) return true;
+                    const itemNames = Array.isArray(order.items) ? order.items.map(item => item.name || '').join(' ') : '';
+                    const shortId = entry.id.slice(-6).toUpperCase();
+                    const haystack = `${entry.id} ${shortId} ${order.customerName || ''} ${order.customerPhone || ''} ${itemNames}`.toLowerCase();
+                    return haystack.includes(query);
+                })
+                .sort((a, b) => {
+                    if (ordersSortMode === 'oldest') return getOrderTimestamp(a.data) - getOrderTimestamp(b.data);
+                    if (ordersSortMode === 'total-asc') return Number((a.data || {}).total || 0) - Number((b.data || {}).total || 0);
+                    if (ordersSortMode === 'total-desc') return Number((b.data || {}).total || 0) - Number((a.data || {}).total || 0);
+                    return getOrderTimestamp(b.data) - getOrderTimestamp(a.data);
+                });
+        }
+
         // Render pagination controls (global so loadOrdersPage can call it)
         function renderPaginationControls(hasNext) {
             const controlsRowId = 'orders-pagination-row';
@@ -2022,7 +2237,7 @@
             const nextDisabled = !hasNext;
             const controls = `
                 <tr id="${controlsRowId}" class="bg-stone-50">
-                        <td colspan="7" class="px-6 py-3 text-center">
+                        <td colspan="${ORDERS_TABLE_COLUMNS}" class="px-6 py-3 text-center">
                         <div class="flex items-center justify-center gap-3">
                             <button id="orders-prev" class="px-3 py-1 rounded border" ${prevDisabled? 'disabled':''}>Prev</button>
                             <span class="text-sm text-stone-600">Page ${ordersPageIndex + 1}</span>
@@ -2048,20 +2263,25 @@
         function loadOrdersPage(pageIndex) {
             const tableBody = document.getElementById('orders-table');
             tableBody.innerHTML = '';
+            const filteredOrders = getFilteredOrders();
 
-            if (!ordersCache.length) {
-                tableBody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-stone-500 italic">No orders received yet.</td></tr>';
+            if (!filteredOrders.length) {
+                tableBody.innerHTML = `<tr><td colspan="${ORDERS_TABLE_COLUMNS}" class="px-6 py-8 text-center text-stone-500 italic">No orders match your current filters.</td></tr>`;
                 renderPaginationControls(false);
                 const badge = document.getElementById('badge-orders');
-                badge.classList.add('hidden');
-                setMetricValue('metric-active-orders', 0);
-                setMetricText('metric-orders-subtext', 'No open kitchen tickets');
+                const pendingCount = ordersCache.filter(entry => {
+                    const s = (entry.data || {}).status;
+                    return s === 'pending' || s === 'preparing' || !s;
+                }).length;
+                badge.classList.toggle('hidden', pendingCount === 0);
+                setMetricValue('metric-active-orders', pendingCount);
+                setMetricText('metric-orders-subtext', pendingCount === 0 ? 'No open kitchen tickets' : (pendingCount === 1 ? '1 open kitchen ticket' : `${pendingCount} open kitchen tickets`));
                 return;
             }
 
             const start = pageIndex * ORDERS_PAGE_SIZE;
-            const pageOrders = ordersCache.slice(start, start + ORDERS_PAGE_SIZE);
-            const hasNext = start + ORDERS_PAGE_SIZE < ordersCache.length;
+            const pageOrders = filteredOrders.slice(start, start + ORDERS_PAGE_SIZE);
+            const hasNext = start + ORDERS_PAGE_SIZE < filteredOrders.length;
 
             let pendingCount = 0;
             ordersCache.forEach(entry => {
@@ -3810,6 +4030,45 @@
         document.getElementById('seed-chatbot-facts-btn').addEventListener('click', seedSecureChatbotFacts);
         document.querySelectorAll('[data-message-filter]').forEach(button => {
             button.addEventListener('click', () => setMessageFilter(button.dataset.messageFilter));
+        });
+        document.getElementById('menu-search').addEventListener('input', event => {
+            menuSearchQuery = event.target.value.trim();
+            renderMenuTable();
+        });
+        document.getElementById('menu-status-filter').addEventListener('change', event => {
+            menuStatusFilter = event.target.value;
+            renderMenuTable();
+        });
+        document.getElementById('menu-sort').addEventListener('change', event => {
+            menuSortMode = event.target.value;
+            renderMenuTable();
+        });
+        document.getElementById('reservations-search').addEventListener('input', event => {
+            reservationsSearchQuery = event.target.value.trim();
+            renderReservationsTable();
+        });
+        document.getElementById('reservations-status-filter').addEventListener('change', event => {
+            reservationsStatusFilter = event.target.value;
+            renderReservationsTable();
+        });
+        document.getElementById('reservations-sort').addEventListener('change', event => {
+            reservationsSortMode = event.target.value;
+            renderReservationsTable();
+        });
+        document.getElementById('orders-search').addEventListener('input', event => {
+            ordersSearchQuery = event.target.value.trim();
+            ordersPageIndex = 0;
+            loadOrdersPage(ordersPageIndex);
+        });
+        document.getElementById('orders-status-filter').addEventListener('change', event => {
+            ordersStatusFilter = event.target.value;
+            ordersPageIndex = 0;
+            loadOrdersPage(ordersPageIndex);
+        });
+        document.getElementById('orders-sort').addEventListener('change', event => {
+            ordersSortMode = event.target.value;
+            ordersPageIndex = 0;
+            loadOrdersPage(ordersPageIndex);
         });
 
         function escapeHtml(str) {

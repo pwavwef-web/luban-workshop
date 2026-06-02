@@ -935,6 +935,7 @@
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
+    <script src="assets/js/menu-data.js"></script>
 
     <script>
         // Initialize Icons
@@ -964,68 +965,7 @@
         const db = firebase.firestore();
 
         // --- Hardcoded Menu ---
-        const HARDCODED_MENU = [
-            { id: 'SP1', name: 'Chicken & Sweet Corn Soup', category: 'soups', price: 40, description: 'A smooth, savoury broth with tender chicken and sweet corn', image: 'assets/menu-items-pictures/SP1.webp' },
-            { id: 'SP2', name: 'Hot & Sour Soup', category: 'soups', price: 40, description: 'Traditional Chinese hot and sour broth with tofu and vegetables', image: 'assets/menu-items-pictures/SP2.webp' },
-            { id: 'S1', name: 'Beef Spring Rolls (3 pcs)', category: 'starters', price: 30, description: 'Crispy spring rolls filled with seasoned beef', image: 'assets/menu-items-pictures/S1.webp' },
-            { id: 'S2', name: 'Vegetable Spring Rolls (3 pcs)', category: 'starters', price: 25, description: 'Crispy spring rolls filled with fresh vegetables', image: 'assets/menu-items-pictures/S2.webp' },
-            { id: 'S3', name: 'Beef Samosa (5 pcs)', category: 'starters', price: 30, description: 'Golden fried samosas filled with spiced beef', image: 'assets/menu-items-pictures/S3.webp' },
-            { id: 'S4', name: 'Fish Samosa (5 pcs)', category: 'starters', price: 30, description: 'Golden fried samosas filled with seasoned fish', image: 'assets/menu-items-pictures/S4.webp' },
-            { id: 'S5', name: 'Fried Chicken Pieces (6 pcs)', category: 'starters', price: 65, description: 'Crispy fried chicken pieces, perfectly seasoned', image: 'assets/menu-items-pictures/S5.webp' },
-            { id: 'S6', name: 'Special Chicken Wings', category: 'starters', price: 65, description: 'Crispy chicken wings with our special seasoning', image: 'assets/menu-items-pictures/S6.webp' },
-            { id: 'S7', name: 'Golden Fried Prawns', category: 'starters', price: 90, description: 'Crunchy golden-fried prawns served with dipping sauce', image: 'assets/menu-items-pictures/S7.webp' },
-            { id: 'S8', name: 'Fried Squid in Spicy Salt', category: 'starters', price: 85, description: 'Tender squid fried with spicy salt seasoning', image: 'assets/menu-items-pictures/S8.webp' },
-            { id: 'B1', name: 'Shredded Beef with Green Pepper & Onion', category: 'beef-lamb', price: 110, description: 'Tender shredded beef stir-fried with green pepper and onion in a savoury sauce', image: 'assets/menu-items-pictures/B1.webp' },
-            { id: 'B2', name: 'Beef in Sichuan Sauce', category: 'beef-lamb', price: 110, description: 'Sliced beef in spicy, aromatic Sichuan sauce', image: 'assets/menu-items-pictures/B2.webp' },
-            { id: 'B3', name: 'Sliced Beef in Curry Sauce', category: 'beef-lamb', price: 110, description: 'Tender sliced beef cooked in a rich curry sauce', image: 'assets/menu-items-pictures/B3.webp' },
-            { id: 'B4', name: 'Beef in Oyster Sauce', category: 'beef-lamb', price: 110, description: 'Succulent beef cooked in rich oyster sauce', image: 'assets/menu-items-pictures/B4.webp' },
-            { id: 'B5', name: 'Crispy Chilli Beef', category: 'beef-lamb', price: 85, description: 'Crispy strips of beef in a tangy chilli sauce', image: 'assets/menu-items-pictures/B5.webp' },
-            { id: 'B6', name: 'Mongolian Shallot Lamb', category: 'beef-lamb', price: 115, description: 'Tender lamb stir-fried with shallots in Mongolian style', image: 'assets/menu-items-pictures/B6.webp' },
-            { id: 'B7', name: 'Lamb Chops', category: 'beef-lamb', price: 85, description: 'Grilled lamb chops with herbs and spices', image: 'assets/menu-items-pictures/B7.webp' },
-            { id: 'P1', name: 'Sweet & Sour Pork', category: 'pork', price: 90, description: 'Classic pork in sweet and sour sauce with peppers and pineapple', image: 'assets/menu-items-pictures/P1.webp' },
-            { id: 'P2', name: 'Pork Sichuan Style', category: 'pork', price: 90, description: 'Pork cooked in bold, spicy Sichuan sauce', image: 'assets/menu-items-pictures/P2.webp' },
-            { id: 'P3', name: 'Pork in Chilli Sauce', category: 'pork', price: 90, description: 'Tender pork in a fiery chilli sauce', image: 'assets/menu-items-pictures/P3.webp' },
-            { id: 'P4', name: 'Pork in Oyster Sauce', category: 'pork', price: 90, description: 'Savoury pork in rich oyster sauce', image: 'assets/menu-items-pictures/P4.webp' },
-            { id: 'P5', name: 'Fried Pork Ribs', category: 'pork', price: 75, description: 'Crispy fried pork ribs with seasoning', image: 'assets/menu-items-pictures/P5.webp' },
-            { id: 'K1', name: 'Sweet & Sour Chicken', category: 'chicken', price: 100, description: 'Crispy chicken in classic sweet and sour sauce', image: 'assets/menu-items-pictures/K1.webp' },
-            { id: 'K2', name: 'Chicken Sichuan Sauce', category: 'chicken', price: 100, description: 'Tender chicken in spicy Sichuan sauce', image: 'assets/menu-items-pictures/K2.webp' },
-            { id: 'K3', name: 'Chicken in Curry Sauce', category: 'chicken', price: 100, description: 'Juicy chicken cooked in aromatic curry sauce', image: 'assets/menu-items-pictures/K3.webp' },
-            { id: 'K4', name: 'Chicken in Oyster Sauce', category: 'chicken', price: 100, description: 'Succulent chicken in rich oyster sauce', image: 'assets/menu-items-pictures/K4.webp' },
-            { id: 'Q1', name: 'Squid in Luban Chilli Sauce', category: 'seafood', price: 120, description: 'Tender squid in our signature Luban chilli sauce', image: 'assets/menu-items-pictures/Q1.webp' },
-            { id: 'Q2', name: 'Squid in Sichuan Sauce', category: 'seafood', price: 120, description: 'Squid cooked in bold Sichuan sauce', image: 'assets/menu-items-pictures/Q2.webp' },
-            { id: 'Q3', name: 'Squid in Garlic Sauce', category: 'seafood', price: 120, description: 'Squid in fragrant garlic sauce', image: 'assets/menu-items-pictures/Q3.webp' },
-            { id: 'F1', name: 'Fish Fillet in Chilli Sauce', category: 'seafood', price: 115, description: 'Tender fish fillet in a fiery chilli sauce', image: 'assets/menu-items-pictures/F1.webp' },
-            { id: 'F2', name: 'Fish Fillet in Vegetable Sauce', category: 'seafood', price: 115, description: 'Fish fillet cooked with fresh vegetables', image: 'assets/menu-items-pictures/F2.webp' },
-            { id: 'F3', name: 'Fish Fillet in Sichuan Sauce', category: 'seafood', price: 115, description: 'Fish fillet in spicy Sichuan sauce', image: 'assets/menu-items-pictures/F3.webp' },
-            { id: 'F4', name: 'Sweet & Sour Fish Fillet', category: 'seafood', price: 115, description: 'Tender fish fillet in sweet and sour sauce', image: 'assets/menu-items-pictures/F4.webp' },
-            { id: 'PR1', name: 'Prawns in Chilli Sauce', category: 'seafood', price: 155, description: 'Succulent prawns in spicy chilli sauce', image: 'assets/menu-items-pictures/PR1.webp' },
-            { id: 'PR2', name: 'Prawns in Curry Sauce', category: 'seafood', price: 155, description: 'Juicy prawns in aromatic curry sauce', image: 'assets/menu-items-pictures/PR2.webp' },
-            { id: 'PR3', name: 'Prawns in Sichuan Sauce', category: 'seafood', price: 155, description: 'Prawns in bold Sichuan sauce', image: 'assets/menu-items-pictures/PR3.webp' },
-            { id: 'SF1', name: 'Special Seafood in Sichuan Sauce', category: 'seafood', price: 170, description: 'A premium selection of seafood in signature Sichuan sauce', image: 'assets/menu-items-pictures/SF1.webp' },
-            { id: 'R1', name: 'Steamed Rice', category: 'rice', price: 29, description: 'Plain steamed white rice', image: 'assets/menu-items-pictures/R1.webp' },
-            { id: 'R2', name: 'Special Jollof Rice', category: 'rice', price: 50, description: 'Fragrant jollof rice cooked in a special blend of spices', image: 'assets/menu-items-pictures/R2.webp' },
-            { id: 'R3', name: 'Combo Fried Rice', category: 'rice', price: 50, description: 'Fried rice with a combination of vegetables and meat', image: 'assets/menu-items-pictures/R3.webp' },
-            { id: 'R4', name: 'Shrimp Fried Rice', category: 'rice', price: 50, description: 'Fried rice with succulent shrimp', image: 'assets/menu-items-pictures/R4.webp' },
-            { id: 'R5', name: 'Egg Fried Rice', category: 'rice', price: 40, description: 'Classic egg fried rice', image: 'assets/menu-items-pictures/R5.webp' },
-            { id: 'R6', name: 'Beef Fried Rice', category: 'rice', price: 45, description: 'Fried rice with tender beef', image: 'assets/menu-items-pictures/R6.webp' },
-            { id: 'R7', name: 'Chicken Fried Rice', category: 'rice', price: 45, description: 'Fried rice with juicy chicken', image: 'assets/menu-items-pictures/R7.webp' },
-            { id: 'R8', name: 'Seafood Fried Rice', category: 'rice', price: 85, description: 'Fried rice with a medley of fresh seafood', image: 'assets/menu-items-pictures/R8.webp' },
-            { id: 'R9', name: 'Pork Fried Rice', category: 'rice', price: 45, description: 'Fried rice with pork', image: 'assets/menu-items-pictures/R9.webp' },
-            { id: 'N1', name: 'Vegetable Noodles', category: 'noodles', price: 45, description: 'Wok-tossed noodles with fresh vegetables', image: 'assets/menu-items-pictures/N1.webp' },
-            { id: 'N2', name: 'Special Noodles', category: 'noodles', price: 80, description: 'Our special noodle dish with a mix of proteins and vegetables', image: 'assets/menu-items-pictures/N2.webp' },
-            { id: 'N4', name: 'Singapore Noodles', category: 'noodles', price: 80, description: 'Vermicelli noodles with prawns, pork and vegetables in curry sauce', image: 'assets/menu-items-pictures/N4.webp' },
-            { id: 'N5', name: 'Seafood Noodles', category: 'noodles', price: 100, description: 'Noodles with a generous serving of fresh seafood', image: 'assets/menu-items-pictures/N5.webp' },
-            { id: 'N6', name: 'Chicken Noodles', category: 'noodles', price: 60, description: 'Noodles stir-fried with tender chicken', image: 'assets/menu-items-pictures/N6.webp' },
-            { id: 'D1', name: 'Steamed Pork Dumpling', category: 'dumplings', price: 30, description: 'Handcrafted steamed dumplings filled with seasoned pork', image: 'assets/menu-items-pictures/D1.webp' },
-            { id: 'D2', name: 'Fried Pork Dumpling', category: 'dumplings', price: 30, description: 'Crispy fried dumplings filled with seasoned pork', image: 'assets/menu-items-pictures/D2.webp' },
-            { id: 'D3', name: 'Steamed Beef Dumpling', category: 'dumplings', price: 30, description: 'Handcrafted steamed dumplings filled with seasoned beef', image: 'assets/menu-items-pictures/D3.webp' },
-            { id: 'D4', name: 'Fried Beef Dumpling', category: 'dumplings', price: 30, description: 'Crispy fried dumplings filled with seasoned beef', image: 'assets/menu-items-pictures/D4.webp' },
-            { id: 'V1', name: 'Mixed Vegetable Sauce', category: 'veg', price: 40, description: 'A medley of fresh vegetables in a savoury sauce', image: 'assets/menu-items-pictures/V1.webp' },
-            { id: 'DR1', name: 'Coca-Cola 300ml', category: 'drinks', price: 15, description: 'Refreshing Coca-Cola 300ml bottle', image: 'assets/drinks/coca-cola-300ml.webp' },
-            { id: 'DR2', name: 'Fanta 300ml', category: 'drinks', price: 15, description: 'Refreshing Fanta 300ml bottle', image: 'assets/drinks/fanta-300ml.webp' },
-            { id: 'DR3', name: 'Sprite 300ml', category: 'drinks', price: 15, description: 'Refreshing Sprite 300ml bottle', image: 'assets/drinks/sprite-300ml.webp' },
-            { id: 'DR4', name: 'Water 300ml', category: 'drinks', price: 5, description: 'Still mineral water 300ml bottle', image: 'assets/drinks/water-300ml.webp' },
-        ];
+        const HARDCODED_MENU = Array.isArray(window.LUBAN_MENU) ? window.LUBAN_MENU.map(item => ({ ...item })) : [];
 
         // Global variables
         let menuItems = [];
