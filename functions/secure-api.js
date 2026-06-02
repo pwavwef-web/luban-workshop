@@ -729,6 +729,40 @@ async function getOwnedOrder(orderId, decoded) {
   return { ref: orderSnap.ref, data };
 }
 
+async function handleGetOwnOrders(req, res) {
+  const decoded = await requireUser(req);
+  const limit = Math.min(Number(req.query.limit || 10), 50);
+  const ordersSnap = await db()
+    .collection('orders')
+    .where('userId', '==', decoded.uid)
+    .orderBy('createdAt', 'desc')
+    .limit(limit)
+    .get();
+  
+  const orders = ordersSnap.docs.map((doc) => {
+    const data = doc.data() || {};
+    return {
+      id: doc.id,
+      orderNumber: `#${doc.id.slice(-6).toUpperCase()}`,
+      status: data.status || 'unknown',
+      total: Number(data.total || 0),
+      createdAt: serializeTimestamp(data.createdAt),
+      items: Array.isArray(data.items) ? data.items.map((item) => ({
+        name: item.name || 'Item',
+        quantity: Number(item.quantity || 0),
+        price: Number(item.price || 0)
+      })) : [],
+      statusUrl: buildOrderStatusLink(doc.id)
+    };
+  });
+
+  sendJson(res, 200, {
+    ok: true,
+    orders,
+    lastOrder: orders.length > 0 ? orders[0] : null
+  });
+}
+
 async function handleCancelOwnOrder(req, res) {
   const decoded = await requireUser(req);
   const orderId = String(req.body.orderId || '').trim();
@@ -1210,6 +1244,21 @@ async function handleBootstrapChatbotKnowledge(req, res) {
       id: 'otp-failure-help',
       title: 'What should I do if my verification code fails or expires?',
       answer: 'If the SMS code is wrong or has expired, request a fresh code from the verification page or reservation status page. Make sure your saved phone number is a valid Ghana number and contact the restaurant if the problem continues.',
+    },
+    {
+      id: 'check-order-status',
+      title: 'How do I check my order status?',
+      answer: 'You can ask me directly about your recent orders! Just ask me "What\'s the status of my last order?" or "Show me my recent orders". I can retrieve information about all your orders including their status, items, and total price. You\'ll also get a link to the full order details page.',
+    },
+    {
+      id: 'ask-last-order',
+      title: 'What can I ask about my orders?',
+      answer: 'You can ask me questions like:\n• "What\'s the status of my last order?"\n• "Show me my recent orders"\n• "Is my order ready?"\n• "When was my order placed?"\n\nI can show you up to 10 of your most recent orders with details about items, prices, and current status.',
+    },
+    {
+      id: 'order-status-help',
+      title: 'What do order statuses mean?',
+      answer: 'Orders have different statuses:\n• Pending: Your order was received and is waiting to be prepared\n• Preparing: The kitchen is making your order\n• Completed: Your order is ready for pickup\n• Cancelled: Your order was cancelled\n\nYou can cancel pending orders within 5 minutes of placing them.',
     }
   ];
   const collection = db().collection('chatbotKnowledge');
@@ -1246,6 +1295,7 @@ async function router(req, res) {
     if (path === 'requestPhoneOtp' && req.method === 'POST') return await handleRequestPhoneOtp(req, res);
     if (path === 'verifyPhoneOtp' && req.method === 'POST') return await handleVerifyPhoneOtp(req, res);
     if (path === 'createOrder' && req.method === 'POST') return await handleCreateOrder(req, res);
+    if (path === 'getOwnOrders' && req.method === 'GET') return await handleGetOwnOrders(req, res);
     if (path === 'cancelOwnOrder' && req.method === 'POST') return await handleCancelOwnOrder(req, res);
     if (path === 'deleteOwnOrder' && req.method === 'POST') return await handleDeleteOwnOrder(req, res);
     if (path === 'submitReservation' && req.method === 'POST') return await handleSubmitReservation(req, res);

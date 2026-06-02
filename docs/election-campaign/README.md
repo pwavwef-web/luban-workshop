@@ -33,7 +33,7 @@ Flyer:
 ## Usage Notes
 
 - Use the corrected QR code only: `lubanrestaurant-com.png`.
-- The old `mainpage.png` and `menu.png` QR files were removed.
+- Retired QR files were removed from the campaign pack.
 - Keep copy neutral. Do not imply endorsement of any candidate, hall, party, or campaign team.
 - Best placements: Instagram feed, Facebook feed, WhatsApp status, WhatsApp broadcast, student group chats, hall pages, SRC pages, LNUGS pages, and event reminders.
 - For stories, add the platform link sticker to `https://lubanrestaurant.com` when possible.
@@ -60,4 +60,3 @@ Use `election-day-feed.png` and `scan-menu-feed.png`.
 
 Results night:
 Use `results-night-story.png` and `student-election-meal-stop-flyer.png`.
-

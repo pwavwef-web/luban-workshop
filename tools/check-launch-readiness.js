@@ -8,6 +8,22 @@ const retiredAdminEmail = ['admin', 'luban.com'].join('@');
 
 const ignoredDirs = new Set(['.git', '.firebase', 'node_modules']);
 const runtimeExtensions = new Set(['.html', '.js', '.rules']);
+const trackedTextExtensions = new Set([
+  '.css',
+  '.html',
+  '.js',
+  '.json',
+  '.md',
+  '.mjs',
+  '.ps1',
+  '.sh',
+  '.ts'
+]);
+const retiredQrFiles = ['mainpage', 'menu'].map((name) => `${name}.png`);
+const campaignAssetDirs = [
+  path.join(root, 'assets', 'election-campaign'),
+  path.join(root, 'assets', 'qr-codes')
+];
 
 function walk(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -32,6 +48,21 @@ function rel(file) {
 
 function read(file) {
   return fs.readFileSync(file, 'utf8');
+}
+
+function trackedFiles(files) {
+  const result = spawnSync('git', ['ls-files'], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+
+  if (result.status !== 0) return files;
+
+  return result.stdout
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((file) => path.join(root, file))
+    .filter((file) => fs.existsSync(file));
 }
 
 function fail(message) {
@@ -170,6 +201,75 @@ function assertNoStockFlyerAssets() {
   }
 }
 
+function isTrackedDocPageOrScript(file) {
+  const relativePath = rel(file);
+  const extension = path.extname(file).toLowerCase();
+  if (!trackedTextExtensions.has(extension)) return false;
+  if (relativePath.startsWith('assets/') && !relativePath.startsWith('assets/js/')) return false;
+  if (relativePath.startsWith('docs/')) return true;
+  return extension !== '.json' || relativePath === 'manifest.json';
+}
+
+function assertNoRetiredQrReferences(files) {
+  for (const file of files) {
+    if (!isTrackedDocPageOrScript(file)) continue;
+
+    const text = read(file);
+    for (const retiredQrFile of retiredQrFiles) {
+      if (text.includes(retiredQrFile)) {
+        fail(`${rel(file)} still references retired QR file ${retiredQrFile}.`);
+      }
+    }
+  }
+}
+
+function resolveCampaignAssetReference(reference, sourceFile) {
+  const normalized = reference.replace(/\\/g, '/').replace(/^https:\/\/lubanrestaurant\.com\//, '');
+  if (normalized.startsWith('/')) return path.join(root, normalized.slice(1));
+  if (normalized.startsWith('assets/')) return path.join(root, normalized);
+  if (normalized.includes('/')) return path.resolve(path.dirname(sourceFile), normalized);
+
+  for (const directory of campaignAssetDirs) {
+    const candidate = path.join(directory, normalized);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+
+  return path.join(campaignAssetDirs[0], normalized);
+}
+
+function extractCampaignAssetReferences(text) {
+  const references = new Set();
+  const explicitAssetPattern = /(?:https:\/\/lubanrestaurant\.com\/|\/|(?:\.\.\/)+)?assets\/(?:election-campaign|qr-codes)\/[^\s"'`)<>]+/gi;
+  const backtickAssetPattern = /`([^`]+\.(?:gif|jpe?g|png|svg|webp))`/gi;
+  let match;
+
+  while ((match = explicitAssetPattern.exec(text))) {
+    references.add(match[0].replace(/[.,;:]+$/, ''));
+  }
+
+  while ((match = backtickAssetPattern.exec(text))) {
+    references.add(match[1].trim());
+  }
+
+  return references;
+}
+
+function assertElectionCampaignAssetReferencesExist() {
+  const docsDir = path.join(root, 'docs', 'election-campaign');
+  const docs = fs.readdirSync(docsDir)
+    .filter((entry) => path.extname(entry).toLowerCase() === '.md')
+    .map((entry) => path.join(docsDir, entry));
+
+  for (const file of docs) {
+    for (const reference of extractCampaignAssetReferences(read(file))) {
+      const target = resolveCampaignAssetReference(reference, file);
+      if (!fs.existsSync(target)) {
+        fail(`${rel(file)} references missing election campaign asset: ${reference}`);
+      }
+    }
+  }
+}
+
 function assertJavaScriptParses(relativePath, module = false) {
   const file = path.join(root, relativePath);
   const args = module ? ['--input-type=module', '--check'] : ['--check'];
@@ -222,6 +322,7 @@ function assertEnglishLocalLinks(files) {
 }
 
 const files = walk(root);
+const tracked = trackedFiles(files);
 assertNoBootstrapAdminFallback(files);
 assertLegalPagesIndexable();
 assertSitemapNoindexConsistency();
@@ -229,6 +330,8 @@ assertValidJsonLd(files);
 assertSearchResultSignals();
 assertHomepageDirections();
 assertNoStockFlyerAssets();
+assertNoRetiredQrReferences(tracked);
+assertElectionCampaignAssetReferencesExist();
 assertSharedScriptsParse();
 assertEnglishLocalLinks(files);
 

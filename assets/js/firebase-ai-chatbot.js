@@ -92,7 +92,7 @@ const ELECTION_WEEK_KNOWLEDGE = [
   'For manifesto night, suggest planning ahead with warm food before or after the event, using the menu link, placing verified-phone pickup orders where suitable, or reserving a table for groups.',
   'For results night, keep language calm and inclusive. Suggest reserving early, planning a group table, using pickup ordering with a verified Ghana phone, and letting staff know group size and timing.',
   `For reservations, direct guests to ${CONTACT.reservationPage}, explain that the restaurant follows up manually, and remind them that Reservation Status links use a one-time SMS code before showing details or accepting change/cancellation requests.`,
-  `Verified QR details: the corrected QR code is ${CONTACT.qrImage} and it points to ${CONTACT.siteUrl}. The old mainpage.png and menu.png QR images were removed because they were not reliable for current campaign materials.`,
+  `Verified QR details: the corrected QR code is ${CONTACT.qrImage} and it points to ${CONTACT.siteUrl}. Retired QR images were removed because they were not reliable for current campaign materials.`,
   `For QR guidance, tell guests and campaign helpers to use only the verified QR, keep the quiet zone, print at high contrast, avoid stretching or cropping it, and use a platform link sticker to ${CONTACT.siteUrl} when possible.`
 ];
 
@@ -1029,6 +1029,64 @@ async function submitAssistantReport(report) {
   };
 }
 
+function isOrderStatusQuery(text) {
+  const normalized = String(text || '').toLowerCase();
+  return /\b(order|status|tracking?|my\s+orders?|recent\s+orders?|last\s+order)\b/.test(normalized) &&
+    /\b(status|check|show|track|see|what|how|when|is|are|what's|whats)\b/.test(normalized);
+}
+
+async function retrieveUserOrders(user) {
+  if (!user) return null;
+  try {
+    const response = await apiRequest('/getOwnOrders?limit=10', { method: 'GET', user });
+    if (response && response.orders && Array.isArray(response.orders)) {
+      return response;
+    }
+  } catch (error) {
+    console.warn('Could not retrieve user orders:', error);
+  }
+  return null;
+}
+
+function formatOrdersForResponse(ordersData) {
+  if (!ordersData || !ordersData.orders || ordersData.orders.length === 0) {
+    return 'You don\'t have any orders yet. Start by adding dishes to your cart from the menu!';
+  }
+
+  const lastOrder = ordersData.lastOrder;
+  if (!lastOrder) return 'Could not find order information.';
+
+  let response = `Your most recent order:\n\n**Order ${lastOrder.orderNumber}**\nStatus: **${lastOrder.status.toUpperCase()}**\nPlaced: ${new Date(lastOrder.createdAt).toLocaleString()}\nTotal: ₵${lastOrder.total.toFixed(2)}\n\nItems:`;
+  
+  if (lastOrder.items && lastOrder.items.length > 0) {
+    lastOrder.items.forEach((item) => {
+      response += `\n- ${item.name} (x${item.quantity})`;
+    });
+  }
+
+  if (ordersData.orders.length > 1) {
+    response += `\n\n[View all ${ordersData.orders.length} orders](${lastOrder.statusUrl})`;
+  } else {
+    response += `\n\n[View full order details](${lastOrder.statusUrl})`;
+  }
+
+  return response;
+}
+
+async function handleOrderStatusQuery(question) {
+  const user = await waitForCurrentUser();
+  if (!user) {
+    return `I can show you your order status once you're signed in. Please sign in first!`;
+  }
+
+  const ordersData = await retrieveUserOrders(user);
+  if (!ordersData) {
+    return `I couldn't retrieve your orders right now. Please try again or [view your orders manually](order-status.html).`;
+  }
+
+  return formatOrdersForResponse(ordersData);
+}
+
 async function handleUserMessage(question) {
   appendMessage('user', question);
   state.history.push({ role: 'guest', text: question });
@@ -1043,6 +1101,14 @@ async function handleUserMessage(question) {
       if (typing) typing.remove();
       appendMessage('bot', reportResponse);
       state.history.push({ role: 'assistant', text: reportResponse });
+      return;
+    }
+
+    if (isOrderStatusQuery(question)) {
+      const orderResponse = await handleOrderStatusQuery(question);
+      if (typing) typing.remove();
+      appendMessage('bot', orderResponse);
+      state.history.push({ role: 'assistant', text: orderResponse });
       return;
     }
 
