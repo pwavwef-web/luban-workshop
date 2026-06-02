@@ -575,7 +575,7 @@ async function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I can help with Luban Workshop's menu scans, group meals, reservations, verified QR, ordering, account checks and reports.`);
+  appendMessage('bot', `Hi, I'm Bao! I can help with Luban Workshop's menu scans, group meals, reservations, order tracking, account checks, verified QR, ordering, and reports.`);
   appendSuggestions(ELECTION_WEEK_SUGGESTIONS);
 }
 
