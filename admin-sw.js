@@ -1,5 +1,5 @@
 // Luban Workshop Restaurant - Admin Dashboard Service Worker
-const CACHE_NAME = 'luban-admin-v2';
+const CACHE_NAME = 'luban-admin-v3';
 const STATIC_ASSETS = [
     '/admin.html',
     '/admin-manifest.json',
