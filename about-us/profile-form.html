@@ -20,15 +20,17 @@
 
     <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
     <link rel="stylesheet" href="../tailwind.css">
+    <link rel="stylesheet" href="../assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.bundle.js"></script>
+    <script src="../assets/js/firebase-config.js"></script>
     <script src="../assets/js/firebase-modular.bundle.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
-        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
 
         nav { position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.97); box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 50; }
         nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
@@ -142,18 +144,8 @@
         <span id="signed-in-email"></span>
         <button onclick="doSignOut()">Sign Out</button>
     </div>
-    <nav>
-        <div>
-            <a href="../index.html" class="brand">
-                <img src="../logo.png" alt="Luban Workshop Logo" style="height:36px;width:36px;border-radius:50%;object-fit:contain;background:#fff;">
-                <span>Luban <em>Workshop</em></span>
-            </a>
-            <div class="nav-links">
-                <a href="../index.html">Home</a>
-                <a href="index.html">Our Team</a>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="back" data-luban-header-home="../index.html" data-luban-header-back-href="index.html" data-luban-header-back-label="Back to Team"></div>
+    <script src="../assets/js/site-header.js"></script>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -348,15 +340,7 @@
     <script>
         lucide.createIcons();
         // Firebase setup
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
         const auth = firebase.auth();
         const db = firebase.firestore();
 

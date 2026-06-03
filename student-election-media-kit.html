@@ -43,6 +43,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="stylesheet" href="student-election-media-kit.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,20 +103,7 @@
 
 <body>
     <main class="page">
-        <header class="topbar" aria-label="Site header">
-            <a class="brand" href="index.html">
-                <img src="logo.png" alt="Luban Workshop Restaurant logo">
-                <span class="brand-text">
-                    <strong>Luban Workshop Restaurant</strong>
-                    <span>Public election media kit</span>
-                </span>
-            </a>
-            <nav class="nav-links" aria-label="Page links">
-                <a href="assets/election-campaign/">Campaign assets</a>
-                <a href="assets/qr-codes/">Verified QR</a>
-                <a href="flyers.html">Flyers</a>
-            </nav>
-        </header>
+    <div data-luban-header="back"></div>
 
         <section class="hero">
             <div class="hero-grid">
@@ -244,6 +232,7 @@
         </footer>
     </main>
 
+    <script src="assets/js/site-header.js"></script>
     <script>
         const campaignAssets = [
             {

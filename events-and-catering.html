@@ -95,6 +95,7 @@
 
 
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -103,13 +104,11 @@
     <script src="assets/js/lucide.bundle.js"></script>
     <script src="assets/js/cookie-consent.js" defer></script>
 
+    <script src="assets/js/firebase-config.js"></script>
     <!-- Firebase SDK -->
     <script src="assets/js/firebase-firestore.bundle.js"></script>
 
     <style>
-        body { font-family: 'Lato', sans-serif; }
-        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
-
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -124,20 +123,7 @@
 <body class="bg-stone-50 text-stone-800 antialiased">
 
     <!-- Navigation -->
-    <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="index.html" class="flex-shrink-0 flex items-center">
-                    <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white mr-2">
-                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
-                            class="text-red-700">Workshop</span></span>
-                </a>
-                <a href="index.html"
-                    class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm">&larr; Back to
-                    Home</a>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="back"></div>
 
     <!-- Hero Section -->
     <header class="relative pt-24 pb-16 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
@@ -393,16 +379,7 @@
         lucide.createIcons();
 
         // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-                        appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-
-                firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
                 // Analytics: initialize only after consent (prevents auto-start)
                 (function(){
                     function tryInit(){
@@ -497,6 +474,7 @@
                 errorDiv.classList.remove('hidden');
             });
     </script>
+    <script src="assets/js/site-header.js"></script>
     <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260530-election-assistant"></script>
 </body>
 

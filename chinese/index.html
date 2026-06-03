@@ -23,6 +23,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
 
     <link rel="stylesheet" href="../tailwind.css">
+    <link rel="stylesheet" href="../assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -104,42 +105,7 @@
 
 <body class="bg-stone-50 text-stone-800 scroll-smooth antialiased">
 
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex-shrink-0 flex items-center">
-                    <img src="../logo.png" alt="鲁班工坊标志" class="h-10 w-10 rounded-full object-contain bg-white mr-2">
-                    <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:#1c1917;">Luban <span class="text-red-700">Workshop</span></span>
-                </div>
-                <div class="hidden md:flex space-x-5 items-center">
-                    <a href="#menu" class="text-stone-600 hover:text-red-700 transition-colors font-medium">菜单</a>
-                    <a href="#reservation" class="text-stone-600 hover:text-red-700 transition-colors font-medium">预订</a>
-                    <a href="#location" class="text-stone-600 hover:text-red-700 transition-colors font-medium">位置</a>
-                    <a href="events-and-catering.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium">活动</a>
-                    <a href="contact-us.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium">联系</a>
-                    <a href="about-us.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium">关于</a>
-                    <a href="menu.html" class="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">查看菜单</a>
-                </div>
-                <div class="flex items-center md:hidden gap-4">
-                    <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Toggle navigation menu" class="text-stone-600 hover:text-red-700 p-2">
-                        <i data-lucide="menu" class="h-6 w-6"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#menu" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">菜单</a>
-                <a href="#reservation" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">预订</a>
-                <a href="#location" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">位置</a>
-                <a href="events-and-catering.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">活动与外烩</a>
-                <a href="contact-us.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">联系我们</a>
-                <a href="about-us.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-700 hover:text-red-700 hover:bg-stone-50">关于我们</a>
-                <a href="menu.html" class="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-700 hover:bg-red-800">查看菜单</a>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="home-zh"></div>
 
     <!-- 主横幅 -->
     <header class="relative pt-24 pb-12 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
@@ -836,6 +802,7 @@
 
     <!-- 页脚 -->
     <div data-luban-footer></div>
+    <script src="../assets/js/site-header.js"></script>
     <script src="../assets/js/site-footer.js"></script>
 
     <script>

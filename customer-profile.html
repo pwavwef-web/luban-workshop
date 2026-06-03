@@ -15,6 +15,7 @@
     <meta name="theme-color" content="#b91c1c">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -25,40 +26,10 @@
             color: #1c1917;
         }
 
-        .serif {
-            font-family: 'Playfair Display', serif;
-        }
-
         .profile-shell {
             background:
                 linear-gradient(180deg, rgba(28, 25, 23, 0.88), rgba(127, 29, 29, 0.78)),
                 url('restcon.png') center bottom / cover no-repeat;
-        }
-
-        .profile-panel {
-            border-radius: 8px;
-            border: 1px solid #e7e5e4;
-            box-shadow: 0 18px 50px rgba(28, 25, 23, 0.08);
-        }
-
-        .form-input,
-        .form-select,
-        .form-textarea {
-            width: 100%;
-            border: 1px solid #d6d3d1;
-            border-radius: 8px;
-            padding: 0.7rem 0.85rem;
-            font-size: 0.95rem;
-            background: #fff;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: #b91c1c;
-            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
         }
 
         .deal-card {
@@ -77,30 +48,7 @@
 </head>
 
 <body>
-    <nav class="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="h-16 flex items-center justify-between gap-4">
-                <a href="index.html" class="flex items-center gap-2 text-stone-900">
-                    <img src="logo.png" alt="Luban Workshop Restaurant" class="h-10 w-10 rounded-full object-contain bg-white">
-                    <span class="serif font-bold text-lg">Luban <span class="text-red-700">Workshop</span></span>
-                </a>
-                <div class="flex items-center gap-2">
-                    <a href="index.html#menu" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
-                        <i data-lucide="utensils" class="h-4 w-4"></i>
-                        Menu
-                    </a>
-                    <a href="index.html#my-orders" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
-                        <i data-lucide="package" class="h-4 w-4"></i>
-                        Orders
-                    </a>
-                    <button id="profile-logout-btn" type="button" class="hidden items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-md">
-                        <i data-lucide="log-out" class="h-4 w-4"></i>
-                        Sign out
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="profile"></div>
 
     <header class="profile-shell pt-28 pb-16">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -269,23 +217,16 @@
 
     <div data-luban-footer></div>
     <script src="assets/js/site-footer.js"></script>
+    <script src="assets/js/site-header.js"></script>
     <script src="assets/js/lucide.bundle.js"></script>
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script>
         lucide.createIcons();
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
 
         const auth = firebase.auth();
         const db = firebase.firestore();

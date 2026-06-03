@@ -24,10 +24,12 @@
 
     <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
     <link rel="stylesheet" href="../tailwind.css">
+    <link rel="stylesheet" href="../assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.bundle.js"></script>
+    <script src="../assets/js/firebase-config.js"></script>
     <script src="../assets/js/firebase-firestore.bundle.js"></script>
 
     <!-- Structured Data: Breadcrumbs -->
@@ -159,20 +161,7 @@
 
 <body>
 
-    <!-- 导航栏 -->
-    <nav>
-        <div>
-            <a href="index.html" class="brand">
-                <img src="../logo.png" alt="鲁班工坊标志" style="height:36px;width:36px;border-radius:50%;object-fit:contain;background:#fff;">
-                <span>Luban <em>Workshop</em></span>
-            </a>
-            <div class="nav-links">
-                <a href="index.html">首页</a>
-                <a href="menu.html">菜单</a>
-                <a href="about-us.html" class="active">关于我们</a>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="about-zh"></div>
 
     <!-- 主横幅 -->
     <header>
@@ -431,20 +420,13 @@
 
     <!-- 页脚 -->
     <div data-luban-footer></div>
+    <script src="../assets/js/site-header.js"></script>
     <script src="../assets/js/site-footer.js"></script>
 
     <script>
         lucide.createIcons();
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
         const db = firebase.firestore();
 
         var currentTeamFilter = 'all';

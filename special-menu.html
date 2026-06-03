@@ -10,6 +10,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -243,19 +244,12 @@
         </article>
     </main>
 
+    <script src="assets/js/site-header.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
     <script>
         lucide.createIcons();
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
         const db = firebase.firestore();
 
         function escapeHtml(value) {

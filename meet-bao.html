@@ -42,6 +42,7 @@
     <meta name="theme-color" content="#b91c1c">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -129,8 +130,7 @@
 
         h1,
         h2,
-        h3,
-        .serif {
+        h3 {
             font-family: 'Playfair Display', Georgia, serif;
         }
 
@@ -1056,27 +1056,7 @@
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <nav class="site-nav" aria-label="Primary navigation">
-        <div class="nav-inner">
-            <a class="brand-link" href="index.html" aria-label="Luban Workshop Restaurant home">
-                <img src="logo.png" alt="Luban Workshop Restaurant">
-                <span class="brand-text serif">Luban <span>Workshop</span></span>
-            </a>
-            <div class="nav-links" aria-label="Site links">
-                <a href="index.html">Home</a>
-                <a href="meet-bao.html" aria-current="page">Meet Bao</a>
-                <a href="menu.html">Menu</a>
-                <a href="events-and-catering.html#reservation">Reservations</a>
-                <a href="events-and-catering.html">Catering</a>
-            </div>
-            <div class="nav-actions">
-                <a class="button button-primary" href="menu.html">
-                    <i data-lucide="utensils"></i>
-                    <span>View Menu</span>
-                </a>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="back" data-luban-header-menu-link="true" data-luban-header-back-href="index.html" data-luban-header-back-label="Back to Home"></div>
 
     <header class="hero">
         <img class="hero-bg" src="assets/mascots/luban-mascot-flyer-art.png" alt="Bao standing with dumplings, noodles, rice, and warm campaign artwork">
@@ -1439,6 +1419,7 @@
     <div data-luban-footer></div>
 
     <script src="assets/js/site-footer.js"></script>
+    <script src="assets/js/site-header.js"></script>
     <script>
         if (window.lucide && typeof window.lucide.createIcons === 'function') {
             window.lucide.createIcons();

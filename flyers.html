@@ -88,6 +88,7 @@
     <link rel="manifest" href="manifest.json">
 
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="stylesheet" href="flyers.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +99,7 @@
 
     <style>
         body { font-family: 'Lato', sans-serif; }
-        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
 
         /* Flyer card base */
         .flyer-card {
@@ -250,22 +251,7 @@
 
 <body class="bg-stone-50 text-stone-800 antialiased">
 
-    <!-- Navigation -->
-    <nav class="w-full bg-white/95 backdrop-blur-sm shadow-md z-50 sticky top-0">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="index.html" class="flex-shrink-0 flex items-center gap-2">
-                    <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white">
-                    <img src="assets/ucc-logo.png" alt="UCC Logo" class="h-9 w-9 object-contain">
-                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span class="text-red-700">Workshop</span></span>
-                </a>
-                <div class="flex items-center gap-4">
-                    <a href="menu.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm hidden sm:inline">Menu</a>
-                    <a href="index.html" class="text-stone-600 hover:text-red-700 transition-colors font-medium text-sm">&larr; Back to Home</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div data-luban-header="back" data-luban-header-sticky="true" data-luban-header-menu-link="true"></div>
 
     <!-- Hero -->
     <header class="flyers-hero pt-12 pb-10 text-white">
@@ -659,6 +645,7 @@
     <!-- Footer -->
     <div data-luban-footer></div>
     <script src="assets/js/site-footer.js"></script>
+    <script src="assets/js/site-header.js"></script>
 
     <script>
         lucide.createIcons();

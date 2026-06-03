@@ -67,24 +67,13 @@
 
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="assets/js/lucide.bundle.js"></script>
 
     <style>
-        :root {
-            --luban-red: #a61b1f;
-            --luban-red-dark: #6f1717;
-            --luban-gold: #c58b2b;
-            --luban-gold-light: #d4a64f;
-            --ink: #1f1b16;
-            --muted: #71665d;
-            --paper: #fffdfa;
-            --surface: #ffffff;
-            --line: #eadfd2;
-        }
-
         *, *::before, *::after { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -546,23 +535,7 @@
 
 <body>
 
-    <!-- ══════════════════ TOOLBAR ══════════════════ -->
-    <div class="toolbar no-print">
-        <div class="toolbar-inner">
-            <a href="index.html" class="toolbar-brand">
-                <img src="logo.png" alt="Luban Workshop Logo">
-                <span>Luban <em>Workshop</em></span>
-            </a>
-            <div class="toolbar-actions">
-                <a href="menu.html" class="btn-back">View Online Menu</a>
-                <a href="index.html" class="btn-back">Home</a>
-                <button class="btn-download" onclick="window.print()" title="Use 'Save as PDF' in the print dialog">
-                    <i data-lucide="download" style="width:16px;height:16px;"></i>
-                    Download PDF
-                </button>
-            </div>
-        </div>
-    </div>
+    <div data-luban-header="back"></div>
 
     <!-- ══════════════════ COVER ══════════════════ -->
     <div class="menu-cover">
@@ -1105,6 +1078,7 @@
         <p class="copyright">&copy; 2025 Luban Workshop Restaurant. All rights reserved.</p>
     </footer>
 
+    <script src="assets/js/site-header.js"></script>
     <script src="assets/js/lucide.bundle.js"></script>
     <script>
         lucide.createIcons();

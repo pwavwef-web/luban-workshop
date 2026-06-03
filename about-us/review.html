@@ -19,15 +19,17 @@
 
     <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
     <link rel="stylesheet" href="../tailwind.css">
+    <link rel="stylesheet" href="../assets/css/site.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.bundle.js"></script>
+    <script src="../assets/js/firebase-config.js"></script>
     <script src="../assets/js/firebase-modular.bundle.js"></script>
 
     <style>
         body { font-family: 'Lato', sans-serif; background: #fafaf9; color: #1c1917; }
-        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
 
         /* Login screen */
         #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1c1917 0%, #7f1d1d 100%); }
@@ -196,15 +198,7 @@
     <script>
         lucide.createIcons();
         // Firebase setup
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxgdwU84vFNoCOUTl-HRdGYonLIcDaXFw",
-            authDomain: "luban-workshop-restaurant.firebaseapp.com",
-            projectId: "luban-workshop-restaurant",
-            storageBucket: "luban-workshop-restaurant.firebasestorage.app",
-            messagingSenderId: "360623290287",
-            appId: "1:360623290287:web:89fae5ebbb342e5e13e15a"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        initLubanFirebase(firebase);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
