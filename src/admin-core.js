@@ -166,6 +166,44 @@ function toggleMobileSidebar() {
     }
 }
 
+function bindMobileSidebarSwipe() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    let startX = 0;
+    let startY = 0;
+    let activePointer = null;
+
+    function resetSwipe() {
+        activePointer = null;
+    }
+
+    function handleSwipeStart(event) {
+        if (window.innerWidth >= MOBILE_BREAKPOINT || !isMobileSidebarOpen) return;
+        startX = event.clientX;
+        startY = event.clientY;
+        activePointer = event.pointerId || 'mouse';
+    }
+
+    function handleSwipeEnd(event) {
+        const pointerId = event.pointerId || 'mouse';
+        if (activePointer !== pointerId) return;
+        const deltaX = event.clientX - startX;
+        const deltaY = Math.abs(event.clientY - startY);
+        resetSwipe();
+
+        if (deltaX < -72 && Math.abs(deltaX) > deltaY * 1.25 && isMobileSidebarOpen) {
+            toggleMobileSidebar();
+        }
+    }
+
+    sidebar.addEventListener('pointerdown', handleSwipeStart);
+    sidebar.addEventListener('pointerup', handleSwipeEnd);
+    sidebar.addEventListener('pointercancel', resetSwipe);
+    sidebar.addEventListener('mousedown', handleSwipeStart);
+    sidebar.addEventListener('mouseup', handleSwipeEnd);
+}
+
 function switchTab(tabName) {
     if (window.innerWidth < MOBILE_BREAKPOINT && isMobileSidebarOpen) {
         toggleMobileSidebar();
@@ -308,6 +346,7 @@ async function initializeAdminDashboard(user) {
         sidebarCloseBtn.addEventListener('click', toggleMobileSidebar);
         overlay.addEventListener('click', toggleMobileSidebar);
         overlay.addEventListener('keydown', handleOverlayKeydown);
+        bindMobileSidebarSwipe();
         mobileSidebarEventsBound = true;
     }
 

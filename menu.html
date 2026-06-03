@@ -11,7 +11,7 @@
     gtag('config', 'G-8LVTFZH7VD');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Menu | Luban Workshop Restaurant – Authentic Chinese Dishes</title>
     <meta name="description" content="Browse the full menu at Luban restaurant, Cape Coast. Authentic Chinese soups, seafood, rice, noodles and more. Pickup orders require a verified Ghana phone; email verification is optional.">
     <meta name="keywords" content="Luban Workshop menu, Luban restaurant menu, Chinese restaurant Cape Coast menu, Cape Coast Chinese food, best Chinese food Cape Coast, beef seafood noodles rice Cape Coast Ghana, Chinese cuisine Cape Coast, dining Cape Coast">
@@ -337,11 +337,15 @@
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--line);
             box-shadow: 0 12px 28px rgba(48, 34, 21, 0.07);
+            overflow: hidden;
         }
 
         .tab-bar > div {
             max-width: 76rem;
             scrollbar-width: thin;
+            scroll-padding-inline: 1rem;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
         }
 
         #category-tabs {
@@ -355,6 +359,7 @@
             background: var(--surface);
             color: #4b4038;
             box-shadow: inset 0 -1px 0 rgba(31, 27, 22, 0.04);
+            scroll-snap-align: start;
         }
 
         .category-tab.active,
@@ -363,6 +368,29 @@
             background: var(--luban-red);
             border-color: var(--luban-red);
             color: #fff;
+        }
+
+        @media (max-width: 767px) {
+            .tab-bar::before,
+            .tab-bar::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                z-index: 2;
+                width: 2rem;
+                pointer-events: none;
+            }
+
+            .tab-bar::before {
+                left: 0;
+                background: linear-gradient(90deg, rgba(255, 253, 250, 0.98), rgba(255, 253, 250, 0));
+            }
+
+            .tab-bar::after {
+                right: 0;
+                background: linear-gradient(270deg, rgba(255, 253, 250, 0.98), rgba(255, 253, 250, 0));
+            }
         }
 
         main {
@@ -1299,6 +1327,7 @@
             });
             btn.classList.add('active', 'bg-red-700', 'text-white');
             btn.classList.remove('text-stone-700');
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
             const target = btn.getAttribute('data-target');
             if (target === 'all') {

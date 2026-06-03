@@ -11,7 +11,7 @@
     gtag('config', 'G-8LVTFZH7VD');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Luban Workshop Restaurant | Best Dining in Cape Coast, Ghana</title>
     <meta name="description" content="Luban restaurant – the best dining experience in Cape Coast, Ghana. Enjoy authentic Chinese cuisine at Luban Workshop Restaurant: soups, beef, seafood, rice & noodles, and more. Open Mon–Fri 11:00–17:30. Reserve a table online.">
     <meta name="keywords" content="Luban restaurant, Luban Workshop restaurant, luban restaurant Cape Coast, luban workshop restaurant Cape Coast, Chinese restaurant Cape Coast, dining Cape Coast, restaurant Cape Coast Ghana, best restaurant Cape Coast, UCC restaurant, authentic Chinese food Ghana, Chinese cuisine Cape Coast, beef seafood noodles Cape Coast, restaurant reservation Cape Coast">
@@ -285,17 +285,26 @@
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="min-w-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
                     <img src="logo.png" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white">
-                    <img src="assets/ucc-logo.png" alt="UCC Logo" class="h-9 w-9 object-contain">
-                    <span class="serif font-bold text-xl tracking-tight text-stone-900">Luban <span
+                    <img src="assets/ucc-logo.png" alt="UCC Logo" class="hidden sm:block h-9 w-9 object-contain">
+                    <span class="serif font-bold text-xl tracking-tight text-stone-900 truncate">Luban <span
                             class="text-red-700">Workshop</span></span>
                 </div>
 
-                <!-- Right side: cart, auth, nav drawer toggle (always visible) -->
+                <div class="hidden md:flex items-center gap-5 text-sm font-medium text-stone-600" aria-label="Primary navigation">
+                    <a href="meet-bao.html" class="hover:text-red-700 transition-colors">Meet Bao</a>
+                    <a href="#menu" class="hover:text-red-700 transition-colors">Menu</a>
+                    <a href="events-and-catering.html" class="hover:text-red-700 transition-colors">Reservations</a>
+                    <a href="contact-us.html" class="hover:text-red-700 transition-colors">Contact</a>
+                    <a href="faq.html" class="hover:text-red-700 transition-colors">FAQ</a>
+                    <a id="admin-btn-desktop" href="admin.html" class="hidden items-center rounded-md bg-stone-900 px-3 py-1.5 text-white hover:bg-stone-800 transition-colors">Admin</a>
+                </div>
+
+                <!-- Right side: cart, auth, mobile nav drawer toggle -->
                 <div class="flex items-center gap-2">
                     <!-- My Orders button (shown when signed in) -->
-                    <a href="#my-orders" id="my-orders-link-desktop" class="hidden p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="My Orders">
+                    <a href="#my-orders" id="my-orders-link-desktop" class="hidden md:inline-flex p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="My Orders">
                         <i data-lucide="package" class="h-6 w-6"></i>
                     </a>
                     <!-- Cart button -->
@@ -307,8 +316,8 @@
                     <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="hidden md:inline-flex px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
                         Sign Up / Login
                     </button>
-                    <!-- Hamburger / nav drawer toggle (all screen sizes) -->
-                    <button onclick="toggleNavDrawer()" class="shrink-0 p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
+                    <!-- Hamburger / nav drawer toggle -->
+                    <button onclick="toggleNavDrawer()" class="md:hidden shrink-0 p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
                 </div>
@@ -317,10 +326,10 @@
     </nav>
 
     <!-- ── Side nav drawer overlay ── -->
-    <div id="nav-drawer-overlay" class="fixed inset-0 bg-black/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleNavDrawer()"></div>
+    <div id="nav-drawer-overlay" class="md:hidden fixed inset-0 bg-black/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300" onclick="toggleNavDrawer()"></div>
 
     <!-- ── Side nav drawer ── -->
-    <div id="nav-drawer" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div id="nav-drawer" class="md:hidden fixed top-0 right-0 h-dvh w-72 max-w-full bg-white shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 flex flex-col mobile-drawer-panel">
         <!-- Drawer header -->
         <div class="flex justify-between items-center p-4 border-b border-stone-100">
             <div class="flex items-center gap-2">
@@ -340,6 +349,9 @@
             <a href="#menu" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="utensils" class="h-5 w-5 flex-shrink-0"></i> Our Menu
             </a>
+            <a href="#my-orders" id="my-orders-link-mobile" onclick="toggleNavDrawer()" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+                <i data-lucide="package" class="h-5 w-5 flex-shrink-0"></i> My Orders
+            </a>
             <a href="events-and-catering.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="calendar" class="h-5 w-5 flex-shrink-0"></i> Reserve a Table
             </a>
@@ -352,7 +364,7 @@
             <a href="contact-us.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
                 <i data-lucide="phone" class="h-5 w-5 flex-shrink-0"></i> Contact Us
             </a>
-            <a id="admin-btn-desktop" href="admin.html" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-stone-800 hover:bg-stone-900 font-medium transition-colors">
+            <a id="admin-btn-mobile" href="admin.html" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-stone-800 hover:bg-stone-900 font-medium transition-colors">
                 <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> Admin Dashboard
             </a>
         </div>
@@ -366,7 +378,7 @@
             </button>
         </div>
         <!-- Auth section in sidebar (user info always shown here; sign-in shown on small screens) -->
-        <div class="border-t border-stone-100 p-4">
+        <div class="border-t border-stone-100 p-4 pb-safe-6">
             <button id="auth-btn-sidebar" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
             <div id="user-info-sidebar" class="hidden w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-red-700 flex items-center justify-between">
                 <div class="home-user-info-row">
@@ -382,11 +394,6 @@
                     </button>
                 </div>
             </div>
-        </div>
-        <!-- Hidden compat elements for JS (my-orders-link-mobile, admin-btn-mobile) -->
-        <div class="hidden" aria-hidden="true">
-            <a href="#my-orders" id="my-orders-link-mobile"></a>
-            <a id="admin-btn-mobile" href="admin.html"></a>
         </div>
     </div>
 
@@ -727,8 +734,8 @@
     <div id="cart-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-50 z-[60] hidden transition-opacity opacity-0"
         onclick="toggleCart()"></div>
 
-    <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-full flex z-[70] pointer-events-none">
-        <div class="w-screen max-w-md pointer-events-auto transform transition ease-in-out duration-300 translate-x-full bg-white shadow-xl flex flex-col h-full"
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full max-w-full flex justify-end z-[70] pointer-events-none">
+        <div class="w-screen max-w-full sm:max-w-md pointer-events-auto transform transition ease-in-out duration-300 translate-x-full bg-white shadow-xl flex flex-col h-dvh mobile-drawer-panel"
             id="cart-panel">
             <div class="flex-1 overflow-y-auto py-6 px-4 sm:px-6">
                 <div class="flex items-start justify-between">
@@ -752,7 +759,7 @@
                 </div>
             </div>
 
-            <div class="border-t border-stone-200 py-6 px-4 sm:px-6 bg-stone-50">
+            <div class="border-t border-stone-200 py-6 px-4 sm:px-6 bg-stone-50 pb-safe-6">
                 <div class="flex justify-between text-base font-medium text-stone-900 mb-4">
                     <p>Subtotal</p>
                     <p id="cart-total">₵0.00</p>
@@ -1073,7 +1080,7 @@
                 userInfoMobile.classList.remove('hidden');
                 myOrdersLinkDesktop.classList.remove('hidden');
                 myOrdersLinkMobile.classList.remove('hidden');
-                myOrdersLinkMobile.classList.add('block');
+                myOrdersLinkMobile.classList.add('flex');
                 myOrdersSection.classList.remove('hidden');
 
                 const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
@@ -1097,10 +1104,11 @@
                     adminBtnDesktop.classList.remove('hidden');
                     adminBtnDesktop.classList.add('flex');
                     adminBtnMobile.classList.remove('hidden');
-                    adminBtnMobile.classList.add('block');
+                    adminBtnMobile.classList.add('flex');
                 } else {
                     adminBtnDesktop.classList.add('hidden');
                     adminBtnMobile.classList.add('hidden');
+                    adminBtnMobile.classList.remove('flex');
                 }
 
                 // Load user's orders
@@ -1116,7 +1124,7 @@
                 adminBtnMobile.classList.add('hidden');
                 myOrdersLinkDesktop.classList.add('hidden');
                 myOrdersLinkMobile.classList.add('hidden');
-                myOrdersLinkMobile.classList.remove('block');
+                myOrdersLinkMobile.classList.remove('flex');
                 myOrdersSection.classList.add('hidden');
             }
             lucide.createIcons();
@@ -1572,6 +1580,52 @@
             }
         }
 
+        function bindRightDrawerSwipe(panelId, isOpen, closeDrawer) {
+            const panel = document.getElementById(panelId);
+            if (!panel) return;
+
+            let startX = 0;
+            let startY = 0;
+            let activePointer = null;
+
+            function resetSwipe() {
+                activePointer = null;
+            }
+
+            function handleSwipeStart(event) {
+                if (window.innerWidth >= 768 || !isOpen()) return;
+                startX = event.clientX;
+                startY = event.clientY;
+                activePointer = event.pointerId || 'mouse';
+            }
+
+            function handleSwipeEnd(event) {
+                const pointerId = event.pointerId || 'mouse';
+                if (activePointer !== pointerId) return;
+                const deltaX = event.clientX - startX;
+                const deltaY = Math.abs(event.clientY - startY);
+                resetSwipe();
+
+                if (deltaX > 72 && Math.abs(deltaX) > deltaY * 1.25 && isOpen()) {
+                    closeDrawer();
+                }
+            }
+
+            panel.addEventListener('pointerdown', handleSwipeStart);
+            panel.addEventListener('pointerup', handleSwipeEnd);
+            panel.addEventListener('pointercancel', resetSwipe);
+            panel.addEventListener('mousedown', handleSwipeStart);
+            panel.addEventListener('mouseup', handleSwipeEnd);
+        }
+
+        bindRightDrawerSwipe('nav-drawer', function () {
+            return !document.getElementById('nav-drawer').classList.contains('translate-x-full');
+        }, toggleNavDrawer);
+
+        bindRightDrawerSwipe('cart-panel', function () {
+            return !document.getElementById('cart-overlay').classList.contains('hidden');
+        }, toggleCart);
+
         function closeSuccessModal() {
             document.getElementById('success-modal').classList.add('hidden');
             _releaseTrap();
@@ -1792,7 +1846,7 @@
                 alert('Your cart is empty.');
                 return;
             }
-            window.location.href = 'checkout.html';
+            window.location.assign(new URL('checkout.html', window.location.href).href);
         }
 
         // --- Public Promotions ---
@@ -1939,6 +1993,7 @@
             if (!document.getElementById('success-modal').classList.contains('hidden')) { closeSuccessModal(); return; }
             if (!document.getElementById('auth-modal').classList.contains('hidden')) { toggleAuthModal(); return; }
             if (!document.getElementById('cart-overlay').classList.contains('hidden')) { toggleCart(); return; }
+            if (!document.getElementById('nav-drawer').classList.contains('translate-x-full')) { toggleNavDrawer(); return; }
         });
 
         // --- Request notification permission after user interaction ---

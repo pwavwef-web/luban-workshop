@@ -11,7 +11,7 @@
     gtag('config', 'G-8LVTFZH7VD');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>菜单 | 鲁班工坊餐厅</title>
     <meta name="description" content="鲁班工坊餐厅完整菜单——汤品、前菜、牛羊肉、猪肉、鸡肉、海鲜、米饭、面条及饺子。">
     <meta name="robots" content="index, follow">
@@ -79,7 +79,9 @@
         body { font-family: 'Noto Sans SC', 'Lato', sans-serif; background-color: #fafaf9; color: #1c1917; }
         h1, h2, h3, .serif { font-family: 'Noto Serif SC', 'Playfair Display', serif; }
 
-        .tab-bar { position: sticky; top: 64px; z-index: 40; background: #fff; box-shadow: 0 1px 0 #e7e5e4; }
+        .tab-bar { position: sticky; top: 64px; z-index: 40; background: #fff; box-shadow: 0 1px 0 #e7e5e4; overflow: hidden; }
+        .tab-bar > div { scroll-padding-inline: 1rem; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+        #category-tabs { scroll-snap-type: x proximity; }
         .category-section { margin-bottom: 3rem; }
 
         .menu-card { background: #fff; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.07); transition: box-shadow 0.2s, transform 0.2s; }
@@ -90,10 +92,33 @@
         .menu-card .en-name { font-size: 0.75rem; color: #a8a29e; margin-bottom: 0.25rem; }
         .menu-card .price { font-size: 0.9rem; font-weight: 700; color: #b91c1c; margin-top: 0.4rem; }
 
-        .category-tab { padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; transition: background 0.2s, color 0.2s; border: 1.5px solid #e7e5e4; cursor: pointer; }
+        .category-tab { padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; transition: background 0.2s, color 0.2s; border: 1.5px solid #e7e5e4; cursor: pointer; scroll-snap-align: start; }
         .category-tab.active { background: #b91c1c; color: #fff; border-color: #b91c1c; }
         .category-tab:not(.active) { background: #fff; color: #44403c; }
         .category-tab:not(.active):hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+
+        @media (max-width: 767px) {
+            .tab-bar::before,
+            .tab-bar::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                z-index: 2;
+                width: 2rem;
+                pointer-events: none;
+            }
+
+            .tab-bar::before {
+                left: 0;
+                background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0));
+            }
+
+            .tab-bar::after {
+                right: 0;
+                background: linear-gradient(270deg, rgba(255,255,255,0.98), rgba(255,255,255,0));
+            }
+        }
 
         /* Logo spin */
         @keyframes hero-flip-y { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
@@ -487,6 +512,7 @@
                 t.classList.remove('active');
             });
             btn.classList.add('active');
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
             var target = btn.getAttribute('data-target');
             if (target === 'all') {
