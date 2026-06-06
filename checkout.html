@@ -21,7 +21,7 @@
 
     <header class="relative overflow-hidden bg-stone-950 pt-28 pb-12 text-white">
         <div class="absolute inset-0">
-            <img src="assets/luban-noodle-spread.jpg" alt="" aria-hidden="true" class="h-full w-full object-cover">
+            <img src="assets/luban-noodle-spread.jpg" srcset="assets/luban-noodle-spread-480.jpg 480w, assets/luban-noodle-spread.jpg 735w" sizes="100vw" alt="" aria-hidden="true" fetchpriority="high" width="735" height="420" class="h-full w-full object-cover">
             <div class="absolute inset-0" style="background: linear-gradient(90deg, rgba(28,25,23,0.94) 0%, rgba(28,25,23,0.76) 48%, rgba(28,25,23,0.5) 100%);"></div>
             <div class="absolute inset-0" style="background: radial-gradient(circle at top left, rgba(185,28,28,0.36), transparent 34%);"></div>
         </div>
@@ -96,9 +96,11 @@
     </main>
 
     <div data-luban-footer></div>
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
     <script src="assets/js/site-footer.js"></script>
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script>
@@ -113,11 +115,20 @@
             { id: 'DR4', name: 'Water 300ml', price: 5, description: 'Simple still mineral water.' }
         ];
 
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message, type, duration }
+            }));
+        }
+
+        function spawnUxConfetti(options) {
+            document.dispatchEvent(new CustomEvent('luban:confetti', {
+                detail: options || {}
+            }));
+        }
+
         function setFeedback(message, isError) {
-            const el = document.getElementById('checkout-feedback');
-            el.textContent = message;
-            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
-            el.classList.remove('hidden');
+            showUxToast(message, isError ? 'error' : 'success');
         }
 
         function renderCart() {
@@ -240,7 +251,14 @@
                     }
                 });
                 lubanClient.clearCart();
-                window.location.href = `order-status.html?order=${encodeURIComponent(result.orderId)}`;
+                try {
+                    window.sessionStorage.setItem('luban:order-success', result.orderId);
+                } catch (storageError) {}
+                showUxToast('Order placed. Opening your status page...', 'success', 1800);
+                spawnUxConfetti({ count: 48 });
+                window.setTimeout(() => {
+                    window.location.href = `order-status.html?order=${encodeURIComponent(result.orderId)}`;
+                }, 850);
             } catch (error) {
                 setFeedback(error.message || 'Could not place the order.', true);
                 button.disabled = false;

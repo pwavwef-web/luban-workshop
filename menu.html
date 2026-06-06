@@ -269,7 +269,10 @@
             isolation: isolate;
             background:
                 linear-gradient(90deg, rgba(31, 27, 22, 0.92), rgba(111, 23, 23, 0.86) 48%, rgba(31, 27, 22, 0.58)),
-                url("restcon.png") center / cover no-repeat !important;
+                url("assets/restcon-1280.jpg") center / cover no-repeat !important;
+            background:
+                linear-gradient(90deg, rgba(31, 27, 22, 0.92), rgba(111, 23, 23, 0.86) 48%, rgba(31, 27, 22, 0.58)),
+                image-set(url("assets/restcon-768.jpg") 1x, url("assets/restcon-1280.jpg") 1.5x, url("assets/restcon-1920.jpg") 2x) center / cover no-repeat !important;
         }
 
         header::after {
@@ -1154,6 +1157,7 @@
 
     <!-- ──────────────────── SCRIPTS ──────────────────── -->
 
+    <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-firestore.bundle.js"></script>
     <script>
@@ -1214,6 +1218,19 @@
 
         var currentHiddenIds = new Set();
         var currentPriceOverrides = {};
+        var menuSyncToastShown = false;
+
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message: message, type: type, duration: duration }
+            }));
+        }
+
+        function showMenuSyncToast(message) {
+            if (menuSyncToastShown) return;
+            menuSyncToastShown = true;
+            showUxToast(message, 'info');
+        }
 
         function initRealtimeMenuSync() {
             menuDb.collection('dishAvailability').onSnapshot(function (snapshot) {
@@ -1222,6 +1239,9 @@
                     if (doc.data().hidden === true) currentHiddenIds.add(doc.id);
                 });
                 applyDishAvailability(currentHiddenIds);
+            }, function (error) {
+                console.error('Failed to sync dish availability:', error);
+                showMenuSyncToast('Showing the saved menu while live updates reconnect.');
             });
 
             menuDb.collection('priceOverrides').onSnapshot(function (snapshot) {
@@ -1230,6 +1250,9 @@
                     currentPriceOverrides[doc.id] = doc.data();
                 });
                 applyPriceOverrides(currentPriceOverrides);
+            }, function (error) {
+                console.error('Failed to sync timed price overrides:', error);
+                showMenuSyncToast('Showing the saved menu while live updates reconnect.');
             });
 
         function applyMenuPrices(priceOverrides) {
@@ -1261,6 +1284,9 @@
                     priceOverrides[doc.id] = doc.data().price;
                 });
                 applyMenuPrices(priceOverrides);
+            }, function (error) {
+                console.error('Failed to sync menu prices:', error);
+                showMenuSyncToast('Showing the saved menu while live updates reconnect.');
             });
         }
 

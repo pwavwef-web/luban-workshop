@@ -21,7 +21,7 @@
 
     <header class="relative overflow-hidden bg-stone-950 pt-28 pb-12 text-white">
         <div class="absolute inset-0">
-            <img src="assets/luban-noodle-spread.jpg" alt="" aria-hidden="true" class="h-full w-full object-cover">
+            <img src="assets/luban-noodle-spread.jpg" srcset="assets/luban-noodle-spread-480.jpg 480w, assets/luban-noodle-spread.jpg 735w" sizes="100vw" alt="" aria-hidden="true" width="735" height="420" class="h-full w-full object-cover">
             <div class="absolute inset-0" style="background: linear-gradient(90deg, rgba(28,25,23,0.94) 0%, rgba(28,25,23,0.76) 48%, rgba(28,25,23,0.5) 100%);"></div>
             <div class="absolute inset-0" style="background: radial-gradient(circle at top left, rgba(185,28,28,0.36), transparent 34%);"></div>
         </div>
@@ -67,6 +67,7 @@
     <script src="assets/js/site-footer.js"></script>
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script src="assets/js/site-header.js"></script>
     <script src="assets/js/firebase-config.js"></script>
@@ -78,16 +79,45 @@
         let currentUser = null;
         let currentOrder = null;
 
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message, type, duration }
+            }));
+        }
+
+        function showUxConfirm(title, message, options) {
+            return new Promise(resolve => {
+                document.dispatchEvent(new CustomEvent('luban:confirm', {
+                    detail: { title, message, options, resolve }
+                }));
+            });
+        }
+
+        function celebrateUxOrder(message) {
+            document.dispatchEvent(new CustomEvent('luban:celebrate-order', {
+                detail: { message }
+            }));
+        }
+
         function canCancelOrder(order) {
             if (!order || order.status !== 'pending' || !order.createdAt || !order.createdAt.toDate) return false;
             return (Date.now() - order.createdAt.toDate().getTime()) <= 5 * 60 * 1000;
         }
 
         function showFeedback(message, isError) {
-            const el = document.getElementById('order-feedback');
-            el.textContent = message;
-            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
-            el.classList.remove('hidden');
+            showUxToast(message, isError ? 'error' : 'success');
+        }
+
+        function maybeCelebratePlacedOrder() {
+            let placedOrderId = '';
+            try {
+                placedOrderId = window.sessionStorage.getItem('luban:order-success') || '';
+            } catch (storageError) {}
+            if (!placedOrderId || placedOrderId !== orderId) return;
+            try {
+                window.sessionStorage.removeItem('luban:order-success');
+            } catch (storageError) {}
+            celebrateUxOrder('Order placed. Track it here.');
         }
 
         async function loadOrder() {
@@ -126,6 +156,7 @@
             }
             try {
                 await loadOrder();
+                maybeCelebratePlacedOrder();
             } catch (error) {
                 showFeedback(error.message || 'Could not load this order.', true);
             }
@@ -142,26 +173,36 @@
 
         document.getElementById('cancel-btn').addEventListener('click', async () => {
             if (!currentUser || !orderId) return;
-            if (!confirm('Cancel this order?')) return;
-            await lubanClient.api('/cancelOwnOrder', {
-                method: 'POST',
-                user: currentUser,
-                body: { orderId }
-            });
-            await loadOrder();
-            showFeedback('Order cancelled.', false);
+            const confirmed = await showUxConfirm('Cancel Order', 'Cancel this order? This can only be done while the order is still pending.', { confirmLabel: 'Cancel Order' });
+            if (!confirmed) return;
+            try {
+                await lubanClient.api('/cancelOwnOrder', {
+                    method: 'POST',
+                    user: currentUser,
+                    body: { orderId }
+                });
+                await loadOrder();
+                showFeedback('Order cancelled.', false);
+            } catch (error) {
+                showFeedback(error.message || 'Could not cancel this order.', true);
+            }
         });
 
         document.getElementById('delete-btn').addEventListener('click', async () => {
             if (!currentUser || !orderId) return;
-            if (!confirm('Delete this order permanently?')) return;
-            await lubanClient.api('/deleteOwnOrder', {
-                method: 'POST',
-                user: currentUser,
-                body: { orderId }
-            });
-            showFeedback('Order deleted. Redirecting back to the homepage...', false);
-            setTimeout(() => { window.location.href = 'index.html#my-orders'; }, 1000);
+            const confirmed = await showUxConfirm('Delete Order', 'Delete this order permanently? This cannot be undone.', { confirmLabel: 'Delete Order' });
+            if (!confirmed) return;
+            try {
+                await lubanClient.api('/deleteOwnOrder', {
+                    method: 'POST',
+                    user: currentUser,
+                    body: { orderId }
+                });
+                showFeedback('Order deleted. Redirecting back to the homepage...', false);
+                setTimeout(() => { window.location.href = 'index.html#my-orders'; }, 1000);
+            } catch (error) {
+                showFeedback(error.message || 'Could not delete this order.', true);
+            }
         });
     </script>
 </body>

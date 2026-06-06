@@ -100,6 +100,7 @@
     <script src="assets/js/lucide.bundle.js"></script>
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script src="assets/js/cookie-consent.js" defer></script>
@@ -111,11 +112,14 @@
         const PHONE_OTP_COOLDOWN_MS = 5 * 60 * 1000;
         let phoneOtpCooldownTimer = null;
 
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message, type, duration }
+            }));
+        }
+
         function showFeedback(message, isError) {
-            const el = document.getElementById('page-feedback');
-            el.textContent = message;
-            el.className = `rounded-md p-4 text-sm ${isError ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`;
-            el.classList.remove('hidden');
+            showUxToast(message, isError ? 'error' : 'success');
         }
 
         function getPhoneOtpCooldownKey() {

@@ -8,6 +8,7 @@ A static Firebase-hosted web application for Luban Workshop Restaurant, featurin
 npm ci
 npm run build
 npm run check
+npm run test:e2e
 ```
 
 Functions use their own dependency tree:
@@ -18,15 +19,24 @@ node --check functions/index.js
 node --check functions/secure-api.js
 ```
 
+Useful local scripts:
+
+- `npm run lint` checks JavaScript with the ESLint baseline.
+- `npm run format` applies Prettier to the current tooling and test baseline.
+- `npm run format:check` verifies that scoped Prettier baseline.
+- `npm run test:e2e` runs the Playwright smoke tests for menu, checkout, and order status pages.
+
+The Chinese pages are still maintained as static HTML mirrors. The next maintainability step is to move shared copy into JSON locale files and load it through a small page-level i18n helper, then migrate pages one section at a time. TypeScript can follow the same incremental path by converting the bundle entry points in `src/` first before touching inline page scripts.
+
 ## Project Ownership
 
 - Lead developer: Francis Pwavwe
-	- Company: AZ Learner
-	- Website: azlearner.me
-	- Website: francis.azlearner.me
-	- Email: francis@azlearner.me
+  - Company: AZ Learner
+  - Website: azlearner.me
+  - Website: francis.azlearner.me
+  - Email: francis@azlearner.me
 - Co-developer: Chinedum Okwonkwo Udeaja
-	- Email: udeajachinedum19@gmail.com
+  - Email: udeajachinedum19@gmail.com
 
 ## Admin Access
 

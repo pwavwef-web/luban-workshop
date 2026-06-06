@@ -287,8 +287,9 @@
 
     <header class="relative pt-24 pb-12 lg:pt-32 lg:pb-24 bg-stone-900 overflow-hidden">
         <div class="home-hero-image-wrap">
-            <img src="restcon.png"
-                alt="Restaurant interior" class="w-full h-full object-cover object-bottom home-hero-image">
+            <img src="assets/restcon-1280.jpg"
+                srcset="assets/restcon-768.jpg 768w, assets/restcon-1280.jpg 1280w, assets/restcon-1920.jpg 1920w"
+                sizes="100vw" alt="Restaurant interior" fetchpriority="high" width="1920" height="1440" class="w-full h-full object-cover object-bottom home-hero-image">
         </div>
         <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p class="text-red-400 tracking-widest uppercase text-xs mb-3">Authentic Chinese Cuisine · Cape Coast, Ghana</p>
@@ -701,6 +702,16 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Scroll to Top -->
+    <button id="scroll-top-btn" class="scroll-top-btn" aria-label="Scroll to top">
+        <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18 15-6-6-6 6"></path>
+        </svg>
+    </button>
+
     <!-- Auth Modal -->
     <div id="auth-modal" class="fixed inset-0 z-[80] overflow-y-auto hidden" aria-labelledby="auth-modal-title"
         role="dialog" aria-modal="true">
@@ -922,6 +933,8 @@
         let menuHiddenIds = new Set();
         let menuPriceOverrides = {};
         let menuImageOverrides = {};
+        let menuTimedPriceOverrides = {};
+        let menuSyncToastShown = false;
 
         // --- Firebase Auth State Observer ---
         auth.onAuthStateChanged(async user => {
@@ -1010,44 +1023,104 @@
             lucide.createIcons();
         });
 
+        // --- Offline Menu Cache (IndexedDB) ---
+        const MenuCache = {
+            DB_NAME: 'luban-menu-db',
+            STORE: 'menu-data',
+            open() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(this.DB_NAME, 1);
+                    req.onupgradeneeded = () => req.result.createObjectStore(this.STORE);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            async save(data) {
+                try {
+                    const db = await this.open();
+                    const tx = db.transaction(this.STORE, 'readwrite');
+                    tx.objectStore(this.STORE).put(data, 'menuItems');
+                } catch (e) { /* silent */ }
+            },
+            async load() {
+                try {
+                    const db = await this.open();
+                    return new Promise((resolve) => {
+                        const tx = db.transaction(this.STORE, 'readonly');
+                        const req = tx.objectStore(this.STORE).get('menuItems');
+                        req.onsuccess = () => resolve(req.result || null);
+                        req.onerror = () => resolve(null);
+                    });
+                } catch (e) { return null; }
+            }
+        };
+
         // --- Menu from hardcoded data + visibility and prices from Firestore ---
+        function getFirestoreDate(value) {
+            if (!value) return null;
+            if (typeof value.toDate === 'function') return value.toDate();
+            if (value.seconds !== undefined) return new Date(value.seconds * 1000);
+            const parsed = new Date(value);
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function getEffectiveMenuPrice(item) {
+            let price = menuPriceOverrides[item.id] !== undefined ? Number(menuPriceOverrides[item.id]) : Number(item.price || 0);
+            const timedOverride = menuTimedPriceOverrides[item.id];
+            const revertAt = timedOverride ? getFirestoreDate(timedOverride.revertAt) : null;
+            if (timedOverride && revertAt && revertAt > new Date()) {
+                const timedPrice = Number(timedOverride.newPrice);
+                if (Number.isFinite(timedPrice)) price = timedPrice;
+            }
+            return Number.isFinite(price) ? price : Number(item.price || 0);
+        }
+
+        function cacheCurrentMenu() {
+            MenuCache.save({
+                menuItems,
+                menuHiddenIds: Array.from(menuHiddenIds),
+                menuPriceOverrides,
+                menuImageOverrides,
+                menuTimedPriceOverrides,
+                timestamp: Date.now()
+            });
+        }
+
         function rebuildMenuItems() {
             menuItems = HARDCODED_MENU
                 .filter(item => !menuHiddenIds.has(item.id))
                 .map(item => ({
                     ...item,
-                    price: menuPriceOverrides[item.id] !== undefined ? menuPriceOverrides[item.id] : item.price,
+                    price: getEffectiveMenuPrice(item),
                     image: menuImageOverrides[item.id] !== undefined ? menuImageOverrides[item.id] : item.image
                 }));
             renderMenu();
+            cacheCurrentMenu();
+        }
+
+        function showMenuSyncToast() {
+            if (menuSyncToastShown) return;
+            menuSyncToastShown = true;
+            showToast('Showing the saved menu while live updates reconnect.', 'info');
         }
 
         function initMenu() {
-            let hiddenIds = new Set();
-            let priceOverrides = {};
+            let firstSnapshotReceived = false;
 
-            function applyAndRender() {
-                const now = new Date();
-                menuItems = HARDCODED_MENU
-                    .filter(item => !hiddenIds.has(item.id))
-                    .map(item => {
-                        const override = priceOverrides[item.id];
-                        let price = item.price;
-                        if (override && override.revertAt) {
-                            const revertAt = override.revertAt.toDate ? override.revertAt.toDate() : new Date(override.revertAt.seconds * 1000);
-                            if (revertAt > now) {
-                                price = override.newPrice;
-                            }
-                        }
-                        return Object.assign({}, item, {
-                            price,
-                            image: menuImageOverrides[item.id] !== undefined ? menuImageOverrides[item.id] : item.image
-                        });
-                    });
-                renderMenu();
-            }
+            // Load cached menu data immediately for offline/first-load performance
+            MenuCache.load().then(cached => {
+                if (cached && cached.menuItems && !firstSnapshotReceived) {
+                    menuItems = cached.menuItems;
+                    menuHiddenIds = new Set(cached.menuHiddenIds || []);
+                    menuPriceOverrides = cached.menuPriceOverrides || {};
+                    menuImageOverrides = cached.menuImageOverrides || {};
+                    menuTimedPriceOverrides = cached.menuTimedPriceOverrides || {};
+                    renderMenu();
+                }
+            });
 
             db.collection('dishAvailability').onSnapshot(snapshot => {
+                firstSnapshotReceived = true;
                 menuHiddenIds = new Set();
                 snapshot.forEach(doc => {
                     if (doc.data().hidden === true) menuHiddenIds.add(doc.id);
@@ -1055,18 +1128,25 @@
                 rebuildMenuItems();
             }, error => {
                 console.error('Error loading dish availability:', error);
+                showMenuSyncToast();
                 rebuildMenuItems();
             });
 
             db.collection('menuPrices').onSnapshot(snapshot => {
+                firstSnapshotReceived = true;
                 menuPriceOverrides = {};
                 snapshot.forEach(doc => {
                     menuPriceOverrides[doc.id] = doc.data().price;
                 });
                 rebuildMenuItems();
+            }, error => {
+                console.error('Error loading menu prices:', error);
+                showMenuSyncToast();
+                rebuildMenuItems();
             });
 
             db.collection('menuImages').onSnapshot(snapshot => {
+                firstSnapshotReceived = true;
                 menuImageOverrides = {};
                 snapshot.forEach(doc => {
                     menuImageOverrides[doc.id] = doc.data().imageUrl;
@@ -1074,17 +1154,27 @@
                 rebuildMenuItems();
             }, error => {
                 console.error('Error loading image overrides:', error);
+                showMenuSyncToast();
             });
 
             db.collection('priceOverrides').onSnapshot(snapshot => {
-                priceOverrides = {};
+                firstSnapshotReceived = true;
+                menuTimedPriceOverrides = {};
                 snapshot.forEach(doc => {
-                    priceOverrides[doc.id] = doc.data();
+                    menuTimedPriceOverrides[doc.id] = doc.data();
                 });
-                applyAndRender();
+                rebuildMenuItems();
             }, error => {
                 console.error('Error loading price overrides:', error);
+                showMenuSyncToast();
+                rebuildMenuItems();
             });
+
+            window.setTimeout(() => {
+                if (!firstSnapshotReceived && !menuItems.length) {
+                    rebuildMenuItems();
+                }
+            }, 3000);
         }
 
         // --- Auth Functions (Login/Signup/Logout) ---
@@ -1189,7 +1279,7 @@
                 toggleAuthModal();
                 errorDiv.classList.add('hidden');
                 document.getElementById('signup-form-modal').reset();
-                alert('Account created. Please verify your Ghana phone number before ordering. Email verification is optional.');
+                showToast('Account created! Please verify your Ghana phone number before ordering.', 'success', 5000);
             } catch (error) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove('hidden');
@@ -1275,7 +1365,7 @@
                 card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
                 card.innerHTML = `
                 <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
-                    <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'" class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" width="600" height="400" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'" class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
                     <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">₵${item.price.toFixed(2)}</div>
                 </div>
                 <div class="p-6 flex flex-col flex-1">
@@ -1389,7 +1479,7 @@
                     li.className = 'py-6 flex';
                     li.innerHTML = `
                     <div class="flex-shrink-0 w-20 h-20 border border-stone-200 rounded-md overflow-hidden">
-                        <img src="${item.image}" alt="${item.name}" loading="lazy" class="w-full h-full object-center object-cover">
+                        <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" width="80" height="80" class="w-full h-full object-center object-cover">
                     </div>
                     <div class="ml-4 flex-1 flex flex-col">
                         <div class="flex justify-between text-base font-medium text-stone-900">
@@ -1687,9 +1777,8 @@
 
         // Cancel order function
         async function cancelOrder(orderId) {
-            if (!confirm('Are you sure you want to cancel this order?')) {
-                return;
-            }
+            const confirmed = await showConfirmModal('Cancel Order', 'Are you sure you want to cancel this order? This cannot be undone.');
+            if (!confirmed) return;
             
             try {
                 await lubanClient.api('/cancelOwnOrder', {
@@ -1697,33 +1786,34 @@
                     user: auth.currentUser,
                     body: { orderId }
                 });
-                alert('Order cancelled successfully!');
+                showToast('Order cancelled successfully!', 'success');
             } catch (error) {
                 console.error('Error cancelling order:', error);
-                alert(error.message || 'Failed to cancel order. Please try again.');
+                showToast(error.message || 'Failed to cancel order. Please try again.', 'error');
             }
         }
 
         // Allow users to delete their own completed or cancelled orders
         async function deleteMyOrder(orderId) {
-            if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+            const confirmed = await showConfirmModal('Delete Order', 'Permanently delete this order? This cannot be undone.');
+            if (!confirmed) return;
             try {
                 await lubanClient.api('/deleteOwnOrder', {
                     method: 'POST',
                     user: auth.currentUser,
                     body: { orderId }
                 });
-                alert('Order deleted.');
+                showToast('Order deleted.', 'success');
             } catch (err) {
                 console.error('Failed to delete order:', err);
-                alert(err.message || 'Could not delete order. Please contact support if the issue continues.');
+                showToast(err.message || 'Could not delete order. Please try again.', 'error');
             }
         }
 
         // --- REAL CHECKOUT LOGIC ---
         async function checkout() {
             if (!cart.length) {
-                alert('Your cart is empty.');
+                showToast('Your cart is empty. Add items before checking out.', 'info');
                 return;
             }
             window.location.assign(new URL('checkout.html', window.location.href).href);
@@ -1857,7 +1947,107 @@
                 });
         }
 
+        // --- Toast Notification System ---
+        function showToast(message, type = 'info', duration = 3500) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const iconMap = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+            toast.innerHTML = `
+                <i data-lucide="${iconMap[type] || 'info'}" class="toast-icon"></i>
+                <span class="toast-msg">${message}</span>
+                <button class="toast-close" aria-label="Dismiss">&times;</button>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons({ nodes: [toast] });
+            const dismiss = () => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 260);
+            };
+            toast.querySelector('.toast-close').addEventListener('click', dismiss);
+            if (duration > 0) setTimeout(dismiss, duration);
+            return dismiss;
+        }
+
+        // --- Styled Confirm Modal ---
+        function showConfirmModal(title, message) {
+            return new Promise(resolve => {
+                const backdrop = document.createElement('div');
+                backdrop.className = 'confirm-modal-backdrop';
+                backdrop.innerHTML = `
+                    <div class="confirm-modal-panel">
+                        <h3 class="serif text-xl font-bold text-stone-900">${title}</h3>
+                        <p class="mt-2 text-sm text-stone-600">${message}</p>
+                        <div class="mt-6 flex gap-3 justify-end">
+                            <button class="confirm-cancel px-4 py-2 rounded-lg border border-stone-300 text-sm font-semibold text-stone-700 hover:bg-stone-50">Cancel</button>
+                            <button class="confirm-ok px-4 py-2 rounded-lg bg-red-700 text-sm font-semibold text-white hover:bg-red-800">Confirm</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(backdrop);
+                backdrop.querySelector('.confirm-cancel').addEventListener('click', () => { backdrop.remove(); resolve(false); });
+                backdrop.querySelector('.confirm-ok').addEventListener('click', () => { backdrop.remove(); resolve(true); });
+                backdrop.addEventListener('click', e => { if (e.target === backdrop) { backdrop.remove(); resolve(false); } });
+            });
+        }
+
+        // --- Scroll to Top Button ---
+        (function initScrollToTop() {
+            const btn = document.getElementById('scroll-top-btn');
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        btn.classList.toggle('visible', window.scrollY > 500);
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+            btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            lucide.createIcons({ nodes: [btn] });
+        })();
+
+        // --- Skeleton Loading Cards ---
+        function showSkeletonCards(count = 8) {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const card = document.createElement('div');
+                card.className = 'skeleton-card flex flex-col h-full';
+                card.innerHTML = `
+                    <div class="skeleton-img"></div>
+                    <div class="p-6 flex flex-col flex-1 gap-3">
+                        <div class="skeleton-text" style="width:70%"></div>
+                        <div class="skeleton-text-sm" style="width:100%"></div>
+                        <div class="skeleton-text-sm" style="width:60%"></div>
+                        <div class="skeleton-btn mt-4"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // --- Confetti Animation ---
+        function spawnConfetti(parentEl) {
+            const colors = ['#b91c1c', '#c58b2b', '#16a34a', '#2563eb', '#9333ea', '#ec4899', '#f97316'];
+            for (let i = 0; i < 35; i++) {
+                const piece = document.createElement('span');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = (Math.random() * 0.8) + 's';
+                piece.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+                piece.style.width = (5 + Math.random() * 6) + 'px';
+                piece.style.height = (5 + Math.random() * 6) + 'px';
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                parentEl.appendChild(piece);
+            }
+            setTimeout(() => parentEl.querySelectorAll('.confetti-piece').forEach(p => p.remove()), 3500);
+        }
+
         // --- Init ---
+        showSkeletonCards();
         initMenu();
         listenToPublicPromotions();
         updateCartUI();

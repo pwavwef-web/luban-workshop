@@ -221,6 +221,7 @@
     <script src="assets/js/lucide.bundle.js"></script>
     <script src="assets/js/site-config.js"></script>
     <script src="assets/js/luban-client.js"></script>
+    <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script>
@@ -234,6 +235,12 @@
         let profileDocExists = false;
         let promotionsUnsubscribe = null;
         let currentAccountStatus = null;
+
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message, type, duration }
+            }));
+        }
 
         function formatGhanaPhone(phone) {
             let cleaned = String(phone || '').replace(/[^\d+]/g, '');
@@ -492,6 +499,7 @@
                 const pill = document.getElementById('profile-status-pill');
                 pill.classList.remove('hidden');
                 setTimeout(() => pill.classList.add('hidden'), 3000);
+                showUxToast('Profile saved.', 'success');
             } catch (error) {
                 console.error('Failed to save profile:', error);
                 showProfileError('Could not save your profile: ' + (error.message || error));
