@@ -314,39 +314,6 @@
         </div>
     </header>
 
-    <section class="py-14 bg-[#fff6e8] border-y border-[#ead8bd]" aria-labelledby="meet-bao-home-title">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-[1fr_0.58fr] gap-10 items-center">
-                <div>
-                    <span class="text-red-700 font-semibold tracking-wide uppercase text-sm">New Campaign</span>
-                    <h2 id="meet-bao-home-title" class="mt-2 serif text-4xl sm:text-5xl font-bold text-stone-900 leading-tight">
-                        Meet Bao, your Luban guide.
-                    </h2>
-                    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-stone-600">
-                        Bao is here for warm welcomes, fresh menu picks, dumplings, noodles, rice bowls, and group meals made easier.
-                    </p>
-                    <div class="mt-7 flex flex-col sm:flex-row gap-3">
-                        <a href="meet-bao.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors font-semibold shadow-md">
-                            <i data-lucide="sparkles" class="h-5 w-5"></i>
-                            Meet Bao
-                        </a>
-                        <a href="menu.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-800 border border-red-100 rounded-md hover:bg-red-50 transition-colors font-semibold">
-                            <i data-lucide="book-open" class="h-5 w-5"></i>
-                            View Menu
-                        </a>
-                        <a href="events-and-catering.html#reservation" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-stone-800 border border-stone-200 rounded-md hover:bg-stone-50 transition-colors font-semibold">
-                            <i data-lucide="calendar-check" class="h-5 w-5"></i>
-                            Reserve
-                        </a>
-                    </div>
-                </div>
-                <div class="relative min-h-64 overflow-hidden rounded-lg border border-[#ead8bd] bg-white">
-                    <img src="assets/bao-campaign/bao-flyer-01-meet-bao.png" alt="Meet Bao campaign flyer for Luban Workshop Restaurant" class="absolute inset-0 h-full w-full object-cover object-top">
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section id="public-promotions-section" class="hidden py-14 bg-stone-950 text-white border-y border-stone-800">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-8">
@@ -653,6 +620,10 @@
                     <p>Subtotal</p>
                     <p id="cart-total">₵0.00</p>
                 </div>
+                <div class="mb-4 rounded-md bg-white p-3 text-sm text-stone-600 border border-stone-200">
+                    <p class="font-semibold text-stone-900">Pickup timing</p>
+                    <p class="mt-1">Most online pickup orders are ready in about 15-25 minutes after kitchen confirmation.</p>
+                </div>
                 <p class="mt-0.5 text-sm text-stone-500 mb-6">Pickup orders require a verified Ghana phone number. Email verification is optional; pay at the counter when you collect.</p>
                 <div class="space-y-3">
                     <button onclick="checkout()" id="checkout-btn"
@@ -745,13 +716,13 @@
                     <form id="login-form-modal" class="space-y-4">
                         <div>
                             <label for="login-email" class="block text-sm font-medium text-stone-700 mb-2">Email</label>
-                            <input type="email" id="login-email" required
+                            <input type="email" id="login-email" required autocomplete="email"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div>
                             <label for="login-password"
                                 class="block text-sm font-medium text-stone-700 mb-2">Password</label>
-                            <input type="password" id="login-password" required
+                            <input type="password" id="login-password" required autocomplete="current-password"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                         </div>
                         <div id="login-error-modal" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
@@ -780,35 +751,40 @@
                         <div>
                             <label for="signup-name"
                                 class="block text-sm font-medium text-stone-700 mb-2">Full Name</label>
-                            <input type="text" id="signup-name" required
+                            <input type="text" id="signup-name" required autocomplete="name"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <p id="signup-name-validation" class="validation-message" aria-live="polite"></p>
                         </div>
                         <div>
                             <label for="signup-phone"
                                 class="block text-sm font-medium text-stone-700 mb-2">Phone Number (Ghana)</label>
-                            <input type="tel" id="signup-phone" placeholder="+233501234567" required
+                            <input type="tel" id="signup-phone" placeholder="+233501234567" required inputmode="tel" autocomplete="tel"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                             <p class="text-xs text-stone-500 mt-1">Required for online orders; verify it by SMS before checkout.</p>
+                            <p id="signup-phone-validation" class="validation-message" aria-live="polite"></p>
                         </div>
                         <div>
                             <label for="signup-email"
                                 class="block text-sm font-medium text-stone-700 mb-2">Email <span class="text-stone-400">(verification optional)</span></label>
-                            <input type="email" id="signup-email" required
+                            <input type="email" id="signup-email" required autocomplete="email"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                             <p class="text-xs text-stone-500 mt-1">Needed for your account; email verification is not required for checkout.</p>
+                            <p id="signup-email-validation" class="validation-message" aria-live="polite"></p>
                         </div>
                         <div>
                             <label for="signup-password"
                                 class="block text-sm font-medium text-stone-700 mb-2">Password</label>
-                            <input type="password" id="signup-password" required minlength="6"
+                            <input type="password" id="signup-password" required minlength="6" autocomplete="new-password"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
                             <p class="text-xs text-stone-500 mt-1">At least 6 characters</p>
+                            <p id="signup-password-validation" class="validation-message" aria-live="polite"></p>
                         </div>
                         <div>
                             <label for="signup-password-confirm"
                                 class="block text-sm font-medium text-stone-700 mb-2">Confirm Password</label>
-                            <input type="password" id="signup-password-confirm" required minlength="6"
+                            <input type="password" id="signup-password-confirm" required minlength="6" autocomplete="new-password"
                                 class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                            <p id="signup-password-confirm-validation" class="validation-message" aria-live="polite"></p>
                         </div>
                         <div id="signup-error-modal" class="hidden text-red-700 text-sm p-3 bg-red-50 rounded-md"></div>
                         <button type="submit"
@@ -928,6 +904,7 @@
         // Global variables
         let menuItems = [];
         let cart = lubanClient.readCart();
+        let cartSyncingFromExternal = false;
         let currentUser = null; // NEW: Track the logged-in user
         let currentUserProfile = null; // Stores name & phone from Firestore
         let menuHiddenIds = new Set();
@@ -1255,18 +1232,13 @@
             const confirmPassword = document.getElementById('signup-password-confirm').value;
             const errorDiv = document.getElementById('signup-error-modal');
 
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match';
+            if (!validateSignUpForm(true)) {
+                errorDiv.textContent = 'Please fix the highlighted fields before creating your account.';
                 errorDiv.classList.remove('hidden');
                 return;
             }
 
             const phone = formatGhanaPhone(rawPhone);
-            if (!phone) {
-                errorDiv.textContent = 'Please enter a valid Ghana phone number (+233 and 9 digits, e.g., +233501234567).';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
@@ -1330,6 +1302,54 @@
         function isValidGhanaPhone(phone) {
             return formatGhanaPhone(phone) !== null;
         }
+
+        function setFieldValidation(inputId, message, isValid) {
+            const input = document.getElementById(inputId);
+            const messageEl = document.getElementById(`${inputId}-validation`);
+            if (!input || !messageEl) return;
+            input.classList.remove('validation-invalid', 'validation-valid');
+            messageEl.classList.remove('error', 'success');
+
+            if (!message) {
+                messageEl.textContent = '';
+                return;
+            }
+
+            input.classList.add(isValid ? 'validation-valid' : 'validation-invalid');
+            messageEl.classList.add(isValid ? 'success' : 'error');
+            messageEl.textContent = message;
+        }
+
+        function validateSignUpForm(showSuccess) {
+            const name = document.getElementById('signup-name').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-password-confirm').value;
+            const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            const phoneValid = isValidGhanaPhone(phone);
+            const passwordValid = password.length >= 6;
+            const passwordMatch = passwordValid && confirmPassword === password;
+            const nameValid = name.length >= 2;
+
+            setFieldValidation('signup-name', name || showSuccess ? (nameValid ? 'Looks good.' : 'Enter your full name.') : '', nameValid);
+            setFieldValidation('signup-phone', phone || showSuccess ? (phoneValid ? 'Valid Ghana number.' : 'Use +233 plus 9 digits, e.g. +233501234567.') : '', phoneValid);
+            setFieldValidation('signup-email', email || showSuccess ? (emailValid ? 'Email format looks good.' : 'Enter a valid email address.') : '', emailValid);
+            setFieldValidation('signup-password', password || showSuccess ? (passwordValid ? 'Password length is okay.' : 'Use at least 6 characters.') : '', passwordValid);
+            setFieldValidation('signup-password-confirm', confirmPassword || showSuccess ? (passwordMatch ? 'Passwords match.' : 'Passwords must match.') : '', passwordMatch);
+
+            return nameValid && phoneValid && emailValid && passwordValid && passwordMatch;
+        }
+
+        ['signup-name', 'signup-phone', 'signup-email', 'signup-password', 'signup-password-confirm'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', () => {
+                validateSignUpForm(false);
+                document.getElementById('signup-error-modal').classList.add('hidden');
+            });
+            input.addEventListener('blur', () => validateSignUpForm(true));
+        });
 
         // Account settings helpers: legacy entry points now use the profile page.
         function openAccountSettingsModal(prefillName = '', prefillEmail = '') {
@@ -1445,6 +1465,18 @@
             updateCartUI();
         }
 
+        function updateCartQuantity(id, quantity) {
+            const nextQuantity = Math.max(0, Math.min(99, Number(quantity) || 0));
+            const index = cart.findIndex(i => i.id === id);
+            if (index === -1) return;
+            if (nextQuantity === 0) {
+                cart.splice(index, 1);
+            } else {
+                cart[index].quantity = nextQuantity;
+            }
+            updateCartUI();
+        }
+
         function updateCartUI() {
             const cartList = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
@@ -1470,6 +1502,7 @@
 
             cartList.innerHTML = '';
             if (cart.length === 0) {
+                totalEl.innerText = '₵0.00';
                 cartList.innerHTML = `<li class="py-12 text-center flex flex-col items-center text-stone-500"><i data-lucide="shopping-basket" class="w-12 h-12 mb-4 text-stone-300"></i><p class="text-lg font-medium">Your cart is empty</p></li>`;
             } else {
                 let subtotal = 0;
@@ -1488,10 +1521,11 @@
                         </div>
                         <p class="mt-1 text-sm text-stone-500">₵${item.price.toFixed(2)} each</p>
                         <div class="flex-1 flex items-end justify-between text-sm">
-                            <div class="flex items-center border border-stone-300 rounded-md">
-                                <button onclick="removeFromCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100">-</button>
-                                <span class="px-2 font-medium">${item.quantity}</span>
-                                <button onclick="addToCart('${item.id}')" class="px-2 py-1 hover:bg-stone-100">+</button>
+                            <div class="flex items-center border border-stone-300 rounded-md overflow-hidden" aria-label="Change quantity for ${item.name}">
+                                <button type="button" onclick="removeFromCart('${item.id}')" class="min-h-11 min-w-11 px-3 hover:bg-stone-100" aria-label="Remove one ${item.name}">-</button>
+                                <label class="sr-only" for="cart-quantity-${item.id}">Quantity for ${item.name}</label>
+                                <input id="cart-quantity-${item.id}" type="number" min="0" max="99" inputmode="numeric" value="${item.quantity}" onchange="updateCartQuantity('${item.id}', this.value)" class="h-11 w-14 border-x border-stone-300 text-center font-medium focus:outline-none focus:ring-2 focus:ring-red-700">
+                                <button type="button" onclick="addToCart('${item.id}')" class="min-h-11 min-w-11 px-3 hover:bg-stone-100" aria-label="Add one ${item.name}">+</button>
                             </div>
                         </div>
                     </div>`;
@@ -1499,9 +1533,20 @@
                 });
                 totalEl.innerText = '₵' + subtotal.toFixed(2);
             }
-            lubanClient.writeCart(cart);
+            if (!cartSyncingFromExternal) {
+                lubanClient.writeCart(cart, { source: 'homepage' });
+            }
             lucide.createIcons();
         }
+
+        window.addEventListener('luban:cart-changed', (event) => {
+            const detail = event.detail || {};
+            if (detail.source === 'homepage' || !Array.isArray(detail.items)) return;
+            cart = detail.items;
+            cartSyncingFromExternal = true;
+            updateCartUI();
+            cartSyncingFromExternal = false;
+        });
 
         // ── Focus-trap utility ───────────────────────────────────────────────────
         const _FOCUSABLE_SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -2079,7 +2124,7 @@
         }, { once: true });
 
     </script>
-    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260530-election-assistant"></script>
+    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260616-bao-position-fix"></script>
     <script src="assets/js/cookie-consent.js" defer></script>
 </body>
 

@@ -24,7 +24,7 @@
     if (window.__lubanAiChatbotLoading) return;
 
     window.__lubanAiChatbotLoading = true;
-    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260530-assistant-button')).catch((error) => {
+    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260616-bao-position-fix')).catch((error) => {
       window.__lubanAiChatbotLoading = false;
       console.warn('Could not load Luban assistant button:', error);
     });

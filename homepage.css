@@ -280,6 +280,14 @@ main section {
     background: #b91c1c;
 }
 
+@media (max-width: 520px) {
+    body.luban-chatbot-open .scroll-top-btn {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(1rem) scale(0.92);
+    }
+}
+
 /* --- Skeleton Loading --- */
 .skeleton-card {
     background: white;

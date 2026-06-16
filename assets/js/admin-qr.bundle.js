@@ -12,7 +12,7 @@
     const _this = {};
     const makeImpl = function(test, maskPattern) {
       _moduleCount = _typeNumber * 4 + 17;
-      _modules = function(moduleCount) {
+      _modules = (function(moduleCount) {
         const modules = new Array(moduleCount);
         for (let row = 0; row < moduleCount; row += 1) {
           modules[row] = new Array(moduleCount);
@@ -21,7 +21,7 @@
           }
         }
         return modules;
-      }(_moduleCount);
+      })(_moduleCount);
       setupPositionProbePattern(0, 0);
       setupPositionProbePattern(_moduleCount - 7, 0);
       setupPositionProbePattern(0, _moduleCount - 7);
@@ -537,7 +537,7 @@
     return bytes;
   };
   qrcode.createStringToBytes = function(unicodeData, numChars) {
-    const unicodeMap = function() {
+    const unicodeMap = (function() {
       const bin = base64DecodeInputStream(unicodeData);
       const read = function() {
         const b = bin.read();
@@ -561,7 +561,7 @@
         throw count + " != " + numChars;
       }
       return unicodeMap2;
-    }();
+    })();
     const unknownChar = "?".charCodeAt(0);
     return function(s) {
       const bytes = [];
@@ -608,7 +608,7 @@
     PATTERN110: 6,
     PATTERN111: 7
   };
-  var QRUtil = function() {
+  var QRUtil = (function() {
     const PATTERN_POSITION_TABLE = [
       [],
       [6, 18],
@@ -837,8 +837,8 @@
       return lostPoint;
     };
     return _this;
-  }();
-  var QRMath = function() {
+  })();
+  var QRMath = (function() {
     const EXP_TABLE = new Array(256);
     const LOG_TABLE = new Array(256);
     for (let i = 0; i < 8; i += 1) {
@@ -867,12 +867,12 @@
       return EXP_TABLE[n];
     };
     return _this;
-  }();
+  })();
   var qrPolynomial = function(num, shift) {
     if (typeof num.length == "undefined") {
       throw num.length + "/" + shift;
     }
-    const _num = function() {
+    const _num = (function() {
       let offset = 0;
       while (offset < num.length && num[offset] == 0) {
         offset += 1;
@@ -882,7 +882,7 @@
         _num2[i] = num[i + offset];
       }
       return _num2;
-    }();
+    })();
     const _this = {};
     _this.getAt = function(index) {
       return _num[index];
@@ -915,7 +915,7 @@
     };
     return _this;
   };
-  var QRRSBlock = function() {
+  var QRRSBlock = (function() {
     const RS_BLOCK_TABLE = [
       // L
       // M
@@ -1161,7 +1161,7 @@
       return list;
     };
     return _this;
-  }();
+  })();
   var qrBitBuffer = function() {
     const _buffer = [];
     let _length = 0;
@@ -1311,12 +1311,12 @@
     const _mode = QRMode.MODE_KANJI;
     const _data = data;
     const stringToBytes2 = qrcode.stringToBytes;
-    !function(c, code) {
+    !(function(c, code) {
       const test = stringToBytes2(c);
       if (test.length != 2 || (test[0] << 8 | test[1]) != code) {
         throw "sjis not supported.";
       }
-    }("\u53CB", 38726);
+    })("\u53CB", 38726);
     const _bytes = stringToBytes2(data);
     const _this = {};
     _this.getMode = function() {

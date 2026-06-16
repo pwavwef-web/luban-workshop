@@ -54,11 +54,13 @@
     return Array.isArray(items) ? items : [];
   }
 
-  function writeCart(items) {
+  function writeCart(items, options) {
+    const opts = options || {};
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(Array.isArray(items) ? items : []));
     window.dispatchEvent(new CustomEvent('luban:cart-changed', {
       detail: {
-        items: readCart()
+        items: readCart(),
+        source: opts.source || ''
       }
     }));
   }

@@ -346,6 +346,114 @@
             color: #4b4038;
             box-shadow: inset 0 -1px 0 rgba(31, 27, 22, 0.04);
             scroll-snap-align: start;
+            min-height: 44px;
+            padding: 0.55rem 1rem;
+        }
+
+        .menu-search-panel {
+            max-width: 76rem;
+            margin: -2rem auto 0;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 30;
+        }
+
+        .menu-search-box {
+            border: 1px solid var(--line);
+            border-radius: 0.75rem;
+            background: rgba(255, 253, 250, 0.98);
+            box-shadow: 0 18px 42px rgba(49, 36, 24, 0.12);
+            padding: 1rem;
+        }
+
+        .menu-search-input-wrap {
+            position: relative;
+        }
+
+        #menu-search {
+            min-height: 48px;
+            width: 100%;
+            border: 1px solid #d6d3d1;
+            border-radius: 999px;
+            padding: 0.75rem 3rem 0.75rem 1.1rem;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        #menu-search:focus {
+            outline: none;
+            border-color: var(--luban-red);
+            box-shadow: 0 0 0 3px var(--luban-focus-ring);
+        }
+
+        #clear-menu-search {
+            position: absolute;
+            right: 0.45rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            min-height: 38px;
+            min-width: 38px;
+            border: 0;
+            border-radius: 999px;
+            color: #57534e;
+            background: #f5f5f4;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        #clear-menu-search.visible {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-no-results {
+            display: none;
+            max-width: 42rem;
+            margin: 2rem auto 4rem;
+            border: 1px dashed rgba(185, 28, 28, 0.28);
+            border-radius: 1rem;
+            background: #fff8f1;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .menu-no-results.visible {
+            display: block;
+        }
+
+        .floating-order-cta {
+            position: fixed;
+            right: max(1rem, env(safe-area-inset-right));
+            bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 4.5rem);
+            z-index: 75;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            border-radius: 999px;
+            background: var(--luban-red);
+            color: #fff;
+            box-shadow: 0 18px 38px rgba(80, 31, 17, 0.24);
+            padding: 0.85rem 1rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .floating-order-cta:hover,
+        .floating-order-cta:focus-visible {
+            background: var(--luban-red-dark);
+            outline: none;
+        }
+
+        .floating-order-cta-count {
+            min-width: 1.6rem;
+            border-radius: 999px;
+            background: #fff;
+            color: var(--luban-red);
+            padding: 0.15rem 0.45rem;
+            text-align: center;
+            font-size: 0.78rem;
         }
 
         .category-tab.active,
@@ -562,6 +670,13 @@
             .menu-card img {
                 height: 150px;
             }
+
+            .floating-order-cta {
+                right: 1rem;
+                left: 1rem;
+                justify-content: center;
+                bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 3.75rem);
+            }
         }
     </style>
 </head>
@@ -594,6 +709,18 @@
             </a>
         </div>
     </header>
+
+    <section class="menu-search-panel" aria-labelledby="menu-search-title">
+        <div class="menu-search-box">
+            <p id="menu-search-title" class="text-xs font-bold uppercase tracking-widest text-red-700">Find your dish faster</p>
+            <div class="menu-search-input-wrap mt-3">
+                <label for="menu-search" class="sr-only">Search menu dishes</label>
+                <input id="menu-search" type="search" placeholder="Search soups, dumplings, seafood, rice..." autocomplete="off">
+                <button id="clear-menu-search" type="button" aria-label="Clear menu search">&times;</button>
+            </div>
+            <p id="menu-search-summary" class="mt-2 text-sm text-stone-500" aria-live="polite">Browse all menu categories or search by dish name.</p>
+        </div>
+    </section>
 
 
     <!-- ──────────────────── CATEGORY TABS ──────────────────── -->
@@ -1149,15 +1276,28 @@
             </div>
         </section>
 
+        <section id="menu-no-results" class="menu-no-results" aria-live="polite">
+            <p class="serif text-2xl font-bold text-stone-900">No dishes found</p>
+            <p class="mt-2 text-stone-600">Try another keyword, clear the search, or browse all categories.</p>
+            <button type="button" id="menu-no-results-clear" class="mt-5 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">
+                Clear search
+            </button>
+        </section>
+
     </main>
 
     <!-- ──────────────────── FOOTER ──────────────────── -->
     <div data-luban-footer></div>
+    <a id="floating-order-cta" class="floating-order-cta" href="index.html#menu" aria-label="Order online from the menu">
+        <span id="floating-order-cta-label">Order online</span>
+        <span id="floating-order-cta-count" class="floating-order-cta-count">0</span>
+    </a>
     <script src="assets/js/site-footer.js"></script>
 
     <!-- ──────────────────── SCRIPTS ──────────────────── -->
 
     <script src="assets/js/customer-experience.js?v=20260603-cx"></script>
+    <script src="assets/js/luban-client.js"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/firebase-firestore.bundle.js"></script>
     <script>
@@ -1170,16 +1310,17 @@
             document.querySelectorAll('.menu-card').forEach(function (card) {
                 var codeSpan = card.querySelector('span[class*="bg-red-100"]');
                 if (codeSpan) {
-                    card.style.display = hiddenIds.has(codeSpan.textContent.trim()) ? 'none' : '';
+                    card.dataset.dishHidden = hiddenIds.has(codeSpan.textContent.trim()) ? 'true' : 'false';
                 }
             });
             // Table-style dishes (beef-lamb, pork, seafood)
             document.querySelectorAll('tbody tr').forEach(function (row) {
                 var codeCell = row.querySelector('td:first-child');
                 if (codeCell && codeCell.textContent.trim()) {
-                    row.style.display = hiddenIds.has(codeCell.textContent.trim()) ? 'none' : '';
+                    row.dataset.dishHidden = hiddenIds.has(codeCell.textContent.trim()) ? 'true' : 'false';
                 }
             });
+            if (typeof applyMenuFilters === 'function') applyMenuFilters();
         }
 
         function applyPriceOverrides(overrides) {
@@ -1300,44 +1441,146 @@
     </script>
 
     <script>
+        var selectedMenuCategory = 'all';
+        var menuSearchQuery = '';
+        var menuFilterTimer = null;
+
+        function getDishText(item) {
+            return (item.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        }
+
+        function getSectionVisibleItems(section) {
+            var cards = Array.from(section.querySelectorAll('.menu-card'));
+            var rows = Array.from(section.querySelectorAll('tbody tr'));
+            return cards.concat(rows).filter(function (item) {
+                return item.style.display !== 'none';
+            }).length;
+        }
+
+        function setActiveCategoryButton(activeButton) {
+            document.querySelectorAll('.category-tab').forEach(function (tab) {
+                tab.classList.toggle('active', tab === activeButton);
+                tab.classList.toggle('bg-red-700', tab === activeButton);
+                tab.classList.toggle('text-white', tab === activeButton);
+                tab.classList.toggle('text-stone-700', tab !== activeButton);
+                tab.classList.toggle('bg-white', tab !== activeButton);
+                tab.classList.toggle('border-stone-200', tab !== activeButton);
+            });
+        }
+
+        function applyMenuFilters() {
+            var query = menuSearchQuery.trim().toLowerCase();
+            var visibleCount = 0;
+            var visibleSections = 0;
+
+            document.querySelectorAll('.category-section').forEach(function (section) {
+                var categoryMatches = selectedMenuCategory === 'all' || section.id === selectedMenuCategory;
+                var cards = Array.from(section.querySelectorAll('.menu-card'));
+                var rows = Array.from(section.querySelectorAll('tbody tr'));
+
+                cards.concat(rows).forEach(function (item) {
+                    var hiddenByAdmin = item.dataset.dishHidden === 'true';
+                    var searchMatches = !query || getDishText(item).includes(query);
+                    item.style.display = !hiddenByAdmin && categoryMatches && searchMatches ? '' : 'none';
+                });
+
+                var sectionVisibleItems = categoryMatches ? getSectionVisibleItems(section) : 0;
+                section.style.display = sectionVisibleItems > 0 ? 'block' : 'none';
+                if (sectionVisibleItems > 0) {
+                    visibleSections += 1;
+                    visibleCount += sectionVisibleItems;
+                }
+            });
+
+            var noResults = document.getElementById('menu-no-results');
+            if (noResults) noResults.classList.toggle('visible', visibleCount === 0);
+
+            var summary = document.getElementById('menu-search-summary');
+            if (summary) {
+                if (query) {
+                    summary.textContent = visibleCount ? visibleCount + ' matching dish' + (visibleCount === 1 ? '' : 'es') + ' found.' : 'No dishes match your search yet.';
+                } else if (selectedMenuCategory !== 'all') {
+                    summary.textContent = visibleCount + ' dish' + (visibleCount === 1 ? '' : 'es') + ' in this category.';
+                } else {
+                    summary.textContent = 'Browse all menu categories or search by dish name.';
+                }
+            }
+
+            return { visibleCount: visibleCount, visibleSections: visibleSections };
+        }
+
+        function scheduleMenuFilter() {
+            window.clearTimeout(menuFilterTimer);
+            menuFilterTimer = window.setTimeout(applyMenuFilters, 180);
+        }
+
+        function updateFloatingOrderCta() {
+            var cta = document.getElementById('floating-order-cta');
+            var countEl = document.getElementById('floating-order-cta-count');
+            var label = document.getElementById('floating-order-cta-label');
+            if (!cta || !countEl || !label || !window.lubanClient) return;
+            var cart = lubanClient.readCart();
+            var count = lubanClient.countCartItems(cart);
+            countEl.textContent = count;
+            countEl.style.display = count > 0 ? '' : 'none';
+            cta.href = count > 0 ? 'checkout.html' : 'index.html#menu';
+            label.textContent = count > 0 ? 'Checkout cart' : 'Order online';
+            cta.setAttribute('aria-label', count > 0 ? 'Checkout ' + count + ' cart item' + (count === 1 ? '' : 's') : 'Order online from the menu');
+        }
+
         // ── Show all sections on load (All tab is active) ──
-        document.querySelectorAll('.category-section').forEach(function (s) {
-            s.style.display = 'block';
-        });
+        applyMenuFilters();
+        updateFloatingOrderCta();
 
         // ── Category tab switching ──
         document.getElementById('category-tabs').addEventListener('click', function (e) {
             const btn = e.target.closest('.category-tab');
             if (!btn) return;
 
-            // Update tab styles
-            document.querySelectorAll('.category-tab').forEach(function (t) {
-                t.classList.remove('active', 'bg-red-700', 'text-white');
-                t.classList.add('text-stone-700', 'bg-white', 'border-stone-200');
-            });
-            btn.classList.add('active', 'bg-red-700', 'text-white');
-            btn.classList.remove('text-stone-700');
+            setActiveCategoryButton(btn);
             btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
-            const target = btn.getAttribute('data-target');
-            if (target === 'all') {
-                // Show all sections
-                document.querySelectorAll('.category-section').forEach(function (s) {
-                    s.style.display = 'block';
-                });
+            selectedMenuCategory = btn.getAttribute('data-target') || 'all';
+            applyMenuFilters();
+            if (selectedMenuCategory === 'all') {
                 window.scrollTo({ top: document.querySelector('main').offsetTop - 64, behavior: 'smooth' });
             } else {
-                // Show only the matching section
-                document.querySelectorAll('.category-section').forEach(function (s) {
-                    s.style.display = 'none';
-                });
-                const section = document.getElementById(target);
+                const section = document.getElementById(selectedMenuCategory);
                 if (section) {
-                    section.style.display = 'block';
                     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         });
+
+        document.getElementById('menu-search').addEventListener('input', function (event) {
+            menuSearchQuery = event.target.value || '';
+            document.getElementById('clear-menu-search').classList.toggle('visible', menuSearchQuery.length > 0);
+            scheduleMenuFilter();
+        });
+
+        document.getElementById('clear-menu-search').addEventListener('click', function () {
+            var search = document.getElementById('menu-search');
+            search.value = '';
+            menuSearchQuery = '';
+            this.classList.remove('visible');
+            applyMenuFilters();
+            search.focus();
+        });
+
+        document.getElementById('menu-no-results-clear').addEventListener('click', function () {
+            var allTab = document.querySelector('.category-tab[data-target="all"]');
+            var search = document.getElementById('menu-search');
+            selectedMenuCategory = 'all';
+            menuSearchQuery = '';
+            search.value = '';
+            document.getElementById('clear-menu-search').classList.remove('visible');
+            if (allTab) setActiveCategoryButton(allTab);
+            applyMenuFilters();
+            search.focus();
+        });
+
+        window.addEventListener('storage', updateFloatingOrderCta);
+        window.addEventListener('luban:cart-changed', updateFloatingOrderCta);
 
         // ── PWA Service Worker Registration ──
         if ('serviceWorker' in navigator) {
@@ -1346,7 +1589,7 @@
     </script>
 
     <script src="assets/js/site-header.js"></script>
-    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260530-election-assistant"></script>
+    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260616-bao-position-fix"></script>
 </body>
 
 </html>

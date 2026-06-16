@@ -14,6 +14,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Lato', sans-serif; background: #f7f3ef; color: #1c1917; }
+        .checkout-spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            border-top-color: #fff;
+            border-radius: 999px;
+            animation: checkout-spin 0.75s linear infinite;
+        }
+        @keyframes checkout-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .checkout-spinner { animation: none; } }
     </style>
 </head>
 <body>
@@ -89,7 +99,7 @@
                             <a id="verify-contact-link" href="verify-contact.html" class="rounded-md border border-stone-300 px-5 py-3 text-center font-semibold text-stone-800 hover:bg-stone-50">Verify Ghana phone</a>
                         </div>
                     </section>
-                    <div id="checkout-feedback" class="hidden rounded-md p-4 text-sm"></div>
+                    <div id="checkout-feedback" class="hidden rounded-md p-4 text-sm" role="status" aria-live="polite"></div>
                 </aside>
             </div>
         </section>
@@ -127,8 +137,49 @@
             }));
         }
 
-        function setFeedback(message, isError) {
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function setFeedback(message, isError, options) {
+            const feedback = document.getElementById('checkout-feedback');
+            const opts = options || {};
+            feedback.className = isError
+                ? 'rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-900'
+                : 'rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-900';
+            feedback.setAttribute('role', isError ? 'alert' : 'status');
+            feedback.innerHTML = `
+                <p class="font-semibold">${escapeHtml(isError ? 'We could not complete that step' : 'Order update')}</p>
+                <p class="mt-1">${escapeHtml(message)}</p>
+                ${opts.showRetry ? '<button type="button" id="checkout-retry-btn" class="mt-3 rounded-md bg-red-700 px-4 py-2 font-semibold text-white hover:bg-red-800">Try again</button>' : ''}
+                ${opts.showSupport ? '<a href="contact-us.html" class="mt-3 inline-block font-semibold text-red-800 underline underline-offset-4">Contact support</a>' : ''}
+            `;
+            feedback.classList.remove('hidden');
+            if (opts.showRetry) {
+                feedback.querySelector('#checkout-retry-btn').addEventListener('click', () => {
+                    document.getElementById('place-order-btn').click();
+                });
+            }
             showUxToast(message, isError ? 'error' : 'success');
+        }
+
+        function clearFeedback() {
+            const feedback = document.getElementById('checkout-feedback');
+            feedback.className = 'hidden rounded-md p-4 text-sm';
+            feedback.textContent = '';
+        }
+
+        function setCheckoutBusy(button, isBusy) {
+            button.disabled = isBusy;
+            button.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+            button.innerHTML = isBusy
+                ? '<span class="inline-flex items-center justify-center gap-2"><span class="checkout-spinner" aria-hidden="true"></span>Placing order...</span>'
+                : 'Place Order';
         }
 
         function renderCart() {
@@ -239,8 +290,8 @@
             const cartState = renderCart();
             if (!currentUser || !cartState.items.length) return;
             const button = document.getElementById('place-order-btn');
-            button.disabled = true;
-            button.textContent = 'Placing order...';
+            clearFeedback();
+            setCheckoutBusy(button, true);
             try {
                 const result = await lubanClient.api('/createOrder', {
                     method: 'POST',
@@ -260,9 +311,12 @@
                     window.location.href = `order-status.html?order=${encodeURIComponent(result.orderId)}`;
                 }, 850);
             } catch (error) {
-                setFeedback(error.message || 'Could not place the order.', true);
-                button.disabled = false;
-                button.textContent = 'Place Order';
+                setFeedback(error.message || 'Could not place the order. Please check your connection and try again.', true, {
+                    showRetry: true,
+                    showSupport: error.status >= 500
+                });
+                setCheckoutBusy(button, false);
+                if (currentAccount) renderVerificationStatus(currentAccount);
             }
         });
 

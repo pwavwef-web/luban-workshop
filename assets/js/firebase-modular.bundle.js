@@ -5946,7 +5946,7 @@
       }
       const name5 = getCookieName(key);
       if (window.cookieStore) {
-        const cb = (event) => {
+        const cb = ((event) => {
           const changedCookie = event.changed.find((change) => change.name === name5);
           if (changedCookie) {
             listener(changedCookie.value);
@@ -5955,7 +5955,7 @@
           if (deletedCookie) {
             listener(null);
           }
-        };
+        });
         const unsubscribe2 = () => window.cookieStore.removeEventListener("change", cb);
         this.listenerUnsubscribes.set(listener, unsubscribe2);
         return window.cookieStore.addEventListener("change", cb);
@@ -8599,7 +8599,7 @@
       }
     }
     da("Symbol.dispose", function(a) {
-      return a ? a : Symbol("Symbol.dispose");
+      return a ? a : /* @__PURE__ */ Symbol("Symbol.dispose");
     });
     da("Array.prototype.values", function(a) {
       return a ? a : function() {
@@ -8758,7 +8758,7 @@
     x2.prototype.h = function() {
       this.defaultPrevented = true;
     };
-    var ua = function() {
+    var ua = (function() {
       if (!l.addEventListener || !Object.defineProperty) return false;
       var a = false, b2 = Object.defineProperty({}, "passive", { get: function() {
         a = true;
@@ -8771,7 +8771,7 @@
       } catch (c) {
       }
       return a;
-    }();
+    })();
     function y(a) {
       return /^[\s\xa0]*$/.test(a);
     }
@@ -10675,9 +10675,9 @@
   function __PRIVATE_argToString(e) {
     if ("string" == typeof e) return e;
     try {
-      return function __PRIVATE_formatJSON(e2) {
+      return (function __PRIVATE_formatJSON(e2) {
         return JSON.stringify(e2);
-      }(e);
+      })(e);
     } catch (t) {
       return e;
     }
@@ -10825,9 +10825,9 @@
   };
   var __PRIVATE_Deferred = class {
     constructor() {
-      this.promise = new Promise((e, t) => {
+      this.promise = new Promise(((e, t) => {
         this.resolve = e, this.reject = t;
-      });
+      }));
     }
   };
   var __PRIVATE_OAuthToken = class {
@@ -10842,7 +10842,7 @@
     invalidateToken() {
     }
     start(e, t) {
-      e.enqueueRetryable(() => t(User.UNAUTHENTICATED));
+      e.enqueueRetryable((() => t(User.UNAUTHENTICATED)));
     }
     shutdown() {
     }
@@ -10863,7 +10863,7 @@
     }
     start(e, t) {
       this.changeListener = t, // Fire with initial user.
-      e.enqueueRetryable(() => t(this.token.user));
+      e.enqueueRetryable((() => t(this.token.user)));
     }
     shutdown() {
       this.changeListener = null;
@@ -10884,20 +10884,20 @@
       const __PRIVATE_guardedChangeListener = (e2) => this.i !== n ? (n = this.i, t(e2)) : Promise.resolve();
       let r = new __PRIVATE_Deferred();
       this.o = () => {
-        this.i++, this.currentUser = this.u(), r.resolve(), r = new __PRIVATE_Deferred(), e.enqueueRetryable(() => __PRIVATE_guardedChangeListener(this.currentUser));
+        this.i++, this.currentUser = this.u(), r.resolve(), r = new __PRIVATE_Deferred(), e.enqueueRetryable((() => __PRIVATE_guardedChangeListener(this.currentUser)));
       };
       const __PRIVATE_awaitNextToken = () => {
         const t2 = r;
-        e.enqueueRetryable(async () => {
+        e.enqueueRetryable((async () => {
           await t2.promise, await __PRIVATE_guardedChangeListener(this.currentUser);
-        });
+        }));
       }, __PRIVATE_registerAuth = (e2) => {
         __PRIVATE_logDebug("FirebaseAuthCredentialsProvider", "Auth detected"), this.auth = e2, this.o && (this.auth.addAuthTokenListener(this.o), __PRIVATE_awaitNextToken());
       };
-      this.t.onInit((e2) => __PRIVATE_registerAuth(e2)), // Our users can initialize Auth right after Firestore, so we give it
+      this.t.onInit(((e2) => __PRIVATE_registerAuth(e2))), // Our users can initialize Auth right after Firestore, so we give it
       // a chance to register itself with the component framework before we
       // determine whether to start up in unauthenticated mode.
-      setTimeout(() => {
+      setTimeout((() => {
         if (!this.auth) {
           const e2 = this.t.getImmediate({
             optional: true
@@ -10907,18 +10907,18 @@
             (__PRIVATE_logDebug("FirebaseAuthCredentialsProvider", "Auth not yet detected"), r.resolve(), r = new __PRIVATE_Deferred())
           );
         }
-      }, 0), __PRIVATE_awaitNextToken();
+      }), 0), __PRIVATE_awaitNextToken();
     }
     getToken() {
       const e = this.i, t = this.forceRefresh;
-      return this.forceRefresh = false, this.auth ? this.auth.getToken(t).then((t2) => (
+      return this.forceRefresh = false, this.auth ? this.auth.getToken(t).then(((t2) => (
         // Cancel the request since the token changed while the request was
         // outstanding so the response is potentially for a previous user (which
         // user, we can't be sure).
         this.i !== e ? (__PRIVATE_logDebug("FirebaseAuthCredentialsProvider", "getToken aborted due to token change."), this.getToken()) : t2 ? (__PRIVATE_hardAssert("string" == typeof t2.accessToken, 31837, {
           l: t2
         }), new __PRIVATE_OAuthToken(t2.accessToken, this.currentUser)) : null
-      )) : Promise.resolve(null);
+      ))) : Promise.resolve(null);
     }
     invalidateToken() {
       this.forceRefresh = true;
@@ -10962,7 +10962,7 @@
       return Promise.resolve(new __PRIVATE_FirstPartyToken(this.P, this.T, this.I));
     }
     start(e, t) {
-      e.enqueueRetryable(() => t(User.FIRST_PARTY));
+      e.enqueueRetryable((() => t(User.FIRST_PARTY)));
     }
     shutdown() {
     }
@@ -10986,14 +10986,14 @@
         return this.m = e2.token, __PRIVATE_logDebug("FirebaseAppCheckTokenProvider", `Received ${n ? "new" : "existing"} token.`), n ? t(e2.token) : Promise.resolve();
       };
       this.o = (t2) => {
-        e.enqueueRetryable(() => onTokenChanged(t2));
+        e.enqueueRetryable((() => onTokenChanged(t2)));
       };
       const __PRIVATE_registerAppCheck = (e2) => {
         __PRIVATE_logDebug("FirebaseAppCheckTokenProvider", "AppCheck detected"), this.appCheck = e2, this.o && this.appCheck.addTokenListener(this.o);
       };
-      this.V.onInit((e2) => __PRIVATE_registerAppCheck(e2)), // Our users can initialize AppCheck after Firestore, so we give it
+      this.V.onInit(((e2) => __PRIVATE_registerAppCheck(e2))), // Our users can initialize AppCheck after Firestore, so we give it
       // a chance to register itself with the component framework.
-      setTimeout(() => {
+      setTimeout((() => {
         if (!this.appCheck) {
           const e2 = this.V.getImmediate({
             optional: true
@@ -11003,14 +11003,14 @@
             __PRIVATE_logDebug("FirebaseAppCheckTokenProvider", "AppCheck not yet detected")
           );
         }
-      }, 0);
+      }), 0);
     }
     getToken() {
       if (this.p) return Promise.resolve(new AppCheckToken(this.p));
       const e = this.forceRefresh;
-      return this.forceRefresh = false, this.appCheck ? this.appCheck.getToken(e).then((e2) => e2 ? (__PRIVATE_hardAssert("string" == typeof e2.token, 44558, {
+      return this.forceRefresh = false, this.appCheck ? this.appCheck.getToken(e).then(((e2) => e2 ? (__PRIVATE_hardAssert("string" == typeof e2.token, 44558, {
         tokenResult: e2
-      }), this.m = e2.token, new AppCheckToken(e2.token)) : null) : Promise.resolve(null);
+      }), this.m = e2.token, new AppCheckToken(e2.token)) : null)) : Promise.resolve(null);
     }
     invalidateToken() {
       this.forceRefresh = true;
@@ -11059,7 +11059,7 @@
     return t >= C && t <= v;
   }
   function __PRIVATE_arrayEquals(e, t, n) {
-    return e.length === t.length && e.every((e2, r) => n(e2, t[r]));
+    return e.length === t.length && e.every(((e2, r) => n(e2, t[r])));
   }
   var F = "__name__";
   var BasePath = class _BasePath {
@@ -11080,9 +11080,9 @@
     }
     child(e) {
       const t = this.segments.slice(this.offset, this.limit());
-      return e instanceof _BasePath ? e.forEach((e2) => {
+      return e instanceof _BasePath ? e.forEach(((e2) => {
         t.push(e2);
-      }) : t.push(e), this.construct(t);
+      })) : t.push(e), this.construct(t);
     }
     /** The index of one past the last segment of the path. */
     limit() {
@@ -11174,7 +11174,7 @@
       const t = [];
       for (const n of e) {
         if (n.indexOf("//") >= 0) throw new FirestoreError(D.INVALID_ARGUMENT, `Invalid segment (${n}). Paths must not contain // in them.`);
-        t.push(...n.split("/").filter((e2) => e2.length > 0));
+        t.push(...n.split("/").filter(((e2) => e2.length > 0)));
       }
       return new _ResourcePath(t);
     }
@@ -11195,7 +11195,7 @@
       return M.test(e);
     }
     canonicalString() {
-      return this.toArray().map((e) => (e = e.replace(/\\/g, "\\\\").replace(/`/g, "\\`"), _FieldPath$1.isValidIdentifier(e) || (e = "`" + e + "`"), e)).join(".");
+      return this.toArray().map(((e) => (e = e.replace(/\\/g, "\\\\").replace(/`/g, "\\`"), _FieldPath$1.isValidIdentifier(e) || (e = "`" + e + "`"), e))).join(".");
     }
     toString() {
       return this.canonicalString();
@@ -11321,10 +11321,10 @@
       {
         const t = (
           /** try to get the constructor name for an object. */
-          function __PRIVATE_tryGetCustomObjectType(e2) {
+          (function __PRIVATE_tryGetCustomObjectType(e2) {
             if (e2.constructor) return e2.constructor.name;
             return null;
-          }(e)
+          })(e)
         );
         return t ? `a custom ${t} object` : "an object";
       }
@@ -11562,7 +11562,7 @@
       this.onCommittedListeners.push(e);
     }
     raiseOnCommittedEvent() {
-      this.onCommittedListeners.forEach((e) => e());
+      this.onCommittedListeners.forEach(((e) => e()));
     }
   };
   async function __PRIVATE_ignoreIfPrimaryLeaseLoss(e) {
@@ -11574,30 +11574,30 @@
       this.nextCallback = null, this.catchCallback = null, // When the operation resolves, we'll set result or error and mark isDone.
       this.result = void 0, this.error = void 0, this.isDone = false, // Set to true when .then() or .catch() are called and prevents additional
       // chaining.
-      this.callbackAttached = false, e((e2) => {
+      this.callbackAttached = false, e(((e2) => {
         this.isDone = true, this.result = e2, this.nextCallback && // value should be defined unless T is Void, but we can't express
         // that in the type system.
         this.nextCallback(e2);
-      }, (e2) => {
+      }), ((e2) => {
         this.isDone = true, this.error = e2, this.catchCallback && this.catchCallback(e2);
-      });
+      }));
     }
     catch(e) {
       return this.next(void 0, e);
     }
     next(e, t) {
-      return this.callbackAttached && fail(59440), this.callbackAttached = true, this.isDone ? this.error ? this.wrapFailure(t, this.error) : this.wrapSuccess(e, this.result) : new _PersistencePromise((n, r) => {
+      return this.callbackAttached && fail(59440), this.callbackAttached = true, this.isDone ? this.error ? this.wrapFailure(t, this.error) : this.wrapSuccess(e, this.result) : new _PersistencePromise(((n, r) => {
         this.nextCallback = (t2) => {
           this.wrapSuccess(e, t2).next(n, r);
         }, this.catchCallback = (e2) => {
           this.wrapFailure(t, e2).next(n, r);
         };
-      });
+      }));
     }
     toPromise() {
-      return new Promise((e, t) => {
+      return new Promise(((e, t) => {
         this.next(e, t);
-      });
+      }));
     }
     wrapUserFunction(e) {
       try {
@@ -11608,30 +11608,30 @@
       }
     }
     wrapSuccess(e, t) {
-      return e ? this.wrapUserFunction(() => e(t)) : _PersistencePromise.resolve(t);
+      return e ? this.wrapUserFunction((() => e(t))) : _PersistencePromise.resolve(t);
     }
     wrapFailure(e, t) {
-      return e ? this.wrapUserFunction(() => e(t)) : _PersistencePromise.reject(t);
+      return e ? this.wrapUserFunction((() => e(t))) : _PersistencePromise.reject(t);
     }
     static resolve(e) {
-      return new _PersistencePromise((t, n) => {
+      return new _PersistencePromise(((t, n) => {
         t(e);
-      });
+      }));
     }
     static reject(e) {
-      return new _PersistencePromise((t, n) => {
+      return new _PersistencePromise(((t, n) => {
         n(e);
-      });
+      }));
     }
     static waitFor(e) {
-      return new _PersistencePromise((t, n) => {
+      return new _PersistencePromise(((t, n) => {
         let r = 0, i = 0, s = false;
-        e.forEach((e2) => {
-          ++r, e2.next(() => {
+        e.forEach(((e2) => {
+          ++r, e2.next((() => {
             ++i, s && i === r && t();
-          }, (e3) => n(e3));
-        }), s = true, i === r && t();
-      });
+          }), ((e3) => n(e3)));
+        })), s = true, i === r && t();
+      }));
     }
     /**
      * Given an array of predicate functions that asynchronously evaluate to a
@@ -11641,29 +11641,29 @@
      */
     static or(e) {
       let t = _PersistencePromise.resolve(false);
-      for (const n of e) t = t.next((e2) => e2 ? _PersistencePromise.resolve(e2) : n());
+      for (const n of e) t = t.next(((e2) => e2 ? _PersistencePromise.resolve(e2) : n()));
       return t;
     }
     static forEach(e, t) {
       const n = [];
-      return e.forEach((e2, r) => {
+      return e.forEach(((e2, r) => {
         n.push(t.call(this, e2, r));
-      }), this.waitFor(n);
+      })), this.waitFor(n);
     }
     /**
      * Concurrently map all array elements through asynchronous function.
      */
     static mapArray(e, t) {
-      return new _PersistencePromise((n, r) => {
+      return new _PersistencePromise(((n, r) => {
         const i = e.length, s = new Array(i);
         let o = 0;
         for (let _ = 0; _ < i; _++) {
           const a = _;
-          t(e[a]).next((e2) => {
+          t(e[a]).next(((e2) => {
             s[a] = e2, ++o, o === i && n(s);
-          }, (e2) => r(e2));
+          }), ((e2) => r(e2)));
         }
-      });
+      }));
     }
     /**
      * An alternative to recursive PersistencePromise calls, that avoids
@@ -11672,14 +11672,14 @@
      * The `action` will be called repeatedly while `condition` is true.
      */
     static doWhile(e, t) {
-      return new _PersistencePromise((n, r) => {
+      return new _PersistencePromise(((n, r) => {
         const process2 = () => {
-          true === e() ? t().next(() => {
+          true === e() ? t().next((() => {
             process2();
-          }, r) : n();
+          }), r) : n();
         };
         process2();
-      });
+      }));
     }
   };
   function __PRIVATE_getAndroidVersion(e) {
@@ -11835,11 +11835,11 @@
       return this.root.inorderTraversal(e);
     }
     forEach(e) {
-      this.inorderTraversal((t, n) => (e(t, n), false));
+      this.inorderTraversal(((t, n) => (e(t, n), false)));
     }
     toString() {
       const e = [];
-      return this.inorderTraversal((t, n) => (e.push(`${t}:${n}`), false)), `{${e.join(", ")}}`;
+      return this.inorderTraversal(((t, n) => (e.push(`${t}:${n}`), false))), `{${e.join(", ")}}`;
     }
     // Traverses the map in reverse key order and calls the specified action
     // function for each key/value pair. If action returns true, traversal is
@@ -12090,7 +12090,7 @@
     }
     /** Iterates elements in order defined by "comparator" */
     forEach(e) {
-      this.data.inorderTraversal((t, n) => (e(t), false));
+      this.data.inorderTraversal(((t, n) => (e(t), false)));
     }
     /** Iterates over `elem`s such that: range[0] &lt;= elem &lt; range[1]. */
     forEachInRange(e, t) {
@@ -12134,9 +12134,9 @@
     }
     unionWith(e) {
       let t = this;
-      return t.size < e.size && (t = e, e = this), e.forEach((e2) => {
+      return t.size < e.size && (t = e, e = this), e.forEach(((e2) => {
         t = t.add(e2);
-      }), t;
+      })), t;
     }
     isEqual(e) {
       if (!(e instanceof _SortedSet)) return false;
@@ -12150,13 +12150,13 @@
     }
     toArray() {
       const e = [];
-      return this.forEach((t) => {
+      return this.forEach(((t) => {
         e.push(t);
-      }), e;
+      })), e;
     }
     toString() {
       const e = [];
-      return this.forEach((t) => e.push(t)), "SortedSet(" + e.toString() + ")";
+      return this.forEach(((t) => e.push(t))), "SortedSet(" + e.toString() + ")";
     }
     copy(e) {
       const t = new _SortedSet(this.comparator);
@@ -12204,7 +12204,7 @@
       return false;
     }
     isEqual(e) {
-      return __PRIVATE_arrayEquals(this.fields, e.fields, (e2, t) => e2.isEqual(t));
+      return __PRIVATE_arrayEquals(this.fields, e.fields, ((e2, t) => e2.isEqual(t)));
     }
   };
   var __PRIVATE_Base64DecodeError = class extends Error {
@@ -12217,13 +12217,13 @@
       this.binaryString = e;
     }
     static fromBase64String(e) {
-      const t = function __PRIVATE_decodeBase64(e2) {
+      const t = (function __PRIVATE_decodeBase64(e2) {
         try {
           return atob(e2);
         } catch (e3) {
           throw "undefined" != typeof DOMException && e3 instanceof DOMException ? new __PRIVATE_Base64DecodeError("Invalid base64 string: " + e3) : e3;
         }
-      }(e);
+      })(e);
       return new _ByteString(t);
     }
     static fromUint8Array(e) {
@@ -12231,11 +12231,11 @@
         /**
         * Helper function to convert an Uint8array to a binary string.
         */
-        function __PRIVATE_binaryStringFromUint8Array(e2) {
+        (function __PRIVATE_binaryStringFromUint8Array(e2) {
           let t2 = "";
           for (let n = 0; n < e2.length; ++n) t2 += String.fromCharCode(e2[n]);
           return t2;
-        }(e)
+        })(e)
       );
       return new _ByteString(t);
     }
@@ -12252,16 +12252,16 @@
       };
     }
     toBase64() {
-      return function __PRIVATE_encodeBase64(e) {
+      return (function __PRIVATE_encodeBase64(e) {
         return btoa(e);
-      }(this.binaryString);
+      })(this.binaryString);
     }
     toUint8Array() {
-      return function __PRIVATE_uint8ArrayFromBinaryString(e) {
+      return (function __PRIVATE_uint8ArrayFromBinaryString(e) {
         const t = new Uint8Array(e.length);
         for (let n = 0; n < e.length; n++) t[n] = e.charCodeAt(n);
         return t;
-      }(this.binaryString);
+      })(this.binaryString);
     }
     approximateByteSize() {
       return 2 * this.binaryString.length;
@@ -12392,43 +12392,43 @@
       case 4:
         return __PRIVATE_getLocalWriteTime(e).isEqual(__PRIVATE_getLocalWriteTime(t));
       case 3:
-        return function __PRIVATE_timestampEquals(e2, t2) {
+        return (function __PRIVATE_timestampEquals(e2, t2) {
           if ("string" == typeof e2.timestampValue && "string" == typeof t2.timestampValue && e2.timestampValue.length === t2.timestampValue.length)
             return e2.timestampValue === t2.timestampValue;
           const n2 = __PRIVATE_normalizeTimestamp(e2.timestampValue), r = __PRIVATE_normalizeTimestamp(t2.timestampValue);
           return n2.seconds === r.seconds && n2.nanos === r.nanos;
-        }(e, t);
+        })(e, t);
       case 5:
         return e.stringValue === t.stringValue;
       case 6:
-        return function __PRIVATE_blobEquals(e2, t2) {
+        return (function __PRIVATE_blobEquals(e2, t2) {
           return __PRIVATE_normalizeByteString(e2.bytesValue).isEqual(__PRIVATE_normalizeByteString(t2.bytesValue));
-        }(e, t);
+        })(e, t);
       case 7:
         return e.referenceValue === t.referenceValue;
       case 8:
-        return function __PRIVATE_geoPointEquals(e2, t2) {
+        return (function __PRIVATE_geoPointEquals(e2, t2) {
           return __PRIVATE_normalizeNumber(e2.geoPointValue.latitude) === __PRIVATE_normalizeNumber(t2.geoPointValue.latitude) && __PRIVATE_normalizeNumber(e2.geoPointValue.longitude) === __PRIVATE_normalizeNumber(t2.geoPointValue.longitude);
-        }(e, t);
+        })(e, t);
       case 2:
-        return function __PRIVATE_numberEquals(e2, t2) {
+        return (function __PRIVATE_numberEquals(e2, t2) {
           if ("integerValue" in e2 && "integerValue" in t2) return __PRIVATE_normalizeNumber(e2.integerValue) === __PRIVATE_normalizeNumber(t2.integerValue);
           if ("doubleValue" in e2 && "doubleValue" in t2) {
             const n2 = __PRIVATE_normalizeNumber(e2.doubleValue), r = __PRIVATE_normalizeNumber(t2.doubleValue);
             return n2 === r ? __PRIVATE_isNegativeZero(n2) === __PRIVATE_isNegativeZero(r) : isNaN(n2) && isNaN(r);
           }
           return false;
-        }(e, t);
+        })(e, t);
       case 9:
         return __PRIVATE_arrayEquals(e.arrayValue.values || [], t.arrayValue.values || [], __PRIVATE_valueEquals);
       case 10:
       case 11:
-        return function __PRIVATE_objectEquals(e2, t2) {
+        return (function __PRIVATE_objectEquals(e2, t2) {
           const n2 = e2.mapValue.fields || {}, r = t2.mapValue.fields || {};
           if (__PRIVATE_objectSize(n2) !== __PRIVATE_objectSize(r)) return false;
           for (const e3 in n2) if (n2.hasOwnProperty(e3) && (void 0 === r[e3] || !__PRIVATE_valueEquals(n2[e3], r[e3]))) return false;
           return true;
-        }(e, t);
+        })(e, t);
       default:
         return fail(52216, {
           left: e
@@ -12436,7 +12436,7 @@
     }
   }
   function __PRIVATE_arrayValueContains(e, t) {
-    return void 0 !== (e.values || []).find((e2) => __PRIVATE_valueEquals(e2, t));
+    return void 0 !== (e.values || []).find(((e2) => __PRIVATE_valueEquals(e2, t)));
   }
   function __PRIVATE_valueCompare(e, t) {
     if (e === t) return 0;
@@ -12449,13 +12449,13 @@
       case 1:
         return __PRIVATE_primitiveComparator(e.booleanValue, t.booleanValue);
       case 2:
-        return function __PRIVATE_compareNumbers(e2, t2) {
+        return (function __PRIVATE_compareNumbers(e2, t2) {
           const n2 = __PRIVATE_normalizeNumber(e2.integerValue || e2.doubleValue), r2 = __PRIVATE_normalizeNumber(t2.integerValue || t2.doubleValue);
           return n2 < r2 ? -1 : n2 > r2 ? 1 : n2 === r2 ? 0 : (
             // one or both are NaN.
             isNaN(n2) ? isNaN(r2) ? 0 : -1 : 1
           );
-        }(e, t);
+        })(e, t);
       case 3:
         return __PRIVATE_compareTimestamps(e.timestampValue, t.timestampValue);
       case 4:
@@ -12463,36 +12463,36 @@
       case 5:
         return __PRIVATE_compareUtf8Strings(e.stringValue, t.stringValue);
       case 6:
-        return function __PRIVATE_compareBlobs(e2, t2) {
+        return (function __PRIVATE_compareBlobs(e2, t2) {
           const n2 = __PRIVATE_normalizeByteString(e2), r2 = __PRIVATE_normalizeByteString(t2);
           return n2.compareTo(r2);
-        }(e.bytesValue, t.bytesValue);
+        })(e.bytesValue, t.bytesValue);
       case 7:
-        return function __PRIVATE_compareReferences(e2, t2) {
+        return (function __PRIVATE_compareReferences(e2, t2) {
           const n2 = e2.split("/"), r2 = t2.split("/");
           for (let e3 = 0; e3 < n2.length && e3 < r2.length; e3++) {
             const t3 = __PRIVATE_primitiveComparator(n2[e3], r2[e3]);
             if (0 !== t3) return t3;
           }
           return __PRIVATE_primitiveComparator(n2.length, r2.length);
-        }(e.referenceValue, t.referenceValue);
+        })(e.referenceValue, t.referenceValue);
       case 8:
-        return function __PRIVATE_compareGeoPoints(e2, t2) {
+        return (function __PRIVATE_compareGeoPoints(e2, t2) {
           const n2 = __PRIVATE_primitiveComparator(__PRIVATE_normalizeNumber(e2.latitude), __PRIVATE_normalizeNumber(t2.latitude));
           if (0 !== n2) return n2;
           return __PRIVATE_primitiveComparator(__PRIVATE_normalizeNumber(e2.longitude), __PRIVATE_normalizeNumber(t2.longitude));
-        }(e.geoPointValue, t.geoPointValue);
+        })(e.geoPointValue, t.geoPointValue);
       case 9:
         return __PRIVATE_compareArrays(e.arrayValue, t.arrayValue);
       case 10:
-        return function __PRIVATE_compareVectors(e2, t2) {
+        return (function __PRIVATE_compareVectors(e2, t2) {
           var _a, _b, _c, _d;
           const n2 = e2.fields || {}, r2 = t2.fields || {}, i = (_a = n2[ut]) == null ? void 0 : _a.arrayValue, s = (_b = r2[ut]) == null ? void 0 : _b.arrayValue, o = __PRIVATE_primitiveComparator(((_c = i == null ? void 0 : i.values) == null ? void 0 : _c.length) || 0, ((_d = s == null ? void 0 : s.values) == null ? void 0 : _d.length) || 0);
           if (0 !== o) return o;
           return __PRIVATE_compareArrays(i, s);
-        }(e.mapValue, t.mapValue);
+        })(e.mapValue, t.mapValue);
       case 11:
-        return function __PRIVATE_compareMaps(e2, t2) {
+        return (function __PRIVATE_compareMaps(e2, t2) {
           if (e2 === _t.mapValue && t2 === _t.mapValue) return 0;
           if (e2 === _t.mapValue) return 1;
           if (t2 === _t.mapValue) return -1;
@@ -12505,7 +12505,7 @@
             if (0 !== o) return o;
           }
           return __PRIVATE_primitiveComparator(r2.length, s.length);
-        }(e.mapValue, t.mapValue);
+        })(e.mapValue, t.mapValue);
       default:
         throw fail(23264, {
           he: n
@@ -12529,25 +12529,25 @@
     return __PRIVATE_canonifyValue(e);
   }
   function __PRIVATE_canonifyValue(e) {
-    return "nullValue" in e ? "null" : "booleanValue" in e ? "" + e.booleanValue : "integerValue" in e ? "" + e.integerValue : "doubleValue" in e ? "" + e.doubleValue : "timestampValue" in e ? function __PRIVATE_canonifyTimestamp(e2) {
+    return "nullValue" in e ? "null" : "booleanValue" in e ? "" + e.booleanValue : "integerValue" in e ? "" + e.integerValue : "doubleValue" in e ? "" + e.doubleValue : "timestampValue" in e ? (function __PRIVATE_canonifyTimestamp(e2) {
       const t = __PRIVATE_normalizeTimestamp(e2);
       return `time(${t.seconds},${t.nanos})`;
-    }(e.timestampValue) : "stringValue" in e ? e.stringValue : "bytesValue" in e ? function __PRIVATE_canonifyByteString(e2) {
+    })(e.timestampValue) : "stringValue" in e ? e.stringValue : "bytesValue" in e ? (function __PRIVATE_canonifyByteString(e2) {
       return __PRIVATE_normalizeByteString(e2).toBase64();
-    }(e.bytesValue) : "referenceValue" in e ? function __PRIVATE_canonifyReference(e2) {
+    })(e.bytesValue) : "referenceValue" in e ? (function __PRIVATE_canonifyReference(e2) {
       return DocumentKey.fromName(e2).toString();
-    }(e.referenceValue) : "geoPointValue" in e ? function __PRIVATE_canonifyGeoPoint(e2) {
+    })(e.referenceValue) : "geoPointValue" in e ? (function __PRIVATE_canonifyGeoPoint(e2) {
       return `geo(${e2.latitude},${e2.longitude})`;
-    }(e.geoPointValue) : "arrayValue" in e ? function __PRIVATE_canonifyArray(e2) {
+    })(e.geoPointValue) : "arrayValue" in e ? (function __PRIVATE_canonifyArray(e2) {
       let t = "[", n = true;
       for (const r of e2.values || []) n ? n = false : t += ",", t += __PRIVATE_canonifyValue(r);
       return t + "]";
-    }(e.arrayValue) : "mapValue" in e ? function __PRIVATE_canonifyMap(e2) {
+    })(e.arrayValue) : "mapValue" in e ? (function __PRIVATE_canonifyMap(e2) {
       const t = Object.keys(e2.fields || {}).sort();
       let n = "{", r = true;
       for (const i of t) r ? r = false : n += ",", n += `${i}:${__PRIVATE_canonifyValue(e2.fields[i])}`;
       return n + "}";
-    }(e.mapValue) : fail(61005, {
+    })(e.mapValue) : fail(61005, {
       value: e
     });
   }
@@ -12571,17 +12571,17 @@
       case 7:
         return e.referenceValue.length;
       case 9:
-        return function __PRIVATE_estimateArrayByteSize(e2) {
-          return (e2.values || []).reduce((e3, t2) => e3 + __PRIVATE_estimateByteSize(t2), 0);
-        }(e.arrayValue);
+        return (function __PRIVATE_estimateArrayByteSize(e2) {
+          return (e2.values || []).reduce(((e3, t2) => e3 + __PRIVATE_estimateByteSize(t2)), 0);
+        })(e.arrayValue);
       case 10:
       case 11:
-        return function __PRIVATE_estimateMapByteSize(e2) {
+        return (function __PRIVATE_estimateMapByteSize(e2) {
           let t2 = 0;
-          return forEach(e2.fields, (e3, n) => {
+          return forEach(e2.fields, ((e3, n) => {
             t2 += e3.length + __PRIVATE_estimateByteSize(n);
-          }), t2;
-        }(e.mapValue);
+          })), t2;
+        })(e.mapValue);
       default:
         throw fail(13486, {
           value: e
@@ -12630,7 +12630,7 @@
           fields: {}
         }
       };
-      return forEach(e.mapValue.fields, (e2, n) => t.mapValue.fields[e2] = __PRIVATE_deepClone(n)), t;
+      return forEach(e.mapValue.fields, ((e2, n) => t.mapValue.fields[e2] = __PRIVATE_deepClone(n))), t;
     }
     if (e.arrayValue) {
       const t = {
@@ -12699,13 +12699,13 @@
      */
     setAll(e) {
       let t = FieldPath$1.emptyPath(), n = {}, r = [];
-      e.forEach((e2, i2) => {
+      e.forEach(((e2, i2) => {
         if (!t.isImmediateParentOf(i2)) {
           const e3 = this.getFieldsMap(t);
           this.applyChanges(e3, n, r), n = {}, r = [], t = i2.popLast();
         }
         e2 ? n[i2.lastSegment()] = __PRIVATE_deepClone(e2) : r.push(i2.lastSegment());
-      });
+      }));
       const i = this.getFieldsMap(t);
       this.applyChanges(i, n, r);
     }
@@ -12746,7 +12746,7 @@
      * entries.
      */
     applyChanges(e, t, n) {
-      forEach(t, (t2, n2) => e[t2] = n2);
+      forEach(t, ((t2, n2) => e[t2] = n2));
       for (const t2 of n) delete e[t2];
     }
     clone() {
@@ -12755,7 +12755,7 @@
   };
   function __PRIVATE_extractFieldMask(e) {
     const t = [];
-    return forEach(e.fields, (e2, n) => {
+    return forEach(e.fields, ((e2, n) => {
       const r = new FieldPath$1([e2]);
       if (__PRIVATE_isMapValue(n)) {
         const e3 = __PRIVATE_extractFieldMask(n.mapValue).fields;
@@ -12765,7 +12765,7 @@
           for (const n2 of e3) t.push(r.child(n2));
       } else
         t.push(r);
-    }), new FieldMask(t);
+    })), new FieldMask(t);
   }
   var MutableDocument = class _MutableDocument {
     constructor(e, t, n, r, i, s, o) {
@@ -13009,10 +13009,10 @@
       return new _CompositeFilter(e, t);
     }
     matches(e) {
-      return __PRIVATE_compositeFilterIsConjunction(this) ? void 0 === this.filters.find((t) => !t.matches(e)) : void 0 !== this.filters.find((t) => t.matches(e));
+      return __PRIVATE_compositeFilterIsConjunction(this) ? void 0 === this.filters.find(((t) => !t.matches(e))) : void 0 !== this.filters.find(((t) => t.matches(e)));
     }
     getFlattenedFilters() {
-      return null !== this.Pe || (this.Pe = this.filters.reduce((e, t) => e.concat(t.getFlattenedFilters()), [])), this.Pe;
+      return null !== this.Pe || (this.Pe = this.filters.reduce(((e, t) => e.concat(t.getFlattenedFilters())), [])), this.Pe;
     }
     // Returns a mutable copy of `this.filters`
     getFilters() {
@@ -13033,28 +13033,28 @@
     if (e instanceof FieldFilter)
       return e.field.canonicalString() + e.op.toString() + canonicalId(e.value);
     if (__PRIVATE_compositeFilterIsFlatConjunction(e))
-      return e.filters.map((e2) => __PRIVATE_canonifyFilter(e2)).join(",");
+      return e.filters.map(((e2) => __PRIVATE_canonifyFilter(e2))).join(",");
     {
-      const t = e.filters.map((e2) => __PRIVATE_canonifyFilter(e2)).join(",");
+      const t = e.filters.map(((e2) => __PRIVATE_canonifyFilter(e2))).join(",");
       return `${e.op}(${t})`;
     }
   }
   function __PRIVATE_filterEquals(e, t) {
-    return e instanceof FieldFilter ? function __PRIVATE_fieldFilterEquals(e2, t2) {
+    return e instanceof FieldFilter ? (function __PRIVATE_fieldFilterEquals(e2, t2) {
       return t2 instanceof FieldFilter && e2.op === t2.op && e2.field.isEqual(t2.field) && __PRIVATE_valueEquals(e2.value, t2.value);
-    }(e, t) : e instanceof CompositeFilter ? function __PRIVATE_compositeFilterEquals(e2, t2) {
+    })(e, t) : e instanceof CompositeFilter ? (function __PRIVATE_compositeFilterEquals(e2, t2) {
       if (t2 instanceof CompositeFilter && e2.op === t2.op && e2.filters.length === t2.filters.length) {
-        return e2.filters.reduce((e3, n, r) => e3 && __PRIVATE_filterEquals(n, t2.filters[r]), true);
+        return e2.filters.reduce(((e3, n, r) => e3 && __PRIVATE_filterEquals(n, t2.filters[r])), true);
       }
       return false;
-    }(e, t) : void fail(19439);
+    })(e, t) : void fail(19439);
   }
   function __PRIVATE_stringifyFilter(e) {
-    return e instanceof FieldFilter ? function __PRIVATE_stringifyFieldFilter(e2) {
+    return e instanceof FieldFilter ? (function __PRIVATE_stringifyFieldFilter(e2) {
       return `${e2.field.canonicalString()} ${e2.op} ${canonicalId(e2.value)}`;
-    }(e) : e instanceof CompositeFilter ? function __PRIVATE_stringifyCompositeFilter(e2) {
+    })(e) : e instanceof CompositeFilter ? (function __PRIVATE_stringifyCompositeFilter(e2) {
       return e2.op.toString() + " {" + e2.getFilters().map(__PRIVATE_stringifyFilter).join(" ,") + "}";
-    }(e) : "Filter";
+    })(e) : "Filter";
   }
   var __PRIVATE_KeyFieldFilter = class extends FieldFilter {
     constructor(e, t, n) {
@@ -13070,7 +13070,7 @@
       super(e, "in", t), this.keys = __PRIVATE_extractDocumentKeysFromArrayValue("in", t);
     }
     matches(e) {
-      return this.keys.some((t) => t.isEqual(e.key));
+      return this.keys.some(((t) => t.isEqual(e.key)));
     }
   };
   var __PRIVATE_KeyFieldNotInFilter = class extends FieldFilter {
@@ -13078,12 +13078,12 @@
       super(e, "not-in", t), this.keys = __PRIVATE_extractDocumentKeysFromArrayValue("not-in", t);
     }
     matches(e) {
-      return !this.keys.some((t) => t.isEqual(e.key));
+      return !this.keys.some(((t) => t.isEqual(e.key)));
     }
   };
   function __PRIVATE_extractDocumentKeysFromArrayValue(e, t) {
     var _a;
-    return (((_a = t.arrayValue) == null ? void 0 : _a.values) || []).map((e2) => DocumentKey.fromName(e2.referenceValue));
+    return (((_a = t.arrayValue) == null ? void 0 : _a.values) || []).map(((e2) => DocumentKey.fromName(e2.referenceValue)));
   }
   var __PRIVATE_ArrayContainsFilter = class extends FieldFilter {
     constructor(e, t) {
@@ -13121,7 +13121,7 @@
     }
     matches(e) {
       const t = e.data.field(this.field);
-      return !(!isArray(t) || !t.arrayValue.values) && t.arrayValue.values.some((e2) => __PRIVATE_arrayValueContains(this.value.arrayValue, e2));
+      return !(!isArray(t) || !t.arrayValue.values) && t.arrayValue.values.some(((e2) => __PRIVATE_arrayValueContains(this.value.arrayValue, e2)));
     }
   };
   var __PRIVATE_TargetImpl = class {
@@ -13136,9 +13136,9 @@
     const t = __PRIVATE_debugCast(e);
     if (null === t.Te) {
       let e2 = t.path.canonicalString();
-      null !== t.collectionGroup && (e2 += "|cg:" + t.collectionGroup), e2 += "|f:", e2 += t.filters.map((e3) => __PRIVATE_canonifyFilter(e3)).join(","), e2 += "|ob:", e2 += t.orderBy.map((e3) => function __PRIVATE_canonifyOrderBy(e4) {
+      null !== t.collectionGroup && (e2 += "|cg:" + t.collectionGroup), e2 += "|f:", e2 += t.filters.map(((e3) => __PRIVATE_canonifyFilter(e3))).join(","), e2 += "|ob:", e2 += t.orderBy.map(((e3) => (function __PRIVATE_canonifyOrderBy(e4) {
         return e4.field.canonicalString() + e4.dir;
-      }(e3)).join(","), __PRIVATE_isNullOrUndefined(t.limit) || (e2 += "|l:", e2 += t.limit), t.startAt && (e2 += "|lb:", e2 += t.startAt.inclusive ? "b:" : "a:", e2 += t.startAt.position.map((e3) => canonicalId(e3)).join(",")), t.endAt && (e2 += "|ub:", e2 += t.endAt.inclusive ? "a:" : "b:", e2 += t.endAt.position.map((e3) => canonicalId(e3)).join(",")), t.Te = e2;
+      })(e3))).join(","), __PRIVATE_isNullOrUndefined(t.limit) || (e2 += "|l:", e2 += t.limit), t.startAt && (e2 += "|lb:", e2 += t.startAt.inclusive ? "b:" : "a:", e2 += t.startAt.position.map(((e3) => canonicalId(e3))).join(",")), t.endAt && (e2 += "|ub:", e2 += t.endAt.inclusive ? "a:" : "b:", e2 += t.endAt.position.map(((e3) => canonicalId(e3))).join(",")), t.Te = e2;
     }
     return t.Te;
   }
@@ -13189,17 +13189,17 @@
       t.Ie = [];
       const e2 = /* @__PURE__ */ new Set();
       for (const n2 of t.explicitOrderBy) t.Ie.push(n2), e2.add(n2.field.canonicalString());
-      const n = t.explicitOrderBy.length > 0 ? t.explicitOrderBy[t.explicitOrderBy.length - 1].dir : "asc", r = function __PRIVATE_getInequalityFilterFields(e3) {
+      const n = t.explicitOrderBy.length > 0 ? t.explicitOrderBy[t.explicitOrderBy.length - 1].dir : "asc", r = (function __PRIVATE_getInequalityFilterFields(e3) {
         let t2 = new SortedSet(FieldPath$1.comparator);
-        return e3.filters.forEach((e4) => {
-          e4.getFlattenedFilters().forEach((e5) => {
+        return e3.filters.forEach(((e4) => {
+          e4.getFlattenedFilters().forEach(((e5) => {
             e5.isInequality() && (t2 = t2.add(e5.field));
-          });
-        }), t2;
-      }(t);
-      r.forEach((r2) => {
+          }));
+        })), t2;
+      })(t);
+      r.forEach(((r2) => {
         e2.has(r2.canonicalString()) || r2.isKeyField() || t.Ie.push(new OrderBy(r2, n));
-      }), // Add the document key field to the last if it is not explicitly ordered.
+      })), // Add the document key field to the last if it is not explicitly ordered.
       e2.has(FieldPath$1.keyField().canonicalString()) || t.Ie.push(new OrderBy(FieldPath$1.keyField(), n));
     }
     return t.Ie;
@@ -13211,10 +13211,10 @@
   function __PRIVATE__queryToTarget(e, t) {
     if ("F" === e.limitType) return __PRIVATE_newTarget(e.path, e.collectionGroup, t, e.filters, e.limit, e.startAt, e.endAt);
     {
-      t = t.map((e2) => {
+      t = t.map(((e2) => {
         const t2 = "desc" === e2.dir ? "asc" : "desc";
         return new OrderBy(e2.field, t2);
-      });
+      }));
       const n = e.endAt ? new Bound(e.endAt.position, e.endAt.inclusive) : null, r = e.startAt ? new Bound(e.startAt.position, e.startAt.inclusive) : null;
       return __PRIVATE_newTarget(e.path, e.collectionGroup, t, e.filters, e.limit, n, r);
     }
@@ -13237,39 +13237,39 @@
     return `${__PRIVATE_canonifyTarget(__PRIVATE_queryToTarget(e))}|lt:${e.limitType}`;
   }
   function __PRIVATE_stringifyQuery(e) {
-    return `Query(target=${function __PRIVATE_stringifyTarget(e2) {
+    return `Query(target=${(function __PRIVATE_stringifyTarget(e2) {
       let t = e2.path.canonicalString();
-      return null !== e2.collectionGroup && (t += " collectionGroup=" + e2.collectionGroup), e2.filters.length > 0 && (t += `, filters: [${e2.filters.map((e3) => __PRIVATE_stringifyFilter(e3)).join(", ")}]`), __PRIVATE_isNullOrUndefined(e2.limit) || (t += ", limit: " + e2.limit), e2.orderBy.length > 0 && (t += `, orderBy: [${e2.orderBy.map((e3) => function __PRIVATE_stringifyOrderBy(e4) {
+      return null !== e2.collectionGroup && (t += " collectionGroup=" + e2.collectionGroup), e2.filters.length > 0 && (t += `, filters: [${e2.filters.map(((e3) => __PRIVATE_stringifyFilter(e3))).join(", ")}]`), __PRIVATE_isNullOrUndefined(e2.limit) || (t += ", limit: " + e2.limit), e2.orderBy.length > 0 && (t += `, orderBy: [${e2.orderBy.map(((e3) => (function __PRIVATE_stringifyOrderBy(e4) {
         return `${e4.field.canonicalString()} (${e4.dir})`;
-      }(e3)).join(", ")}]`), e2.startAt && (t += ", startAt: ", t += e2.startAt.inclusive ? "b:" : "a:", t += e2.startAt.position.map((e3) => canonicalId(e3)).join(",")), e2.endAt && (t += ", endAt: ", t += e2.endAt.inclusive ? "a:" : "b:", t += e2.endAt.position.map((e3) => canonicalId(e3)).join(",")), `Target(${t})`;
-    }(__PRIVATE_queryToTarget(e))}; limitType=${e.limitType})`;
+      })(e3))).join(", ")}]`), e2.startAt && (t += ", startAt: ", t += e2.startAt.inclusive ? "b:" : "a:", t += e2.startAt.position.map(((e3) => canonicalId(e3))).join(",")), e2.endAt && (t += ", endAt: ", t += e2.endAt.inclusive ? "a:" : "b:", t += e2.endAt.position.map(((e3) => canonicalId(e3))).join(",")), `Target(${t})`;
+    })(__PRIVATE_queryToTarget(e))}; limitType=${e.limitType})`;
   }
   function __PRIVATE_queryMatches(e, t) {
-    return t.isFoundDocument() && function __PRIVATE_queryMatchesPathAndCollectionGroup(e2, t2) {
+    return t.isFoundDocument() && (function __PRIVATE_queryMatchesPathAndCollectionGroup(e2, t2) {
       const n = t2.key.path;
       return null !== e2.collectionGroup ? t2.key.hasCollectionId(e2.collectionGroup) && e2.path.isPrefixOf(n) : DocumentKey.isDocumentKey(e2.path) ? e2.path.isEqual(n) : e2.path.isImmediateParentOf(n);
-    }(e, t) && function __PRIVATE_queryMatchesOrderBy(e2, t2) {
+    })(e, t) && (function __PRIVATE_queryMatchesOrderBy(e2, t2) {
       for (const n of __PRIVATE_queryNormalizedOrderBy(e2))
         if (!n.field.isKeyField() && null === t2.data.field(n.field)) return false;
       return true;
-    }(e, t) && function __PRIVATE_queryMatchesFilters(e2, t2) {
+    })(e, t) && (function __PRIVATE_queryMatchesFilters(e2, t2) {
       for (const n of e2.filters) if (!n.matches(t2)) return false;
       return true;
-    }(e, t) && function __PRIVATE_queryMatchesBounds(e2, t2) {
+    })(e, t) && (function __PRIVATE_queryMatchesBounds(e2, t2) {
       if (e2.startAt && !/**
       * Returns true if a document sorts before a bound using the provided sort
       * order.
       */
-      function __PRIVATE_boundSortsBeforeDocument(e3, t3, n) {
+      (function __PRIVATE_boundSortsBeforeDocument(e3, t3, n) {
         const r = __PRIVATE_boundCompareToDocument(e3, t3, n);
         return e3.inclusive ? r <= 0 : r < 0;
-      }(e2.startAt, __PRIVATE_queryNormalizedOrderBy(e2), t2)) return false;
-      if (e2.endAt && !function __PRIVATE_boundSortsAfterDocument(e3, t3, n) {
+      })(e2.startAt, __PRIVATE_queryNormalizedOrderBy(e2), t2)) return false;
+      if (e2.endAt && !(function __PRIVATE_boundSortsAfterDocument(e3, t3, n) {
         const r = __PRIVATE_boundCompareToDocument(e3, t3, n);
         return e3.inclusive ? r >= 0 : r > 0;
-      }(e2.endAt, __PRIVATE_queryNormalizedOrderBy(e2), t2)) return false;
+      })(e2.endAt, __PRIVATE_queryNormalizedOrderBy(e2), t2)) return false;
       return true;
-    }(e, t);
+    })(e, t);
   }
   function __PRIVATE_queryCollectionGroup(e) {
     return e.collectionGroup || (e.path.length % 2 == 1 ? e.path.lastSegment() : e.path.get(e.path.length - 2));
@@ -13286,10 +13286,10 @@
     };
   }
   function __PRIVATE_compareDocs(e, t, n) {
-    const r = e.field.isKeyField() ? DocumentKey.comparator(t.key, n.key) : function __PRIVATE_compareDocumentsByField(e2, t2, n2) {
+    const r = e.field.isKeyField() ? DocumentKey.comparator(t.key, n.key) : (function __PRIVATE_compareDocumentsByField(e2, t2, n2) {
       const r2 = t2.data.field(e2), i = n2.data.field(e2);
       return null !== r2 && null !== i ? __PRIVATE_valueCompare(r2, i) : fail(42886);
-    }(e.field, t, n);
+    })(e.field, t, n);
     switch (e.dir) {
       case "asc":
         return r;
@@ -13340,9 +13340,9 @@
       return false;
     }
     forEach(e) {
-      forEach(this.inner, (t, n) => {
+      forEach(this.inner, ((t, n) => {
         for (const [t2, r] of n) e(t2, r);
-      });
+      }));
     }
     isEmpty() {
       return isEmpty2(this.inner);
@@ -13363,7 +13363,7 @@
   }
   function __PRIVATE_convertOverlayedDocumentMapToDocumentMap(e) {
     let t = Pt;
-    return e.forEach((e2, n) => t = t.insert(e2, n.overlayedDocument)), t;
+    return e.forEach(((e2, n) => t = t.insert(e2, n.overlayedDocument))), t;
   }
   function __PRIVATE_newOverlayMap() {
     return __PRIVATE_newDocumentKeyMap();
@@ -13372,7 +13372,7 @@
     return __PRIVATE_newDocumentKeyMap();
   }
   function __PRIVATE_newDocumentKeyMap() {
-    return new ObjectMap((e) => e.toString(), (e, t) => e.isEqual(t));
+    return new ObjectMap(((e) => e.toString()), ((e, t) => e.isEqual(t)));
   }
   var Tt = new SortedMap(DocumentKey.comparator);
   var It = new SortedSet(DocumentKey.comparator);
@@ -13415,7 +13415,7 @@
     }
   };
   function __PRIVATE_applyTransformOperationToLocalView(e, t, n) {
-    return e instanceof __PRIVATE_ServerTimestampTransform ? function serverTimestamp$1(e2, t2) {
+    return e instanceof __PRIVATE_ServerTimestampTransform ? (function serverTimestamp$1(e2, t2) {
       const n2 = {
         fields: {
           [tt]: {
@@ -13432,10 +13432,10 @@
       return t2 && __PRIVATE_isServerTimestamp(t2) && (t2 = __PRIVATE_getPreviousValue(t2)), t2 && (n2.fields[nt] = t2), {
         mapValue: n2
       };
-    }(n, t) : e instanceof __PRIVATE_ArrayUnionTransformOperation ? __PRIVATE_applyArrayUnionTransformOperation(e, t) : e instanceof __PRIVATE_ArrayRemoveTransformOperation ? __PRIVATE_applyArrayRemoveTransformOperation(e, t) : function __PRIVATE_applyNumericIncrementTransformOperationToLocalView(e2, t2) {
+    })(n, t) : e instanceof __PRIVATE_ArrayUnionTransformOperation ? __PRIVATE_applyArrayUnionTransformOperation(e, t) : e instanceof __PRIVATE_ArrayRemoveTransformOperation ? __PRIVATE_applyArrayRemoveTransformOperation(e, t) : (function __PRIVATE_applyNumericIncrementTransformOperationToLocalView(e2, t2) {
       const n2 = __PRIVATE_computeTransformOperationBaseValue(e2, t2), r = asNumber(n2) + asNumber(e2.Ae);
       return isInteger(n2) && isInteger(e2.Ae) ? __PRIVATE_toInteger(r) : __PRIVATE_toDouble(e2.serializer, r);
-    }(e, t);
+    })(e, t);
   }
   function __PRIVATE_applyTransformOperationToRemoteDocument(e, t, n) {
     return e instanceof __PRIVATE_ArrayUnionTransformOperation ? __PRIVATE_applyArrayUnionTransformOperation(e, t) : e instanceof __PRIVATE_ArrayRemoveTransformOperation ? __PRIVATE_applyArrayRemoveTransformOperation(e, t) : n;
@@ -13443,11 +13443,11 @@
   function __PRIVATE_computeTransformOperationBaseValue(e, t) {
     return e instanceof __PRIVATE_NumericIncrementTransformOperation ? (
       /** Returns true if `value` is either an IntegerValue or a DoubleValue. */
-      function __PRIVATE_isNumber(e2) {
-        return isInteger(e2) || function __PRIVATE_isDouble(e3) {
+      (function __PRIVATE_isNumber(e2) {
+        return isInteger(e2) || (function __PRIVATE_isDouble(e3) {
           return !!e3 && "doubleValue" in e3;
-        }(e2);
-      }(t) ? t : {
+        })(e2);
+      })(t) ? t : {
         integerValue: 0
       }
     ) : null;
@@ -13461,7 +13461,7 @@
   };
   function __PRIVATE_applyArrayUnionTransformOperation(e, t) {
     const n = __PRIVATE_coercedFieldValuesArray(t);
-    for (const t2 of e.elements) n.some((e2) => __PRIVATE_valueEquals(e2, t2)) || n.push(t2);
+    for (const t2 of e.elements) n.some(((e2) => __PRIVATE_valueEquals(e2, t2))) || n.push(t2);
     return {
       arrayValue: {
         values: n
@@ -13475,7 +13475,7 @@
   };
   function __PRIVATE_applyArrayRemoveTransformOperation(e, t) {
     let n = __PRIVATE_coercedFieldValuesArray(t);
-    for (const t2 of e.elements) n = n.filter((e2) => !__PRIVATE_valueEquals(e2, t2));
+    for (const t2 of e.elements) n = n.filter(((e2) => !__PRIVATE_valueEquals(e2, t2)));
     return {
       arrayValue: {
         values: n
@@ -13499,9 +13499,9 @@
     }
   };
   function __PRIVATE_fieldTransformEquals(e, t) {
-    return e.field.isEqual(t.field) && function __PRIVATE_transformOperationEquals(e2, t2) {
+    return e.field.isEqual(t.field) && (function __PRIVATE_transformOperationEquals(e2, t2) {
       return e2 instanceof __PRIVATE_ArrayUnionTransformOperation && t2 instanceof __PRIVATE_ArrayUnionTransformOperation || e2 instanceof __PRIVATE_ArrayRemoveTransformOperation && t2 instanceof __PRIVATE_ArrayRemoveTransformOperation ? __PRIVATE_arrayEquals(e2.elements, t2.elements, __PRIVATE_valueEquals) : e2 instanceof __PRIVATE_NumericIncrementTransformOperation && t2 instanceof __PRIVATE_NumericIncrementTransformOperation ? __PRIVATE_valueEquals(e2.Ae, t2.Ae) : e2 instanceof __PRIVATE_ServerTimestampTransform && t2 instanceof __PRIVATE_ServerTimestampTransform;
-    }(e.transform, t.transform);
+    })(e.transform, t.transform);
   }
   var MutationResult = class {
     constructor(e, t) {
@@ -13551,33 +13551,33 @@
     }
   }
   function __PRIVATE_mutationApplyToRemoteDocument(e, t, n) {
-    e instanceof __PRIVATE_SetMutation ? function __PRIVATE_setMutationApplyToRemoteDocument(e2, t2, n2) {
+    e instanceof __PRIVATE_SetMutation ? (function __PRIVATE_setMutationApplyToRemoteDocument(e2, t2, n2) {
       const r = e2.value.clone(), i = __PRIVATE_serverTransformResults(e2.fieldTransforms, t2, n2.transformResults);
       r.setAll(i), t2.convertToFoundDocument(n2.version, r).setHasCommittedMutations();
-    }(e, t, n) : e instanceof __PRIVATE_PatchMutation ? function __PRIVATE_patchMutationApplyToRemoteDocument(e2, t2, n2) {
+    })(e, t, n) : e instanceof __PRIVATE_PatchMutation ? (function __PRIVATE_patchMutationApplyToRemoteDocument(e2, t2, n2) {
       if (!__PRIVATE_preconditionIsValidForDocument(e2.precondition, t2))
         return void t2.convertToUnknownDocument(n2.version);
       const r = __PRIVATE_serverTransformResults(e2.fieldTransforms, t2, n2.transformResults), i = t2.data;
       i.setAll(__PRIVATE_getPatch(e2)), i.setAll(r), t2.convertToFoundDocument(n2.version, i).setHasCommittedMutations();
-    }(e, t, n) : function __PRIVATE_deleteMutationApplyToRemoteDocument(e2, t2, n2) {
+    })(e, t, n) : (function __PRIVATE_deleteMutationApplyToRemoteDocument(e2, t2, n2) {
       t2.convertToNoDocument(n2.version).setHasCommittedMutations();
-    }(0, t, n);
+    })(0, t, n);
   }
   function __PRIVATE_mutationApplyToLocalView(e, t, n, r) {
-    return e instanceof __PRIVATE_SetMutation ? function __PRIVATE_setMutationApplyToLocalView(e2, t2, n2, r2) {
+    return e instanceof __PRIVATE_SetMutation ? (function __PRIVATE_setMutationApplyToLocalView(e2, t2, n2, r2) {
       if (!__PRIVATE_preconditionIsValidForDocument(e2.precondition, t2))
         return n2;
       const i = e2.value.clone(), s = __PRIVATE_localTransformResults(e2.fieldTransforms, r2, t2);
       return i.setAll(s), t2.convertToFoundDocument(t2.version, i).setHasLocalMutations(), null;
-    }(e, t, n, r) : e instanceof __PRIVATE_PatchMutation ? function __PRIVATE_patchMutationApplyToLocalView(e2, t2, n2, r2) {
+    })(e, t, n, r) : e instanceof __PRIVATE_PatchMutation ? (function __PRIVATE_patchMutationApplyToLocalView(e2, t2, n2, r2) {
       if (!__PRIVATE_preconditionIsValidForDocument(e2.precondition, t2)) return n2;
       const i = __PRIVATE_localTransformResults(e2.fieldTransforms, r2, t2), s = t2.data;
       if (s.setAll(__PRIVATE_getPatch(e2)), s.setAll(i), t2.convertToFoundDocument(t2.version, s).setHasLocalMutations(), null === n2) return null;
-      return n2.unionWith(e2.fieldMask.fields).unionWith(e2.fieldTransforms.map((e3) => e3.field));
-    }(e, t, n, r) : function __PRIVATE_deleteMutationApplyToLocalView(e2, t2, n2) {
+      return n2.unionWith(e2.fieldMask.fields).unionWith(e2.fieldTransforms.map(((e3) => e3.field)));
+    })(e, t, n, r) : (function __PRIVATE_deleteMutationApplyToLocalView(e2, t2, n2) {
       if (__PRIVATE_preconditionIsValidForDocument(e2.precondition, t2)) return t2.convertToNoDocument(t2.version).setHasLocalMutations(), null;
       return n2;
-    }(e, t, n);
+    })(e, t, n);
   }
   function __PRIVATE_mutationExtractBaseValue(e, t) {
     let n = null;
@@ -13588,9 +13588,9 @@
     return n || null;
   }
   function __PRIVATE_mutationEquals(e, t) {
-    return e.type === t.type && (!!e.key.isEqual(t.key) && (!!e.precondition.isEqual(t.precondition) && (!!function __PRIVATE_fieldTransformsAreEqual(e2, t2) {
-      return void 0 === e2 && void 0 === t2 || !(!e2 || !t2) && __PRIVATE_arrayEquals(e2, t2, (e3, t3) => __PRIVATE_fieldTransformEquals(e3, t3));
-    }(e.fieldTransforms, t.fieldTransforms) && (0 === e.type ? e.value.isEqual(t.value) : 1 !== e.type || e.data.isEqual(t.data) && e.fieldMask.isEqual(t.fieldMask)))));
+    return e.type === t.type && (!!e.key.isEqual(t.key) && (!!e.precondition.isEqual(t.precondition) && (!!(function __PRIVATE_fieldTransformsAreEqual(e2, t2) {
+      return void 0 === e2 && void 0 === t2 || !(!e2 || !t2) && __PRIVATE_arrayEquals(e2, t2, ((e3, t3) => __PRIVATE_fieldTransformEquals(e3, t3)));
+    })(e.fieldTransforms, t.fieldTransforms) && (0 === e.type ? e.value.isEqual(t.value) : 1 !== e.type || e.data.isEqual(t.data) && e.fieldMask.isEqual(t.fieldMask)))));
   }
   var __PRIVATE_SetMutation = class extends Mutation {
     constructor(e, t, n, r = []) {
@@ -13610,12 +13610,12 @@
   };
   function __PRIVATE_getPatch(e) {
     const t = /* @__PURE__ */ new Map();
-    return e.fieldMask.fields.forEach((n) => {
+    return e.fieldMask.fields.forEach(((n) => {
       if (!n.isEmpty()) {
         const r = e.data.field(n);
         t.set(n, r);
       }
-    }), t;
+    })), t;
   }
   function __PRIVATE_serverTransformResults(e, t, n) {
     const r = /* @__PURE__ */ new Map();
@@ -13705,19 +13705,19 @@
      */
     applyToLocalDocumentSet(e, t) {
       const n = __PRIVATE_newMutationMap();
-      return this.mutations.forEach((r) => {
+      return this.mutations.forEach(((r) => {
         const i = e.get(r.key), s = i.overlayedDocument;
         let o = this.applyToLocalView(s, i.mutatedFields);
         o = t.has(r.key) ? null : o;
         const _ = __PRIVATE_calculateOverlayMutation(s, o);
         null !== _ && n.set(r.key, _), s.isValidDocument() || s.convertToNoDocument(SnapshotVersion.min());
-      }), n;
+      })), n;
     }
     keys() {
-      return this.mutations.reduce((e, t) => e.add(t.key), __PRIVATE_documentKeySet());
+      return this.mutations.reduce(((e, t) => e.add(t.key)), __PRIVATE_documentKeySet());
     }
     isEqual(e) {
-      return this.batchId === e.batchId && __PRIVATE_arrayEquals(this.mutations, e.mutations, (e2, t) => __PRIVATE_mutationEquals(e2, t)) && __PRIVATE_arrayEquals(this.baseMutations, e.baseMutations, (e2, t) => __PRIVATE_mutationEquals(e2, t));
+      return this.batchId === e.batchId && __PRIVATE_arrayEquals(this.mutations, e.mutations, ((e2, t) => __PRIVATE_mutationEquals(e2, t))) && __PRIVATE_arrayEquals(this.baseMutations, e.baseMutations, ((e2, t) => __PRIVATE_mutationEquals(e2, t)));
     }
   };
   var MutationBatchResult = class _MutationBatchResult {
@@ -13734,9 +13734,9 @@
         me: e.mutations.length,
         fe: n.length
       });
-      let r = /* @__PURE__ */ function __PRIVATE_documentVersionMap() {
+      let r = /* @__PURE__ */ (function __PRIVATE_documentVersionMap() {
         return Tt;
-      }();
+      })();
       const i = e.mutations;
       for (let e2 = 0; e2 < i.length; e2++) r = r.insert(i[e2].key, n[e2].version);
       return new _MutationBatchResult(e, t, n, r);
@@ -13906,7 +13906,7 @@
     /** Create bloom filter for testing purposes only. */
     static create(e, t, n) {
       const r = e % 8 == 0 ? 0 : 8 - e % 8, i = new Uint8Array(Math.ceil(e / 8)), s = new _BloomFilter(i, r, t);
-      return n.forEach((e2) => s.insert(e2)), s;
+      return n.forEach(((e2) => s.insert(e2))), s;
     }
     insert(e) {
       if (0 === this.ge) return;
@@ -14024,7 +14024,7 @@
      */
     ke() {
       let e = __PRIVATE_documentKeySet(), t = __PRIVATE_documentKeySet(), n = __PRIVATE_documentKeySet();
-      return this.Fe.forEach((r, i) => {
+      return this.Fe.forEach(((r, i) => {
         switch (i) {
           case 0:
             e = e.add(r);
@@ -14040,7 +14040,7 @@
               changeType: i
             });
         }
-      }), new TargetChange(this.Me, this.xe, e, t, n);
+      })), new TargetChange(this.Me, this.xe, e, t, n);
     }
     /**
      * Resets the document changes and sets `hasPendingChanges` to false.
@@ -14087,7 +14087,7 @@
     }
     /** Processes and adds the WatchTargetChange to the current set of changes. */
     tt(e) {
-      this.forEachTarget(e, (t) => {
+      this.forEachTarget(e, ((t) => {
         const n = this.nt(t);
         switch (e.state) {
           case 0:
@@ -14116,7 +14116,7 @@
               state: e.state
             });
         }
-      });
+      }));
     }
     /**
      * Iterates over all targetIds that the watch change applies to: either the
@@ -14124,9 +14124,9 @@
      * active targets.
      */
     forEachTarget(e, t) {
-      e.targetIds.length > 0 ? e.targetIds.forEach(t) : this.ze.forEach((e2, n) => {
+      e.targetIds.length > 0 ? e.targetIds.forEach(t) : this.ze.forEach(((e2, n) => {
         this.rt(n) && t(n);
-      });
+      }));
     }
     /**
      * Handles existence filters and synthesizes deletes for filter mismatches.
@@ -14152,7 +14152,7 @@
               const e2 = 2 === i2 ? "TargetPurposeExistenceFilterMismatchBloom" : "TargetPurposeExistenceFilterMismatch";
               this.Ze = this.Ze.insert(t, e2);
             }
-            Vt == null ? void 0 : Vt.o(function __PRIVATE_createExistenceFilterMismatchInfoForTestingHooks(e2, t2, n3, r3, i3) {
+            Vt == null ? void 0 : Vt.o((function __PRIVATE_createExistenceFilterMismatchInfoForTestingHooks(e2, t2, n3, r3, i3) {
               var _a, _b, _c, _d, _e, _f;
               const s = {
                 localCacheCount: e2,
@@ -14171,7 +14171,7 @@
                 }
               });
               return s;
-            }(r2, e.Ce, this.Ge.ht(), n2, i2));
+            })(r2, e.Ce, this.Ge.ht(), n2, i2));
           }
         }
       }
@@ -14212,7 +14212,7 @@
     Pt(e, t) {
       const n = this.Ge.getRemoteKeysForTarget(t);
       let r = 0;
-      return n.forEach((n2) => {
+      return n.forEach(((n2) => {
         const i = this.Ge.ht(), s = `projects/${i.projectId}/databases/${i.database}/documents/${n2.path.canonicalString()}`;
         e.mightContain(s) || (this.et(
           t,
@@ -14220,7 +14220,7 @@
           /*updatedDocument=*/
           null
         ), r++);
-      }), r;
+      })), r;
     }
     /**
      * Converts the currently accumulated state into a remote event at the
@@ -14228,7 +14228,7 @@
      */
     Tt(e) {
       const t = /* @__PURE__ */ new Map();
-      this.ze.forEach((n2, r2) => {
+      this.ze.forEach(((n2, r2) => {
         const i = this.ot(r2);
         if (i) {
           if (n2.current && __PRIVATE_targetIsDocumentTarget(i.target)) {
@@ -14237,15 +14237,15 @@
           }
           n2.Be && (t.set(r2, n2.ke()), n2.Ke());
         }
-      });
+      }));
       let n = __PRIVATE_documentKeySet();
-      this.He.forEach((e2, t2) => {
+      this.He.forEach(((e2, t2) => {
         let r2 = true;
-        t2.forEachWhile((e3) => {
+        t2.forEachWhile(((e3) => {
           const t3 = this.ot(e3);
           return !t3 || "TargetPurposeLimboResolution" === t3.purpose || (r2 = false, false);
-        }), r2 && (n = n.add(e2));
-      }), this.je.forEach((t2, n2) => n2.setReadTime(e));
+        })), r2 && (n = n.add(e2));
+      })), this.je.forEach(((t2, n2) => n2.setReadTime(e)));
       const r = new RemoteEvent(e, t, this.Ze, this.je, n);
       return this.je = __PRIVATE_mutableDocumentMap(), this.Je = __PRIVATE_documentTargetMap(), this.He = __PRIVATE_documentTargetMap(), this.Ze = new SortedMap(__PRIVATE_primitiveComparator), r;
     }
@@ -14335,14 +14335,14 @@
      */
     it(e) {
       this.ze.set(e, new __PRIVATE_TargetState());
-      this.Ge.getRemoteKeysForTarget(e).forEach((t) => {
+      this.Ge.getRemoteKeysForTarget(e).forEach(((t) => {
         this.et(
           e,
           t,
           /*updatedDocument=*/
           null
         );
-      });
+      }));
     }
     /**
      * Returns whether the LocalStore considers the document to be part of the
@@ -14413,18 +14413,18 @@
     return toTimestamp(e, t.toTimestamp());
   }
   function __PRIVATE_fromVersion(e) {
-    return __PRIVATE_hardAssert(!!e, 49232), SnapshotVersion.fromTimestamp(function fromTimestamp(e2) {
+    return __PRIVATE_hardAssert(!!e, 49232), SnapshotVersion.fromTimestamp((function fromTimestamp(e2) {
       const t = __PRIVATE_normalizeTimestamp(e2);
       return new Timestamp(t.seconds, t.nanos);
-    }(e));
+    })(e));
   }
   function __PRIVATE_toResourceName(e, t) {
     return __PRIVATE_toResourcePath(e, t).canonicalString();
   }
   function __PRIVATE_toResourcePath(e, t) {
-    const n = function __PRIVATE_fullyQualifiedPrefixPath(e2) {
+    const n = (function __PRIVATE_fullyQualifiedPrefixPath(e2) {
       return new ResourcePath(["projects", e2.projectId, "databases", e2.database]);
-    }(e).child("documents");
+    })(e).child("documents");
     return void 0 === t ? n : n.child(t);
   }
   function __PRIVATE_fromResourceName(e) {
@@ -14467,20 +14467,20 @@
     let n;
     if ("targetChange" in t) {
       t.targetChange;
-      const r = function __PRIVATE_fromWatchTargetChangeState(e2) {
+      const r = (function __PRIVATE_fromWatchTargetChangeState(e2) {
         return "NO_CHANGE" === e2 ? 0 : "ADD" === e2 ? 1 : "REMOVE" === e2 ? 2 : "CURRENT" === e2 ? 3 : "RESET" === e2 ? 4 : fail(39313, {
           state: e2
         });
-      }(t.targetChange.targetChangeType || "NO_CHANGE"), i = t.targetChange.targetIds || [], s = function __PRIVATE_fromBytes(e2, t2) {
+      })(t.targetChange.targetChangeType || "NO_CHANGE"), i = t.targetChange.targetIds || [], s = (function __PRIVATE_fromBytes(e2, t2) {
         return e2.useProto3Json ? (__PRIVATE_hardAssert(void 0 === t2 || "string" == typeof t2, 58123), ByteString.fromBase64String(t2 || "")) : (__PRIVATE_hardAssert(void 0 === t2 || // Check if the value is an instance of both Buffer and Uint8Array,
         // despite the fact that Buffer extends Uint8Array. In some
         // environments, such as jsdom, the prototype chain of Buffer
         // does not indicate that it extends Uint8Array.
         t2 instanceof Buffer || t2 instanceof Uint8Array, 16193), ByteString.fromUint8Array(t2 || new Uint8Array()));
-      }(e, t.targetChange.resumeToken), o = t.targetChange.cause, _ = o && function __PRIVATE_fromRpcStatus(e2) {
+      })(e, t.targetChange.resumeToken), o = t.targetChange.cause, _ = o && (function __PRIVATE_fromRpcStatus(e2) {
         const t2 = void 0 === e2.code ? D.UNKNOWN : __PRIVATE_mapCodeFromRpcCode(e2.code);
         return new FirestoreError(t2, e2.message || "");
-      }(o);
+      })(o);
       n = new __PRIVATE_WatchTargetChange(r, i, s, _ || null);
     } else if ("documentChange" in t) {
       t.documentChange;
@@ -14538,7 +14538,7 @@
         verify: __PRIVATE_toName(e, t.key)
       };
     }
-    return t.fieldTransforms.length > 0 && (n.updateTransforms = t.fieldTransforms.map((e2) => function __PRIVATE_toFieldTransform(e3, t2) {
+    return t.fieldTransforms.length > 0 && (n.updateTransforms = t.fieldTransforms.map(((e2) => (function __PRIVATE_toFieldTransform(e3, t2) {
       const n2 = t2.transform;
       if (n2 instanceof __PRIVATE_ServerTimestampTransform) return {
         fieldPath: t2.field.canonicalString(),
@@ -14563,16 +14563,16 @@
       throw fail(20930, {
         transform: t2.transform
       });
-    }(0, e2))), t.precondition.isNone || (n.currentDocument = function __PRIVATE_toPrecondition(e2, t2) {
+    })(0, e2)))), t.precondition.isNone || (n.currentDocument = (function __PRIVATE_toPrecondition(e2, t2) {
       return void 0 !== t2.updateTime ? {
         updateTime: __PRIVATE_toVersion(e2, t2.updateTime)
       } : void 0 !== t2.exists ? {
         exists: t2.exists
       } : fail(27497);
-    }(e, t.precondition)), n;
+    })(e, t.precondition)), n;
   }
   function __PRIVATE_fromWriteResults(e, t) {
-    return e && e.length > 0 ? (__PRIVATE_hardAssert(void 0 !== t, 14353), e.map((e2) => function __PRIVATE_fromWriteResult(e3, t2) {
+    return e && e.length > 0 ? (__PRIVATE_hardAssert(void 0 !== t, 14353), e.map(((e2) => (function __PRIVATE_fromWriteResult(e3, t2) {
       let n = e3.updateTime ? __PRIVATE_fromVersion(e3.updateTime) : __PRIVATE_fromVersion(t2);
       return n.isEqual(SnapshotVersion.min()) && // The Firestore Emulator currently returns an update time of 0 for
       // deletes of non-existing documents (rather than null). This breaks the
@@ -14580,7 +14580,7 @@
       // with version 0 are filtered by IndexedDb's RemoteDocumentCache.
       // TODO(#2149): Remove this when Emulator is fixed
       (n = __PRIVATE_fromVersion(t2)), new MutationResult(n, e3.transformResults || []);
-    }(e2, t))) : [];
+    })(e2, t)))) : [];
   }
   function __PRIVATE_toDocumentsTarget(e, t) {
     return {
@@ -14598,40 +14598,40 @@
     }]) : (i = r.popLast(), n.structuredQuery.from = [{
       collectionId: r.lastSegment()
     }]), n.parent = __PRIVATE_toQueryPath(e, i);
-    const s = function __PRIVATE_toFilters(e2) {
+    const s = (function __PRIVATE_toFilters(e2) {
       if (0 === e2.length) return;
       return __PRIVATE_toFilter(CompositeFilter.create(
         e2,
         "and"
         /* CompositeOperator.AND */
       ));
-    }(t.filters);
+    })(t.filters);
     s && (n.structuredQuery.where = s);
-    const o = function __PRIVATE_toOrder(e2) {
+    const o = (function __PRIVATE_toOrder(e2) {
       if (0 === e2.length) return;
-      return e2.map((e3) => (
+      return e2.map(((e3) => (
         // visible for testing
-        function __PRIVATE_toPropertyOrder(e4) {
+        (function __PRIVATE_toPropertyOrder(e4) {
           return {
             field: __PRIVATE_toFieldPathReference(e4.field),
             direction: __PRIVATE_toDirection(e4.dir)
           };
-        }(e3)
-      ));
-    }(t.orderBy);
+        })(e3)
+      )));
+    })(t.orderBy);
     o && (n.structuredQuery.orderBy = o);
     const _ = __PRIVATE_toInt32Proto(e, t.limit);
-    return null !== _ && (n.structuredQuery.limit = _), t.startAt && (n.structuredQuery.startAt = function __PRIVATE_toStartAtCursor(e2) {
+    return null !== _ && (n.structuredQuery.limit = _), t.startAt && (n.structuredQuery.startAt = (function __PRIVATE_toStartAtCursor(e2) {
       return {
         before: e2.inclusive,
         values: e2.position
       };
-    }(t.startAt)), t.endAt && (n.structuredQuery.endAt = function __PRIVATE_toEndAtCursor(e2) {
+    })(t.startAt)), t.endAt && (n.structuredQuery.endAt = (function __PRIVATE_toEndAtCursor(e2) {
       return {
         before: !e2.inclusive,
         values: e2.position
       };
-    }(t.endAt)), {
+    })(t.endAt)), {
       ft: n,
       parent: i
     };
@@ -14646,18 +14646,18 @@
       e2.allDescendants ? i = e2.collectionId : t = t.child(e2.collectionId);
     }
     let s = [];
-    n.where && (s = function __PRIVATE_fromFilters(e2) {
+    n.where && (s = (function __PRIVATE_fromFilters(e2) {
       const t2 = __PRIVATE_fromFilter(e2);
       if (t2 instanceof CompositeFilter && __PRIVATE_compositeFilterIsFlatConjunction(t2)) return t2.getFilters();
       return [t2];
-    }(n.where));
+    })(n.where));
     let o = [];
-    n.orderBy && (o = function __PRIVATE_fromOrder(e2) {
-      return e2.map((e3) => function __PRIVATE_fromPropertyOrder(e4) {
+    n.orderBy && (o = (function __PRIVATE_fromOrder(e2) {
+      return e2.map(((e3) => (function __PRIVATE_fromPropertyOrder(e4) {
         return new OrderBy(
           __PRIVATE_fromFieldPathReference(e4.field),
           // visible for testing
-          function __PRIVATE_fromDirection(e5) {
+          (function __PRIVATE_fromDirection(e5) {
             switch (e5) {
               case "ASCENDING":
                 return "asc";
@@ -14666,28 +14666,28 @@
               default:
                 return;
             }
-          }(e4.direction)
+          })(e4.direction)
         );
-      }(e3));
-    }(n.orderBy));
+      })(e3)));
+    })(n.orderBy));
     let _ = null;
-    n.limit && (_ = function __PRIVATE_fromInt32Proto(e2) {
+    n.limit && (_ = (function __PRIVATE_fromInt32Proto(e2) {
       let t2;
       return t2 = "object" == typeof e2 ? e2.value : e2, __PRIVATE_isNullOrUndefined(t2) ? null : t2;
-    }(n.limit));
+    })(n.limit));
     let a = null;
-    n.startAt && (a = function __PRIVATE_fromStartAtCursor(e2) {
+    n.startAt && (a = (function __PRIVATE_fromStartAtCursor(e2) {
       const t2 = !!e2.before, n2 = e2.values || [];
       return new Bound(n2, t2);
-    }(n.startAt));
+    })(n.startAt));
     let u = null;
-    return n.endAt && (u = function __PRIVATE_fromEndAtCursor(e2) {
+    return n.endAt && (u = (function __PRIVATE_fromEndAtCursor(e2) {
       const t2 = !e2.before, n2 = e2.values || [];
       return new Bound(n2, t2);
-    }(n.endAt)), __PRIVATE_newQuery(t, i, o, s, _, "F", a, u);
+    })(n.endAt)), __PRIVATE_newQuery(t, i, o, s, _, "F", a, u);
   }
   function __PRIVATE_toListenRequestLabels(e, t) {
-    const n = function __PRIVATE_toLabel(e2) {
+    const n = (function __PRIVATE_toLabel(e2) {
       switch (e2) {
         case "TargetPurposeListen":
           return null;
@@ -14702,13 +14702,13 @@
             purpose: e2
           });
       }
-    }(t.purpose);
+    })(t.purpose);
     return null == n ? null : {
       "goog-listen-tags": n
     };
   }
   function __PRIVATE_fromFilter(e) {
-    return void 0 !== e.unaryFilter ? function __PRIVATE_fromUnaryFilter(e2) {
+    return void 0 !== e.unaryFilter ? (function __PRIVATE_fromUnaryFilter(e2) {
       switch (e2.unaryFilter.op) {
         case "IS_NAN":
           const t = __PRIVATE_fromFieldPathReference(e2.unaryFilter.field);
@@ -14735,8 +14735,8 @@
         default:
           return fail(60726);
       }
-    }(e) : void 0 !== e.fieldFilter ? function __PRIVATE_fromFieldFilter(e2) {
-      return FieldFilter.create(__PRIVATE_fromFieldPathReference(e2.fieldFilter.field), function __PRIVATE_fromOperatorName(e3) {
+    })(e) : void 0 !== e.fieldFilter ? (function __PRIVATE_fromFieldFilter(e2) {
+      return FieldFilter.create(__PRIVATE_fromFieldPathReference(e2.fieldFilter.field), (function __PRIVATE_fromOperatorName(e3) {
         switch (e3) {
           case "EQUAL":
             return "==";
@@ -14763,9 +14763,9 @@
           default:
             return fail(50506);
         }
-      }(e2.fieldFilter.op), e2.fieldFilter.value);
-    }(e) : void 0 !== e.compositeFilter ? function __PRIVATE_fromCompositeFilter(e2) {
-      return CompositeFilter.create(e2.compositeFilter.filters.map((e3) => __PRIVATE_fromFilter(e3)), function __PRIVATE_fromCompositeOperatorName(e3) {
+      })(e2.fieldFilter.op), e2.fieldFilter.value);
+    })(e) : void 0 !== e.compositeFilter ? (function __PRIVATE_fromCompositeFilter(e2) {
+      return CompositeFilter.create(e2.compositeFilter.filters.map(((e3) => __PRIVATE_fromFilter(e3))), (function __PRIVATE_fromCompositeOperatorName(e3) {
         switch (e3) {
           case "AND":
             return "and";
@@ -14774,8 +14774,8 @@
           default:
             return fail(1026);
         }
-      }(e2.compositeFilter.op));
-    }(e) : fail(30097, {
+      })(e2.compositeFilter.op));
+    })(e) : fail(30097, {
       filter: e
     });
   }
@@ -14797,7 +14797,7 @@
     return FieldPath$1.fromServerFormat(e.fieldPath);
   }
   function __PRIVATE_toFilter(e) {
-    return e instanceof FieldFilter ? function __PRIVATE_toUnaryOrFieldFilter(e2) {
+    return e instanceof FieldFilter ? (function __PRIVATE_toUnaryOrFieldFilter(e2) {
       if ("==" === e2.op) {
         if (__PRIVATE_isNanValue(e2.value)) return {
           unaryFilter: {
@@ -14832,8 +14832,8 @@
           value: e2.value
         }
       };
-    }(e) : e instanceof CompositeFilter ? function __PRIVATE_toCompositeFilter(e2) {
-      const t = e2.getFilters().map((e3) => __PRIVATE_toFilter(e3));
+    })(e) : e instanceof CompositeFilter ? (function __PRIVATE_toCompositeFilter(e2) {
+      const t = e2.getFilters().map(((e3) => __PRIVATE_toFilter(e3)));
       if (1 === t.length) return t[0];
       return {
         compositeFilter: {
@@ -14841,13 +14841,13 @@
           filters: t
         }
       };
-    }(e) : fail(54877, {
+    })(e) : fail(54877, {
       filter: e
     });
   }
   function __PRIVATE_toDocumentMask(e) {
     const t = [];
-    return e.fields.forEach((e2) => t.push(e2.canonicalString())), {
+    return e.fields.forEach(((e2) => t.push(e2.canonicalString()))), {
       fieldPaths: t
     };
   }
@@ -14977,9 +14977,9 @@
     }
     Lt(e, t) {
       this.Ft(t, 37);
-      DocumentKey.fromName(e).path.forEach((e2) => {
+      DocumentKey.fromName(e).path.forEach(((e2) => {
         this.Ft(t, 60), this.$t(e2, t);
-      });
+      }));
     }
     Ft(e, t) {
       e.Mt(t);
@@ -15126,7 +15126,7 @@
       return null !== this.Rr;
     }
     Ar(e) {
-      __PRIVATE_logDebug(Dt, `Garbage collection scheduled in ${e}ms`), this.Rr = this.asyncQueue.enqueueAfterDelay("lru_garbage_collection", e, async () => {
+      __PRIVATE_logDebug(Dt, `Garbage collection scheduled in ${e}ms`), this.Rr = this.asyncQueue.enqueueAfterDelay("lru_garbage_collection", e, (async () => {
         this.Rr = null;
         try {
           await this.localStore.collectGarbage(this.garbageCollector);
@@ -15134,7 +15134,7 @@
           __PRIVATE_isIndexedDbTransactionError(e2) ? __PRIVATE_logDebug(Dt, "Ignoring IndexedDB error during garbage collection: ", e2) : await __PRIVATE_ignoreIfPrimaryLeaseLoss(e2);
         }
         await this.Ar(3e5);
-      });
+      }));
     }
   };
   var __PRIVATE_LruGarbageCollectorImpl = class {
@@ -15142,12 +15142,12 @@
       this.Vr = e, this.params = t;
     }
     calculateTargetCount(e, t) {
-      return this.Vr.dr(e).next((e2) => Math.floor(t / 100 * e2));
+      return this.Vr.dr(e).next(((e2) => Math.floor(t / 100 * e2)));
     }
     nthSequenceNumber(e, t) {
       if (0 === t) return PersistencePromise.resolve(__PRIVATE_ListenSequence.ce);
       const n = new __PRIVATE_RollingSequenceNumberBuffer(t);
-      return this.Vr.forEachTarget(e, (e2) => n.Er(e2.sequenceNumber)).next(() => this.Vr.mr(e, (e2) => n.Er(e2))).next(() => n.maxValue);
+      return this.Vr.forEachTarget(e, ((e2) => n.Er(e2.sequenceNumber))).next((() => this.Vr.mr(e, ((e2) => n.Er(e2))))).next((() => n.maxValue));
     }
     removeTargets(e, t, n) {
       return this.Vr.removeTargets(e, t, n);
@@ -15156,7 +15156,7 @@
       return this.Vr.removeOrphanedDocuments(e, t);
     }
     collect(e, t) {
-      return -1 === this.params.cacheSizeCollectionThreshold ? (__PRIVATE_logDebug("LruGarbageCollector", "Garbage collection skipped; disabled"), PersistencePromise.resolve(bt)) : this.getCacheSize(e).next((n) => n < this.params.cacheSizeCollectionThreshold ? (__PRIVATE_logDebug("LruGarbageCollector", `Garbage collection skipped; Cache size ${n} is lower than threshold ${this.params.cacheSizeCollectionThreshold}`), bt) : this.gr(e, t));
+      return -1 === this.params.cacheSizeCollectionThreshold ? (__PRIVATE_logDebug("LruGarbageCollector", "Garbage collection skipped; disabled"), PersistencePromise.resolve(bt)) : this.getCacheSize(e).next(((n) => n < this.params.cacheSizeCollectionThreshold ? (__PRIVATE_logDebug("LruGarbageCollector", `Garbage collection skipped; Cache size ${n} is lower than threshold ${this.params.cacheSizeCollectionThreshold}`), bt) : this.gr(e, t)));
     }
     getCacheSize(e) {
       return this.Vr.getCacheSize(e);
@@ -15164,10 +15164,10 @@
     gr(e, t) {
       let n, r, i, s, o, _, a;
       const u = Date.now();
-      return this.calculateTargetCount(e, this.params.percentileToCollect).next((t2) => (
+      return this.calculateTargetCount(e, this.params.percentileToCollect).next(((t2) => (
         // Cap at the configured max
         (t2 > this.params.maximumSequenceNumbersToCollect ? (__PRIVATE_logDebug("LruGarbageCollector", `Capping sequence numbers to collect down to the maximum of ${this.params.maximumSequenceNumbersToCollect} from ${t2}`), r = this.params.maximumSequenceNumbersToCollect) : r = t2, s = Date.now(), this.nthSequenceNumber(e, r))
-      )).next((r2) => (n = r2, o = Date.now(), this.removeTargets(e, n, t))).next((t2) => (i = t2, _ = Date.now(), this.removeOrphanedDocuments(e, n))).next((e2) => {
+      ))).next(((r2) => (n = r2, o = Date.now(), this.removeTargets(e, n, t)))).next(((t2) => (i = t2, _ = Date.now(), this.removeOrphanedDocuments(e, n)))).next(((e2) => {
         if (a = Date.now(), __PRIVATE_getLogLevel() <= LogLevel.DEBUG) {
           __PRIVATE_logDebug("LruGarbageCollector", `LRU Garbage Collection
 	Counted targets in ${s - u}ms
@@ -15182,7 +15182,7 @@ Total Duration: ${a - u}ms`);
           targetsRemoved: i,
           documentsRemoved: e2
         });
-      });
+      }));
     }
   };
   function __PRIVATE_newLruGarbageCollector(e, t) {
@@ -15190,7 +15190,7 @@ Total Duration: ${a - u}ms`);
   }
   var RemoteDocumentChangeBuffer = class {
     constructor() {
-      this.changes = new ObjectMap((e) => e.toString(), (e, t) => e.isEqual(t)), this.changesApplied = false;
+      this.changes = new ObjectMap(((e) => e.toString()), ((e, t) => e.isEqual(t))), this.changesApplied = false;
     }
     /**
      * Buffers a `RemoteDocumentCache.addEntry()` call.
@@ -15267,7 +15267,7 @@ Total Duration: ${a - u}ms`);
      */
     getDocument(e, t) {
       let n = null;
-      return this.documentOverlayCache.getOverlay(e, t).next((r) => (n = r, this.remoteDocumentCache.getEntry(e, t))).next((e2) => (null !== n && __PRIVATE_mutationApplyToLocalView(n.mutation, e2, FieldMask.empty(), Timestamp.now()), e2));
+      return this.documentOverlayCache.getOverlay(e, t).next(((r) => (n = r, this.remoteDocumentCache.getEntry(e, t)))).next(((e2) => (null !== n && __PRIVATE_mutationApplyToLocalView(n.mutation, e2, FieldMask.empty(), Timestamp.now()), e2)));
     }
     /**
      * Gets the local view of the documents identified by `keys`.
@@ -15276,7 +15276,7 @@ Total Duration: ${a - u}ms`);
      * be stored for that key in the resulting set.
      */
     getDocuments(e, t) {
-      return this.remoteDocumentCache.getEntries(e, t).next((t2) => this.getLocalViewOfDocuments(e, t2, __PRIVATE_documentKeySet()).next(() => t2));
+      return this.remoteDocumentCache.getEntries(e, t).next(((t2) => this.getLocalViewOfDocuments(e, t2, __PRIVATE_documentKeySet()).next((() => t2))));
     }
     /**
      * Similar to `getDocuments`, but creates the local view from the given
@@ -15290,12 +15290,12 @@ Total Duration: ${a - u}ms`);
      */
     getLocalViewOfDocuments(e, t, n = __PRIVATE_documentKeySet()) {
       const r = __PRIVATE_newOverlayMap();
-      return this.populateOverlays(e, r, t).next(() => this.computeViews(e, t, r, n).next((e2) => {
+      return this.populateOverlays(e, r, t).next((() => this.computeViews(e, t, r, n).next(((e2) => {
         let t2 = documentMap();
-        return e2.forEach((e3, n2) => {
+        return e2.forEach(((e3, n2) => {
           t2 = t2.insert(e3, n2.overlayedDocument);
-        }), t2;
-      }));
+        })), t2;
+      }))));
     }
     /**
      * Gets the overlayed documents for the given document map, which will include
@@ -15304,7 +15304,7 @@ Total Duration: ${a - u}ms`);
      */
     getOverlayedDocuments(e, t) {
       const n = __PRIVATE_newOverlayMap();
-      return this.populateOverlays(e, n, t).next(() => this.computeViews(e, t, n, __PRIVATE_documentKeySet()));
+      return this.populateOverlays(e, n, t).next((() => this.computeViews(e, t, n, __PRIVATE_documentKeySet())));
     }
     /**
      * Fetches the overlays for {@code docs} and adds them to provided overlay map
@@ -15312,13 +15312,13 @@ Total Duration: ${a - u}ms`);
      */
     populateOverlays(e, t, n) {
       const r = [];
-      return n.forEach((e2) => {
+      return n.forEach(((e2) => {
         t.has(e2) || r.push(e2);
-      }), this.documentOverlayCache.getOverlays(e, r).next((e2) => {
-        e2.forEach((e3, n2) => {
+      })), this.documentOverlayCache.getOverlays(e, r).next(((e2) => {
+        e2.forEach(((e3, n2) => {
           t.set(e3, n2);
-        });
-      });
+        }));
+      }));
     }
     /**
      * Computes the local view for the given documents.
@@ -15334,53 +15334,53 @@ Total Duration: ${a - u}ms`);
      */
     computeViews(e, t, n, r) {
       let i = __PRIVATE_mutableDocumentMap();
-      const s = __PRIVATE_newDocumentKeyMap(), o = function __PRIVATE_newOverlayedDocumentMap() {
+      const s = __PRIVATE_newDocumentKeyMap(), o = (function __PRIVATE_newOverlayedDocumentMap() {
         return __PRIVATE_newDocumentKeyMap();
-      }();
-      return t.forEach((e2, t2) => {
+      })();
+      return t.forEach(((e2, t2) => {
         const o2 = n.get(t2.key);
         r.has(t2.key) && (void 0 === o2 || o2.mutation instanceof __PRIVATE_PatchMutation) ? i = i.insert(t2.key, t2) : void 0 !== o2 ? (s.set(t2.key, o2.mutation.getFieldMask()), __PRIVATE_mutationApplyToLocalView(o2.mutation, t2, o2.mutation.getFieldMask(), Timestamp.now())) : (
           // no overlay exists
           // Using EMPTY to indicate there is no overlay for the document.
           s.set(t2.key, FieldMask.empty())
         );
-      }), this.recalculateAndSaveOverlays(e, i).next((e2) => (e2.forEach((e3, t2) => s.set(e3, t2)), t.forEach((e3, t2) => {
+      })), this.recalculateAndSaveOverlays(e, i).next(((e2) => (e2.forEach(((e3, t2) => s.set(e3, t2))), t.forEach(((e3, t2) => {
         var _a;
         return o.set(e3, new OverlayedDocument(t2, (_a = s.get(e3)) != null ? _a : null));
-      }), o));
+      })), o)));
     }
     recalculateAndSaveOverlays(e, t) {
       const n = __PRIVATE_newDocumentKeyMap();
-      let r = new SortedMap((e2, t2) => e2 - t2), i = __PRIVATE_documentKeySet();
-      return this.mutationQueue.getAllMutationBatchesAffectingDocumentKeys(e, t).next((e2) => {
-        for (const i2 of e2) i2.keys().forEach((e3) => {
+      let r = new SortedMap(((e2, t2) => e2 - t2)), i = __PRIVATE_documentKeySet();
+      return this.mutationQueue.getAllMutationBatchesAffectingDocumentKeys(e, t).next(((e2) => {
+        for (const i2 of e2) i2.keys().forEach(((e3) => {
           const s = t.get(e3);
           if (null === s) return;
           let o = n.get(e3) || FieldMask.empty();
           o = i2.applyToLocalView(s, o), n.set(e3, o);
           const _ = (r.get(i2.batchId) || __PRIVATE_documentKeySet()).add(e3);
           r = r.insert(i2.batchId, _);
-        });
-      }).next(() => {
+        }));
+      })).next((() => {
         const s = [], o = r.getReverseIterator();
         for (; o.hasNext(); ) {
           const r2 = o.getNext(), _ = r2.key, a = r2.value, u = __PRIVATE_newMutationMap();
-          a.forEach((e2) => {
+          a.forEach(((e2) => {
             if (!i.has(e2)) {
               const r3 = __PRIVATE_calculateOverlayMutation(t.get(e2), n.get(e2));
               null !== r3 && u.set(e2, r3), i = i.add(e2);
             }
-          }), s.push(this.documentOverlayCache.saveOverlays(e, _, u));
+          })), s.push(this.documentOverlayCache.saveOverlays(e, _, u));
         }
         return PersistencePromise.waitFor(s);
-      }).next(() => n);
+      })).next((() => n));
     }
     /**
      * Recalculates overlays by reading the documents from remote document cache
      * first, and saves them after they are calculated.
      */
     recalculateAndSaveOverlaysForDocumentKeys(e, t) {
-      return this.remoteDocumentCache.getEntries(e, t).next((t2) => this.recalculateAndSaveOverlays(e, t2));
+      return this.remoteDocumentCache.getEntries(e, t).next(((t2) => this.recalculateAndSaveOverlays(e, t2)));
     }
     /**
      * Performs a query against the local view of all documents.
@@ -15410,28 +15410,28 @@ Total Duration: ${a - u}ms`);
      * @returns A LocalWriteResult with the documents that follow the provided offset and the last processed batch id.
      */
     getNextDocuments(e, t, n, r) {
-      return this.remoteDocumentCache.getAllFromCollectionGroup(e, t, n, r).next((i) => {
+      return this.remoteDocumentCache.getAllFromCollectionGroup(e, t, n, r).next(((i) => {
         const s = r - i.size > 0 ? this.documentOverlayCache.getOverlaysForCollectionGroup(e, t, n.largestBatchId, r - i.size) : PersistencePromise.resolve(__PRIVATE_newOverlayMap());
         let o = N, _ = i;
-        return s.next((t2) => PersistencePromise.forEach(t2, (t3, n2) => (o < n2.largestBatchId && (o = n2.largestBatchId), i.get(t3) ? PersistencePromise.resolve() : this.remoteDocumentCache.getEntry(e, t3).next((e2) => {
+        return s.next(((t2) => PersistencePromise.forEach(t2, ((t3, n2) => (o < n2.largestBatchId && (o = n2.largestBatchId), i.get(t3) ? PersistencePromise.resolve() : this.remoteDocumentCache.getEntry(e, t3).next(((e2) => {
           _ = _.insert(t3, e2);
-        }))).next(() => this.populateOverlays(e, t2, i)).next(() => this.computeViews(e, _, t2, __PRIVATE_documentKeySet())).next((e2) => ({
+        }))))).next((() => this.populateOverlays(e, t2, i))).next((() => this.computeViews(e, _, t2, __PRIVATE_documentKeySet()))).next(((e2) => ({
           batchId: o,
           changes: __PRIVATE_convertOverlayedDocumentMapToDocumentMap(e2)
-        })));
-      });
+        })))));
+      }));
     }
     getDocumentsMatchingDocumentQuery(e, t) {
-      return this.getDocument(e, new DocumentKey(t)).next((e2) => {
+      return this.getDocument(e, new DocumentKey(t)).next(((e2) => {
         let t2 = documentMap();
         return e2.isFoundDocument() && (t2 = t2.insert(e2.key, e2)), t2;
-      });
+      }));
     }
     getDocumentsMatchingCollectionGroupQuery(e, t, n, r) {
       const i = t.collectionGroup;
       let s = documentMap();
-      return this.indexManager.getCollectionParents(e, i).next((o) => PersistencePromise.forEach(o, (o2) => {
-        const _ = function __PRIVATE_asCollectionQueryAtPath(e2, t2) {
+      return this.indexManager.getCollectionParents(e, i).next(((o) => PersistencePromise.forEach(o, ((o2) => {
+        const _ = (function __PRIVATE_asCollectionQueryAtPath(e2, t2) {
           return new __PRIVATE_QueryImpl(
             t2,
             /*collectionGroup=*/
@@ -15443,28 +15443,28 @@ Total Duration: ${a - u}ms`);
             e2.startAt,
             e2.endAt
           );
-        }(t, o2.child(i));
-        return this.getDocumentsMatchingCollectionQuery(e, _, n, r).next((e2) => {
-          e2.forEach((e3, t2) => {
+        })(t, o2.child(i));
+        return this.getDocumentsMatchingCollectionQuery(e, _, n, r).next(((e2) => {
+          e2.forEach(((e3, t2) => {
             s = s.insert(e3, t2);
-          });
-        });
-      }).next(() => s));
+          }));
+        }));
+      })).next((() => s))));
     }
     getDocumentsMatchingCollectionQuery(e, t, n, r) {
       let i;
-      return this.documentOverlayCache.getOverlaysForCollection(e, t.path, n.largestBatchId).next((s) => (i = s, this.remoteDocumentCache.getDocumentsMatchingQuery(e, t, n, i, r))).next((e2) => {
-        i.forEach((t2, n3) => {
+      return this.documentOverlayCache.getOverlaysForCollection(e, t.path, n.largestBatchId).next(((s) => (i = s, this.remoteDocumentCache.getDocumentsMatchingQuery(e, t, n, i, r)))).next(((e2) => {
+        i.forEach(((t2, n3) => {
           const r2 = n3.getKey();
           null === e2.get(r2) && (e2 = e2.insert(r2, MutableDocument.newInvalidDocument(r2)));
-        });
+        }));
         let n2 = documentMap();
-        return e2.forEach((e3, r2) => {
+        return e2.forEach(((e3, r2) => {
           const s = i.get(e3);
           void 0 !== s && __PRIVATE_mutationApplyToLocalView(s.mutation, r2, FieldMask.empty(), Timestamp.now()), // Finally, insert the documents that still match the query
           __PRIVATE_queryMatches(t, r2) && (n2 = n2.insert(e3, r2));
-        }), n2;
-      });
+        })), n2;
+      }));
     }
   };
   var __PRIVATE_MemoryBundleCache = class {
@@ -15478,26 +15478,26 @@ Total Duration: ${a - u}ms`);
       return this.Nr.set(
         t.id,
         /** Decodes a BundleMetadata proto into a BundleMetadata object. */
-        function __PRIVATE_fromBundleMetadata(e2) {
+        (function __PRIVATE_fromBundleMetadata(e2) {
           return {
             id: e2.id,
             version: e2.version,
             createTime: __PRIVATE_fromVersion(e2.createTime)
           };
-        }(t)
+        })(t)
       ), PersistencePromise.resolve();
     }
     getNamedQuery(e, t) {
       return PersistencePromise.resolve(this.Br.get(t));
     }
     saveNamedQuery(e, t) {
-      return this.Br.set(t.name, function __PRIVATE_fromProtoNamedQuery(e2) {
+      return this.Br.set(t.name, (function __PRIVATE_fromProtoNamedQuery(e2) {
         return {
           name: e2.name,
           query: __PRIVATE_fromBundledQuery(e2.bundledQuery),
           readTime: __PRIVATE_fromVersion(e2.readTime)
         };
-      }(t)), PersistencePromise.resolve();
+      })(t)), PersistencePromise.resolve();
     }
   };
   var __PRIVATE_MemoryDocumentOverlayCache = class {
@@ -15509,18 +15509,18 @@ Total Duration: ${a - u}ms`);
     }
     getOverlays(e, t) {
       const n = __PRIVATE_newOverlayMap();
-      return PersistencePromise.forEach(t, (t2) => this.getOverlay(e, t2).next((e2) => {
+      return PersistencePromise.forEach(t, ((t2) => this.getOverlay(e, t2).next(((e2) => {
         null !== e2 && n.set(t2, e2);
-      })).next(() => n);
+      })))).next((() => n));
     }
     saveOverlays(e, t, n) {
-      return n.forEach((n2, r) => {
+      return n.forEach(((n2, r) => {
         this.St(e, t, r);
-      }), PersistencePromise.resolve();
+      })), PersistencePromise.resolve();
     }
     removeOverlaysForBatchId(e, t, n) {
       const r = this.Lr.get(n);
-      return void 0 !== r && (r.forEach((e2) => this.overlays = this.overlays.remove(e2)), this.Lr.delete(n)), PersistencePromise.resolve();
+      return void 0 !== r && (r.forEach(((e2) => this.overlays = this.overlays.remove(e2))), this.Lr.delete(n)), PersistencePromise.resolve();
     }
     getOverlaysForCollection(e, t, n) {
       const r = __PRIVATE_newOverlayMap(), i = t.length + 1, s = new DocumentKey(t.child("")), o = this.overlays.getIteratorFrom(s);
@@ -15532,7 +15532,7 @@ Total Duration: ${a - u}ms`);
       return PersistencePromise.resolve(r);
     }
     getOverlaysForCollectionGroup(e, t, n, r) {
-      let i = new SortedMap((e2, t2) => e2 - t2);
+      let i = new SortedMap(((e2, t2) => e2 - t2));
       const s = this.overlays.getIterator();
       for (; s.hasNext(); ) {
         const e2 = s.getNext().value;
@@ -15543,7 +15543,7 @@ Total Duration: ${a - u}ms`);
       }
       const o = __PRIVATE_newOverlayMap(), _ = i.getIterator();
       for (; _.hasNext(); ) {
-        if (_.getNext().value.forEach((e2, t2) => o.set(e2, t2)), o.size() >= r) break;
+        if (_.getNext().value.forEach(((e2, t2) => o.set(e2, t2))), o.size() >= r) break;
       }
       return PersistencePromise.resolve(o);
     }
@@ -15585,7 +15585,7 @@ Total Duration: ${a - u}ms`);
     }
     /** Add references to the given document keys for the given ID. */
     $r(e, t) {
-      e.forEach((e2) => this.addReference(e2, t));
+      e.forEach(((e2) => this.addReference(e2, t)));
     }
     /**
      * Removes a reference to the given document key for the given
@@ -15595,7 +15595,7 @@ Total Duration: ${a - u}ms`);
       this.Wr(new __PRIVATE_DocReference(e, t));
     }
     Qr(e, t) {
-      e.forEach((e2) => this.removeReference(e2, t));
+      e.forEach(((e2) => this.removeReference(e2, t)));
     }
     /**
      * Clears all references with a given ID. Calls removeRef() for each key
@@ -15603,12 +15603,12 @@ Total Duration: ${a - u}ms`);
      */
     Gr(e) {
       const t = new DocumentKey(new ResourcePath([])), n = new __PRIVATE_DocReference(t, e), r = new __PRIVATE_DocReference(t, e + 1), i = [];
-      return this.qr.forEachInRange([n, r], (e2) => {
+      return this.qr.forEachInRange([n, r], ((e2) => {
         this.Wr(e2), i.push(e2.key);
-      }), i;
+      })), i;
     }
     zr() {
-      this.kr.forEach((e) => this.Wr(e));
+      this.kr.forEach(((e) => this.Wr(e)));
     }
     Wr(e) {
       this.kr = this.kr.delete(e), this.qr = this.qr.delete(e);
@@ -15616,9 +15616,9 @@ Total Duration: ${a - u}ms`);
     jr(e) {
       const t = new DocumentKey(new ResourcePath([])), n = new __PRIVATE_DocReference(t, e), r = new __PRIVATE_DocReference(t, e + 1);
       let i = __PRIVATE_documentKeySet();
-      return this.qr.forEachInRange([n, r], (e2) => {
+      return this.qr.forEachInRange([n, r], ((e2) => {
         i = i.add(e2.key);
-      }), i;
+      })), i;
     }
     containsKey(e) {
       const t = new __PRIVATE_DocReference(e, 0), n = this.kr.firstAfterOrEqual(t);
@@ -15674,19 +15674,19 @@ Total Duration: ${a - u}ms`);
     }
     getAllMutationBatchesAffectingDocumentKey(e, t) {
       const n = new __PRIVATE_DocReference(t, 0), r = new __PRIVATE_DocReference(t, Number.POSITIVE_INFINITY), i = [];
-      return this.Hr.forEachInRange([n, r], (e2) => {
+      return this.Hr.forEachInRange([n, r], ((e2) => {
         const t2 = this.Zr(e2.Jr);
         i.push(t2);
-      }), PersistencePromise.resolve(i);
+      })), PersistencePromise.resolve(i);
     }
     getAllMutationBatchesAffectingDocumentKeys(e, t) {
       let n = new SortedSet(__PRIVATE_primitiveComparator);
-      return t.forEach((e2) => {
+      return t.forEach(((e2) => {
         const t2 = new __PRIVATE_DocReference(e2, 0), r = new __PRIVATE_DocReference(e2, Number.POSITIVE_INFINITY);
-        this.Hr.forEachInRange([t2, r], (e3) => {
+        this.Hr.forEachInRange([t2, r], ((e3) => {
           n = n.add(e3.Jr);
-        });
-      }), PersistencePromise.resolve(this.Yr(n));
+        }));
+      })), PersistencePromise.resolve(this.Yr(n));
     }
     getAllMutationBatchesAffectingQuery(e, t) {
       const n = t.path, r = n.length + 1;
@@ -15694,7 +15694,7 @@ Total Duration: ${a - u}ms`);
       DocumentKey.isDocumentKey(i) || (i = i.child(""));
       const s = new __PRIVATE_DocReference(new DocumentKey(i), 0);
       let o = new SortedSet(__PRIVATE_primitiveComparator);
-      return this.Hr.forEachWhile((e2) => {
+      return this.Hr.forEachWhile(((e2) => {
         const t2 = e2.key.path;
         return !!n.isPrefixOf(t2) && // Rows with document keys more than one segment longer than the query
         // path can't be matches. For example, a query on 'rooms' can't match
@@ -15702,24 +15702,24 @@ Total Duration: ${a - u}ms`);
         // TODO(mcg): we'll need a different scanner when we implement
         // ancestor queries.
         (t2.length === r && (o = o.add(e2.Jr)), true);
-      }, s), PersistencePromise.resolve(this.Yr(o));
+      }), s), PersistencePromise.resolve(this.Yr(o));
     }
     Yr(e) {
       const t = [];
-      return e.forEach((e2) => {
+      return e.forEach(((e2) => {
         const n = this.Zr(e2);
         null !== n && t.push(n);
-      }), t;
+      })), t;
     }
     removeMutationBatch(e, t) {
       __PRIVATE_hardAssert(0 === this.ei(t.batchId, "removed"), 55003), this.mutationQueue.shift();
       let n = this.Hr;
-      return PersistencePromise.forEach(t.mutations, (r) => {
+      return PersistencePromise.forEach(t.mutations, ((r) => {
         const i = new __PRIVATE_DocReference(r.key, t.batchId);
         return n = n.delete(i), this.referenceDelegate.markPotentiallyOrphaned(e, r.key);
-      }).next(() => {
+      })).next((() => {
         this.Hr = n;
-      });
+      }));
     }
     nr(e) {
     }
@@ -15773,9 +15773,9 @@ Total Duration: ${a - u}ms`);
      */
     constructor(e) {
       this.ti = e, /** Underlying cache of documents and their read times. */
-      this.docs = function __PRIVATE_documentEntryMap() {
+      this.docs = (function __PRIVATE_documentEntryMap() {
         return new SortedMap(DocumentKey.comparator);
-      }(), /** Size of all cached documents. */
+      })(), /** Size of all cached documents. */
       this.size = 0;
     }
     setIndexManager(e) {
@@ -15810,10 +15810,10 @@ Total Duration: ${a - u}ms`);
     }
     getEntries(e, t) {
       let n = __PRIVATE_mutableDocumentMap();
-      return t.forEach((e2) => {
+      return t.forEach(((e2) => {
         const t2 = this.docs.get(e2);
         n = n.insert(e2, t2 ? t2.document.mutableCopy() : MutableDocument.newInvalidDocument(e2));
-      }), PersistencePromise.resolve(n);
+      })), PersistencePromise.resolve(n);
     }
     getDocumentsMatchingQuery(e, t, n, r) {
       let i = __PRIVATE_mutableDocumentMap();
@@ -15829,7 +15829,7 @@ Total Duration: ${a - u}ms`);
       fail(9500);
     }
     ni(e, t) {
-      return PersistencePromise.forEach(this.docs, (e2) => t(e2));
+      return PersistencePromise.forEach(this.docs, ((e2) => t(e2)));
     }
     newChangeBuffer(e) {
       return new __PRIVATE_MemoryRemoteDocumentChangeBuffer(this);
@@ -15844,9 +15844,9 @@ Total Duration: ${a - u}ms`);
     }
     applyChanges(e) {
       const t = [];
-      return this.changes.forEach((n, r) => {
+      return this.changes.forEach(((n, r) => {
         r.isValidDocument() ? t.push(this.Mr.addEntry(e, r)) : this.Mr.removeEntry(n);
-      }), PersistencePromise.waitFor(t);
+      })), PersistencePromise.waitFor(t);
     }
     getFromCache(e, t) {
       return this.Mr.getEntry(e, t);
@@ -15860,7 +15860,7 @@ Total Duration: ${a - u}ms`);
       this.persistence = e, /**
        * Maps a target to the data about that target
        */
-      this.ri = new ObjectMap((e2) => __PRIVATE_canonifyTarget(e2), __PRIVATE_targetEquals), /** The last received snapshot version. */
+      this.ri = new ObjectMap(((e2) => __PRIVATE_canonifyTarget(e2)), __PRIVATE_targetEquals), /** The last received snapshot version. */
       this.lastRemoteSnapshotVersion = SnapshotVersion.min(), /** The highest numbered target ID encountered. */
       this.highestTargetId = 0, /** The highest sequence number encountered. */
       this.ii = 0, /**
@@ -15870,7 +15870,7 @@ Total Duration: ${a - u}ms`);
       this.si = new __PRIVATE_ReferenceSet(), this.targetCount = 0, this.oi = __PRIVATE_TargetIdGenerator._r();
     }
     forEachTarget(e, t) {
-      return this.ri.forEach((e2, n) => t(n)), PersistencePromise.resolve();
+      return this.ri.forEach(((e2, n) => t(n))), PersistencePromise.resolve();
     }
     getLastRemoteSnapshotVersion(e) {
       return PersistencePromise.resolve(this.lastRemoteSnapshotVersion);
@@ -15901,9 +15901,9 @@ Total Duration: ${a - u}ms`);
     removeTargets(e, t, n) {
       let r = 0;
       const i = [];
-      return this.ri.forEach((s, o) => {
+      return this.ri.forEach(((s, o) => {
         o.sequenceNumber <= t && null === n.get(o.targetId) && (this.ri.delete(s), i.push(this.removeMatchingKeysForTargetId(e, o.targetId)), r++);
-      }), PersistencePromise.waitFor(i).next(() => r);
+      })), PersistencePromise.waitFor(i).next((() => r));
     }
     getTargetCount(e) {
       return PersistencePromise.resolve(this.targetCount);
@@ -15918,9 +15918,9 @@ Total Duration: ${a - u}ms`);
     removeMatchingKeys(e, t, n) {
       this.si.Qr(t, n);
       const r = this.persistence.referenceDelegate, i = [];
-      return r && t.forEach((t2) => {
+      return r && t.forEach(((t2) => {
         i.push(r.markPotentiallyOrphaned(e, t2));
-      }), PersistencePromise.waitFor(i);
+      })), PersistencePromise.waitFor(i);
     }
     removeMatchingKeysForTargetId(e, t) {
       return this.si.Gr(t), PersistencePromise.resolve();
@@ -15942,9 +15942,9 @@ Total Duration: ${a - u}ms`);
      */
     constructor(e, t) {
       this._i = {}, this.overlays = {}, this.ai = new __PRIVATE_ListenSequence(0), this.ui = false, this.ui = true, this.ci = new __PRIVATE_MemoryGlobalsCache(), this.referenceDelegate = e(this), this.li = new __PRIVATE_MemoryTargetCache(this);
-      this.indexManager = new __PRIVATE_MemoryIndexManager(), this.remoteDocumentCache = function __PRIVATE_newMemoryRemoteDocumentCache(e2) {
+      this.indexManager = new __PRIVATE_MemoryIndexManager(), this.remoteDocumentCache = (function __PRIVATE_newMemoryRemoteDocumentCache(e2) {
         return new __PRIVATE_MemoryRemoteDocumentCacheImpl(e2);
-      }((e2) => this.referenceDelegate.hi(e2)), this.serializer = new __PRIVATE_LocalSerializer(t), this.Pi = new __PRIVATE_MemoryBundleCache(this.serializer);
+      })(((e2) => this.referenceDelegate.hi(e2))), this.serializer = new __PRIVATE_LocalSerializer(t), this.Pi = new __PRIVATE_MemoryBundleCache(this.serializer);
     }
     start() {
       return Promise.resolve();
@@ -15985,10 +15985,10 @@ Total Duration: ${a - u}ms`);
     runTransaction(e, t, n) {
       __PRIVATE_logDebug("MemoryPersistence", "Starting transaction:", e);
       const r = new __PRIVATE_MemoryTransaction(this.ai.next());
-      return this.referenceDelegate.Ti(), n(r).next((e2) => this.referenceDelegate.Ii(r).next(() => e2)).toPromise().then((e2) => (r.raiseOnCommittedEvent(), e2));
+      return this.referenceDelegate.Ti(), n(r).next(((e2) => this.referenceDelegate.Ii(r).next((() => e2)))).toPromise().then(((e2) => (r.raiseOnCommittedEvent(), e2)));
     }
     Ei(e, t) {
-      return PersistencePromise.or(Object.values(this._i).map((n) => () => n.containsKey(e, t)));
+      return PersistencePromise.or(Object.values(this._i).map(((n) => () => n.containsKey(e, t))));
     }
   };
   var __PRIVATE_MemoryTransaction = class extends PersistenceTransaction {
@@ -16019,28 +16019,28 @@ Total Duration: ${a - u}ms`);
       return this.di.add(t.toString()), PersistencePromise.resolve();
     }
     removeTarget(e, t) {
-      this.Ri.Gr(t.targetId).forEach((e2) => this.di.add(e2.toString()));
+      this.Ri.Gr(t.targetId).forEach(((e2) => this.di.add(e2.toString())));
       const n = this.persistence.getTargetCache();
-      return n.getMatchingKeysForTargetId(e, t.targetId).next((e2) => {
-        e2.forEach((e3) => this.di.add(e3.toString()));
-      }).next(() => n.removeTargetData(e, t));
+      return n.getMatchingKeysForTargetId(e, t.targetId).next(((e2) => {
+        e2.forEach(((e3) => this.di.add(e3.toString())));
+      })).next((() => n.removeTargetData(e, t)));
     }
     Ti() {
       this.Ai = /* @__PURE__ */ new Set();
     }
     Ii(e) {
       const t = this.persistence.getRemoteDocumentCache().newChangeBuffer();
-      return PersistencePromise.forEach(this.di, (n) => {
+      return PersistencePromise.forEach(this.di, ((n) => {
         const r = DocumentKey.fromPath(n);
-        return this.mi(e, r).next((e2) => {
+        return this.mi(e, r).next(((e2) => {
           e2 || t.removeEntry(r, SnapshotVersion.min());
-        });
-      }).next(() => (this.Ai = null, t.apply(e)));
+        }));
+      })).next((() => (this.Ai = null, t.apply(e))));
     }
     updateLimboDocument(e, t) {
-      return this.mi(e, t).next((e2) => {
+      return this.mi(e, t).next(((e2) => {
         e2 ? this.di.delete(t.toString()) : this.di.add(t.toString());
-      });
+      }));
     }
     hi(e) {
       return 0;
@@ -16051,7 +16051,7 @@ Total Duration: ${a - u}ms`);
   };
   var __PRIVATE_MemoryLruDelegate = class ___PRIVATE_MemoryLruDelegate {
     constructor(e, t) {
-      this.persistence = e, this.fi = new ObjectMap((e2) => __PRIVATE_encodeResourcePath(e2.path), (e2, t2) => e2.isEqual(t2)), this.garbageCollector = __PRIVATE_newLruGarbageCollector(this, t);
+      this.persistence = e, this.fi = new ObjectMap(((e2) => __PRIVATE_encodeResourcePath(e2.path)), ((e2, t2) => e2.isEqual(t2))), this.garbageCollector = __PRIVATE_newLruGarbageCollector(this, t);
     }
     static Vi(e, t) {
       return new ___PRIVATE_MemoryLruDelegate(e, t);
@@ -16068,16 +16068,16 @@ Total Duration: ${a - u}ms`);
     }
     dr(e) {
       const t = this.pr(e);
-      return this.persistence.getTargetCache().getTargetCount(e).next((e2) => t.next((t2) => e2 + t2));
+      return this.persistence.getTargetCache().getTargetCount(e).next(((e2) => t.next(((t2) => e2 + t2))));
     }
     pr(e) {
       let t = 0;
-      return this.mr(e, (e2) => {
+      return this.mr(e, ((e2) => {
         t++;
-      }).next(() => t);
+      })).next((() => t));
     }
     mr(e, t) {
-      return PersistencePromise.forEach(this.fi, (n, r) => this.wr(e, n, r).next((e2) => e2 ? PersistencePromise.resolve() : t(r)));
+      return PersistencePromise.forEach(this.fi, ((n, r) => this.wr(e, n, r).next(((e2) => e2 ? PersistencePromise.resolve() : t(r)))));
     }
     removeTargets(e, t, n) {
       return this.persistence.getTargetCache().removeTargets(e, t, n);
@@ -16085,9 +16085,9 @@ Total Duration: ${a - u}ms`);
     removeOrphanedDocuments(e, t) {
       let n = 0;
       const r = this.persistence.getRemoteDocumentCache(), i = r.newChangeBuffer();
-      return r.ni(e, (r2) => this.wr(e, r2, t).next((e2) => {
+      return r.ni(e, ((r2) => this.wr(e, r2, t).next(((e2) => {
         e2 || (n++, i.removeEntry(r2, SnapshotVersion.min()));
-      })).next(() => i.apply(e)).next(() => n);
+      })))).next((() => i.apply(e))).next((() => n));
     }
     markPotentiallyOrphaned(e, t) {
       return this.fi.set(t, e.currentSequenceNumber), PersistencePromise.resolve();
@@ -16158,9 +16158,9 @@ Total Duration: ${a - u}ms`);
       * / ([docKey, docContent] per documents in full collection scan) coming from
       * experiment [enter PR experiment URL here].
       */
-      function __PRIVATE_getDefaultRelativeIndexReadCostPerDocument() {
+      (function __PRIVATE_getDefaultRelativeIndexReadCostPerDocument() {
         return isSafari() ? 8 : __PRIVATE_getAndroidVersion(getUA()) > 0 ? 6 : 4;
-      }();
+      })();
     }
     /** Sets the document view to query against. */
     initialize(e, t) {
@@ -16171,19 +16171,19 @@ Total Duration: ${a - u}ms`);
       const i = {
         result: null
       };
-      return this.gs(e, t).next((e2) => {
+      return this.gs(e, t).next(((e2) => {
         i.result = e2;
-      }).next(() => {
-        if (!i.result) return this.ps(e, t, r, n).next((e2) => {
+      })).next((() => {
+        if (!i.result) return this.ps(e, t, r, n).next(((e2) => {
           i.result = e2;
-        });
-      }).next(() => {
+        }));
+      })).next((() => {
         if (i.result) return;
         const n2 = new QueryContext();
-        return this.ys(e, t, n2).next((r2) => {
+        return this.ys(e, t, n2).next(((r2) => {
           if (i.result = r2, this.As) return this.ws(e, t, n2, r2.size);
-        });
-      }).next(() => i.result);
+        }));
+      })).next((() => i.result));
     }
     ws(e, t, n, r) {
       return n.documentReadCount < this.Vs ? (__PRIVATE_getLogLevel() <= LogLevel.DEBUG && __PRIVATE_logDebug("QueryEngine", "SDK will not create cache indexes for query:", __PRIVATE_stringifyQuery(t), "since it only creates cache indexes for collection contains", "more than or equal to", this.Vs, "documents"), PersistencePromise.resolve()) : (__PRIVATE_getLogLevel() <= LogLevel.DEBUG && __PRIVATE_logDebug("QueryEngine", "Query:", __PRIVATE_stringifyQuery(t), "scans", n.documentReadCount, "local documents and returns", r, "documents as results."), n.documentReadCount > this.ds * r ? (__PRIVATE_getLogLevel() <= LogLevel.DEBUG && __PRIVATE_logDebug("QueryEngine", "The SDK decides to create cache indexes for query:", __PRIVATE_stringifyQuery(t), "as using cache indexes may help improve performance."), this.indexManager.createTargetIndexes(e, __PRIVATE_queryToTarget(t))) : PersistencePromise.resolve());
@@ -16196,7 +16196,7 @@ Total Duration: ${a - u}ms`);
       if (__PRIVATE_queryMatchesAllDocuments(t))
         return PersistencePromise.resolve(null);
       let n = __PRIVATE_queryToTarget(t);
-      return this.indexManager.getIndexType(e, n).next((r) => 0 === r ? null : (null !== t.limit && 1 === r && // We cannot apply a limit for targets that are served using a partial
+      return this.indexManager.getIndexType(e, n).next(((r) => 0 === r ? null : (null !== t.limit && 1 === r && // We cannot apply a limit for targets that are served using a partial
       // index. If a partial index will be used to serve the target, the
       // query may return a superset of documents that match the target
       // (e.g. if the index doesn't include all the target's filters), or
@@ -16208,9 +16208,9 @@ Total Duration: ${a - u}ms`);
         null,
         "F"
         /* LimitType.First */
-      ), n = __PRIVATE_queryToTarget(t)), this.indexManager.getDocumentsMatchingTarget(e, n).next((r2) => {
+      ), n = __PRIVATE_queryToTarget(t)), this.indexManager.getDocumentsMatchingTarget(e, n).next(((r2) => {
         const i = __PRIVATE_documentKeySet(...r2);
-        return this.fs.getDocuments(e, i).next((r3) => this.indexManager.getMinOffset(e, n).next((n2) => {
+        return this.fs.getDocuments(e, i).next(((r3) => this.indexManager.getMinOffset(e, n).next(((n2) => {
           const s = this.Ss(t, r3);
           return this.bs(t, s, i, n2.readTime) ? this.gs(e, __PRIVATE_queryWithLimit(
             t,
@@ -16218,25 +16218,25 @@ Total Duration: ${a - u}ms`);
             "F"
             /* LimitType.First */
           )) : this.Ds(e, s, t, n2);
-        }));
-      })));
+        }))));
+      })))));
     }
     /**
      * Performs a query based on the target's persisted query mapping. Returns
      * `null` if the mapping is not available or cannot be used.
      */
     ps(e, t, n, r) {
-      return __PRIVATE_queryMatchesAllDocuments(t) || r.isEqual(SnapshotVersion.min()) ? PersistencePromise.resolve(null) : this.fs.getDocuments(e, n).next((i) => {
+      return __PRIVATE_queryMatchesAllDocuments(t) || r.isEqual(SnapshotVersion.min()) ? PersistencePromise.resolve(null) : this.fs.getDocuments(e, n).next(((i) => {
         const s = this.Ss(t, i);
-        return this.bs(t, s, n, r) ? PersistencePromise.resolve(null) : (__PRIVATE_getLogLevel() <= LogLevel.DEBUG && __PRIVATE_logDebug("QueryEngine", "Re-using previous result from %s to execute query: %s", r.toString(), __PRIVATE_stringifyQuery(t)), this.Ds(e, s, t, __PRIVATE_newIndexOffsetSuccessorFromReadTime(r, N)).next((e2) => e2));
-      });
+        return this.bs(t, s, n, r) ? PersistencePromise.resolve(null) : (__PRIVATE_getLogLevel() <= LogLevel.DEBUG && __PRIVATE_logDebug("QueryEngine", "Re-using previous result from %s to execute query: %s", r.toString(), __PRIVATE_stringifyQuery(t)), this.Ds(e, s, t, __PRIVATE_newIndexOffsetSuccessorFromReadTime(r, N)).next(((e2) => e2)));
+      }));
     }
     /** Applies the query filter and sorting to the provided documents.  */
     Ss(e, t) {
       let n = new SortedSet(__PRIVATE_newQueryComparator(e));
-      return t.forEach((t2, r) => {
+      return t.forEach(((t2, r) => {
         __PRIVATE_queryMatches(e, r) && (n = n.add(r));
-      }), n;
+      })), n;
     }
     /**
      * Determines if a limit query needs to be refilled from cache, making it
@@ -16266,12 +16266,12 @@ Total Duration: ${a - u}ms`);
      * that have not yet been indexed.
      */
     Ds(e, t, n, r) {
-      return this.fs.getDocumentsMatchingQuery(e, n, r).next((e2) => (
+      return this.fs.getDocumentsMatchingQuery(e, n, r).next(((e2) => (
         // Merge with existing results
-        (t.forEach((t2) => {
+        (t.forEach(((t2) => {
           e2 = e2.insert(t2.key, t2);
-        }), e2)
-      ));
+        })), e2)
+      )));
     }
   };
   var Nt = "LocalStore";
@@ -16286,7 +16286,7 @@ Total Duration: ${a - u}ms`);
        */
       this.vs = new SortedMap(__PRIVATE_primitiveComparator), /** Maps a target to its targetID. */
       // TODO(wuandy): Evaluate if TargetId can be part of Target.
-      this.Fs = new ObjectMap((e2) => __PRIVATE_canonifyTarget(e2), __PRIVATE_targetEquals), /**
+      this.Fs = new ObjectMap(((e2) => __PRIVATE_canonifyTarget(e2)), __PRIVATE_targetEquals), /**
        * A per collection group index of the last read time processed by
        * `getNewDocumentChanges()`.
        *
@@ -16298,7 +16298,7 @@ Total Duration: ${a - u}ms`);
       this.documentOverlayCache = this.persistence.getDocumentOverlayCache(e), this.indexManager = this.persistence.getIndexManager(e), this.mutationQueue = this.persistence.getMutationQueue(e, this.indexManager), this.localDocuments = new LocalDocumentsView(this.xs, this.mutationQueue, this.documentOverlayCache, this.indexManager), this.xs.setIndexManager(this.indexManager), this.Cs.initialize(this.localDocuments, this.indexManager);
     }
     collectGarbage(e) {
-      return this.persistence.runTransaction("Collect garbage", "readwrite-primary", (t) => e.collect(t, this.vs));
+      return this.persistence.runTransaction("Collect garbage", "readwrite-primary", ((t) => e.collect(t, this.vs)));
     }
   };
   function __PRIVATE_newLocalStore(e, t, n, r) {
@@ -16306,9 +16306,9 @@ Total Duration: ${a - u}ms`);
   }
   async function __PRIVATE_localStoreHandleUserChange(e, t) {
     const n = __PRIVATE_debugCast(e);
-    return await n.persistence.runTransaction("Handle user change", "readonly", (e2) => {
+    return await n.persistence.runTransaction("Handle user change", "readonly", ((e2) => {
       let r;
-      return n.mutationQueue.getAllMutationBatches(e2).next((i) => (r = i, n.Os(t), n.mutationQueue.getAllMutationBatches(e2))).next((t2) => {
+      return n.mutationQueue.getAllMutationBatches(e2).next(((i) => (r = i, n.Os(t), n.mutationQueue.getAllMutationBatches(e2)))).next(((t2) => {
         const i = [], s = [];
         let o = __PRIVATE_documentKeySet();
         for (const e3 of r) {
@@ -16319,58 +16319,58 @@ Total Duration: ${a - u}ms`);
           s.push(e3.batchId);
           for (const t3 of e3.mutations) o = o.add(t3.key);
         }
-        return n.localDocuments.getDocuments(e2, o).next((e3) => ({
+        return n.localDocuments.getDocuments(e2, o).next(((e3) => ({
           Ns: e3,
           removedBatchIds: i,
           addedBatchIds: s
-        }));
-      });
-    });
+        })));
+      }));
+    }));
   }
   function __PRIVATE_localStoreAcknowledgeBatch(e, t) {
     const n = __PRIVATE_debugCast(e);
-    return n.persistence.runTransaction("Acknowledge batch", "readwrite-primary", (e2) => {
+    return n.persistence.runTransaction("Acknowledge batch", "readwrite-primary", ((e2) => {
       const r = t.batch.keys(), i = n.xs.newChangeBuffer({
         trackRemovals: true
       });
-      return function __PRIVATE_applyWriteToRemoteDocuments(e3, t2, n2, r2) {
+      return (function __PRIVATE_applyWriteToRemoteDocuments(e3, t2, n2, r2) {
         const i2 = n2.batch, s = i2.keys();
         let o = PersistencePromise.resolve();
-        return s.forEach((e4) => {
-          o = o.next(() => r2.getEntry(t2, e4)).next((t3) => {
+        return s.forEach(((e4) => {
+          o = o.next((() => r2.getEntry(t2, e4))).next(((t3) => {
             const s2 = n2.docVersions.get(e4);
             __PRIVATE_hardAssert(null !== s2, 48541), t3.version.compareTo(s2) < 0 && (i2.applyToRemoteDocument(t3, n2), t3.isValidDocument() && // We use the commitVersion as the readTime rather than the
             // document's updateTime since the updateTime is not advanced
             // for updates that do not modify the underlying document.
             (t3.setReadTime(n2.commitVersion), r2.addEntry(t3)));
-          });
-        }), o.next(() => e3.mutationQueue.removeMutationBatch(t2, i2));
-      }(n, e2, t, i).next(() => i.apply(e2)).next(() => n.mutationQueue.performConsistencyCheck(e2)).next(() => n.documentOverlayCache.removeOverlaysForBatchId(e2, r, t.batch.batchId)).next(() => n.localDocuments.recalculateAndSaveOverlaysForDocumentKeys(e2, function __PRIVATE_getKeysWithTransformResults(e3) {
+          }));
+        })), o.next((() => e3.mutationQueue.removeMutationBatch(t2, i2)));
+      })(n, e2, t, i).next((() => i.apply(e2))).next((() => n.mutationQueue.performConsistencyCheck(e2))).next((() => n.documentOverlayCache.removeOverlaysForBatchId(e2, r, t.batch.batchId))).next((() => n.localDocuments.recalculateAndSaveOverlaysForDocumentKeys(e2, (function __PRIVATE_getKeysWithTransformResults(e3) {
         let t2 = __PRIVATE_documentKeySet();
         for (let n2 = 0; n2 < e3.mutationResults.length; ++n2) {
           e3.mutationResults[n2].transformResults.length > 0 && (t2 = t2.add(e3.batch.mutations[n2].key));
         }
         return t2;
-      }(t))).next(() => n.localDocuments.getDocuments(e2, r));
-    });
+      })(t)))).next((() => n.localDocuments.getDocuments(e2, r)));
+    }));
   }
   function __PRIVATE_localStoreGetLastRemoteSnapshotVersion(e) {
     const t = __PRIVATE_debugCast(e);
-    return t.persistence.runTransaction("Get last remote snapshot version", "readonly", (e2) => t.li.getLastRemoteSnapshotVersion(e2));
+    return t.persistence.runTransaction("Get last remote snapshot version", "readonly", ((e2) => t.li.getLastRemoteSnapshotVersion(e2)));
   }
   function __PRIVATE_localStoreApplyRemoteEventToLocalCache(e, t) {
     const n = __PRIVATE_debugCast(e), r = t.snapshotVersion;
     let i = n.vs;
-    return n.persistence.runTransaction("Apply remote event", "readwrite-primary", (e2) => {
+    return n.persistence.runTransaction("Apply remote event", "readwrite-primary", ((e2) => {
       const s = n.xs.newChangeBuffer({
         trackRemovals: true
       });
       i = n.vs;
       const o = [];
-      t.targetChanges.forEach((s2, _2) => {
+      t.targetChanges.forEach(((s2, _2) => {
         const a2 = i.get(_2);
         if (!a2) return;
-        o.push(n.li.removeMatchingKeys(e2, s2.removedDocuments, _2).next(() => n.li.addMatchingKeys(e2, s2.addedDocuments, _2)));
+        o.push(n.li.removeMatchingKeys(e2, s2.removedDocuments, _2).next((() => n.li.addMatchingKeys(e2, s2.addedDocuments, _2))));
         let u = a2.withSequenceNumber(e2.currentSequenceNumber);
         null !== t.targetMismatches.get(_2) ? u = u.withResumeToken(ByteString.EMPTY_BYTE_STRING, SnapshotVersion.min()).withLastLimboFreeSnapshotVersion(SnapshotVersion.min()) : s2.resumeToken.approximateByteSize() > 0 && (u = u.withResumeToken(s2.resumeToken, r)), i = i.insert(_2, u), // Update the target data if there are target changes (or if
         // sufficient time has passed since the last update).
@@ -16385,33 +16385,33 @@ Total Duration: ${a - u}ms`);
         * values from getting too stale after a crash, but this doesn't have to be
         * too frequent.
         */
-        function __PRIVATE_shouldPersistTargetData(e3, t2, n2) {
+        (function __PRIVATE_shouldPersistTargetData(e3, t2, n2) {
           if (0 === e3.resumeToken.approximateByteSize()) return true;
           const r2 = t2.snapshotVersion.toMicroseconds() - e3.snapshotVersion.toMicroseconds();
           if (r2 >= Bt) return true;
           const i2 = n2.addedDocuments.size + n2.modifiedDocuments.size + n2.removedDocuments.size;
           return i2 > 0;
-        }(a2, u, s2) && o.push(n.li.updateTargetData(e2, u));
-      });
+        })(a2, u, s2) && o.push(n.li.updateTargetData(e2, u));
+      }));
       let _ = __PRIVATE_mutableDocumentMap(), a = __PRIVATE_documentKeySet();
-      if (t.documentUpdates.forEach((r2) => {
+      if (t.documentUpdates.forEach(((r2) => {
         t.resolvedLimboDocuments.has(r2) && o.push(n.persistence.referenceDelegate.updateLimboDocument(e2, r2));
-      }), // Each loop iteration only affects its "own" doc, so it's safe to get all
+      })), // Each loop iteration only affects its "own" doc, so it's safe to get all
       // the remote documents in advance in a single call.
-      o.push(__PRIVATE_populateDocumentChangeBuffer(e2, s, t.documentUpdates).next((e3) => {
+      o.push(__PRIVATE_populateDocumentChangeBuffer(e2, s, t.documentUpdates).next(((e3) => {
         _ = e3.Bs, a = e3.Ls;
-      })), !r.isEqual(SnapshotVersion.min())) {
-        const t2 = n.li.getLastRemoteSnapshotVersion(e2).next((t3) => n.li.setTargetsMetadata(e2, e2.currentSequenceNumber, r));
+      }))), !r.isEqual(SnapshotVersion.min())) {
+        const t2 = n.li.getLastRemoteSnapshotVersion(e2).next(((t3) => n.li.setTargetsMetadata(e2, e2.currentSequenceNumber, r)));
         o.push(t2);
       }
-      return PersistencePromise.waitFor(o).next(() => s.apply(e2)).next(() => n.localDocuments.getLocalViewOfDocuments(e2, _, a)).next(() => _);
-    }).then((e2) => (n.vs = i, e2));
+      return PersistencePromise.waitFor(o).next((() => s.apply(e2))).next((() => n.localDocuments.getLocalViewOfDocuments(e2, _, a))).next((() => _));
+    })).then(((e2) => (n.vs = i, e2)));
   }
   function __PRIVATE_populateDocumentChangeBuffer(e, t, n) {
     let r = __PRIVATE_documentKeySet(), i = __PRIVATE_documentKeySet();
-    return n.forEach((e2) => r = r.add(e2)), t.getEntries(e, r).next((e2) => {
+    return n.forEach(((e2) => r = r.add(e2))), t.getEntries(e, r).next(((e2) => {
       let r2 = __PRIVATE_mutableDocumentMap();
-      return n.forEach((n2, s) => {
+      return n.forEach(((n2, s) => {
         const o = e2.get(n2);
         s.isFoundDocument() !== o.isFoundDocument() && (i = i.add(n2)), // Note: The order of the steps below is important, since we want
         // to ensure that rejected limbo resolutions (which fabricate
@@ -16423,35 +16423,35 @@ Total Duration: ${a - u}ms`);
           // access.
           (t.removeEntry(n2, s.readTime), r2 = r2.insert(n2, s))
         ) : !o.isValidDocument() || s.version.compareTo(o.version) > 0 || 0 === s.version.compareTo(o.version) && o.hasPendingWrites ? (t.addEntry(s), r2 = r2.insert(n2, s)) : __PRIVATE_logDebug(Nt, "Ignoring outdated watch update for ", n2, ". Current version:", o.version, " Watch version:", s.version);
-      }), {
+      })), {
         Bs: r2,
         Ls: i
       };
-    });
+    }));
   }
   function __PRIVATE_localStoreGetNextMutationBatch(e, t) {
     const n = __PRIVATE_debugCast(e);
-    return n.persistence.runTransaction("Get next mutation batch", "readonly", (e2) => (void 0 === t && (t = q), n.mutationQueue.getNextMutationBatchAfterBatchId(e2, t)));
+    return n.persistence.runTransaction("Get next mutation batch", "readonly", ((e2) => (void 0 === t && (t = q), n.mutationQueue.getNextMutationBatchAfterBatchId(e2, t))));
   }
   function __PRIVATE_localStoreAllocateTarget(e, t) {
     const n = __PRIVATE_debugCast(e);
-    return n.persistence.runTransaction("Allocate target", "readwrite", (e2) => {
+    return n.persistence.runTransaction("Allocate target", "readwrite", ((e2) => {
       let r;
-      return n.li.getTargetData(e2, t).next((i) => i ? (
+      return n.li.getTargetData(e2, t).next(((i) => i ? (
         // This target has been listened to previously, so reuse the
         // previous targetID.
         // TODO(mcg): freshen last accessed date?
         (r = i, PersistencePromise.resolve(r))
-      ) : n.li.allocateTargetId(e2).next((i2) => (r = new TargetData(t, i2, "TargetPurposeListen", e2.currentSequenceNumber), n.li.addTargetData(e2, r).next(() => r))));
-    }).then((e2) => {
+      ) : n.li.allocateTargetId(e2).next(((i2) => (r = new TargetData(t, i2, "TargetPurposeListen", e2.currentSequenceNumber), n.li.addTargetData(e2, r).next((() => r)))))));
+    })).then(((e2) => {
       const r = n.vs.get(e2.targetId);
       return (null === r || e2.snapshotVersion.compareTo(r.snapshotVersion) > 0) && (n.vs = n.vs.insert(e2.targetId, e2), n.Fs.set(t, e2.targetId)), e2;
-    });
+    }));
   }
   async function __PRIVATE_localStoreReleaseTarget(e, t, n) {
     const r = __PRIVATE_debugCast(e), i = r.vs.get(t), s = n ? "readwrite" : "readwrite-primary";
     try {
-      n || await r.persistence.runTransaction("Release target", s, (e2) => r.persistence.referenceDelegate.removeTarget(e2, i));
+      n || await r.persistence.runTransaction("Release target", s, ((e2) => r.persistence.referenceDelegate.removeTarget(e2, i)));
     } catch (e2) {
       if (!__PRIVATE_isIndexedDbTransactionError(e2)) throw e2;
       __PRIVATE_logDebug(Nt, `Failed to update sequence numbers for target ${t}: ${e2}`);
@@ -16466,24 +16466,24 @@ Total Duration: ${a - u}ms`);
       "readwrite",
       // Use readwrite instead of readonly so indexes can be created
       // Use readwrite instead of readonly so indexes can be created
-      (e2) => function __PRIVATE_localStoreGetTargetData(e3, t2, n2) {
+      ((e2) => (function __PRIVATE_localStoreGetTargetData(e3, t2, n2) {
         const r2 = __PRIVATE_debugCast(e3), i2 = r2.Fs.get(n2);
         return void 0 !== i2 ? PersistencePromise.resolve(r2.vs.get(i2)) : r2.li.getTargetData(t2, n2);
-      }(r, e2, __PRIVATE_queryToTarget(t)).next((t2) => {
-        if (t2) return i = t2.lastLimboFreeSnapshotVersion, r.li.getMatchingKeysForTargetId(e2, t2.targetId).next((e3) => {
+      })(r, e2, __PRIVATE_queryToTarget(t)).next(((t2) => {
+        if (t2) return i = t2.lastLimboFreeSnapshotVersion, r.li.getMatchingKeysForTargetId(e2, t2.targetId).next(((e3) => {
           s = e3;
-        });
-      }).next(() => r.Cs.getDocumentsMatchingQuery(e2, t, n ? i : SnapshotVersion.min(), n ? s : __PRIVATE_documentKeySet())).next((e3) => (__PRIVATE_setMaxReadTime(r, __PRIVATE_queryCollectionGroup(t), e3), {
+        }));
+      })).next((() => r.Cs.getDocumentsMatchingQuery(e2, t, n ? i : SnapshotVersion.min(), n ? s : __PRIVATE_documentKeySet()))).next(((e3) => (__PRIVATE_setMaxReadTime(r, __PRIVATE_queryCollectionGroup(t), e3), {
         documents: e3,
         ks: s
-      }))
+      }))))
     );
   }
   function __PRIVATE_setMaxReadTime(e, t, n) {
     let r = e.Ms.get(t) || SnapshotVersion.min();
-    n.forEach((e2, t2) => {
+    n.forEach(((e2, t2) => {
       t2.readTime.compareTo(r) > 0 && (r = t2.readTime);
-    }), e.Ms.set(t, r);
+    })), e.Ms.set(t, r);
   }
   var __PRIVATE_LocalClientState = class {
     constructor() {
@@ -16593,9 +16593,9 @@ Total Duration: ${a - u}ms`);
   };
   var $t = null;
   function __PRIVATE_generateUniqueDebugId() {
-    return null === $t ? $t = function __PRIVATE_generateInitialUniqueDebugId() {
+    return null === $t ? $t = (function __PRIVATE_generateInitialUniqueDebugId() {
       return 268435456 + Math.round(2147483648 * Math.random());
-    }() : $t++, "0x" + $t.toString(16);
+    })() : $t++, "0x" + $t.toString(16);
   }
   var Wt = "RestConnection";
   var Qt = {
@@ -16623,9 +16623,9 @@ Total Duration: ${a - u}ms`);
       };
       this.Go(_, r, i);
       const { host: a } = new URL(o), c = isCloudWorkstation(a);
-      return this.zo(e, o, _, n, c).then((t2) => (__PRIVATE_logDebug(Wt, `Received RPC '${e}' ${s}: `, t2), t2), (t2) => {
+      return this.zo(e, o, _, n, c).then(((t2) => (__PRIVATE_logDebug(Wt, `Received RPC '${e}' ${s}: `, t2), t2)), ((t2) => {
         throw __PRIVATE_logWarn(Wt, `RPC '${e}' ${s} failed with error: `, t2, "url: ", o, "request:", n), t2;
-      });
+      }));
     }
     jo(e, t, n, r, i, s) {
       return this.Wo(e, t, n, r, i);
@@ -16637,13 +16637,13 @@ Total Duration: ${a - u}ms`);
     Go(e, t, n) {
       e["X-Goog-Api-Client"] = // SDK_VERSION is updated to different value at runtime depending on the entry point,
       // so we need to get its value when we need it in a function.
-      function __PRIVATE_getGoogApiClientValue() {
+      (function __PRIVATE_getGoogApiClientValue() {
         return "gl-js/ fire/" + b;
-      }(), // Content-Type: text/plain will avoid preflight requests which might
+      })(), // Content-Type: text/plain will avoid preflight requests which might
       // mess with CORS and redirects by proxies. If we add custom headers
       // we will need to change this code to potentially use the $httpOverwrite
       // parameter supported by ESF to avoid triggering preflight requests.
-      e["Content-Type"] = "text/plain", this.databaseInfo.appId && (e["X-Firebase-GMPID"] = this.databaseInfo.appId), t && t.headers.forEach((t2, n2) => e[n2] = t2), n && n.headers.forEach((t2, n2) => e[n2] = t2);
+      e["Content-Type"] = "text/plain", this.databaseInfo.appId && (e["X-Firebase-GMPID"] = this.databaseInfo.appId), t && t.headers.forEach(((t2, n2) => e[n2] = t2)), n && n.headers.forEach(((t2, n2) => e[n2] = t2));
     }
     Qo(e, t) {
       const n = Qt[e];
@@ -16695,15 +16695,15 @@ Total Duration: ${a - u}ms`);
   };
   var Gt = "WebChannelConnection";
   var __PRIVATE_unguardedEventListen = (e, t, n) => {
-    e.listen(t, (e2) => {
+    e.listen(t, ((e2) => {
       try {
         n(e2);
       } catch (e3) {
-        setTimeout(() => {
+        setTimeout((() => {
           throw e3;
-        }, 0);
+        }), 0);
       }
-    });
+    }));
   };
   var __PRIVATE_WebChannelConnection = class ___PRIVATE_WebChannelConnection extends __PRIVATE_RestConnection {
     constructor(e) {
@@ -16717,16 +16717,16 @@ Total Duration: ${a - u}ms`);
     static u_() {
       if (!___PRIVATE_WebChannelConnection.c_) {
         const e = getStatEventTarget();
-        __PRIVATE_unguardedEventListen(e, Event.STAT_EVENT, (e2) => {
+        __PRIVATE_unguardedEventListen(e, Event.STAT_EVENT, ((e2) => {
           e2.stat === Stat.PROXY ? __PRIVATE_logDebug(Gt, "STAT_EVENT: detected buffering proxy") : e2.stat === Stat.NOPROXY && __PRIVATE_logDebug(Gt, "STAT_EVENT: detected no buffering proxy");
-        }), ___PRIVATE_WebChannelConnection.c_ = true;
+        })), ___PRIVATE_WebChannelConnection.c_ = true;
       }
     }
     zo(e, t, n, r, i) {
       const s = __PRIVATE_generateUniqueDebugId();
-      return new Promise((i2, o) => {
+      return new Promise(((i2, o) => {
         const _ = new XhrIo();
-        _.setWithCredentials(true), _.listenOnce(EventType.COMPLETE, () => {
+        _.setWithCredentials(true), _.listenOnce(EventType.COMPLETE, (() => {
           try {
             switch (_.getLastErrorCode()) {
               case ErrorCode.NO_ERROR:
@@ -16743,10 +16743,10 @@ Total Duration: ${a - u}ms`);
                   Array.isArray(e2) && (e2 = e2[0]);
                   const t3 = e2 == null ? void 0 : e2.error;
                   if (t3 && t3.status && t3.message) {
-                    const e3 = function __PRIVATE_mapCodeFromHttpResponseErrorStatus(e4) {
+                    const e3 = (function __PRIVATE_mapCodeFromHttpResponseErrorStatus(e4) {
                       const t4 = e4.toLowerCase().replace(/_/g, "-");
                       return Object.values(D).indexOf(t4) >= 0 ? t4 : D.UNKNOWN;
-                    }(t3.status);
+                    })(t3.status);
                     o(new FirestoreError(e3, t3.message));
                   } else o(new FirestoreError(D.UNKNOWN, "Server responded with status " + _.getStatus()));
                 } else
@@ -16763,10 +16763,10 @@ Total Duration: ${a - u}ms`);
           } finally {
             __PRIVATE_logDebug(Gt, `RPC '${e}' ${s} completed.`);
           }
-        });
+        }));
         const a = JSON.stringify(r);
         __PRIVATE_logDebug(Gt, `RPC '${e}' ${s} sending request:`, r), _.send(t, "POST", a, n, 15);
-      });
+      }));
     }
     T_(e, t, n) {
       const r = __PRIVATE_generateUniqueDebugId(), i = [this.qo, "/", "google.firestore.v1.Firestore", "/", e, "/channel"], s = this.createWebChannelTransport(), o = {
@@ -16814,13 +16814,13 @@ Total Duration: ${a - u}ms`);
         },
         Ho: () => u.close()
       });
-      return __PRIVATE_unguardedEventListen(u, WebChannel.EventType.OPEN, () => {
+      return __PRIVATE_unguardedEventListen(u, WebChannel.EventType.OPEN, (() => {
         l || (__PRIVATE_logDebug(Gt, `RPC '${e}' stream ${r} transport opened.`), h.i_());
-      }), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.CLOSE, () => {
+      })), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.CLOSE, (() => {
         l || (l = true, __PRIVATE_logDebug(Gt, `RPC '${e}' stream ${r} transport closed`), h.o_(), this.E_(u));
-      }), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.ERROR, (t2) => {
+      })), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.ERROR, ((t2) => {
         l || (l = true, __PRIVATE_logWarn(Gt, `RPC '${e}' stream ${r} transport errored. Name:`, t2.name, "Message:", t2.message), h.o_(new FirestoreError(D.UNAVAILABLE, "The operation could not be completed")));
-      }), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.MESSAGE, (t2) => {
+      })), __PRIVATE_unguardedEventListen(u, WebChannel.EventType.MESSAGE, ((t2) => {
         var _a;
         if (!l) {
           const n2 = t2.data[0];
@@ -16836,25 +16836,25 @@ Total Duration: ${a - u}ms`);
               * @returns The Code equivalent to the given status string or undefined if
               *     there is no match.
               */
-              function __PRIVATE_mapCodeFromRpcStatus(e2) {
+              (function __PRIVATE_mapCodeFromRpcStatus(e2) {
                 const t4 = Rt[e2];
                 if (void 0 !== t4) return __PRIVATE_mapCodeFromRpcCode(t4);
-              }(t3)
+              })(t3)
             ), i3 = s2.message;
             "NOT_FOUND" === t3 && i3.includes("database") && i3.includes("does not exist") && i3.includes(this.databaseId.database) && __PRIVATE_logWarn(`Database '${this.databaseId.database}' not found. Please check your project configuration.`), void 0 === n3 && (n3 = D.INTERNAL, i3 = "Unknown error status: " + t3 + " with message " + s2.message), // Mark closed so no further events are propagated
             l = true, h.o_(new FirestoreError(n3, i3)), u.close();
           } else __PRIVATE_logDebug(Gt, `RPC '${e}' stream ${r} received:`, n2), h.__(n2);
         }
-      }), // Ensure that event listeners are configured for STAT_EVENTs.
-      ___PRIVATE_WebChannelConnection.u_(), setTimeout(() => {
+      })), // Ensure that event listeners are configured for STAT_EVENTs.
+      ___PRIVATE_WebChannelConnection.u_(), setTimeout((() => {
         h.s_();
-      }, 0), h;
+      }), 0), h;
     }
     /**
      * Closes and cleans up any resources associated with the connection.
      */
     terminate() {
-      this.a_.forEach((e) => e.close()), this.a_ = [];
+      this.a_.forEach(((e) => e.close())), this.a_ = [];
     }
     /**
      * Add a WebChannel instance to the collection of open instances.
@@ -16868,7 +16868,7 @@ Total Duration: ${a - u}ms`);
      * @param webChannel
      */
     E_(e) {
-      this.a_ = this.a_.filter((t) => t === e);
+      this.a_ = this.a_.filter(((t) => t === e));
     }
     /**
      * Modifies the headers for a request, adding the api key if present,
@@ -16930,7 +16930,7 @@ Total Duration: ${a - u}ms`);
     p_(e) {
       this.cancel();
       const t = Math.floor(this.d_ + this.y_()), n = Math.max(0, Date.now() - this.f_), r = Math.max(0, t - n);
-      r > 0 && __PRIVATE_logDebug("ExponentialBackoff", `Backing off for ${r} ms (base delay: ${this.d_} ms, delay with jitter: ${t} ms, last attempt: ${n} ms ago)`), this.m_ = this.Ci.enqueueAfterDelay(this.timerId, r, () => (this.f_ = Date.now(), e())), // Apply backoff factor to determine next delay and ensure it is within
+      r > 0 && __PRIVATE_logDebug("ExponentialBackoff", `Backing off for ${r} ms (base delay: ${this.d_} ms, delay with jitter: ${t} ms, last attempt: ${n} ms ago)`), this.m_ = this.Ci.enqueueAfterDelay(this.timerId, r, (() => (this.f_ = Date.now(), e()))), // Apply backoff factor to determine next delay and ensure it is within
       // bounds.
       this.d_ *= this.A_, this.d_ < this.R_ && (this.d_ = this.R_), this.d_ > this.V_ && (this.d_ = this.V_);
     }
@@ -17019,7 +17019,7 @@ Total Duration: ${a - u}ms`);
      * states imply pending network operations.
      */
     L_() {
-      this.O_() && null === this.C_ && (this.C_ = this.Ci.enqueueAfterDelay(this.S_, 6e4, () => this.k_()));
+      this.O_() && null === this.C_ && (this.C_ = this.Ci.enqueueAfterDelay(this.S_, 6e4, (() => this.k_())));
     }
     /** Sends a message to the underlying stream. */
     K_(e) {
@@ -17084,34 +17084,34 @@ Total Duration: ${a - u}ms`);
     auth() {
       this.state = 1;
       const e = this.Q_(this.D_), t = this.D_;
-      Promise.all([this.authCredentialsProvider.getToken(), this.appCheckCredentialsProvider.getToken()]).then(([e2, n]) => {
+      Promise.all([this.authCredentialsProvider.getToken(), this.appCheckCredentialsProvider.getToken()]).then((([e2, n]) => {
         this.D_ === t && // Normally we'd have to schedule the callback on the AsyncQueue.
         // However, the following calls are safe to be called outside the
         // AsyncQueue since they don't chain asynchronous calls
         this.G_(e2, n);
-      }, (t2) => {
-        e(() => {
+      }), ((t2) => {
+        e((() => {
           const e2 = new FirestoreError(D.UNKNOWN, "Fetching auth token failed: " + t2.message);
           return this.z_(e2);
-        });
-      });
+        }));
+      }));
     }
     G_(e, t) {
       const n = this.Q_(this.D_);
-      this.stream = this.j_(e, t), this.stream.Zo(() => {
-        n(() => this.listener.Zo());
-      }), this.stream.Yo(() => {
-        n(() => (this.state = 2, this.v_ = this.Ci.enqueueAfterDelay(this.b_, 1e4, () => (this.O_() && (this.state = 3), Promise.resolve())), this.listener.Yo()));
-      }), this.stream.t_((e2) => {
-        n(() => this.z_(e2));
-      }), this.stream.onMessage((e2) => {
-        n(() => 1 == ++this.F_ ? this.J_(e2) : this.onNext(e2));
-      });
+      this.stream = this.j_(e, t), this.stream.Zo((() => {
+        n((() => this.listener.Zo()));
+      })), this.stream.Yo((() => {
+        n((() => (this.state = 2, this.v_ = this.Ci.enqueueAfterDelay(this.b_, 1e4, (() => (this.O_() && (this.state = 3), Promise.resolve()))), this.listener.Yo())));
+      })), this.stream.t_(((e2) => {
+        n((() => this.z_(e2)));
+      })), this.stream.onMessage(((e2) => {
+        n((() => 1 == ++this.F_ ? this.J_(e2) : this.onNext(e2)));
+      }));
     }
     N_() {
-      this.state = 5, this.M_.p_(async () => {
+      this.state = 5, this.M_.p_((async () => {
         this.state = 0, this.start();
-      });
+      }));
     }
     // Visible for tests
     z_(e) {
@@ -17125,7 +17125,7 @@ Total Duration: ${a - u}ms`);
      */
     Q_(e) {
       return (t) => {
-        this.Ci.enqueueAndForget(() => this.D_ === e ? t() : (__PRIVATE_logDebug(zt, "stream callback skipped by getCloseGuardedDispatcher."), Promise.resolve()));
+        this.Ci.enqueueAndForget((() => this.D_ === e ? t() : (__PRIVATE_logDebug(zt, "stream callback skipped by getCloseGuardedDispatcher."), Promise.resolve())));
       };
     }
   };
@@ -17141,11 +17141,11 @@ Total Duration: ${a - u}ms`);
     }
     onNext(e) {
       this.M_.reset();
-      const t = __PRIVATE_fromWatchChange(this.serializer, e), n = function __PRIVATE_versionFromListenResponse(e2) {
+      const t = __PRIVATE_fromWatchChange(this.serializer, e), n = (function __PRIVATE_versionFromListenResponse(e2) {
         if (!("targetChange" in e2)) return SnapshotVersion.min();
         const t2 = e2.targetChange;
         return t2.targetIds && t2.targetIds.length ? SnapshotVersion.min() : t2.readTime ? __PRIVATE_fromVersion(t2.readTime) : SnapshotVersion.min();
-      }(e);
+      })(e);
       return this.listener.H_(t, n);
     }
     /**
@@ -17156,7 +17156,7 @@ Total Duration: ${a - u}ms`);
      */
     Z_(e) {
       const t = {};
-      t.database = __PRIVATE_getEncodedDatabaseId(this.serializer), t.addTarget = function __PRIVATE_toTarget(e2, t2) {
+      t.database = __PRIVATE_getEncodedDatabaseId(this.serializer), t.addTarget = (function __PRIVATE_toTarget(e2, t2) {
         let n2;
         const r = t2.target;
         if (n2 = __PRIVATE_targetIsDocumentTarget(r) ? {
@@ -17173,7 +17173,7 @@ Total Duration: ${a - u}ms`);
           null !== r2 && (n2.expectedCount = r2);
         }
         return n2;
-      }(this.serializer, e);
+      })(this.serializer, e);
       const n = __PRIVATE_toListenRequestLabels(this.serializer, e);
       n && (t.labels = n), this.K_(t);
     }
@@ -17232,7 +17232,7 @@ Total Duration: ${a - u}ms`);
     ea(e) {
       const t = {
         streamToken: this.lastStreamToken,
-        writes: e.map((e2) => toMutation(this.serializer, e2))
+        writes: e.map(((e2) => toMutation(this.serializer, e2)))
       };
       this.K_(t);
     }
@@ -17248,15 +17248,15 @@ Total Duration: ${a - u}ms`);
     }
     /** Invokes the provided RPC with auth and AppCheck tokens. */
     Wo(e, t, n, r) {
-      return this.sa(), Promise.all([this.authCredentials.getToken(), this.appCheckCredentials.getToken()]).then(([i, s]) => this.connection.Wo(e, __PRIVATE_toResourcePath(t, n), r, i, s)).catch((e2) => {
+      return this.sa(), Promise.all([this.authCredentials.getToken(), this.appCheckCredentials.getToken()]).then((([i, s]) => this.connection.Wo(e, __PRIVATE_toResourcePath(t, n), r, i, s))).catch(((e2) => {
         throw "FirebaseError" === e2.name ? (e2.code === D.UNAUTHENTICATED && (this.authCredentials.invalidateToken(), this.appCheckCredentials.invalidateToken()), e2) : new FirestoreError(D.UNKNOWN, e2.toString());
-      });
+      }));
     }
     /** Invokes the provided RPC with streamed results with auth and AppCheck tokens. */
     jo(e, t, n, r, i) {
-      return this.sa(), Promise.all([this.authCredentials.getToken(), this.appCheckCredentials.getToken()]).then(([s, o]) => this.connection.jo(e, __PRIVATE_toResourcePath(t, n), r, s, o, i)).catch((e2) => {
+      return this.sa(), Promise.all([this.authCredentials.getToken(), this.appCheckCredentials.getToken()]).then((([s, o]) => this.connection.jo(e, __PRIVATE_toResourcePath(t, n), r, s, o, i))).catch(((e2) => {
         throw "FirebaseError" === e2.name ? (e2.code === D.UNAUTHENTICATED && (this.authCredentials.invalidateToken(), this.appCheckCredentials.invalidateToken()), e2) : new FirestoreError(D.UNKNOWN, e2.toString());
-      });
+      }));
     }
     terminate() {
       this.ia = true, this.connection.terminate();
@@ -17296,10 +17296,10 @@ Total Duration: ${a - u}ms`);
       0 === this.oa && (this.ca(
         "Unknown"
         /* OnlineState.Unknown */
-      ), this._a = this.asyncQueue.enqueueAfterDelay("online_state_timeout", 1e4, () => (this._a = null, this.la("Backend didn't respond within 10 seconds."), this.ca(
+      ), this._a = this.asyncQueue.enqueueAfterDelay("online_state_timeout", 1e4, (() => (this._a = null, this.la("Backend didn't respond within 10 seconds."), this.ca(
         "Offline"
         /* OnlineState.Offline */
-      ), Promise.resolve())));
+      ), Promise.resolve()))));
     }
     /**
      * Updates our OnlineState as appropriate after the watch stream reports a
@@ -17380,9 +17380,9 @@ This typically indicates that your device does not have a healthy Internet conne
        * underlying streams (to support tree-shakeable streams). On Android and iOS,
        * the streams are created during construction of RemoteStore.
        */
-      this.ma = [], this.fa = i, this.fa.Mo((e2) => {
-        n.enqueueAndForget(async () => {
-          __PRIVATE_canUseNetwork(this) && (__PRIVATE_logDebug(jt, "Restarting streams for network reachability change."), await async function __PRIVATE_restartNetwork(e3) {
+      this.ma = [], this.fa = i, this.fa.Mo(((e2) => {
+        n.enqueueAndForget((async () => {
+          __PRIVATE_canUseNetwork(this) && (__PRIVATE_logDebug(jt, "Restarting streams for network reachability change."), await (async function __PRIVATE_restartNetwork(e3) {
             const t2 = __PRIVATE_debugCast(e3);
             t2.da.add(
               4
@@ -17394,9 +17394,9 @@ This typically indicates that your device does not have a healthy Internet conne
               4
               /* OfflineCause.ConnectivityChange */
             ), await __PRIVATE_enableNetworkInternal(t2);
-          }(this));
-        });
-      }), this.ga = new __PRIVATE_OnlineStateTracker(n, r);
+          })(this));
+        }));
+      })), this.ga = new __PRIVATE_OnlineStateTracker(n, r);
     }
   };
   async function __PRIVATE_enableNetworkInternal(e) {
@@ -17426,15 +17426,15 @@ This typically indicates that your device does not have a healthy Internet conne
       * @param sdkTargetId
       * @return The new remote ID.
       */
-      function __PRIVATE_allocateRemoteTargetId(e2, t2) {
+      (function __PRIVATE_allocateRemoteTargetId(e2, t2) {
         const n2 = __PRIVATE_getRemoteTargetId(e2, t2);
         void 0 !== n2 && // If there was an existing remote target ID mapped to that SDK target ID, forget about the old remote ID.
         e2.Ra.delete(n2);
-        const r2 = function __PRIVATE_generateRemoteTargetId(e3, t3) {
+        const r2 = (function __PRIVATE_generateRemoteTargetId(e3, t3) {
           return t3 % 2 != 0 ? e3.Va.next() : e3.Aa.next();
-        }(e2, t2);
+        })(e2, t2);
         return e2.Ea.set(t2, r2), e2.Ra.set(r2, t2), r2;
-      }(n, t.targetId)
+      })(n, t.targetId)
     );
     __PRIVATE_logDebug(jt, "remoteStoreListen mapping SDK target ID to remote", t.targetId, i);
     const s = new TargetData(t.target, i, t.purpose, t.sequenceNumber, t.snapshotVersion, t.lastLimboFreeSnapshotVersion, t.resumeToken);
@@ -17492,9 +17492,9 @@ This typically indicates that your device does not have a healthy Internet conne
     );
   }
   async function __PRIVATE_onWatchStreamOpen(e) {
-    e.Ia.forEach((t, n) => {
+    e.Ia.forEach(((t, n) => {
       __PRIVATE_sendWatchRequest(e, t);
-    });
+    }));
   }
   async function __PRIVATE_onWatchStreamClose(e, t) {
     __PRIVATE_cleanUpWatchStreamState(e), // If we still need the watch stream, retry the connection.
@@ -17517,7 +17517,7 @@ This typically indicates that your device does not have a healthy Internet conne
       ), t instanceof __PRIVATE_WatchTargetChange && 2 === t.state && t.cause
     )
       try {
-        await async function __PRIVATE_handleTargetError(e2, t2) {
+        await (async function __PRIVATE_handleTargetError(e2, t2) {
           const n2 = t2.cause;
           for (const r of t2.targetIds) {
             if (e2.Ia.has(r)) {
@@ -17526,7 +17526,7 @@ This typically indicates that your device does not have a healthy Internet conne
             }
             e2.pa.removeTarget(r);
           }
-        }(e, t);
+        })(e, t);
       } catch (n2) {
         __PRIVATE_logDebug(jt, "Failed to remove targets %s: %s ", t.targetIds.join(","), n2), await __PRIVATE_disableNetworkUntilRecovery(e, n2);
       }
@@ -17539,16 +17539,16 @@ This typically indicates that your device does not have a healthy Internet conne
       * RemoteEvent, and passes that on to the listener, which is typically the
       * SyncEngine.
       */
-      await function __PRIVATE_raiseWatchSnapshot(e2, t3) {
+      await (function __PRIVATE_raiseWatchSnapshot(e2, t3) {
         const n2 = e2.pa.Tt(t3);
-        n2.targetChanges.forEach((n3, r2) => {
+        n2.targetChanges.forEach(((n3, r2) => {
           if (n3.resumeToken.approximateByteSize() > 0) {
             const i = e2.Ia.get(r2);
             i && e2.Ia.set(r2, i.withResumeToken(n3.resumeToken, t3));
           }
-        }), // Re-establish listens for the targets that have been invalidated by
+        })), // Re-establish listens for the targets that have been invalidated by
         // existence filter mismatches.
-        n2.targetMismatches.forEach((t4, n3) => {
+        n2.targetMismatches.forEach(((t4, n3) => {
           const r2 = e2.Ia.get(t4);
           if (!r2)
             return;
@@ -17557,7 +17557,7 @@ This typically indicates that your device does not have a healthy Internet conne
           __PRIVATE_sendUnwatchRequest(e2, t4);
           const i = new TargetData(r2.target, t4, n3, r2.sequenceNumber);
           __PRIVATE_sendWatchRequest(e2, i);
-        });
+        }));
         const r = (
           /**
           * Convert a RemoteEvent with remote IDs to a RemoteEvent with
@@ -17569,21 +17569,21 @@ This typically indicates that your device does not have a healthy Internet conne
           * @return a new RemoteEvent with SDK IDs and dropped updates
           * for any targets we no longer track.
           */
-          function __PRIVATE_toSdkRemoteEvent(e3, t4) {
+          (function __PRIVATE_toSdkRemoteEvent(e3, t4) {
             const n3 = /* @__PURE__ */ new Map();
-            t4.targetChanges.forEach((t5, r3) => {
+            t4.targetChanges.forEach(((t5, r3) => {
               const i = e3.Ra.get(r3);
               void 0 !== i && n3.set(i, t5);
-            });
+            }));
             let r2 = new SortedMap(__PRIVATE_primitiveComparator);
-            return t4.targetMismatches.forEach((t5, n4) => {
+            return t4.targetMismatches.forEach(((t5, n4) => {
               const i = e3.Ra.get(t5);
               void 0 !== i && (r2 = r2.insert(i, n4));
-            }), new RemoteEvent(t4.snapshotVersion, n3, r2, t4.documentUpdates, t4.resolvedLimboDocuments);
-          }(e2, n2)
+            })), new RemoteEvent(t4.snapshotVersion, n3, r2, t4.documentUpdates, t4.resolvedLimboDocuments);
+          })(e2, n2)
         );
         return e2.remoteSyncer.applyRemoteEvent(r);
-      }(e, n);
+      })(e, n);
     } catch (t2) {
       __PRIVATE_logDebug(jt, "Failed to raise snapshot:", t2), await __PRIVATE_disableNetworkUntilRecovery(e, t2);
     }
@@ -17601,15 +17601,15 @@ This typically indicates that your device does not have a healthy Internet conne
     // Ideally, we would expose a health check directly on SimpleDb, but
     // RemoteStore only has access to persistence through LocalStore.
     (n = () => __PRIVATE_localStoreGetLastRemoteSnapshotVersion(e.localStore)), // Probe IndexedDB periodically and re-enable network
-    e.asyncQueue.enqueueRetryable(async () => {
+    e.asyncQueue.enqueueRetryable((async () => {
       __PRIVATE_logDebug(jt, "Retrying IndexedDB access"), await n(), e.da.delete(
         1
         /* OfflineCause.IndexedDbFailed */
       ), await __PRIVATE_enableNetworkInternal(e);
-    });
+    }));
   }
   function __PRIVATE_executeWithRecovery(e, t) {
-    return t().catch((n) => __PRIVATE_disableNetworkUntilRecovery(e, n, t));
+    return t().catch(((n) => __PRIVATE_disableNetworkUntilRecovery(e, n, t)));
   }
   async function __PRIVATE_fillWritePipeline(e) {
     const t = __PRIVATE_debugCast(e), n = __PRIVATE_ensureWriteStream(t);
@@ -17649,22 +17649,22 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   async function __PRIVATE_onMutationResult(e, t, n) {
     const r = e.Ta.shift(), i = MutationBatchResult.from(r, t, n);
-    await __PRIVATE_executeWithRecovery(e, () => e.remoteSyncer.applySuccessfulWrite(i)), // It's possible that with the completion of this mutation another
+    await __PRIVATE_executeWithRecovery(e, (() => e.remoteSyncer.applySuccessfulWrite(i))), // It's possible that with the completion of this mutation another
     // slot has freed up.
     await __PRIVATE_fillWritePipeline(e);
   }
   async function __PRIVATE_onWriteStreamClose(e, t) {
     t && __PRIVATE_ensureWriteStream(e).Y_ && // This error affects the actual write.
-    await async function __PRIVATE_handleWriteError(e2, t2) {
-      if (function __PRIVATE_isPermanentWriteError(e3) {
+    await (async function __PRIVATE_handleWriteError(e2, t2) {
+      if ((function __PRIVATE_isPermanentWriteError(e3) {
         return __PRIVATE_isPermanentError(e3) && e3 !== D.ABORTED;
-      }(t2.code)) {
+      })(t2.code)) {
         const n = e2.Ta.shift();
-        __PRIVATE_ensureWriteStream(e2).B_(), await __PRIVATE_executeWithRecovery(e2, () => e2.remoteSyncer.rejectFailedWrite(n.batchId, t2)), // It's possible that with the completion of this mutation
+        __PRIVATE_ensureWriteStream(e2).B_(), await __PRIVATE_executeWithRecovery(e2, (() => e2.remoteSyncer.rejectFailedWrite(n.batchId, t2))), // It's possible that with the completion of this mutation
         // another slot has freed up.
         await __PRIVATE_fillWritePipeline(e2);
       }
-    }(e, t), // The write stream might have been started by refilling the write
+    })(e, t), // The write stream might have been started by refilling the write
     // pipeline for failed writes
     __PRIVATE_shouldStartWriteStream(e) && __PRIVATE_startWriteStream(e);
   }
@@ -17699,44 +17699,44 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   function __PRIVATE_ensureWatchStream(e) {
     return e.ya || // Create stream (but note that it is not started yet).
-    (e.ya = function __PRIVATE_newPersistentWatchStream(e2, t, n) {
+    (e.ya = (function __PRIVATE_newPersistentWatchStream(e2, t, n) {
       const r = __PRIVATE_debugCast(e2);
       return r.sa(), new __PRIVATE_PersistentListenStream(t, r.connection, r.authCredentials, r.appCheckCredentials, r.serializer, n);
-    }(e.datastore, e.asyncQueue, {
+    })(e.datastore, e.asyncQueue, {
       Zo: __PRIVATE_onWatchStreamConnected.bind(null, e),
       Yo: __PRIVATE_onWatchStreamOpen.bind(null, e),
       t_: __PRIVATE_onWatchStreamClose.bind(null, e),
       H_: __PRIVATE_onWatchStreamChange.bind(null, e)
-    }), e.ma.push(async (t) => {
+    }), e.ma.push((async (t) => {
       t ? (e.ya.B_(), __PRIVATE_shouldStartWatchStream(e) ? __PRIVATE_startWatchStream(e) : e.ga.set(
         "Unknown"
         /* OnlineState.Unknown */
       )) : (await e.ya.stop(), __PRIVATE_cleanUpWatchStreamState(e));
-    })), e.ya;
+    }))), e.ya;
   }
   function __PRIVATE_ensureWriteStream(e) {
     return e.wa || // Create stream (but note that it is not started yet).
-    (e.wa = function __PRIVATE_newPersistentWriteStream(e2, t, n) {
+    (e.wa = (function __PRIVATE_newPersistentWriteStream(e2, t, n) {
       const r = __PRIVATE_debugCast(e2);
       return r.sa(), new __PRIVATE_PersistentWriteStream(t, r.connection, r.authCredentials, r.appCheckCredentials, r.serializer, n);
-    }(e.datastore, e.asyncQueue, {
+    })(e.datastore, e.asyncQueue, {
       Zo: () => Promise.resolve(),
       Yo: __PRIVATE_onWriteStreamOpen.bind(null, e),
       t_: __PRIVATE_onWriteStreamClose.bind(null, e),
       ta: __PRIVATE_onWriteHandshakeComplete.bind(null, e),
       na: __PRIVATE_onMutationResult.bind(null, e)
-    }), e.ma.push(async (t) => {
+    }), e.ma.push((async (t) => {
       t ? (e.wa.B_(), // This will start the write stream if necessary.
       await __PRIVATE_fillWritePipeline(e)) : (await e.wa.stop(), e.Ta.length > 0 && (__PRIVATE_logDebug(jt, `Stopping write stream with ${e.Ta.length} pending writes`), e.Ta = []));
-    })), e.wa;
+    }))), e.wa;
   }
   var DelayedOperation = class _DelayedOperation {
     constructor(e, t, n, r, i) {
       this.asyncQueue = e, this.timerId = t, this.targetTimeMs = n, this.op = r, this.removalCallback = i, this.deferred = new __PRIVATE_Deferred(), this.then = this.deferred.promise.then.bind(this.deferred.promise), // It's normal for the deferred promise to be canceled (due to cancellation)
       // and so we attach a dummy catch callback to avoid
       // 'UnhandledPromiseRejectionWarning' log spam.
-      this.deferred.promise.catch((e2) => {
-      });
+      this.deferred.promise.catch(((e2) => {
+      }));
     }
     get promise() {
       return this.deferred.promise;
@@ -17764,7 +17764,7 @@ This typically indicates that your device does not have a healthy Internet conne
      * createAndSchedule().
      */
     start(e) {
-      this.timerHandle = setTimeout(() => this.handleDelayElapsed(), e);
+      this.timerHandle = setTimeout((() => this.handleDelayElapsed()), e);
     }
     /**
      * Queues the operation to run immediately (if it hasn't already been run or
@@ -17784,7 +17784,7 @@ This typically indicates that your device does not have a healthy Internet conne
       null !== this.timerHandle && (this.clearTimeout(), this.deferred.reject(new FirestoreError(D.CANCELLED, "Operation cancelled" + (e ? ": " + e : ""))));
     }
     handleDelayElapsed() {
-      this.asyncQueue.enqueueAndForget(() => null !== this.timerHandle ? (this.clearTimeout(), this.op().then((e) => this.deferred.resolve(e))) : Promise.resolve());
+      this.asyncQueue.enqueueAndForget((() => null !== this.timerHandle ? (this.clearTimeout(), this.op().then(((e) => this.deferred.resolve(e)))) : Promise.resolve()));
     }
     clearTimeout() {
       null !== this.timerHandle && (this.removalCallback(this), clearTimeout(this.timerHandle), this.timerHandle = null);
@@ -17834,7 +17834,7 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     /** Iterates documents in order defined by "comparator" */
     forEach(e) {
-      this.sortedSet.inorderTraversal((t, n) => (e(t), false));
+      this.sortedSet.inorderTraversal(((t, n) => (e(t), false)));
     }
     /** Inserts or updates a document with the same key */
     add(e) {
@@ -17858,9 +17858,9 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     toString() {
       const e = [];
-      return this.forEach((t) => {
+      return this.forEach(((t) => {
         e.push(t.toString());
-      }), 0 === e.length ? "DocumentSet ()" : "DocumentSet (\n  " + e.join("  \n") + "\n)";
+      })), 0 === e.length ? "DocumentSet ()" : "DocumentSet (\n  " + e.join("  \n") + "\n)";
     }
     copy(e, t) {
       const n = new _DocumentSet();
@@ -17907,9 +17907,9 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     Da() {
       const e = [];
-      return this.Sa.inorderTraversal((t, n) => {
+      return this.Sa.inorderTraversal(((t, n) => {
         e.push(n);
-      }), e;
+      })), e;
     }
   };
   var ViewSnapshot = class _ViewSnapshot {
@@ -17919,12 +17919,12 @@ This typically indicates that your device does not have a healthy Internet conne
     /** Returns a view snapshot as if all documents in the snapshot were added. */
     static fromInitialDocuments(e, t, n, r, i) {
       const s = [];
-      return t.forEach((e2) => {
+      return t.forEach(((e2) => {
         s.push({
           type: 0,
           doc: e2
         });
-      }), new _ViewSnapshot(
+      })), new _ViewSnapshot(
         e,
         t,
         DocumentSet.emptySet(t),
@@ -17955,7 +17955,7 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     // Helper methods that checks if the query has listeners that listening to remote store
     Fa() {
-      return this.va.some((e) => e.Ma());
+      return this.va.some(((e) => e.Ma()));
     }
   };
   var __PRIVATE_EventManagerImpl = class {
@@ -17963,16 +17963,16 @@ This typically indicates that your device does not have a healthy Internet conne
       this.queries = __PRIVATE_newQueriesObjectMap(), this.onlineState = "Unknown", this.xa = /* @__PURE__ */ new Set();
     }
     terminate() {
-      !function __PRIVATE_errorAllTargets(e, t) {
+      !(function __PRIVATE_errorAllTargets(e, t) {
         const n = __PRIVATE_debugCast(e), r = n.queries;
-        n.queries = __PRIVATE_newQueriesObjectMap(), r.forEach((e2, n2) => {
+        n.queries = __PRIVATE_newQueriesObjectMap(), r.forEach(((e2, n2) => {
           for (const e3 of n2.va) e3.onError(t);
-        });
-      }(this, new FirestoreError(D.ABORTED, "Firestore shutting down"));
+        }));
+      })(this, new FirestoreError(D.ABORTED, "Firestore shutting down"));
     }
   };
   function __PRIVATE_newQueriesObjectMap() {
-    return new ObjectMap((e) => __PRIVATE_canonifyQuery(e), __PRIVATE_queryEquals);
+    return new ObjectMap(((e) => __PRIVATE_canonifyQuery(e)), __PRIVATE_queryEquals);
   }
   async function __PRIVATE_eventManagerListen(e, t) {
     const n = __PRIVATE_debugCast(e);
@@ -18055,9 +18055,9 @@ This typically indicates that your device does not have a healthy Internet conne
     r.queries.delete(t);
   }
   function __PRIVATE_raiseSnapshotsInSyncEvent(e) {
-    e.xa.forEach((e2) => {
+    e.xa.forEach(((e2) => {
       e2.next();
-    });
+    }));
   }
   var Ht;
   var Jt;
@@ -18167,7 +18167,7 @@ This typically indicates that your device does not have a healthy Internet conne
       const n = t ? t.au : new __PRIVATE_DocumentChangeSet(), r = t ? t.su : this.su;
       let i = t ? t.mutatedKeys : this.mutatedKeys, s = r, o = false;
       const _ = "F" === this.query.limitType && r.size === this.query.limit ? r.last() : null, a = "L" === this.query.limitType && r.size === this.query.limit ? r.first() : null;
-      if (e.inorderTraversal((e2, t2) => {
+      if (e.inorderTraversal(((e2, t2) => {
         const u = r.get(e2), c = __PRIVATE_queryMatches(this.query, t2) ? t2 : null, l = !!u && this.mutatedKeys.has(u.key), h = !!c && (c.hasLocalMutations || // We only consider committed mutations for documents that were
         // mutated during the lifetime of the view.
         this.mutatedKeys.has(c.key) && c.hasCommittedMutations);
@@ -18194,7 +18194,7 @@ This typically indicates that your device does not have a healthy Internet conne
         // doc that should be in the results.
         (o = true));
         P && (c ? (s = s.add(c), i = h ? i.add(e2) : i.delete(e2)) : (s = s.delete(e2), i = i.delete(e2)));
-      }), null !== this.query.limit) for (; s.size > this.query.limit; ) {
+      })), null !== this.query.limit) for (; s.size > this.query.limit; ) {
         const e2 = "F" === this.query.limitType ? s.last() : s.first();
         s = s.delete(e2.key), i = i.delete(e2.key), n.track({
           type: 1,
@@ -18229,7 +18229,7 @@ This typically indicates that your device does not have a healthy Internet conne
       const i = this.su;
       this.su = e.su, this.mutatedKeys = e.mutatedKeys;
       const s = e.au.Da();
-      s.sort((e2, t2) => function __PRIVATE_compareChangeType(e3, t3) {
+      s.sort(((e2, t2) => (function __PRIVATE_compareChangeType(e3, t3) {
         const order = (e4) => {
           switch (e4) {
             case 0:
@@ -18246,7 +18246,7 @@ This typically indicates that your device does not have a healthy Internet conne
           }
         };
         return order(e3) - order(t3);
-      }(e2.type, t2.type) || this.iu(e2.doc, t2.doc)), this.cu(n), r = r != null ? r : false;
+      })(e2.type, t2.type) || this.iu(e2.doc, t2.doc))), this.cu(n), r = r != null ? r : false;
       const o = t && !r ? this.lu() : [], _ = 0 === this.ru.size && this.current && !r ? 1 : 0, a = _ !== this.nu;
       if (this.nu = _, 0 !== s.length || a) {
         return {
@@ -18305,21 +18305,21 @@ This typically indicates that your device does not have a healthy Internet conne
      * Returns the list of changes to which docs are in limbo.
      */
     cu(e) {
-      e && (e.addedDocuments.forEach((e2) => this.tu = this.tu.add(e2)), e.modifiedDocuments.forEach((e2) => {
-      }), e.removedDocuments.forEach((e2) => this.tu = this.tu.delete(e2)), this.current = e.current);
+      e && (e.addedDocuments.forEach(((e2) => this.tu = this.tu.add(e2))), e.modifiedDocuments.forEach(((e2) => {
+      })), e.removedDocuments.forEach(((e2) => this.tu = this.tu.delete(e2))), this.current = e.current);
     }
     lu() {
       if (!this.current) return [];
       const e = this.ru;
-      this.ru = __PRIVATE_documentKeySet(), this.su.forEach((e2) => {
+      this.ru = __PRIVATE_documentKeySet(), this.su.forEach(((e2) => {
         this.Pu(e2.key) && (this.ru = this.ru.add(e2.key));
-      });
+      }));
       const t = [];
-      return e.forEach((e2) => {
+      return e.forEach(((e2) => {
         this.ru.has(e2) || t.push(new __PRIVATE_RemovedLimboDocument(e2));
-      }), this.ru.forEach((n) => {
+      })), this.ru.forEach(((n) => {
         e.has(n) || t.push(new __PRIVATE_AddedLimboDocument(n));
-      }), t;
+      })), t;
     }
     /**
      * Update the in-memory state of the current view with the state read from
@@ -18379,7 +18379,7 @@ This typically indicates that your device does not have a healthy Internet conne
   };
   var __PRIVATE_SyncEngineImpl = class {
     constructor(e, t, n, r, i, s) {
-      this.localStore = e, this.remoteStore = t, this.eventManager = n, this.sharedClientState = r, this.currentUser = i, this.maxConcurrentLimboResolutions = s, this.Ru = {}, this.Au = new ObjectMap((e2) => __PRIVATE_canonifyQuery(e2), __PRIVATE_queryEquals), this.Vu = /* @__PURE__ */ new Map(), /**
+      this.localStore = e, this.remoteStore = t, this.eventManager = n, this.sharedClientState = r, this.currentUser = i, this.maxConcurrentLimboResolutions = s, this.Ru = {}, this.Au = new ObjectMap(((e2) => __PRIVATE_canonifyQuery(e2)), __PRIVATE_queryEquals), this.Vu = /* @__PURE__ */ new Map(), /**
        * The keys of documents that are in limbo for which we haven't yet started a
        * limbo resolution query. The strings in this set are the result of calling
        * `key.path.canonicalString()` where `key` is a `DocumentKey` object.
@@ -18444,7 +18444,7 @@ This typically indicates that your device does not have a healthy Internet conne
     return r && (_ = await __PRIVATE_initializeViewAndComputeSnapshot(e, t, s, "current" === o, i.resumeToken)), e.isPrimaryClient && n && __PRIVATE_remoteStoreListen(e.remoteStore, i), _;
   }
   async function __PRIVATE_initializeViewAndComputeSnapshot(e, t, n, r, i) {
-    e.bu = (t2, n2, r2) => async function __PRIVATE_applyDocChanges(e2, t3, n3, r3) {
+    e.bu = (t2, n2, r2) => (async function __PRIVATE_applyDocChanges(e2, t3, n3, r3) {
       let i2 = t3.view._u(n3);
       i2.bs && // The query has a limit and some docs were removed, so we need
       // to re-run the query against the local store to make sure we
@@ -18454,7 +18454,7 @@ This typically indicates that your device does not have a healthy Internet conne
         t3.query,
         /* usePreviousResults= */
         false
-      ).then(({ documents: e3 }) => t3.view._u(e3, i2)));
+      ).then((({ documents: e3 }) => t3.view._u(e3, i2))));
       const s2 = r3 && r3.targetChanges.get(t3.targetId), o2 = r3 && null != r3.targetMismatches.get(t3.targetId), _2 = t3.view.applyChanges(
         i2,
         /* limboResolutionEnabled= */
@@ -18463,7 +18463,7 @@ This typically indicates that your device does not have a healthy Internet conne
         o2
       );
       return __PRIVATE_updateTrackedLimbos(e2, t3.targetId, _2.hu), _2.snapshot;
-    }(e, t2, n2, r2);
+    })(e, t2, n2, r2);
     const s = await __PRIVATE_localStoreExecuteQuery(
       e.localStore,
       t,
@@ -18481,7 +18481,7 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   async function __PRIVATE_syncEngineUnlisten(e, t, n) {
     const r = __PRIVATE_debugCast(e), i = r.Au.get(t), s = r.Vu.get(i.targetId);
-    if (s.length > 1) return r.Vu.set(i.targetId, s.filter((e2) => !__PRIVATE_queryEquals(e2, t))), void r.Au.delete(t);
+    if (s.length > 1) return r.Vu.set(i.targetId, s.filter(((e2) => !__PRIVATE_queryEquals(e2, t)))), void r.Au.delete(t);
     if (r.isPrimaryClient) {
       r.sharedClientState.removeLocalQueryTarget(i.targetId);
       r.sharedClientState.isActiveQueryTarget(i.targetId) || await __PRIVATE_localStoreReleaseTarget(
@@ -18489,9 +18489,9 @@ This typically indicates that your device does not have a healthy Internet conne
         i.targetId,
         /*keepPersistedTargetData=*/
         false
-      ).then(() => {
+      ).then((() => {
         r.sharedClientState.clearQueryState(i.targetId), n && __PRIVATE_remoteStoreUnlisten(r.remoteStore, i.targetId), __PRIVATE_removeAndCleanupTarget(r, i.targetId);
-      }).catch(__PRIVATE_ignoreIfPrimaryLeaseLoss);
+      })).catch(__PRIVATE_ignoreIfPrimaryLeaseLoss);
     } else __PRIVATE_removeAndCleanupTarget(r, i.targetId), await __PRIVATE_localStoreReleaseTarget(
       r.localStore,
       i.targetId,
@@ -18508,16 +18508,16 @@ This typically indicates that your device does not have a healthy Internet conne
   async function __PRIVATE_syncEngineWrite(e, t, n) {
     const r = __PRIVATE_syncEngineEnsureWriteCallbacks(e);
     try {
-      const e2 = await function __PRIVATE_localStoreWriteLocally(e3, t2) {
-        const n2 = __PRIVATE_debugCast(e3), r2 = Timestamp.now(), i = t2.reduce((e4, t3) => e4.add(t3.key), __PRIVATE_documentKeySet());
+      const e2 = await (function __PRIVATE_localStoreWriteLocally(e3, t2) {
+        const n2 = __PRIVATE_debugCast(e3), r2 = Timestamp.now(), i = t2.reduce(((e4, t3) => e4.add(t3.key)), __PRIVATE_documentKeySet());
         let s, o;
-        return n2.persistence.runTransaction("Locally write mutations", "readwrite", (e4) => {
+        return n2.persistence.runTransaction("Locally write mutations", "readwrite", ((e4) => {
           let _ = __PRIVATE_mutableDocumentMap(), a = __PRIVATE_documentKeySet();
-          return n2.xs.getEntries(e4, i).next((e5) => {
-            _ = e5, _.forEach((e6, t3) => {
+          return n2.xs.getEntries(e4, i).next(((e5) => {
+            _ = e5, _.forEach(((e6, t3) => {
               t3.isValidDocument() || (a = a.add(e6));
-            });
-          }).next(() => n2.localDocuments.getOverlayedDocuments(e4, _)).next((i2) => {
+            }));
+          })).next((() => n2.localDocuments.getOverlayedDocuments(e4, _))).next(((i2) => {
             s = i2;
             const o2 = [];
             for (const e5 of t2) {
@@ -18528,21 +18528,21 @@ This typically indicates that your device does not have a healthy Internet conne
               o2.push(new __PRIVATE_PatchMutation(e5.key, t3, __PRIVATE_extractFieldMask(t3.value.mapValue), Precondition.exists(true)));
             }
             return n2.mutationQueue.addMutationBatch(e4, r2, o2, t2);
-          }).next((t3) => {
+          })).next(((t3) => {
             o = t3;
             const r3 = t3.applyToLocalDocumentSet(s, a);
             return n2.documentOverlayCache.saveOverlays(e4, t3.batchId, r3);
-          });
-        }).then(() => ({
+          }));
+        })).then((() => ({
           batchId: o.batchId,
           changes: __PRIVATE_convertOverlayedDocumentMapToDocumentMap(s)
-        }));
-      }(r.localStore, t);
-      r.sharedClientState.addPendingMutation(e2.batchId), function __PRIVATE_addMutationCallback(e3, t2, n2) {
+        })));
+      })(r.localStore, t);
+      r.sharedClientState.addPendingMutation(e2.batchId), (function __PRIVATE_addMutationCallback(e3, t2, n2) {
         let r2 = e3.pu[e3.currentUser.toKey()];
         r2 || (r2 = new SortedMap(__PRIVATE_primitiveComparator));
         r2 = r2.insert(t2, n2), e3.pu[e3.currentUser.toKey()] = r2;
-      }(r, e2.batchId, n), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(r, e2.changes), await __PRIVATE_fillWritePipeline(r.remoteStore);
+      })(r, e2.batchId, n), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(r, e2.changes), await __PRIVATE_fillWritePipeline(r.remoteStore);
     } catch (e2) {
       const t2 = __PRIVATE_wrapInUserErrorIfRecoverable(e2, "Failed to persist write");
       n.reject(t2);
@@ -18552,12 +18552,12 @@ This typically indicates that your device does not have a healthy Internet conne
     const n = __PRIVATE_debugCast(e);
     try {
       const e2 = await __PRIVATE_localStoreApplyRemoteEventToLocalCache(n.localStore, t);
-      t.targetChanges.forEach((e3, t2) => {
+      t.targetChanges.forEach(((e3, t2) => {
         const r = n.fu.get(t2);
         r && // Since this is a limbo resolution lookup, it's for a single document
         // and it could be added, modified, or removed, but not a combination.
         (__PRIVATE_hardAssert(e3.addedDocuments.size + e3.modifiedDocuments.size + e3.removedDocuments.size <= 1, 22616), e3.addedDocuments.size > 0 ? r.Eu = true : e3.modifiedDocuments.size > 0 ? __PRIVATE_hardAssert(r.Eu, 14607) : e3.removedDocuments.size > 0 && (__PRIVATE_hardAssert(r.Eu, 42227), r.Eu = false));
-      }), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(n, e2, t);
+      })), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(n, e2, t);
     } catch (e2) {
       await __PRIVATE_ignoreIfPrimaryLeaseLoss(e2);
     }
@@ -18566,18 +18566,18 @@ This typically indicates that your device does not have a healthy Internet conne
     const r = __PRIVATE_debugCast(e);
     if (r.isPrimaryClient && 0 === n || !r.isPrimaryClient && 1 === n) {
       const e2 = [];
-      r.Au.forEach((n2, r2) => {
+      r.Au.forEach(((n2, r2) => {
         const i = r2.view.Oa(t);
         i.snapshot && e2.push(i.snapshot);
-      }), function __PRIVATE_eventManagerOnOnlineStateChange(e3, t2) {
+      })), (function __PRIVATE_eventManagerOnOnlineStateChange(e3, t2) {
         const n2 = __PRIVATE_debugCast(e3);
         n2.onlineState = t2;
         let r2 = false;
-        n2.queries.forEach((e4, n3) => {
+        n2.queries.forEach(((e4, n3) => {
           for (const e5 of n3.va)
             e5.Oa(t2) && (r2 = true);
-        }), r2 && __PRIVATE_raiseSnapshotsInSyncEvent(n2);
-      }(r.eventManager, t), e2.length && r.Ru.H_(e2), r.onlineState = t, r.isPrimaryClient && r.sharedClientState.setOnlineState(t);
+        })), r2 && __PRIVATE_raiseSnapshotsInSyncEvent(n2);
+      })(r.eventManager, t), e2.length && r.Ru.H_(e2), r.onlineState = t, r.isPrimaryClient && r.sharedClientState.setOnlineState(t);
     }
   }
   async function __PRIVATE_syncEngineRejectListen(e, t, n) {
@@ -18607,7 +18607,7 @@ This typically indicates that your device does not have a healthy Internet conne
       t,
       /* keepPersistedTargetData */
       false
-    ).then(() => __PRIVATE_removeAndCleanupTarget(r, t, n)).catch(__PRIVATE_ignoreIfPrimaryLeaseLoss);
+    ).then((() => __PRIVATE_removeAndCleanupTarget(r, t, n))).catch(__PRIVATE_ignoreIfPrimaryLeaseLoss);
   }
   async function __PRIVATE_syncEngineApplySuccessfulWrite(e, t) {
     const n = __PRIVATE_debugCast(e), r = t.batch.batchId;
@@ -18626,22 +18626,22 @@ This typically indicates that your device does not have a healthy Internet conne
   async function __PRIVATE_syncEngineRejectFailedWrite(e, t, n) {
     const r = __PRIVATE_debugCast(e);
     try {
-      const e2 = await function __PRIVATE_localStoreRejectBatch(e3, t2) {
+      const e2 = await (function __PRIVATE_localStoreRejectBatch(e3, t2) {
         const n2 = __PRIVATE_debugCast(e3);
-        return n2.persistence.runTransaction("Reject batch", "readwrite-primary", (e4) => {
+        return n2.persistence.runTransaction("Reject batch", "readwrite-primary", ((e4) => {
           let r2;
-          return n2.mutationQueue.lookupMutationBatch(e4, t2).next((t3) => (__PRIVATE_hardAssert(null !== t3, 37113), r2 = t3.keys(), n2.mutationQueue.removeMutationBatch(e4, t3))).next(() => n2.mutationQueue.performConsistencyCheck(e4)).next(() => n2.documentOverlayCache.removeOverlaysForBatchId(e4, r2, t2)).next(() => n2.localDocuments.recalculateAndSaveOverlaysForDocumentKeys(e4, r2)).next(() => n2.localDocuments.getDocuments(e4, r2));
-        });
-      }(r.localStore, t);
+          return n2.mutationQueue.lookupMutationBatch(e4, t2).next(((t3) => (__PRIVATE_hardAssert(null !== t3, 37113), r2 = t3.keys(), n2.mutationQueue.removeMutationBatch(e4, t3)))).next((() => n2.mutationQueue.performConsistencyCheck(e4))).next((() => n2.documentOverlayCache.removeOverlaysForBatchId(e4, r2, t2))).next((() => n2.localDocuments.recalculateAndSaveOverlaysForDocumentKeys(e4, r2))).next((() => n2.localDocuments.getDocuments(e4, r2)));
+        }));
+      })(r.localStore, t);
       __PRIVATE_processUserCallback(r, t, n), __PRIVATE_triggerPendingWritesCallbacks(r, t), r.sharedClientState.updateMutationState(t, "rejected", n), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(r, e2);
     } catch (n2) {
       await __PRIVATE_ignoreIfPrimaryLeaseLoss(n2);
     }
   }
   function __PRIVATE_triggerPendingWritesCallbacks(e, t) {
-    (e.yu.get(t) || []).forEach((e2) => {
+    (e.yu.get(t) || []).forEach(((e2) => {
       e2.resolve();
-    }), e.yu.delete(t);
+    })), e.yu.delete(t);
   }
   function __PRIVATE_processUserCallback(e, t, n) {
     const r = __PRIVATE_debugCast(e);
@@ -18655,10 +18655,10 @@ This typically indicates that your device does not have a healthy Internet conne
     e.sharedClientState.removeLocalQueryTarget(t);
     for (const r of e.Vu.get(t)) e.Au.delete(r), n && e.Ru.Du(r, n);
     if (e.Vu.delete(t), e.isPrimaryClient) {
-      e.gu.Gr(t).forEach((t2) => {
+      e.gu.Gr(t).forEach(((t2) => {
         e.gu.containsKey(t2) || // We removed the last reference for this key
         __PRIVATE_removeLimboTarget(e, t2);
-      });
+      }));
     }
   }
   function __PRIVATE_removeLimboTarget(e, t) {
@@ -18690,8 +18690,8 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   async function __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(e, t, n) {
     const r = __PRIVATE_debugCast(e), i = [], s = [], o = [];
-    r.Au.isEmpty() || (r.Au.forEach((e2, _) => {
-      o.push(r.bu(_, t, n).then((e3) => {
+    r.Au.isEmpty() || (r.Au.forEach(((e2, _) => {
+      o.push(r.bu(_, t, n).then(((e3) => {
         var _a;
         if ((e3 || n) && r.isPrimaryClient) {
           const t2 = e3 ? !e3.fromCache : (_a = n == null ? void 0 : n.targetChanges.get(_.targetId)) == null ? void 0 : _a.current;
@@ -18702,11 +18702,11 @@ This typically indicates that your device does not have a healthy Internet conne
           const t2 = __PRIVATE_LocalViewChanges.Es(_.targetId, e3);
           s.push(t2);
         }
-      }));
-    }), await Promise.all(o), r.Ru.H_(i), await async function __PRIVATE_localStoreNotifyLocalViewChanges(e2, t2) {
+      })));
+    })), await Promise.all(o), r.Ru.H_(i), await (async function __PRIVATE_localStoreNotifyLocalViewChanges(e2, t2) {
       const n2 = __PRIVATE_debugCast(e2);
       try {
-        await n2.persistence.runTransaction("notifyLocalViewChanges", "readwrite", (e3) => PersistencePromise.forEach(t2, (t3) => PersistencePromise.forEach(t3.Ts, (r2) => n2.persistence.referenceDelegate.addReference(e3, t3.targetId, r2)).next(() => PersistencePromise.forEach(t3.Is, (r2) => n2.persistence.referenceDelegate.removeReference(e3, t3.targetId, r2)))));
+        await n2.persistence.runTransaction("notifyLocalViewChanges", "readwrite", ((e3) => PersistencePromise.forEach(t2, ((t3) => PersistencePromise.forEach(t3.Ts, ((r2) => n2.persistence.referenceDelegate.addReference(e3, t3.targetId, r2))).next((() => PersistencePromise.forEach(t3.Is, ((r2) => n2.persistence.referenceDelegate.removeReference(e3, t3.targetId, r2)))))))));
       } catch (e3) {
         if (!__PRIVATE_isIndexedDbTransactionError(e3)) throw e3;
         __PRIVATE_logDebug(Nt, "Failed to update sequence numbers: " + e3);
@@ -18718,7 +18718,7 @@ This typically indicates that your device does not have a healthy Internet conne
           n2.vs = n2.vs.insert(t3, i2);
         }
       }
-    }(r.localStore, s));
+    })(r.localStore, s));
   }
   async function __PRIVATE_syncEngineHandleCredentialChange(e, t) {
     const n = __PRIVATE_debugCast(e);
@@ -18726,13 +18726,13 @@ This typically indicates that your device does not have a healthy Internet conne
       __PRIVATE_logDebug(Zt, "User change. New user:", t.toKey());
       const e2 = await __PRIVATE_localStoreHandleUserChange(n.localStore, t);
       n.currentUser = t, // Fails tasks waiting for pending writes requested by previous user.
-      function __PRIVATE_rejectOutstandingPendingWritesCallbacks(e3, t2) {
-        e3.yu.forEach((e4) => {
-          e4.forEach((e5) => {
+      (function __PRIVATE_rejectOutstandingPendingWritesCallbacks(e3, t2) {
+        e3.yu.forEach(((e4) => {
+          e4.forEach(((e5) => {
             e5.reject(new FirestoreError(D.CANCELLED, t2));
-          });
-        }), e3.yu.clear();
-      }(n, "'waitForPendingWrites' promise is rejected due to a user change."), // TODO(b/114226417): Consider calling this only in the primary tab.
+          }));
+        })), e3.yu.clear();
+      })(n, "'waitForPendingWrites' promise is rejected due to a user change."), // TODO(b/114226417): Consider calling this only in the primary tab.
       n.sharedClientState.handleUserChange(t, e2.removedBatchIds, e2.addedBatchIds), await __PRIVATE_syncEngineEmitNewSnapsAndNotifyLocalStore(n, e2.Ns);
     }
   }
@@ -18799,7 +18799,7 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     xu(e) {
       const t = void 0 !== this.cacheSizeBytes ? LruParams.withCacheSize(this.cacheSizeBytes) : LruParams.DEFAULT;
-      return new __PRIVATE_MemoryPersistence((e2) => __PRIVATE_MemoryLruDelegate.Vi(e2, t), this.serializer);
+      return new __PRIVATE_MemoryPersistence(((e2) => __PRIVATE_MemoryLruDelegate.Vi(e2, t)), this.serializer);
     }
   };
   var OnlineComponentProvider = class {
@@ -18816,35 +18816,35 @@ This typically indicates that your device does not have a healthy Internet conne
       ), this.remoteStore.remoteSyncer.handleCredentialChange = __PRIVATE_syncEngineHandleCredentialChange.bind(null, this.syncEngine), await __PRIVATE_remoteStoreApplyPrimaryState(this.remoteStore, this.syncEngine.isPrimaryClient));
     }
     createEventManager(e) {
-      return function __PRIVATE_newEventManager() {
+      return (function __PRIVATE_newEventManager() {
         return new __PRIVATE_EventManagerImpl();
-      }();
+      })();
     }
     createDatastore(e) {
       const t = __PRIVATE_newSerializer(e.databaseInfo.databaseId), n = __PRIVATE_newConnection(e.databaseInfo);
       return __PRIVATE_newDatastore(e.authCredentials, e.appCheckCredentials, n, t);
     }
     createRemoteStore(e) {
-      return function __PRIVATE_newRemoteStore(e2, t, n, r, i) {
+      return (function __PRIVATE_newRemoteStore(e2, t, n, r, i) {
         return new __PRIVATE_RemoteStoreImpl(e2, t, n, r, i);
-      }(this.localStore, this.datastore, e.asyncQueue, (e2) => __PRIVATE_syncEngineApplyOnlineStateChange(
+      })(this.localStore, this.datastore, e.asyncQueue, ((e2) => __PRIVATE_syncEngineApplyOnlineStateChange(
         this.syncEngine,
         e2,
         0
         /* OnlineStateSource.RemoteStore */
-      ), function __PRIVATE_newConnectivityMonitor() {
+      )), (function __PRIVATE_newConnectivityMonitor() {
         return __PRIVATE_BrowserConnectivityMonitor.v() ? new __PRIVATE_BrowserConnectivityMonitor() : new __PRIVATE_NoopConnectivityMonitor();
-      }());
+      })());
     }
     createSyncEngine(e, t) {
-      return function __PRIVATE_newSyncEngine(e2, t2, n, r, i, s, o) {
+      return (function __PRIVATE_newSyncEngine(e2, t2, n, r, i, s, o) {
         const _ = new __PRIVATE_SyncEngineImpl(e2, t2, n, r, i, s);
         return o && (_.Su = true), _;
-      }(this.localStore, this.remoteStore, this.eventManager, this.sharedClientState, e.initialUser, e.maxConcurrentLimboResolutions, t);
+      })(this.localStore, this.remoteStore, this.eventManager, this.sharedClientState, e.initialUser, e.maxConcurrentLimboResolutions, t);
     }
     async terminate() {
       var _a, _b;
-      await async function __PRIVATE_remoteStoreShutdown(e) {
+      await (async function __PRIVATE_remoteStoreShutdown(e) {
         const t = __PRIVATE_debugCast(e);
         __PRIVATE_logDebug(jt, "RemoteStore shutting down."), t.da.add(
           5
@@ -18855,7 +18855,7 @@ This typically indicates that your device does not have a healthy Internet conne
           "Unknown"
           /* OnlineState.Unknown */
         );
-      }(this.remoteStore), (_a = this.datastore) == null ? void 0 : _a.terminate(), (_b = this.eventManager) == null ? void 0 : _b.terminate();
+      })(this.remoteStore), (_a = this.datastore) == null ? void 0 : _a.terminate(), (_b = this.eventManager) == null ? void 0 : _b.terminate();
     }
   };
   OnlineComponentProvider.provider = {
@@ -18879,17 +18879,17 @@ This typically indicates that your device does not have a healthy Internet conne
       this.muted = true;
     }
     ku(e, t) {
-      setTimeout(() => {
+      setTimeout((() => {
         this.muted || e(t);
-      }, 0);
+      }), 0);
     }
   };
   var Xt = "FirestoreClient";
   var FirestoreClient = class {
     constructor(e, t, n, r, i) {
-      this.authCredentials = e, this.appCheckCredentials = t, this.asyncQueue = n, this._databaseInfo = r, this.user = User.UNAUTHENTICATED, this.clientId = __PRIVATE_AutoId.newId(), this.authCredentialListener = () => Promise.resolve(), this.appCheckCredentialListener = () => Promise.resolve(), this._uninitializedComponentsProvider = i, this.authCredentials.start(n, async (e2) => {
+      this.authCredentials = e, this.appCheckCredentials = t, this.asyncQueue = n, this._databaseInfo = r, this.user = User.UNAUTHENTICATED, this.clientId = __PRIVATE_AutoId.newId(), this.authCredentialListener = () => Promise.resolve(), this.appCheckCredentialListener = () => Promise.resolve(), this._uninitializedComponentsProvider = i, this.authCredentials.start(n, (async (e2) => {
         __PRIVATE_logDebug(Xt, "Received user=", e2.uid), await this.authCredentialListener(e2), this.user = e2;
-      }), this.appCheckCredentials.start(n, (e2) => (__PRIVATE_logDebug(Xt, "Received new app check token=", e2), this.appCheckCredentialListener(e2, this.user)));
+      })), this.appCheckCredentials.start(n, ((e2) => (__PRIVATE_logDebug(Xt, "Received new app check token=", e2), this.appCheckCredentialListener(e2, this.user))));
     }
     get configuration() {
       return {
@@ -18911,7 +18911,7 @@ This typically indicates that your device does not have a healthy Internet conne
     terminate() {
       this.asyncQueue.enterRestrictedMode();
       const e = new __PRIVATE_Deferred();
-      return this.asyncQueue.enqueueAndForgetEvenWhileRestricted(async () => {
+      return this.asyncQueue.enqueueAndForgetEvenWhileRestricted((async () => {
         try {
           this._onlineComponents && await this._onlineComponents.terminate(), this._offlineComponents && await this._offlineComponents.terminate(), // The credentials provider must be terminated after shutting down the
           // RemoteStore as it will prevent the RemoteStore from retrieving auth
@@ -18921,7 +18921,7 @@ This typically indicates that your device does not have a healthy Internet conne
           const n = __PRIVATE_wrapInUserErrorIfRecoverable(t, "Failed to shutdown persistence");
           e.reject(n);
         }
-      }), e.promise;
+      })), e.promise;
     }
   };
   async function __PRIVATE_setOfflineComponentProvider(e, t) {
@@ -18929,18 +18929,18 @@ This typically indicates that your device does not have a healthy Internet conne
     const n = e.configuration;
     await t.initialize(n);
     let r = n.initialUser;
-    e.setCredentialChangeListener(async (e2) => {
+    e.setCredentialChangeListener((async (e2) => {
       r.isEqual(e2) || (await __PRIVATE_localStoreHandleUserChange(t.localStore, e2), r = e2);
-    }), // When a user calls clearPersistence() in one client, all other clients
+    })), // When a user calls clearPersistence() in one client, all other clients
     // need to be terminated to allow the delete to succeed.
-    t.persistence.setDatabaseDeletedListener(() => e.terminate()), e._offlineComponents = t;
+    t.persistence.setDatabaseDeletedListener((() => e.terminate())), e._offlineComponents = t;
   }
   async function __PRIVATE_setOnlineComponentProvider(e, t) {
     e.asyncQueue.verifyOperationInProgress();
     const n = await __PRIVATE_ensureOfflineComponents(e);
     __PRIVATE_logDebug(Xt, "Initializing OnlineComponentProvider"), await t.initialize(n, e.configuration), // The CredentialChangeListener of the online component provider takes
     // precedence over the offline component provider.
-    e.setCredentialChangeListener((e2) => __PRIVATE_remoteStoreHandleCredentialChange(t.remoteStore, e2)), e.setAppCheckTokenChangeListener((e2, n2) => __PRIVATE_remoteStoreHandleCredentialChange(t.remoteStore, n2)), e._onlineComponents = t;
+    e.setCredentialChangeListener(((e2) => __PRIVATE_remoteStoreHandleCredentialChange(t.remoteStore, e2))), e.setAppCheckTokenChangeListener(((e2, n2) => __PRIVATE_remoteStoreHandleCredentialChange(t.remoteStore, n2))), e._onlineComponents = t;
   }
   async function __PRIVATE_ensureOfflineComponents(e) {
     if (!e._offlineComponents) if (e._uninitializedComponentsProvider) {
@@ -18949,14 +18949,14 @@ This typically indicates that your device does not have a healthy Internet conne
         await __PRIVATE_setOfflineComponentProvider(e, e._uninitializedComponentsProvider._offline);
       } catch (t) {
         const n = t;
-        if (!function __PRIVATE_canFallbackFromIndexedDbError(e2) {
+        if (!(function __PRIVATE_canFallbackFromIndexedDbError(e2) {
           return "FirebaseError" === e2.name ? e2.code === D.FAILED_PRECONDITION || e2.code === D.UNIMPLEMENTED : !("undefined" != typeof DOMException && e2 instanceof DOMException) || // When the browser is out of quota we could get either quota exceeded
           // or an aborted error depending on whether the error happened during
           // schema migration.
           22 === e2.code || 20 === e2.code || // Firefox Private Browsing mode disables IndexedDb and returns
           // INVALID_STATE for any usage.
           11 === e2.code;
-        }(n)) throw n;
+        })(n)) throw n;
         __PRIVATE_logWarn("Error using user provided cache. Falling back to memory cache: " + n), await __PRIVATE_setOfflineComponentProvider(e, new __PRIVATE_MemoryOfflineComponentProvider());
       }
     } else __PRIVATE_logDebug(Xt, "Using default OfflineComponentProvider"), await __PRIVATE_setOfflineComponentProvider(e, new __PRIVATE_LruGcMemoryOfflineComponentProvider(void 0));
@@ -18966,7 +18966,7 @@ This typically indicates that your device does not have a healthy Internet conne
     return e._onlineComponents || (e._uninitializedComponentsProvider ? (__PRIVATE_logDebug(Xt, "Using user provided OnlineComponentProvider"), await __PRIVATE_setOnlineComponentProvider(e, e._uninitializedComponentsProvider._online)) : (__PRIVATE_logDebug(Xt, "Using default OnlineComponentProvider"), await __PRIVATE_setOnlineComponentProvider(e, new OnlineComponentProvider()))), e._onlineComponents;
   }
   function __PRIVATE_getSyncEngine(e) {
-    return __PRIVATE_ensureOnlineComponents(e).then((e2) => e2.syncEngine);
+    return __PRIVATE_ensureOnlineComponents(e).then(((e2) => e2.syncEngine));
   }
   async function __PRIVATE_getEventManager(e) {
     const t = await __PRIVATE_ensureOnlineComponents(e), n = t.eventManager;
@@ -18974,16 +18974,16 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   function __PRIVATE_firestoreClientListen(e, t, n, r) {
     const i = new __PRIVATE_AsyncObserver(r), s = new __PRIVATE_QueryListener(t, i, n);
-    return e.asyncQueue.enqueueAndForget(async () => __PRIVATE_eventManagerListen(await __PRIVATE_getEventManager(e), s)), () => {
-      i.Ku(), e.asyncQueue.enqueueAndForget(async () => __PRIVATE_eventManagerUnlisten(await __PRIVATE_getEventManager(e), s));
+    return e.asyncQueue.enqueueAndForget((async () => __PRIVATE_eventManagerListen(await __PRIVATE_getEventManager(e), s))), () => {
+      i.Ku(), e.asyncQueue.enqueueAndForget((async () => __PRIVATE_eventManagerUnlisten(await __PRIVATE_getEventManager(e), s)));
     };
   }
   function __PRIVATE_firestoreClientGetDocumentViaSnapshotListener(e, t, n = {}) {
     const r = new __PRIVATE_Deferred();
-    return e.asyncQueue.enqueueAndForget(async () => function __PRIVATE_readDocumentViaSnapshotListener(e2, t2, n2, r2, i) {
+    return e.asyncQueue.enqueueAndForget((async () => (function __PRIVATE_readDocumentViaSnapshotListener(e2, t2, n2, r2, i) {
       const s = new __PRIVATE_AsyncObserver({
         next: (_) => {
-          s.Ku(), t2.enqueueAndForget(() => __PRIVATE_eventManagerUnlisten(e2, o));
+          s.Ku(), t2.enqueueAndForget((() => __PRIVATE_eventManagerUnlisten(e2, o)));
           const a = _.docs.has(n2);
           !a && _.fromCache ? (
             // TODO(dimond): If we're online and the document doesn't
@@ -19002,14 +19002,14 @@ This typically indicates that your device does not have a healthy Internet conne
         Wa: true
       });
       return __PRIVATE_eventManagerListen(e2, o);
-    }(await __PRIVATE_getEventManager(e), e.asyncQueue, t, n, r)), r.promise;
+    })(await __PRIVATE_getEventManager(e), e.asyncQueue, t, n, r))), r.promise;
   }
   function __PRIVATE_firestoreClientGetDocumentsViaSnapshotListener(e, t, n = {}) {
     const r = new __PRIVATE_Deferred();
-    return e.asyncQueue.enqueueAndForget(async () => function __PRIVATE_executeQueryViaSnapshotListener(e2, t2, n2, r2, i) {
+    return e.asyncQueue.enqueueAndForget((async () => (function __PRIVATE_executeQueryViaSnapshotListener(e2, t2, n2, r2, i) {
       const s = new __PRIVATE_AsyncObserver({
         next: (n3) => {
-          s.Ku(), t2.enqueueAndForget(() => __PRIVATE_eventManagerUnlisten(e2, o)), n3.fromCache && "server" === r2.source ? i.reject(new FirestoreError(D.UNAVAILABLE, 'Failed to get documents from server. (However, these documents may exist in the local cache. Run again without setting source to "server" to retrieve the cached documents.)')) : i.resolve(n3);
+          s.Ku(), t2.enqueueAndForget((() => __PRIVATE_eventManagerUnlisten(e2, o))), n3.fromCache && "server" === r2.source ? i.reject(new FirestoreError(D.UNAVAILABLE, 'Failed to get documents from server. (However, these documents may exist in the local cache. Run again without setting source to "server" to retrieve the cached documents.)')) : i.resolve(n3);
         },
         error: (e3) => i.reject(e3)
       }), o = new __PRIVATE_QueryListener(n2, s, {
@@ -19017,11 +19017,11 @@ This typically indicates that your device does not have a healthy Internet conne
         Wa: true
       });
       return __PRIVATE_eventManagerListen(e2, o);
-    }(await __PRIVATE_getEventManager(e), e.asyncQueue, t, n, r)), r.promise;
+    })(await __PRIVATE_getEventManager(e), e.asyncQueue, t, n, r))), r.promise;
   }
   function __PRIVATE_firestoreClientWrite(e, t) {
     const n = new __PRIVATE_Deferred();
-    return e.asyncQueue.enqueueAndForget(async () => __PRIVATE_syncEngineWrite(await __PRIVATE_getSyncEngine(e), t, n)), n.promise;
+    return e.asyncQueue.enqueueAndForget((async () => __PRIVATE_syncEngineWrite(await __PRIVATE_getSyncEngine(e), t, n))), n.promise;
   }
   function __PRIVATE_cloneLongPollingOptions(e) {
     const t = {};
@@ -19051,18 +19051,18 @@ This typically indicates that your device does not have a healthy Internet conne
         // the TypeScript compiler has narrowed the type to boolean already.
         // noinspection PointlessBooleanExpressionJS
         this.experimentalAutoDetectLongPolling = !!e.experimentalAutoDetectLongPolling
-      ), this.experimentalLongPollingOptions = __PRIVATE_cloneLongPollingOptions((_b = e.experimentalLongPollingOptions) != null ? _b : {}), function __PRIVATE_validateLongPollingOptions(e2) {
+      ), this.experimentalLongPollingOptions = __PRIVATE_cloneLongPollingOptions((_b = e.experimentalLongPollingOptions) != null ? _b : {}), (function __PRIVATE_validateLongPollingOptions(e2) {
         if (void 0 !== e2.timeoutSeconds) {
           if (isNaN(e2.timeoutSeconds)) throw new FirestoreError(D.INVALID_ARGUMENT, `invalid long polling timeout: ${e2.timeoutSeconds} (must not be NaN)`);
           if (e2.timeoutSeconds < 5) throw new FirestoreError(D.INVALID_ARGUMENT, `invalid long polling timeout: ${e2.timeoutSeconds} (minimum allowed value is 5)`);
           if (e2.timeoutSeconds > 30) throw new FirestoreError(D.INVALID_ARGUMENT, `invalid long polling timeout: ${e2.timeoutSeconds} (maximum allowed value is 30)`);
         }
-      }(this.experimentalLongPollingOptions), this.useFetchStreams = !!e.useFetchStreams;
+      })(this.experimentalLongPollingOptions), this.useFetchStreams = !!e.useFetchStreams;
     }
     isEqual(e) {
-      return this.host === e.host && this.ssl === e.ssl && this.credentials === e.credentials && this.cacheSizeBytes === e.cacheSizeBytes && this.experimentalForceLongPolling === e.experimentalForceLongPolling && this.experimentalAutoDetectLongPolling === e.experimentalAutoDetectLongPolling && function __PRIVATE_longPollingOptionsEqual(e2, t) {
+      return this.host === e.host && this.ssl === e.ssl && this.credentials === e.credentials && this.cacheSizeBytes === e.cacheSizeBytes && this.experimentalForceLongPolling === e.experimentalForceLongPolling && this.experimentalAutoDetectLongPolling === e.experimentalAutoDetectLongPolling && (function __PRIVATE_longPollingOptionsEqual(e2, t) {
         return e2.timeoutSeconds === t.timeoutSeconds;
-      }(this.experimentalLongPollingOptions, e.experimentalLongPollingOptions) && this.ignoreUndefinedProperties === e.ignoreUndefinedProperties && this.useFetchStreams === e.useFetchStreams;
+      })(this.experimentalLongPollingOptions, e.experimentalLongPollingOptions) && this.ignoreUndefinedProperties === e.ignoreUndefinedProperties && this.useFetchStreams === e.useFetchStreams;
     }
   };
   var Firestore$1 = class {
@@ -19093,7 +19093,7 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     _setSettings(e) {
       if (this._settingsFrozen) throw new FirestoreError(D.FAILED_PRECONDITION, "Firestore has already been started and its settings can no longer be changed. You can only modify settings before calling any other methods on a Firestore object.");
-      this._settings = new FirestoreSettingsImpl(e), this._emulatorOptions = e.emulatorOptions || {}, void 0 !== e.credentials && (this._authCredentials = function __PRIVATE_makeAuthCredentialsProvider(e2) {
+      this._settings = new FirestoreSettingsImpl(e), this._emulatorOptions = e.emulatorOptions || {}, void 0 !== e.credentials && (this._authCredentials = (function __PRIVATE_makeAuthCredentialsProvider(e2) {
         if (!e2) return new __PRIVATE_EmptyAuthCredentialsProvider();
         switch (e2.type) {
           case "firstParty":
@@ -19103,7 +19103,7 @@ This typically indicates that your device does not have a healthy Internet conne
           default:
             throw new FirestoreError(D.INVALID_ARGUMENT, "makeAuthCredentialsProvider failed due to invalid credential type");
         }
-      }(e.credentials));
+      })(e.credentials));
     }
     _getSettings() {
       return this._settings;
@@ -19136,10 +19136,10 @@ This typically indicates that your device does not have a healthy Internet conne
      * Only ever called once.
      */
     _terminate() {
-      return function __PRIVATE_removeComponents(e) {
+      return (function __PRIVATE_removeComponents(e) {
         const t = en.get(e);
         t && (__PRIVATE_logDebug(Yt, "Removing Datastore"), en.delete(e), t.terminate());
-      }(this), Promise.resolve();
+      })(this), Promise.resolve();
     }
   };
   function connectFirestoreEmulator(e, t, n, r = {}) {
@@ -19352,13 +19352,13 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     enqueue(e) {
       if (this.Pc(), this.sc)
-        return new Promise(() => {
-        });
+        return new Promise((() => {
+        }));
       const t = new __PRIVATE_Deferred();
-      return this.Tc(() => this.sc && this.uc ? Promise.resolve() : (e().then(t.resolve, t.reject), t.promise)).then(() => t.promise);
+      return this.Tc((() => this.sc && this.uc ? Promise.resolve() : (e().then(t.resolve, t.reject), t.promise))).then((() => t.promise));
     }
     enqueueRetryable(e) {
-      this.enqueueAndForget(() => (this.rc.push(e), this.Ic()));
+      this.enqueueAndForget((() => (this.rc.push(e), this.Ic())));
     }
     /**
      * Runs the next operation from the retryable queue. If the operation fails,
@@ -19382,20 +19382,20 @@ This typically indicates that your device does not have a healthy Internet conne
         // Since `backoffAndRun()` cancels an existing backoff and schedules a
         // new backoff on every call, there is only ever a single additional
         // operation in the queue.
-        this.M_.p_(() => this.Ic());
+        this.M_.p_((() => this.Ic()));
       }
     }
     Tc(e) {
-      const t = this.hc.then(() => (this.ac = true, e().catch((e2) => {
+      const t = this.hc.then((() => (this.ac = true, e().catch(((e2) => {
         this._c = e2, this.ac = false;
         throw __PRIVATE_logError("INTERNAL UNHANDLED ERROR: ", __PRIVATE_getMessageOrStack(e2)), e2;
-      }).then((e2) => (this.ac = false, e2))));
+      })).then(((e2) => (this.ac = false, e2))))));
       return this.hc = t, t;
     }
     enqueueAfterDelay(e, t, n) {
       this.Pc(), // Fast-forward delays for timerIds that have been overridden.
       this.cc.indexOf(e) > -1 && (t = 0);
-      const r = DelayedOperation.createAndSchedule(this, e, t, n, (e2) => this.Ec(e2));
+      const r = DelayedOperation.createAndSchedule(this, e, t, n, ((e2) => this.Ec(e2)));
       return this.oc.push(r), r;
     }
     Pc() {
@@ -19431,11 +19431,11 @@ This typically indicates that your device does not have a healthy Internet conne
      * @returns a Promise that resolves once all operations have been run.
      */
     dc(e) {
-      return this.Ac().then(() => {
-        this.oc.sort((e2, t) => e2.targetTimeMs - t.targetTimeMs);
+      return this.Ac().then((() => {
+        this.oc.sort(((e2, t) => e2.targetTimeMs - t.targetTimeMs));
         for (const t of this.oc) if (t.skipDelay(), "all" !== e && t.timerId === e) break;
         return this.Ac();
-      });
+      }));
     }
     /**
      * For Tests: Skip all subsequent delays for a timer id.
@@ -19488,13 +19488,13 @@ This typically indicates that your device does not have a healthy Internet conne
     e._componentsProvider || ((_c = t.localCache) == null ? void 0 : _c._offlineComponentProvider) && ((_d = t.localCache) == null ? void 0 : _d._onlineComponentProvider) && (e._componentsProvider = {
       _offline: t.localCache._offlineComponentProvider,
       _online: t.localCache._onlineComponentProvider
-    }), e._firestoreClient = new FirestoreClient(e._authCredentials, e._appCheckCredentials, e._queue, n, e._componentsProvider && function __PRIVATE_buildComponentProvider(e2) {
+    }), e._firestoreClient = new FirestoreClient(e._authCredentials, e._appCheckCredentials, e._queue, n, e._componentsProvider && (function __PRIVATE_buildComponentProvider(e2) {
       const t2 = e2 == null ? void 0 : e2._online.build();
       return {
         _offline: e2 == null ? void 0 : e2._offline.build(t2),
         _online: t2
       };
-    }(e._componentsProvider));
+    })(e._componentsProvider));
   }
   var Bytes = class _Bytes {
     /** @hideconstructor */
@@ -19685,23 +19685,23 @@ This typically indicates that your device does not have a healthy Internet conne
      * @internal
      */
     constructor(e) {
-      this._values = (e || []).map((e2) => e2);
+      this._values = (e || []).map(((e2) => e2));
     }
     /**
      * Returns a copy of the raw number array form of the vector.
      */
     toArray() {
-      return this._values.map((e) => e);
+      return this._values.map(((e) => e));
     }
     /**
      * Returns `true` if the two `VectorValue` values have the same raw number arrays, returns `false` otherwise.
      */
     isEqual(e) {
-      return function __PRIVATE_isPrimitiveArrayEqual(e2, t) {
+      return (function __PRIVATE_isPrimitiveArrayEqual(e2, t) {
         if (e2.length !== t.length) return false;
         for (let n = 0; n < e2.length; ++n) if (e2[n] !== t[n]) return false;
         return true;
-      }(this._values, e._values);
+      })(this._values, e._values);
     }
     /**
      * Returns a JSON-serializable representation of this `VectorValue` instance.
@@ -19723,7 +19723,7 @@ This typically indicates that your device does not have a healthy Internet conne
      */
     static fromJSON(e) {
       if (__PRIVATE_validateJSON(e, _VectorValue._jsonSchema)) {
-        if (Array.isArray(e.vectorValues) && e.vectorValues.every((e2) => "number" == typeof e2)) return new _VectorValue(e.vectorValues);
+        if (Array.isArray(e.vectorValues) && e.vectorValues.every(((e2) => "number" == typeof e2))) return new _VectorValue(e.vectorValues);
         throw new FirestoreError(D.INVALID_ARGUMENT, "Expected 'vectorValues' field to be a number array");
       }
     }
@@ -19830,7 +19830,7 @@ This typically indicates that your device does not have a healthy Internet conne
     }
     /** Returns 'true' if 'fieldPath' was traversed when creating this context. */
     contains(e) {
-      return void 0 !== this.fieldMask.find((t) => e.isPrefixOf(t)) || void 0 !== this.fieldTransforms.find((t) => e.isPrefixOf(t.field));
+      return void 0 !== this.fieldMask.find(((t) => e.isPrefixOf(t))) || void 0 !== this.fieldTransforms.find(((t) => e.isPrefixOf(t.field)));
     }
     fc() {
       if (this.path) for (let e = 0; e < this.path.length; e++) this.wc(this.path.get(e));
@@ -19873,7 +19873,7 @@ This typically indicates that your device does not have a healthy Internet conne
         if (!o.contains(i2)) throw new FirestoreError(D.INVALID_ARGUMENT, `Field '${i2}' is specified in your field mask but missing from your input data.`);
         __PRIVATE_fieldMaskContains(e2, i2) || e2.push(i2);
       }
-      a = new FieldMask(e2), u = o.fieldTransforms.filter((e3) => a.covers(e3.field));
+      a = new FieldMask(e2), u = o.fieldTransforms.filter(((e3) => a.covers(e3.field)));
     } else a = null, u = o.fieldTransforms;
     return new ParsedSetData(new ObjectValue(_), a, u);
   }
@@ -19898,7 +19898,7 @@ This typically indicates that your device does not have a healthy Internet conne
     const i = e.V(1, t, n);
     __PRIVATE_validatePlainObject("Data must be an object, but it was:", i, r);
     const s = [], o = ObjectValue.empty();
-    forEach(r, (e2, r2) => {
+    forEach(r, ((e2, r2) => {
       const _2 = __PRIVATE_fieldPathFromDotSeparatedString(t, e2, n);
       r2 = getModularInstance(r2);
       const a = i.Sc(_2);
@@ -19908,7 +19908,7 @@ This typically indicates that your device does not have a healthy Internet conne
         const e3 = __PRIVATE_parseData(r2, a);
         null != e3 && (s.push(_2), o.set(_2, e3));
       }
-    });
+    }));
     const _ = new FieldMask(s);
     return new ParsedUpdateData(o, _, i.fieldTransforms);
   }
@@ -19942,12 +19942,12 @@ This typically indicates that your device does not have a healthy Internet conne
       e = getModularInstance(e)
     )) return __PRIVATE_validatePlainObject("Unsupported field value:", t, e), __PRIVATE_parseObject(e, t);
     if (e instanceof FieldValue)
-      return function __PRIVATE_parseSentinelFieldValue(e2, t2) {
+      return (function __PRIVATE_parseSentinelFieldValue(e2, t2) {
         if (!__PRIVATE_isWrite(t2.dataSource)) throw t2.Dc(`${e2._methodName}() can only be used with update() and set()`);
         if (!t2.path) throw t2.Dc(`${e2._methodName}() is not currently supported inside arrays`);
         const n = e2._toFieldTransform(t2);
         n && t2.fieldTransforms.push(n);
-      }(e, t), null;
+      })(e, t), null;
     if (void 0 === e && t.ignoreUndefinedProperties)
       return null;
     if (
@@ -19956,7 +19956,7 @@ This typically indicates that your device does not have a healthy Internet conne
       t.path && t.fieldMask.push(t.path), e instanceof Array
     ) {
       if (t.settings.arrayElement && 4 !== t.dataSource) throw t.Dc("Nested arrays are not supported");
-      return function __PRIVATE_parseArray(e2, t2) {
+      return (function __PRIVATE_parseArray(e2, t2) {
         const n = [];
         let r = 0;
         for (const i of e2) {
@@ -19972,9 +19972,9 @@ This typically indicates that your device does not have a healthy Internet conne
             values: n
           }
         };
-      }(e, t);
+      })(e, t);
     }
-    return function __PRIVATE_parseScalarValue(e2, t2) {
+    return (function __PRIVATE_parseScalarValue(e2, t2) {
       if (null === (e2 = getModularInstance(e2))) return {
         nullValue: "NULL_VALUE"
       };
@@ -20014,7 +20014,7 @@ This typically indicates that your device does not have a healthy Internet conne
         };
       }
       if (e2 instanceof VectorValue)
-        return function __PRIVATE_parseVectorValue(e3, t3) {
+        return (function __PRIVATE_parseVectorValue(e3, t3) {
           const n = e3 instanceof VectorValue ? e3.toArray() : e3, r = {
             fields: {
               [st]: {
@@ -20022,10 +20022,10 @@ This typically indicates that your device does not have a healthy Internet conne
               },
               [ut]: {
                 arrayValue: {
-                  values: n.map((e4) => {
+                  values: n.map(((e4) => {
                     if ("number" != typeof e4) throw t3.Dc("VectorValues must only contain numeric values.");
                     return __PRIVATE_toDouble(t3.serializer, e4);
-                  })
+                  }))
                 }
               }
             }
@@ -20033,10 +20033,10 @@ This typically indicates that your device does not have a healthy Internet conne
           return {
             mapValue: r
           };
-        }(e2, t2);
+        })(e2, t2);
       if (__PRIVATE_isProtoValueSerializable(e2)) return e2._toProto(t2.serializer);
       throw t2.Dc(`Unsupported field value: ${__PRIVATE_valueDescription(e2)}`);
-    }(e, t);
+    })(e, t);
   }
   function __PRIVATE_parseObject(e, t) {
     const n = {};
@@ -20044,10 +20044,10 @@ This typically indicates that your device does not have a healthy Internet conne
       // If we encounter an empty object, we explicitly add it to the update
       // mask to ensure that the server creates a map entry.
       t.path && t.path.length > 0 && t.fieldMask.push(t.path)
-    ) : forEach(e, (e2, r) => {
+    ) : forEach(e, ((e2, r) => {
       const i = __PRIVATE_parseData(r, t.yc(e2));
       null != i && (n[e2] = i);
-    }), {
+    })), {
       mapValue: {
         fields: n
       }
@@ -20112,7 +20112,7 @@ This typically indicates that your device does not have a healthy Internet conne
     return (s || o) && (a += " (found", s && (a += ` in field ${r}`), o && (a += ` in document ${i}`), a += ")"), new FirestoreError(D.INVALID_ARGUMENT, _ + e + a);
   }
   function __PRIVATE_fieldMaskContains(e, t) {
-    return e.some((e2) => e2.isEqual(t));
+    return e.some(((e2) => e2.isEqual(t)));
   }
   var AbstractUserDataWriter = class {
     convertValue(e, t = "none") {
@@ -20155,23 +20155,23 @@ This typically indicates that your device does not have a healthy Internet conne
      */
     convertObjectMap(e, t = "none") {
       const n = {};
-      return forEach(e, (e2, r) => {
+      return forEach(e, ((e2, r) => {
         n[e2] = this.convertValue(r, t);
-      }), n;
+      })), n;
     }
     /**
      * @internal
      */
     convertVectorValue(e) {
       var _a, _b, _c;
-      const t = (_c = (_b = (_a = e.fields) == null ? void 0 : _a[ut].arrayValue) == null ? void 0 : _b.values) == null ? void 0 : _c.map((e2) => __PRIVATE_normalizeNumber(e2.doubleValue));
+      const t = (_c = (_b = (_a = e.fields) == null ? void 0 : _a[ut].arrayValue) == null ? void 0 : _b.values) == null ? void 0 : _c.map(((e2) => __PRIVATE_normalizeNumber(e2.doubleValue)));
       return new VectorValue(t);
     }
     convertGeoPoint(e) {
       return new GeoPoint(__PRIVATE_normalizeNumber(e.latitude), __PRIVATE_normalizeNumber(e.longitude));
     }
     convertArray(e, t) {
-      return (e.values || []).map((e2) => this.convertValue(e2, t));
+      return (e.values || []).map(((e2) => this.convertValue(e2, t)));
     }
     convertServerTimestamp(e, t) {
       switch (t) {
@@ -20226,12 +20226,12 @@ This typically indicates that your device does not have a healthy Internet conne
   var Ut2 = "@firebase/firestore";
   var Ht2 = "4.14.1";
   function __PRIVATE_isPartialObserver(t) {
-    return function __PRIVATE_implementsAnyMethods(t2, e) {
+    return (function __PRIVATE_implementsAnyMethods(t2, e) {
       if ("object" != typeof t2 || null === t2) return false;
       const n = t2;
       for (const t3 of e) if (t3 in n && "function" == typeof n[t3]) return true;
       return false;
-    }(t, ["next", "error", "complete"]);
+    })(t, ["next", "error", "complete"]);
   }
   var DocumentSnapshot$1 = class {
     // Note: This class is stripped down version of the DocumentSnapshot in
@@ -20335,10 +20335,10 @@ This typically indicates that your device does not have a healthy Internet conne
   };
   function query(t, e, ...n) {
     let r = [];
-    e instanceof AppliableConstraint && r.push(e), r = r.concat(n), function __PRIVATE_validateQueryConstraintArray(t2) {
-      const e2 = t2.filter((t3) => t3 instanceof QueryCompositeFilterConstraint).length, n2 = t2.filter((t3) => t3 instanceof QueryFieldFilterConstraint).length;
+    e instanceof AppliableConstraint && r.push(e), r = r.concat(n), (function __PRIVATE_validateQueryConstraintArray(t2) {
+      const e2 = t2.filter(((t3) => t3 instanceof QueryCompositeFilterConstraint)).length, n2 = t2.filter(((t3) => t3 instanceof QueryFieldFilterConstraint)).length;
       if (e2 > 1 || e2 > 0 && n2 > 0) throw new FirestoreError(D.INVALID_ARGUMENT, "InvalidQuery. When using composite filters, you cannot use more than one filter at the top level. Consider nesting the multiple filters within an `and(...)` statement. For example: change `query(query, where(...), or(...))` to `query(query, and(where(...), or(...)))`.");
-    }(r);
+    })(r);
     for (const e2 of r) t = e2._apply(t);
     return t;
   }
@@ -20358,7 +20358,7 @@ This typically indicates that your device does not have a healthy Internet conne
       return __PRIVATE_validateNewFieldFilter(t._query, e), new Query(t.firestore, t.converter, __PRIVATE_queryWithAddedFilter(t._query, e));
     }
     _parse(t) {
-      const e = __PRIVATE_newUserDataReader(t.firestore), n = function __PRIVATE_newQueryFilter(t2, e2, n2, r, s, a, o) {
+      const e = __PRIVATE_newUserDataReader(t.firestore), n = (function __PRIVATE_newQueryFilter(t2, e2, n2, r, s, a, o) {
         let i;
         if (s.isKeyField()) {
           if ("array-contains" === a || "array-contains-any" === a) throw new FirestoreError(D.INVALID_ARGUMENT, `Invalid Query. You can't perform '${a}' queries on documentId().`);
@@ -20381,7 +20381,7 @@ This typically indicates that your device does not have a healthy Internet conne
         );
         const c = FieldFilter.create(s, a, i);
         return c;
-      }(t._query, "where", e, t.firestore._databaseId, this._field, this._op, this._value);
+      })(t._query, "where", e, t.firestore._databaseId, this._field, this._op, this._value);
       return n;
     }
   };
@@ -20400,16 +20400,16 @@ This typically indicates that your device does not have a healthy Internet conne
       return new _QueryCompositeFilterConstraint(t, e);
     }
     _parse(t) {
-      const e = this._queryConstraints.map((e2) => e2._parse(t)).filter((t2) => t2.getFilters().length > 0);
+      const e = this._queryConstraints.map(((e2) => e2._parse(t))).filter(((t2) => t2.getFilters().length > 0));
       return 1 === e.length ? e[0] : CompositeFilter.create(e, this._getOperator());
     }
     _apply(t) {
       const e = this._parse(t);
-      return 0 === e.getFilters().length ? t : (function __PRIVATE_validateNewFilter(t2, e2) {
+      return 0 === e.getFilters().length ? t : ((function __PRIVATE_validateNewFilter(t2, e2) {
         let n = t2;
         const r = e2.getFlattenedFilters();
         for (const t3 of r) __PRIVATE_validateNewFieldFilter(n, t3), n = __PRIVATE_queryWithAddedFilter(n, t3);
-      }(t._query, e), new Query(t.firestore, t.converter, __PRIVATE_queryWithAddedFilter(t._query, e)));
+      })(t._query, e), new Query(t.firestore, t.converter, __PRIVATE_queryWithAddedFilter(t._query, e)));
     }
     _getQueryConstraints() {
       return this._queryConstraints;
@@ -20430,12 +20430,12 @@ This typically indicates that your device does not have a healthy Internet conne
       return new _QueryOrderByConstraint(t, e);
     }
     _apply(t) {
-      const e = function __PRIVATE_newQueryOrderBy(t2, e2, n) {
+      const e = (function __PRIVATE_newQueryOrderBy(t2, e2, n) {
         if (null !== t2.startAt) throw new FirestoreError(D.INVALID_ARGUMENT, "Invalid query. You must not call startAt() or startAfter() before calling orderBy().");
         if (null !== t2.endAt) throw new FirestoreError(D.INVALID_ARGUMENT, "Invalid query. You must not call endAt() or endBefore() before calling orderBy().");
         const r = new OrderBy(e2, n);
         return r;
-      }(t._query, this._field, this._direction);
+      })(t._query, this._field, this._direction);
       return new Query(t.firestore, t.converter, __PRIVATE_queryWithAddedOrderBy(t._query, e));
     }
   };
@@ -20458,10 +20458,10 @@ This typically indicates that your device does not have a healthy Internet conne
     if (!Array.isArray(t) || 0 === t.length) throw new FirestoreError(D.INVALID_ARGUMENT, `Invalid Query. A non-empty array is required for '${e.toString()}' filters.`);
   }
   function __PRIVATE_validateNewFieldFilter(t, e) {
-    const n = function __PRIVATE_findOpInsideFilters(t2, e2) {
+    const n = (function __PRIVATE_findOpInsideFilters(t2, e2) {
       for (const n2 of t2) for (const t3 of n2.getFlattenedFilters()) if (e2.indexOf(t3.op) >= 0) return t3.op;
       return null;
-    }(t.filters, function __PRIVATE_conflictingOps(t2) {
+    })(t.filters, (function __PRIVATE_conflictingOps(t2) {
       switch (t2) {
         case "!=":
           return [
@@ -20486,7 +20486,7 @@ This typically indicates that your device does not have a healthy Internet conne
         default:
           return [];
       }
-    }(e.op));
+    })(e.op));
     if (null !== n)
       throw n === e.op ? new FirestoreError(D.INVALID_ARGUMENT, `Invalid query. You cannot use more than one '${e.op.toString()}' filter.`) : new FirestoreError(D.INVALID_ARGUMENT, `Invalid query. You cannot use '${e.op.toString()}' filters with '${n.toString()}' filters.`);
   }
@@ -20621,7 +20621,7 @@ This typically indicates that your device does not have a healthy Internet conne
     /** An array of all the documents in the `QuerySnapshot`. */
     get docs() {
       const t = [];
-      return this.forEach((e) => t.push(e)), t;
+      return this.forEach(((e) => t.push(e))), t;
     }
     /** The number of documents in the `QuerySnapshot`. */
     get size() {
@@ -20639,9 +20639,9 @@ This typically indicates that your device does not have a healthy Internet conne
      * @param thisArg - The `this` binding for the callback.
      */
     forEach(t, e) {
-      this._snapshot.docs.forEach((n) => {
+      this._snapshot.docs.forEach(((n) => {
         t.call(e, new QueryDocumentSnapshot(this._firestore, this._userDataWriter, n.key, n, new SnapshotMetadata(this._snapshot.mutatedKeys.has(n.key), this._snapshot.fromCache), this.query.converter));
-      });
+      }));
     }
     /**
      * Returns an array of the documents changes since the last snapshot. If this
@@ -20656,10 +20656,10 @@ This typically indicates that your device does not have a healthy Internet conne
       const e = !!t.includeMetadataChanges;
       if (e && this._snapshot.excludesMetadataChanges) throw new FirestoreError(D.INVALID_ARGUMENT, "To include metadata changes with your document changes, you must also pass { includeMetadataChanges:true } to onSnapshot().");
       return this._cachedChanges && this._cachedChangesIncludeMetadataChanges === e || (this._cachedChanges = /** Calculates the array of `DocumentChange`s for a given `ViewSnapshot`. */
-      function __PRIVATE_changesFromSnapshot(t2, e2) {
+      (function __PRIVATE_changesFromSnapshot(t2, e2) {
         if (t2._snapshot.oldDocs.isEmpty()) {
           let e3 = 0;
-          return t2._snapshot.docChanges.map((n) => {
+          return t2._snapshot.docChanges.map(((n) => {
             const r = new QueryDocumentSnapshot(t2._firestore, t2._userDataWriter, n.doc.key, n.doc, new SnapshotMetadata(t2._snapshot.mutatedKeys.has(n.doc.key), t2._snapshot.fromCache), t2.query.converter);
             return n.doc, {
               type: "added",
@@ -20667,11 +20667,11 @@ This typically indicates that your device does not have a healthy Internet conne
               oldIndex: -1,
               newIndex: e3++
             };
-          });
+          }));
         }
         {
           let n = t2._snapshot.oldDocs;
-          return t2._snapshot.docChanges.filter((t3) => e2 || 3 !== t3.type).map((e3) => {
+          return t2._snapshot.docChanges.filter(((t3) => e2 || 3 !== t3.type)).map(((e3) => {
             const r = new QueryDocumentSnapshot(t2._firestore, t2._userDataWriter, e3.doc.key, e3.doc, new SnapshotMetadata(t2._snapshot.mutatedKeys.has(e3.doc.key), t2._snapshot.fromCache), t2.query.converter);
             let s = -1, a = -1;
             return 0 !== e3.type && (s = n.indexOf(e3.doc.key), n = n.delete(e3.doc.key)), 1 !== e3.type && (n = n.add(e3.doc), a = n.indexOf(e3.doc.key)), {
@@ -20680,9 +20680,9 @@ This typically indicates that your device does not have a healthy Internet conne
               oldIndex: s,
               newIndex: a
             };
-          });
+          }));
         }
-      }(this, e), this._cachedChangesIncludeMetadataChanges = e), this._cachedChanges;
+      })(this, e), this._cachedChangesIncludeMetadataChanges = e), this._cachedChanges;
     }
     /**
      * Returns a JSON-serializable representation of this `QuerySnapshot` instance.
@@ -20695,9 +20695,9 @@ This typically indicates that your device does not have a healthy Internet conne
       const t = {};
       t.type = _QuerySnapshot._jsonSchemaVersion, t.bundleSource = "QuerySnapshot", t.bundleName = __PRIVATE_AutoId.newId(), this._firestore._databaseId.database, this._firestore._databaseId.projectId;
       const e = [], n = [], r = [];
-      return this.docs.forEach((t2) => {
+      return this.docs.forEach(((t2) => {
         null !== t2._document && (e.push(t2._document), n.push(this._userDataWriter.convertObjectMap(t2._document.data.value.mapValue.fields, "previous")), r.push(t2.ref.path));
-      }), t.bundle = (this._firestore, this.query._query, t.bundleName, "NOT SUPPORTED"), t;
+      })), t.bundle = (this._firestore, this.query._query, t.bundleName, "NOT SUPPORTED"), t;
     }
   };
   function __PRIVATE_resultChangeType(t) {
@@ -20724,12 +20724,12 @@ This typically indicates that your device does not have a healthy Internet conne
   function getDoc(t) {
     t = __PRIVATE_cast(t, DocumentReference);
     const e = __PRIVATE_cast(t.firestore, Firestore), n = ensureFirestoreConfigured(e);
-    return __PRIVATE_firestoreClientGetDocumentViaSnapshotListener(n, t._key).then((n2) => __PRIVATE_convertToDocSnapshot(e, t, n2));
+    return __PRIVATE_firestoreClientGetDocumentViaSnapshotListener(n, t._key).then(((n2) => __PRIVATE_convertToDocSnapshot(e, t, n2)));
   }
   function getDocs(t) {
     t = __PRIVATE_cast(t, Query);
     const e = __PRIVATE_cast(t.firestore, Firestore), n = ensureFirestoreConfigured(e), r = new __PRIVATE_ExpUserDataWriter(e);
-    return __PRIVATE_validateHasExplicitOrderByForLimitToLast(t._query), __PRIVATE_firestoreClientGetDocumentsViaSnapshotListener(n, t._query).then((n2) => new QuerySnapshot(e, r, t, n2));
+    return __PRIVATE_validateHasExplicitOrderByForLimitToLast(t._query), __PRIVATE_firestoreClientGetDocumentsViaSnapshotListener(n, t._query).then(((n2) => new QuerySnapshot(e, r, t, n2)));
   }
   function setDoc(t, e, n) {
     t = __PRIVATE_cast(t, DocumentReference);
@@ -20750,7 +20750,7 @@ This typically indicates that your device does not have a healthy Internet conne
   }
   function addDoc(t, e) {
     const n = __PRIVATE_cast(t.firestore, Firestore), r = doc(t), s = __PRIVATE_applyFirestoreDataConverter(t.converter, e), o = __PRIVATE_newUserDataReader(t.firestore);
-    return executeWrite(n, [__PRIVATE_parseSetData(o, "addDoc", r._key, s, null !== t.converter, {}).toMutation(r._key, Precondition.exists(false))]).then(() => r);
+    return executeWrite(n, [__PRIVATE_parseSetData(o, "addDoc", r._key, s, null !== t.converter, {}).toMutation(r._key, Precondition.exists(false))]).then((() => r));
   }
   function onSnapshot(t, ...e) {
     var _a, _b, _c;
@@ -20799,16 +20799,16 @@ This typically indicates that your device does not have a healthy Internet conne
     const r = n.docs.get(e._key), s = new __PRIVATE_ExpUserDataWriter(t);
     return new DocumentSnapshot(t, s, e._key, r, new SnapshotMetadata(n.hasPendingWrites, n.fromCache), e.converter);
   }
-  !function __PRIVATE_registerFirestore(h, d = true) {
-    __PRIVATE_setSDKVersion(SDK_VERSION), _registerComponent(new Component("firestore", (t, { instanceIdentifier: e, options: n }) => {
+  !(function __PRIVATE_registerFirestore(h, d = true) {
+    __PRIVATE_setSDKVersion(SDK_VERSION), _registerComponent(new Component("firestore", ((t, { instanceIdentifier: e, options: n }) => {
       const r = t.getProvider("app").getImmediate(), s = new Firestore(new __PRIVATE_FirebaseAuthCredentialsProvider(t.getProvider("auth-internal")), new __PRIVATE_FirebaseAppCheckTokenProvider(r, t.getProvider("app-check-internal")), __PRIVATE_databaseIdFromApp(r, e), r);
       return n = {
         useFetchStreams: d,
         ...n
       }, s._setSettings(n), s;
-    }, "PUBLIC").setMultipleInstances(true)), registerVersion(Ut2, Ht2, h), // BUILD_TARGET will be replaced by values like esm, cjs, etc during the compilation
+    }), "PUBLIC").setMultipleInstances(true)), registerVersion(Ut2, Ht2, h), // BUILD_TARGET will be replaced by values like esm, cjs, etc during the compilation
     registerVersion(Ut2, Ht2, "esm2020");
-  }();
+  })();
 
   // node_modules/@firebase/storage/dist/index.esm.js
   var DEFAULT_HOST = "firebasestorage.googleapis.com";
@@ -22516,42 +22516,39 @@ ${this.customData.serverResponse}`;
 /*! Bundled license information:
 
 @firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/util/dist/index.esm.js:
+@firebase/logger/dist/esm/index.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -22620,60 +22617,14 @@ ${this.customData.serverResponse}`;
    *)
 
 @firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
   (**
    * @license
    * Copyright 2022 Google LLC
@@ -22692,60 +22643,16 @@ ${this.customData.serverResponse}`;
    *)
 
 @firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/util/dist/index.esm.js:
+@firebase/component/dist/esm/index.esm.js:
+@firebase/app/dist/esm/index.esm.js:
+@firebase/app/dist/esm/index.esm.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/storage/dist/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
@@ -22764,6 +22671,48 @@ ${this.customData.serverResponse}`;
    *)
 
 @firebase/util/dist/index.esm.js:
+firebase/app/dist/esm/index.esm.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/firestore/dist/index.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
@@ -22815,60 +22764,6 @@ ${this.customData.serverResponse}`;
    * limitations under the License.
    *)
 
-@firebase/component/dist/esm/index.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/logger/dist/esm/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/app/dist/esm/index.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/app/dist/esm/index.esm.js:
   (**
    * @license
@@ -22906,24 +22801,6 @@ ${this.customData.serverResponse}`;
 @firebase/app/dist/esm/index.esm.js:
   (**
    * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/app/dist/esm/index.esm.js:
-  (**
-   * @license
    * Copyright 2021 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22955,25 +22832,9 @@ ${this.customData.serverResponse}`;
    * limitations under the License.
    *)
 
-firebase/app/dist/esm/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/auth/dist/esm/index-907e9a1a.js:
+@firebase/firestore/dist/index.esm.js:
+@firebase/storage/dist/index.esm.js:
   (**
    * @license
    * Copyright 2021 Google LLC
@@ -22992,95 +22853,6 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/auth/dist/esm/index-907e9a1a.js:
   (**
    * @license
@@ -23168,94 +22940,6 @@ firebase/app/dist/esm/index.esm.js:
 @firebase/auth/dist/esm/index-907e9a1a.js:
   (**
    * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
    * Copyright 2019 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23270,348 +22954,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
   (**
    * @license
    * Copyright 2020 Google LLC
@@ -23746,42 +23088,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
   (**
    * @license
    * Copyright 2021 Google LLC
@@ -23801,42 +23107,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/auth/dist/esm/index-907e9a1a.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -23902,16 +23172,6 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/webchannel-wrapper/dist/bloom-blob/esm/bloom_blob_es2018.js:
-  (** @license
-  Copyright The Closure Library Authors.
-  SPDX-License-Identifier: Apache-2.0
-  *)
-  (** @license
-  
-   Copyright The Closure Library Authors.
-   SPDX-License-Identifier: Apache-2.0
-  *)
-
 @firebase/webchannel-wrapper/dist/webchannel-blob/esm/webchannel_blob_es2018.js:
   (** @license
   Copyright The Closure Library Authors.
@@ -23924,6 +23184,7 @@ firebase/app/dist/esm/index.esm.js:
   *)
 
 @firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/storage/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -23958,41 +23219,9 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
+@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
@@ -24010,24 +23239,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -24098,40 +23309,6 @@ firebase/app/dist/esm/index.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
    * Copyright 2018 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24146,114 +23323,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -24306,40 +23375,7 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
+@firebase/firestore/dist/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
@@ -24359,42 +23395,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -24561,60 +23561,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -24684,60 +23630,6 @@ firebase/app/dist/esm/index.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
    * Copyright 2018 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24755,78 +23647,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -24959,24 +23779,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -25076,167 +23878,11 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
    * Copyright 2025 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -25268,60 +23914,6 @@ firebase/app/dist/esm/index.esm.js:
    * See the License for the specific language governing permissions and
    * limitations under the License.
    *)
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
    * Copyright 2020 Google LLC
@@ -25423,148 +24015,6 @@ firebase/app/dist/esm/index.esm.js:
    * limitations under the License.
    *)
 
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2025 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2025 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/common-7a7519be.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/firestore/dist/index.esm.js:
   (**
    * @license
@@ -25600,189 +24050,10 @@ firebase/app/dist/esm/index.esm.js:
    *)
 
 @firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2022 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2021 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
 @firebase/firestore/dist/index.esm.js:
   (**
    * @license
    * Copyright 2023 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/firestore/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2023 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.
@@ -25849,184 +24120,6 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2019 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2017 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-  (**
-   * @license
-   * Copyright 2020 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *   http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *)
-
-@firebase/storage/dist/index.esm.js:
-  (**
-   * @license
-   * Copyright 2021 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.

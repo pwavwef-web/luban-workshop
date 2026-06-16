@@ -854,589 +854,78 @@
 /*! Bundled license information:
 
 lucide/dist/esm/defaultAttributes.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/createElement.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/shared/src/utils/hasA11yProp.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/shared/src/utils/mergeClasses.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/shared/src/utils/toCamelCase.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/shared/src/utils/toPascalCase.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/replaceElement.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/arrow-left.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/arrow-right.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/badge-percent.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/book-open.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/bot.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/briefcase.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/calendar-check.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/calendar-clock.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/calendar.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/camera.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/check.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/chef-hat.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/circle-alert.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/circle-check-big.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/circle-question-mark.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/circle-user-round.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/clock.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/cloud-upload.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/copy.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/download.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/external-link.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/eye-off.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/eye.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/file-text.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/graduation-cap.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/heart-handshake.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/house.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/image.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/info.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/layout-dashboard.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/leaf.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/loader.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/log-in.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/log-out.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/mail-x.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/mail.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/map-pin.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/map.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/menu.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/message-square.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/navigation.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/package.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/party-popper.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/pencil.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/phone.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/plus.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/printer.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/qr-code.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/refresh-cw.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/rotate-ccw.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/save.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/settings.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/share-2.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/shield-alert.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/shield-check.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/shield.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/shopping-bag.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/shopping-basket.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/sparkles.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/trash-2.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/truck.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/user-check.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/user.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/utensils-crossed.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/utensils.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/icons/x.mjs:
-  (**
-   * @license lucide v1.16.0 - ISC
-   *
-   * This source code is licensed under the ISC license.
-   * See the LICENSE file in the root directory of this source tree.
-   *)
-
 lucide/dist/esm/lucide.mjs:
   (**
    * @license lucide v1.16.0 - ISC

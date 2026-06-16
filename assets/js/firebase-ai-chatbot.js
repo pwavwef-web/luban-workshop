@@ -198,6 +198,8 @@ Do not start every reply with a greeting. Greet only once at chat start, then an
 If the context does not answer the question, say you do not have that detail in the restaurant information available here and direct the guest to call 020 543 8455, email reservations@lubanrestaurant.com, or use [Contact Us](contact-us.html).
 Do not invent menu availability, prices, reservation status, dietary safety, staff names, policies, or private data.
 You can help guests with menu discovery, ordering and checkout guidance, reservation paths, account verification, event/catering questions, contact paths, and issue reports.
+Direct cart actions are handled by website functions before you answer. Guests can ask to add menu items, remove items, show or clear the cart, or open checkout.
+Never say a cart action or report was completed unless the website function result says it succeeded. Never place the final order for the guest; checkout still requires the guest to review and confirm.
 During election-week or campaign-season questions, treat political terms as event context only. Keep the answer neutral, food-first, and practical.
 Never endorse, oppose, rank, compare, campaign for, predict, congratulate, criticize, or write persuasive political messaging for any candidate, hall, party, campaign team, or election outcome.
 If the guest asks for candidate advice, campaign strategy, vote appeals, slogans, manifestos, or results commentary, politely explain that Bao can only help with restaurant menu, QR, ordering, reservation, and group-meal logistics.
@@ -229,7 +231,16 @@ const state = {
   account: null,
   accountPromise: null,
   knowledgePromise: null,
+  menuCatalog: null,
+  menuCatalogPromise: null,
   pendingReport: null,
+  lockedScrollY: 0,
+  previousHtmlOverflow: '',
+  previousBodyOverflow: '',
+  previousBodyPosition: '',
+  previousBodyTop: '',
+  previousBodyWidth: '',
+  previousBodyTouchAction: '',
   history: []
 };
 
@@ -427,15 +438,17 @@ function injectStyles() {
   const style = document.createElement('style');
   style.id = 'luban-ai-chatbot-styles';
   style.textContent = `
-    .luban-chatbot { position: fixed; right: 18px; bottom: 18px; z-index: 55; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c1917; }
+    .luban-chatbot { position: fixed; right: 18px; bottom: 18px; z-index: 55; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c1917; pointer-events: none; }
     .luban-chatbot * { box-sizing: border-box; }
-    .luban-chatbot__button { width: 62px; height: 62px; border: 0; border-radius: 50%; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 14px 32px rgba(28,25,23,.28); cursor: pointer; transition: transform .2s ease, background .2s ease; }
+    .luban-chatbot__button { width: 62px; height: 62px; border: 0; border-radius: 50%; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 14px 32px rgba(28,25,23,.28); cursor: pointer; transition: transform .2s ease, background .2s ease, opacity .18s ease; pointer-events: auto; }
     .luban-chatbot__button:hover { background: #991b1b; transform: translateY(-2px); }
     .luban-chatbot__button:focus-visible, .luban-chatbot button:focus-visible, .luban-chatbot textarea:focus-visible { outline: 3px solid rgba(185,28,28,.25); outline-offset: 3px; }
     .luban-chatbot__button svg, .luban-chatbot__button img { width: 28px; height: 28px; display: block; }
-    .luban-chatbot__panel { position: absolute; right: 0; bottom: 78px; width: min(390px, calc(100vw - 28px)); max-height: min(680px, calc(100vh - 118px)); background: #fff; border: 1px solid #e7e5e4; border-radius: 8px; box-shadow: 0 24px 70px rgba(28,25,23,.32); overflow: hidden; display: grid; grid-template-rows: auto minmax(220px, 1fr) auto; transform-origin: bottom right; opacity: 0; pointer-events: none; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease; }
+    .luban-chatbot__panel { position: absolute; right: 0; bottom: 78px; width: min(390px, calc(100vw - 28px)); height: min(680px, calc(100dvh - 118px)); max-height: min(680px, calc(100vh - 118px)); background: #fff; border: 1px solid #e7e5e4; border-radius: 8px; box-shadow: 0 24px 70px rgba(28,25,23,.32); overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform-origin: bottom right; opacity: 0; pointer-events: none; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease; overscroll-behavior: contain; }
+    .luban-chatbot__panel[hidden] { display: none; }
+    .luban-chatbot--open { pointer-events: auto; }
     .luban-chatbot--open .luban-chatbot__panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-    .luban-chatbot__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 12px; background: #1c1917; color: #fff; }
+    .luban-chatbot__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 12px; background: #1c1917; color: #fff; flex-shrink: 0; }
     .luban-chatbot__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .luban-chatbot__mark { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: #b91c1c; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .luban-chatbot__mark svg, .luban-chatbot__mark img { width: 19px; height: 19px; display: block; }
@@ -444,7 +457,7 @@ function injectStyles() {
     .luban-chatbot__icon-btn { border: 0; width: 34px; height: 34px; border-radius: 6px; background: rgba(255,255,255,.08); color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .luban-chatbot__icon-btn:hover { background: rgba(255,255,255,.16); }
     .luban-chatbot__icon-btn svg { width: 18px; height: 18px; }
-    .luban-chatbot__messages { overflow-y: auto; padding: 16px 14px; background: #fafaf9; display: flex; flex-direction: column; gap: 10px; }
+    .luban-chatbot__messages { min-height: 0; overflow-y: auto; padding: 16px 14px; background: #fafaf9; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
     .luban-chatbot__message { max-width: 88%; border-radius: 8px; padding: 10px 12px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
     .luban-chatbot__message--bot { align-self: flex-start; background: #fff; border: 1px solid #e7e5e4; color: #292524; }
     .luban-chatbot__message--user { align-self: flex-end; background: #b91c1c; color: #fff; }
@@ -454,15 +467,25 @@ function injectStyles() {
     .luban-chatbot__suggestions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
     .luban-chatbot__suggestion { border: 1px solid #e7e5e4; background: #fff; color: #57534e; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 7px 10px; cursor: pointer; }
     .luban-chatbot__suggestion:hover { border-color: #b91c1c; color: #b91c1c; }
-    .luban-chatbot__form { padding: 12px; border-top: 1px solid #e7e5e4; background: #fff; display: grid; grid-template-columns: 1fr 44px; gap: 9px; align-items: end; }
+    .luban-chatbot__form { padding: 12px; border-top: 1px solid #e7e5e4; background: #fff; display: grid; grid-template-columns: 1fr 44px; gap: 9px; align-items: end; flex-shrink: 0; }
     .luban-chatbot__input { min-height: 44px; max-height: 112px; resize: none; border: 1px solid #d6d3d1; border-radius: 8px; padding: 11px 12px; font: inherit; font-size: 14px; color: #1c1917; }
     .luban-chatbot__send { width: 44px; height: 44px; border: 0; border-radius: 8px; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
     .luban-chatbot__send:disabled { opacity: .55; cursor: not-allowed; }
     .luban-chatbot__send svg { width: 19px; height: 19px; }
     @media (max-width: 520px) {
-      .luban-chatbot { right: 12px; bottom: 12px; }
-      .luban-chatbot__panel { width: calc(100vw - 24px); max-height: calc(100vh - 102px); bottom: 72px; }
-      .luban-chatbot__button { width: 58px; height: 58px; }
+      .luban-chatbot { top: auto; right: 12px; bottom: 12px; left: auto; width: 58px; height: 58px; display: block; padding: 0; background: transparent; transition: background .18s ease; }
+      .luban-chatbot { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+      .luban-chatbot--open { top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; display: flex; align-items: flex-end; justify-content: center; padding: 72px 10px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(28,25,23,.42); }
+      .luban-chatbot__panel { position: relative; right: auto; bottom: auto; width: 100%; height: min(620px, calc(100dvh - 96px)); max-height: calc(100vh - 96px); border-radius: 8px; transform-origin: bottom center; }
+      .luban-chatbot__button { position: static; width: 58px; height: 58px; }
+      .luban-chatbot--open .luban-chatbot__button { position: absolute; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+      .luban-chatbot--open .luban-chatbot__button { opacity: 0; pointer-events: none; transform: scale(.96); }
+      .luban-chatbot__status { max-width: 210px; }
+    }
+    @supports (height: 100svh) {
+      @media (max-width: 520px) {
+        .luban-chatbot__panel { height: min(620px, calc(100svh - 96px)); max-height: calc(100svh - 96px); }
+      }
     }
   `;
   document.head.appendChild(style);
@@ -477,6 +500,56 @@ function createIcon(name) {
     sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"></path></svg>'
   };
   return icons[name] || '';
+}
+
+function isMobileChatViewport() {
+  return window.matchMedia && window.matchMedia('(max-width: 520px)').matches;
+}
+
+function lockPageScrollForChat() {
+  if (!document.body || !document.documentElement || document.body.dataset.lubanChatLocked === 'true') return;
+  state.lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  state.previousHtmlOverflow = document.documentElement.style.overflow;
+  state.previousBodyOverflow = document.body.style.overflow;
+  state.previousBodyPosition = document.body.style.position;
+  state.previousBodyTop = document.body.style.top;
+  state.previousBodyWidth = document.body.style.width;
+  state.previousBodyTouchAction = document.body.style.touchAction;
+  document.body.dataset.lubanChatLocked = 'true';
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${state.lockedScrollY}px`;
+  document.body.style.width = '100%';
+  document.body.style.touchAction = 'none';
+}
+
+function unlockPageScrollForChat() {
+  if (!document.body || !document.documentElement || document.body.dataset.lubanChatLocked !== 'true') return;
+  const scrollY = state.lockedScrollY;
+  document.documentElement.style.overflow = state.previousHtmlOverflow || '';
+  document.body.style.overflow = state.previousBodyOverflow || '';
+  document.body.style.position = state.previousBodyPosition || '';
+  document.body.style.top = state.previousBodyTop || '';
+  document.body.style.width = state.previousBodyWidth || '';
+  document.body.style.touchAction = state.previousBodyTouchAction || '';
+  delete document.body.dataset.lubanChatLocked;
+  window.scrollTo(0, scrollY);
+  state.lockedScrollY = 0;
+  state.previousHtmlOverflow = '';
+  state.previousBodyOverflow = '';
+  state.previousBodyPosition = '';
+  state.previousBodyTop = '';
+  state.previousBodyWidth = '';
+  state.previousBodyTouchAction = '';
+}
+
+function syncPageScrollLock() {
+  if (state.open && isMobileChatViewport()) {
+    lockPageScrollForChat();
+  } else {
+    unlockPageScrollForChat();
+  }
 }
 
 function mountChatbot() {
@@ -538,6 +611,11 @@ function mountChatbot() {
   input.addEventListener('input', () => autoSizeInput(input));
 
   root.addEventListener('click', (event) => {
+    if (event.target === root && state.open) {
+      setOpen(false);
+      return;
+    }
+
     const suggestion = event.target.closest('[data-luban-suggestion]');
     if (!suggestion || state.busy) return;
     handleUserMessage(suggestion.getAttribute('data-luban-suggestion'));
@@ -547,13 +625,17 @@ function mountChatbot() {
     if (event.key === 'Escape' && state.open) setOpen(false);
   });
 
+  window.addEventListener('resize', syncPageScrollLock);
+
   function setOpen(open) {
     state.open = open;
     root.classList.toggle('luban-chatbot--open', open);
+    if (document.body) document.body.classList.toggle('luban-chatbot-open', open);
     panel.hidden = !open;
+    panel.setAttribute('aria-modal', String(open));
     toggle.setAttribute('aria-expanded', String(open));
-    toggle.setAttribute('aria-label', open ? 'Close restaurant chat' : 'Open restaurant chat');
-  toggle.setAttribute('aria-label', open ? 'Close Bao chat' : 'Open Bao chat');
+    toggle.setAttribute('aria-label', open ? 'Close Bao chat' : 'Open Bao chat');
+    syncPageScrollLock();
 
     if (open) {
       ensureGreeting();
@@ -1087,6 +1169,307 @@ async function handleOrderStatusQuery(question) {
   return formatOrdersForResponse(ordersData);
 }
 
+const QUANTITY_WORDS = {
+  a: 1,
+  an: 1,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10
+};
+
+const MENU_ITEM_ALIASES = {
+  DR1: ['coke', 'cola', 'coca cola', 'coca-cola'],
+  DR2: ['fanta'],
+  DR3: ['sprite'],
+  DR4: ['water', 'bottled water', 'mineral water'],
+  N6: ['chicken noodles'],
+  N5: ['seafood noodles'],
+  N2: ['special noodles'],
+  N1: ['vegetable noodles'],
+  R7: ['chicken fried rice'],
+  R6: ['beef fried rice'],
+  R5: ['egg fried rice'],
+  R4: ['shrimp fried rice'],
+  R3: ['combo fried rice'],
+  R2: ['jollof rice', 'special jollof'],
+  D1: ['pork dumplings', 'steamed pork dumplings'],
+  D2: ['fried pork dumplings'],
+  D3: ['beef dumplings', 'steamed beef dumplings'],
+  D4: ['fried beef dumplings']
+};
+
+const CART_ACTION_TOOLS = {
+  addItems(items) {
+    const cart = readAssistantCart();
+    items.forEach(({ item, quantity }) => {
+      const safeQuantity = Math.max(1, Math.min(99, Number(quantity) || 1));
+      const existing = cart.find((cartItem) => cartItem.id === item.id);
+      if (existing) {
+        existing.quantity = Math.min(99, Number(existing.quantity || 0) + safeQuantity);
+        existing.name = item.name;
+        existing.price = item.price;
+        existing.image = item.image;
+      } else {
+        cart.push({ ...item, quantity: safeQuantity });
+      }
+    });
+    writeAssistantCart(cart);
+    return cart;
+  },
+  removeItems(items) {
+    const cart = readAssistantCart();
+    const removed = [];
+    items.forEach(({ item, quantity }) => {
+      const index = cart.findIndex((cartItem) => cartItem.id === item.id);
+      if (index === -1) return;
+      const currentQuantity = Number(cart[index].quantity || 0);
+      const requestedQuantity = Number(quantity || 0);
+      const removeQuantity = requestedQuantity > 0 ? Math.min(requestedQuantity, currentQuantity) : currentQuantity;
+      if (removeQuantity >= currentQuantity) {
+        cart.splice(index, 1);
+      } else {
+        cart[index].quantity = currentQuantity - removeQuantity;
+      }
+      removed.push({ item, quantity: removeQuantity });
+    });
+    writeAssistantCart(cart);
+    return { cart, removed };
+  },
+  clearCart() {
+    writeAssistantCart([]);
+    return [];
+  },
+  showCart() {
+    return readAssistantCart();
+  },
+  openCheckout() {
+    window.setTimeout(() => {
+      window.location.href = new URL('checkout.html', SITE_ROOT).href;
+    }, 700);
+  }
+};
+
+function getCartActionType(text) {
+  const value = normalizeSearchText(text);
+  if (!value || /\border status\b|\btrack (my )?order\b/.test(value)) return '';
+  if (/\b(clear|empty)\b.*\b(cart|basket|order)\b/.test(value)) return 'clear';
+  if (/\b(show|view|see|list|check|what is|whats|what's)\b.*\b(cart|basket|order)\b/.test(value)) return 'show';
+  if (isCheckoutActionRequest(value)) return 'checkout';
+  if (/\b(remove|delete|drop|take out|take off)\b/.test(value) && /\b(cart|basket|order|from)\b/.test(value)) return 'remove';
+  if (/\b(add|put|include)\b/.test(value) && /\b(cart|basket|order)\b/.test(value)) return 'add';
+  if (/\b(can you|could you|please|i want|i need|i would like|i'll have|ill have|order|get me)\b/.test(value) && /\b(add|cart|order|get|have)\b/.test(value)) return 'add';
+  return '';
+}
+
+function isCheckoutActionRequest(value) {
+  const text = String(value || '').trim();
+  if (!/\b(?:checkout|check out)\b/.test(text)) return false;
+
+  if (/\b(?:why|how|what|when|where|who)\b/.test(text)) return false;
+  if (/\b(?:cant|cannot|unable|stuck|problem|issue|error|failed|failing|broken|not working|wont|dont|doesnt|isnt|no)\b/.test(text)) return false;
+  if (/\b(?:can|could|should|would|do|did)\s+i\b.*\b(?:checkout|check out)\b/.test(text)) return false;
+
+  return text === 'checkout' ||
+    text === 'check out' ||
+    /\b(?:open|go to|take me to|send me to|bring me to|start|begin|proceed to|continue to|head to|move to)\s+(?:the\s+)?(?:checkout|check out)(?:\s+page)?\b/.test(text) ||
+    /\b(?:checkout|check out)\s+(?:now|please|page)\b/.test(text);
+}
+
+async function handleCartAction(question) {
+  const action = getCartActionType(question);
+  if (!action) return null;
+
+  if (!window.lubanClient || typeof window.lubanClient.writeCart !== 'function') {
+    return `I can't update the cart on this page right now. Please use [Menu](${CONTACT.menuPage}) or refresh the page and try again.`;
+  }
+
+  if (action === 'clear') {
+    CART_ACTION_TOOLS.clearCart();
+    return 'Done. I cleared your cart.';
+  }
+
+  if (action === 'show') {
+    return formatCartSummary(CART_ACTION_TOOLS.showCart());
+  }
+
+  if (action === 'checkout') {
+    const cart = CART_ACTION_TOOLS.showCart();
+    if (!cart.length) {
+      return `Your cart is empty. Tell me what to add, or browse the [Menu](${CONTACT.menuPage}).`;
+    }
+    CART_ACTION_TOOLS.openCheckout();
+    return 'Opening checkout now. You will still review and confirm the order there.';
+  }
+
+  const resolution = await resolveCartMenuItems(question);
+  if (resolution.status === 'no_match') {
+    return `I couldn't match a menu item in that cart request. Try the dish name or code from the [Menu](${CONTACT.menuPage}), for example "add Chicken Noodles to cart".`;
+  }
+  if (resolution.status === 'ambiguous') {
+    return `I found a few possible matches: ${resolution.options.map((item) => `${item.name} (${item.id})`).join(', ')}. Please tell me the exact item name or code to ${action === 'remove' ? 'remove' : 'add'}.`;
+  }
+
+  if (action === 'remove') {
+    const result = CART_ACTION_TOOLS.removeItems(resolution.items);
+    if (!result.removed.length) {
+      return `I found the item, but it is not in your cart yet. ${formatCartSummary(result.cart)}`;
+    }
+    return `Removed ${formatActionItemList(result.removed)}.\n\n${formatCartSummary(result.cart)}`;
+  }
+
+  const cart = CART_ACTION_TOOLS.addItems(resolution.items);
+  return `Added ${formatActionItemList(resolution.items)} to your cart.\n\n${formatCartSummary(cart)}`;
+}
+
+async function resolveCartMenuItems(text) {
+  const catalog = await getLiveMenuCatalog();
+  const normalized = normalizeSearchText(text);
+  const directMatches = [];
+
+  catalog.forEach((item) => {
+    const aliases = getMenuItemAliases(item);
+    let bestMatch = null;
+    aliases.forEach((alias) => {
+      const index = normalized.indexOf(alias);
+      if (index === -1) return;
+      if (!bestMatch || alias.length > bestMatch.alias.length) {
+        bestMatch = { alias, index };
+      }
+    });
+    if (bestMatch) {
+      directMatches.push({
+        item,
+        quantity: inferQuantityForMatch(normalized, bestMatch.index, bestMatch.alias.length),
+        index: bestMatch.index,
+        aliasLength: bestMatch.alias.length
+      });
+    }
+  });
+
+  const dedupedMatches = dedupeCartMatches(directMatches);
+  if (dedupedMatches.length) {
+    return { status: 'matched', items: dedupedMatches };
+  }
+
+  const requestedTokens = getSignificantTokens(normalized);
+  if (!requestedTokens.length) return { status: 'no_match' };
+
+  const minimumScore = requestedTokens.length === 1 ? 1 : 2;
+  const scored = catalog
+    .map((item) => ({ item, score: scoreMenuItemMatch(item, requestedTokens) }))
+    .filter((entry) => entry.score >= minimumScore)
+    .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name));
+
+  if (!scored.length) return { status: 'no_match' };
+  const topScore = scored[0].score;
+  const top = scored.filter((entry) => entry.score === topScore).slice(0, 5).map((entry) => entry.item);
+  if (top.length > 1) {
+    return { status: 'ambiguous', options: top };
+  }
+
+  return {
+    status: 'matched',
+    items: [{ item: top[0], quantity: inferGeneralQuantity(normalized) }]
+  };
+}
+
+function dedupeCartMatches(matches) {
+  const byId = new Map();
+  matches
+    .sort((a, b) => a.index - b.index || b.aliasLength - a.aliasLength)
+    .forEach((match) => {
+      if (!byId.has(match.item.id)) byId.set(match.item.id, { item: match.item, quantity: match.quantity });
+    });
+  return Array.from(byId.values());
+}
+
+function getMenuItemAliases(item) {
+  const aliases = new Set();
+  aliases.add(normalizeSearchText(item.id));
+  aliases.add(normalizeSearchText(item.name));
+  aliases.add(normalizeSearchText(item.name.replace(/\([^)]*\)/g, '')));
+  (MENU_ITEM_ALIASES[item.id] || []).forEach((alias) => aliases.add(normalizeSearchText(alias)));
+  return Array.from(aliases).filter((alias) => alias.length >= 2).sort((a, b) => b.length - a.length);
+}
+
+function scoreMenuItemMatch(item, requestedTokens) {
+  const itemTokens = new Set(getSignificantTokens(`${item.id} ${item.name} ${item.category}`));
+  return requestedTokens.reduce((score, token) => score + (itemTokens.has(token) ? 1 : 0), 0);
+}
+
+function getSignificantTokens(text) {
+  const ignored = new Set(['add', 'put', 'include', 'remove', 'delete', 'drop', 'take', 'out', 'off', 'cart', 'basket', 'order', 'orders', 'please', 'can', 'could', 'you', 'me', 'my', 'the', 'to', 'for', 'of', 'and', 'with', 'get', 'have', 'want', 'need', 'like', 'would', 'ill']);
+  return normalizeSearchText(text)
+    .split(' ')
+    .filter((token) => token.length > 1 && !ignored.has(token) && !QUANTITY_WORDS[token] && !/^\d+$/.test(token));
+}
+
+function inferQuantityForMatch(normalizedText, index, length) {
+  const quantityPattern = '(\\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten)';
+  const before = normalizedText.slice(Math.max(0, index - 56), index);
+  const after = normalizedText.slice(index + length, index + length + 24);
+  const beforeMatch = before.match(new RegExp(`${quantityPattern}\\s*(?:x|orders? of|plates? of|servings? of|portions? of|bottles? of|cups? of|pieces? of)?\\s*$`, 'i'));
+  if (beforeMatch) return parseQuantity(beforeMatch[1]);
+  const afterMatch = after.match(new RegExp(`^\\s*(?:x\\s*)?${quantityPattern}\\b`, 'i'));
+  if (afterMatch) return parseQuantity(afterMatch[1]);
+  return 1;
+}
+
+function inferGeneralQuantity(normalizedText) {
+  const match = normalizedText.match(/\b(\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten)\b/);
+  return match ? parseQuantity(match[1]) : 1;
+}
+
+function parseQuantity(value) {
+  const token = String(value || '').toLowerCase();
+  const numeric = QUANTITY_WORDS[token] || Number(token);
+  return Math.max(1, Math.min(20, Number.isFinite(numeric) ? numeric : 1));
+}
+
+function readAssistantCart() {
+  const items = window.lubanClient && typeof window.lubanClient.readCart === 'function'
+    ? window.lubanClient.readCart()
+    : [];
+  return Array.isArray(items) ? items : [];
+}
+
+function writeAssistantCart(items) {
+  window.lubanClient.writeCart(Array.isArray(items) ? items : [], { source: 'assistant' });
+}
+
+function formatActionItemList(items) {
+  return items
+    .map(({ item, quantity }) => `${quantity} x ${item.name} (${formatCediPrice(item.price)} each)`)
+    .join(', ');
+}
+
+function formatCartSummary(cart) {
+  if (!Array.isArray(cart) || !cart.length) {
+    return `Your cart is empty. You can ask me to add an item or browse the [Menu](${CONTACT.menuPage}).`;
+  }
+
+  const lines = cart.map((item) => `- ${item.name} x${Number(item.quantity || 0)} - ${formatCediPrice(Number(item.price || 0) * Number(item.quantity || 0))}`);
+  const total = cart.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
+  return `Cart now:\n${lines.join('\n')}\n\nSubtotal: **${formatCediPrice(total)}**\n\nWhen you're ready, say "checkout" or open [Checkout](checkout.html).`;
+}
+
+function normalizeSearchText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 async function handleUserMessage(question) {
   appendMessage('user', question);
   state.history.push({ role: 'guest', text: question });
@@ -1109,6 +1492,14 @@ async function handleUserMessage(question) {
       if (typing) typing.remove();
       appendMessage('bot', orderResponse);
       state.history.push({ role: 'assistant', text: orderResponse });
+      return;
+    }
+
+    const cartResponse = await handleCartAction(question);
+    if (cartResponse) {
+      if (typing) typing.remove();
+      appendMessage('bot', cartResponse);
+      state.history.push({ role: 'assistant', text: cartResponse });
       return;
     }
 
@@ -1165,7 +1556,7 @@ function connectionFallback() {
 }
 
 function normalizeCediFormatting(text) {
-  return String(text || '').replace(/\b(?:GHS|GH₵)\s*([0-9]+(?:\.[0-9]+)?)/gi, (_, value) => formatCediPrice(value));
+  return String(text || '').replace(/\bGHS\s*([0-9]+(?:\.[0-9]+)?)/gi, (_, value) => formatCediPrice(value));
 }
 
 function normalizePriceValue(value) {
@@ -1261,23 +1652,42 @@ async function buildKnowledge() {
   return limitText(sections.filter(Boolean).join('\n'), 30000);
 }
 
-async function readFirestoreKnowledge() {
+async function getLiveMenuCatalog() {
+  if (state.menuCatalog) return state.menuCatalog;
+  if (!state.menuCatalogPromise) {
+    state.menuCatalogPromise = loadLiveMenuCatalog()
+      .then((items) => {
+        state.menuCatalog = items;
+        return items;
+      })
+      .catch((error) => {
+        console.warn('Could not prepare live menu catalog:', error && error.message ? error.message : error);
+        state.menuCatalogPromise = null;
+        state.menuCatalog = MENU.map(normalizeMenuItemForCart);
+        return state.menuCatalog;
+      });
+  }
+  return state.menuCatalogPromise;
+}
+
+async function loadLiveMenuCatalog() {
+  initFirebase();
   const [
     hiddenSnapshot,
     menuPricesSnapshot,
     priceOverridesSnapshot,
-    menuItemsSnapshot,
-    teamSnapshot,
-    chatbotKnowledgeSnapshot
+    menuItemsSnapshot
   ] = await Promise.all([
     safeGetDocs(collection(state.db, 'dishAvailability')),
     safeGetDocs(collection(state.db, 'menuPrices')),
     safeGetDocs(collection(state.db, 'priceOverrides')),
-    safeGetDocs(collection(state.db, 'menuItems')),
-    safeGetDocs(query(collection(state.db, 'teamProfiles'), where('status', '==', 'approved'))),
-    safeGetDocs(collection(state.db, 'chatbotKnowledge'))
+    safeGetDocs(collection(state.db, 'menuItems'))
   ]);
 
+  return buildMenuCatalogFromSnapshots(hiddenSnapshot, menuPricesSnapshot, priceOverridesSnapshot, menuItemsSnapshot);
+}
+
+function buildMenuCatalogFromSnapshots(hiddenSnapshot, menuPricesSnapshot, priceOverridesSnapshot, menuItemsSnapshot) {
   const hiddenIds = new Set();
   if (hiddenSnapshot) {
     hiddenSnapshot.forEach((docSnap) => {
@@ -1310,10 +1720,10 @@ async function readFirestoreKnowledge() {
   const menuById = new Map();
   MENU.forEach((item) => {
     if (hiddenIds.has(item.id)) return;
-    menuById.set(item.id, {
+    menuById.set(item.id, normalizeMenuItemForCart({
       ...item,
       price: livePrices[item.id] !== undefined ? livePrices[item.id] : item.price
-    });
+    }));
   });
 
   if (menuItemsSnapshot) {
@@ -1321,18 +1731,57 @@ async function readFirestoreKnowledge() {
       const data = docSnap.data();
       if (!data || hiddenIds.has(docSnap.id)) return;
       const id = data.id || docSnap.id;
-      menuById.set(id, {
+      menuById.set(id, normalizeMenuItemForCart({
         id,
         name: data.name || data.title || id,
         category: data.category || 'Menu',
         price: livePrices[id] !== undefined ? livePrices[id] : normalizePriceValue(data.price),
-        description: data.description || data.details || ''
-      });
+        description: data.description || data.details || '',
+        image: data.image || data.imageUrl || data.photo || data.photoUrl || ''
+      }));
     });
   }
 
-  const menuLines = Array.from(menuById.values())
-    .sort((a, b) => String(a.category).localeCompare(String(b.category)) || String(a.id).localeCompare(String(b.id)))
+  return Array.from(menuById.values())
+    .sort((a, b) => String(a.category).localeCompare(String(b.category)) || String(a.id).localeCompare(String(b.id)));
+}
+
+function normalizeMenuItemForCart(item) {
+  const price = normalizePriceValue(item && item.price);
+  return {
+    id: String(item && item.id || '').trim(),
+    name: String(item && item.name || item && item.id || 'Menu item').trim(),
+    category: String(item && item.category || 'Menu').trim(),
+    price: price === null ? 0 : price,
+    description: String(item && item.description || '').trim(),
+    image: String(item && item.image || '') || getDefaultMenuImage(item && item.id)
+  };
+}
+
+function getDefaultMenuImage(id) {
+  const itemId = String(id || '').trim();
+  if (!itemId) return new URL('../../logo.png', import.meta.url).href;
+  const drinkImages = {
+    DR1: '../drinks/coca-cola-300ml.webp',
+    DR2: '../drinks/fanta-300ml.webp',
+    DR3: '../drinks/sprite-300ml.webp',
+    DR4: '../drinks/water-300ml.webp'
+  };
+  return new URL(drinkImages[itemId] || `../menu-items-pictures/${itemId}.webp`, import.meta.url).href;
+}
+
+async function readFirestoreKnowledge() {
+  const [
+    menuItems,
+    teamSnapshot,
+    chatbotKnowledgeSnapshot
+  ] = await Promise.all([
+    getLiveMenuCatalog(),
+    safeGetDocs(query(collection(state.db, 'teamProfiles'), where('status', '==', 'approved'))),
+    safeGetDocs(collection(state.db, 'chatbotKnowledge'))
+  ]);
+
+  const menuLines = menuItems
     .map((item) => {
       const price = formatCediPrice(item.price);
       const description = item.description ? ` - ${item.description}` : '';
