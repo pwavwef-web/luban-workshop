@@ -49,9 +49,22 @@
                     <span id="order-status-pill" class="rounded-full bg-stone-100 px-4 py-2 text-xs font-bold text-stone-700">PENDING</span>
                 </div>
                 <div id="order-items" class="mt-6 space-y-4"></div>
-                <div class="mt-6 flex items-center justify-between border-t border-stone-100 pt-5">
-                    <span class="text-lg font-semibold text-stone-900">Total</span>
-                    <span id="order-total" class="text-lg font-bold text-stone-900">₵0.00</span>
+                <div class="mt-6 space-y-3 border-t border-stone-100 pt-5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-stone-500">Subtotal</span>
+                        <span id="order-subtotal" class="font-semibold text-stone-900">₵0.00</span>
+                    </div>
+                    <div id="order-packaging-row" class="hidden items-start justify-between gap-4">
+                        <span>
+                            <span class="block text-stone-500">Packaging fee</span>
+                            <span id="order-packaging-note" class="mt-0.5 block text-xs text-stone-400">Take out only, drinks excluded.</span>
+                        </span>
+                        <span id="order-packaging-fee" class="font-semibold text-stone-900">₵0.00</span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-stone-100 pt-3">
+                        <span class="text-lg font-semibold text-stone-900">Total</span>
+                        <span id="order-total" class="text-lg font-bold text-stone-900">₵0.00</span>
+                    </div>
                 </div>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3">
                     <button id="cancel-btn" type="button" class="hidden rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Cancel Order</button>
@@ -126,8 +139,20 @@
             if (!snap.exists) throw new Error('Order not found.');
             const order = snap.data() || {};
             currentOrder = order;
+            const itemSubtotal = (order.items || []).reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
+            const subtotal = Number(order.subtotal ?? itemSubtotal);
+            const packagingFee = Number(order.packagingFee || 0);
+            const packagingItemCount = Number(order.packagingItemCount || 0);
+            const packagingRow = document.getElementById('order-packaging-row');
             document.getElementById('order-title').textContent = `Order #${orderId.slice(-6).toUpperCase()}`;
             document.getElementById('order-created').textContent = order.createdAt && order.createdAt.toDate ? `Placed ${order.createdAt.toDate().toLocaleString()}` : 'Placed recently';
+            document.getElementById('order-subtotal').textContent = lubanClient.formatMoney(subtotal);
+            document.getElementById('order-packaging-fee').textContent = lubanClient.formatMoney(packagingFee);
+            document.getElementById('order-packaging-note').textContent = packagingItemCount
+                ? `₵${Number(order.packagingFeePerDish || 5)} x ${packagingItemCount} ${packagingItemCount === 1 ? 'dish' : 'dishes'}; drinks excluded.`
+                : 'Drinks are exempt from the take out packaging fee.';
+            packagingRow.classList.toggle('hidden', packagingFee <= 0);
+            packagingRow.classList.toggle('flex', packagingFee > 0);
             document.getElementById('order-total').textContent = lubanClient.formatMoney(order.total || 0);
             document.getElementById('order-status-pill').textContent = (order.status || 'pending').toUpperCase();
             document.getElementById('order-items').innerHTML = (order.items || []).map((item) => `

@@ -55,6 +55,24 @@
     if (!Number.isFinite(amount)) return "";
     return `GHS ${amount.toFixed(2).replace(/\.00$/, "")}`;
   }
+  async function fetchAdminApi(path, options = {}) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Not authenticated");
+    const token = await user.getIdToken();
+    const response = await fetch(path, {
+      method: options.method || "GET",
+      headers: Object.assign({
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }, options.headers || {}),
+      body: options.body ? JSON.stringify(options.body) : void 0
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || `HTTP ${response.status}`);
+    }
+    return data;
+  }
   function formatGhanaPhone(phone) {
     let cleaned = phone.replace(/[^\d+]/g, "");
     let hasPlus = cleaned.startsWith("+");
@@ -103,6 +121,7 @@
     "listenToPromotions",
     "listenToSpecialMenus",
     "listenToAdminUsers",
+    "initSmsCampaigns",
     "listenToMessages",
     "loadFraudReview",
     "listenToChatbotKnowledge",
@@ -183,6 +202,7 @@
     document.getElementById("view-" + tabName).classList.remove("hidden");
     if (tabName === "account") {
       window.checkSmsBalance();
+      window.refreshSmsCampaigns();
     }
     const activeBtn = document.getElementById("tab-btn-" + tabName);
     activeBtn.classList.add("bg-red-50", "text-red-700", "admin-nav-active");
@@ -210,19 +230,7 @@
       if (!user) {
         throw new Error("Not authenticated");
       }
-      const idToken = await user.getIdToken();
-      const response = await fetch("https://checksmsbalance-s5psnepkqq-uc.a.run.app", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${idToken}`,
-          "Content-Type": "application/json"
-        }
-      });
-      if (!response.ok) {
-        const data2 = await response.json().catch(() => ({}));
-        throw new Error(data2.error || `HTTP ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await fetchAdminApi("/api/admin/sms/balance");
       displaySmsBalance(data.balance);
       loading.classList.add("hidden");
       result.classList.remove("hidden");
@@ -272,6 +280,7 @@
     window.listenToPromotions();
     window.listenToSpecialMenus();
     window.listenToAdminUsers();
+    window.initSmsCampaigns();
     window.listenToMessages();
     window.loadFraudReview();
     window.listenToChatbotKnowledge();
@@ -392,6 +401,7 @@
   window.getFirestoreDate = getFirestoreDate;
   window.truncateText = truncateText;
   window.formatCurrency = formatCurrency;
+  window.fetchAdminApi = fetchAdminApi;
   window.formatGhanaPhone = formatGhanaPhone;
   window.showAdminNotification = showAdminNotification;
   window.toggleMobileSidebar = toggleMobileSidebar;

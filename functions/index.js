@@ -79,6 +79,32 @@ function normalizePhoneNumber(phone) {
   return digits;
 }
 
+function normalizeSmsRecipients(value) {
+  return String(value || '')
+    .split(/[,\n;]+/)
+    .map(number => normalizePhoneNumber(number))
+    .filter(Boolean);
+}
+
+function getRestaurantSmsRecipients() {
+  const recipients = normalizeSmsRecipients(RESTAURANT_SMS_NUMBER.value());
+  recipients.push(normalizePhoneNumber('0557535673'));
+  return [...new Set(recipients)];
+}
+
+function getOrderTypeLabel(order = {}) {
+  const explicitLabel = cleanPlainText(order.orderTypeLabel);
+  if (explicitLabel) return explicitLabel;
+  const orderType = cleanPlainText(order.orderType || '').toLowerCase().replace(/[\s-]+/g, '_');
+  if (['dine_in', 'dinein', 'dining_in', 'dining'].includes(orderType)) return 'Dining in';
+  if (['takeout', 'take_out', 'takeaway', 'take_away', 'pickup', 'collection'].includes(orderType)) return 'Take out';
+  return 'Take out';
+}
+
+function isDineInOrder(order = {}) {
+  return getOrderTypeLabel(order).toLowerCase() === 'dining in';
+}
+
 function getArkeselApiKey() {
   return ARKESEL_API_KEY.value() || process.env.ARKESEL_API_KEY || '';
 }
@@ -238,8 +264,8 @@ Hours: Mon-Fri 11:00-17:30
 }
 
 async function sendRestaurantOrderPlacedSms(orderId, order) {
-  const to = normalizePhoneNumber(RESTAURANT_SMS_NUMBER.value());
-  if (!to) {
+  const recipients = getRestaurantSmsRecipients();
+  if (!recipients.length) {
     logger.info('Restaurant phone missing; skipping restaurant SMS', { orderId });
     return;
   }
@@ -247,6 +273,7 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
   const total = Number(order.total || 0).toFixed(2);
   const customerName = cleanPlainText(order.customerName || 'Customer');
   const customerPhone = cleanPlainText(order.customerPhone || 'Not provided');
+  const orderTypeLabel = getOrderTypeLabel(order);
 
   const itemsList = Array.isArray(order.items)
     ? order.items
@@ -258,6 +285,7 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
 
 Customer: ${customerName}
 Customer phone: ${customerPhone}
+Order type: ${orderTypeLabel}
 
 Order:
 ${itemsList}
@@ -266,11 +294,72 @@ Total: GHS ${total}
 
 Please prepare this order.`;
 
-  await sendArkeselSms({
+  const results = await Promise.allSettled(recipients.map(to => sendArkeselSms({
     to,
     message,
     orderId,
     logContext: 'SMS sent to restaurant',
+  })));
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      logger.error('Failed to send restaurant SMS to recipient', {
+        orderId,
+        to: recipients[index],
+        error: result.reason?.message || result.reason,
+        response: result.reason?.response?.data,
+      });
+    }
+  });
+}
+
+async function sendRestaurantOrderCancelledSms(orderId, order, previousStatus) {
+  const recipients = getRestaurantSmsRecipients();
+  if (!recipients.length) {
+    logger.info('Restaurant phone missing; skipping cancelled-order restaurant SMS', { orderId });
+    return;
+  }
+
+  const total = Number(order.total || 0).toFixed(2);
+  const customerName = cleanPlainText(order.customerName || 'Customer');
+  const customerPhone = cleanPlainText(order.customerPhone || 'Not provided');
+  const orderTypeLabel = getOrderTypeLabel(order);
+  const cancelledBy = cleanPlainText(order.cancelledBy || 'restaurant/admin');
+  const itemsList = Array.isArray(order.items)
+    ? order.items
+        .map(item => `${cleanPlainText(item.name || 'Item')} (x${item.quantity || 1})`)
+        .join(', ')
+    : 'No items listed';
+
+  const message = `ORDER CANCELLED at Luban Workshop.
+
+Order #${String(orderId).slice(-6).toUpperCase()}
+Cancelled by: ${cancelledBy}
+Customer: ${customerName}
+Customer phone: ${customerPhone}
+Order type: ${orderTypeLabel}
+Previous status: ${cleanPlainText(previousStatus || 'pending')}
+Items: ${truncateForSms(itemsList, 220)}
+Total: GHS ${total}
+
+Stop preparation if already started.`;
+
+  const results = await Promise.allSettled(recipients.map(to => sendArkeselSms({
+    to,
+    message,
+    orderId,
+    logContext: 'SMS sent to restaurant on order cancellation',
+  })));
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      logger.error('Failed to send cancelled-order restaurant SMS to recipient', {
+        orderId,
+        to: recipients[index],
+        error: result.reason?.message || result.reason,
+        response: result.reason?.response?.data,
+      });
+    }
   });
 }
 
@@ -285,7 +374,10 @@ async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
   if (newStatus === 'preparing') {
     message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
   } else if (newStatus === 'completed') {
-    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, your order is ready for pickup. Please pay at the counter when you collect it. - Luban Restaurant`;
+    const nextStep = isDineInOrder(order)
+      ? 'your dine-in order is ready. Please check in with the team at the counter'
+      : 'your order is ready for pickup. Please pay at the counter when you collect it';
+    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, ${nextStep}. - Luban Restaurant`;
   }
 
   if (!message) return;
@@ -378,6 +470,7 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
   const customerName = order.customerName || 'there';
   const escapedName = escapeHtml(customerName);
   const total = formatMoney(order.total);
+  const orderTypeLabel = getOrderTypeLabel(order);
   const subject = isCompleted
     ? `Your Luban Workshop order is complete (#${orderId})`
     : `We received your Luban Workshop order (#${orderId})`;
@@ -388,7 +481,9 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     ? 'Your meal has been marked complete. Thank you for choosing Luban Workshop Restaurant.'
     : 'Thank you for ordering from Luban Workshop Restaurant. Our team has received your order and will prepare it with care.';
   const nextStep = isCompleted
-    ? 'Please collect your order at the counter. Payment is completed at pickup unless our team has arranged otherwise with you directly.'
+    ? (isDineInOrder(order)
+      ? 'Your dine-in order is ready. Please check in with the team at the counter when you arrive.'
+      : 'Please collect your order at the counter. Payment is completed at pickup unless our team has arranged otherwise with you directly.')
     : 'We will let you know when your order moves forward. For quick help, call 020 543 8455.';
 
   const text = [
@@ -398,6 +493,7 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     '',
     `Order ID: ${orderId}`,
     `Status: ${isCompleted ? 'completed' : 'pending'}`,
+    `Order type: ${orderTypeLabel}`,
     `Total: GHS ${total}`,
     '',
     'Items:',
@@ -587,6 +683,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
   const isCancelled = type === 'cancelled';
   const total = formatMoney(order.total);
   const status = order.status || (isCancelled ? 'cancelled' : 'pending');
+  const orderTypeLabel = getOrderTypeLabel(order);
   const subject = isCancelled ? `Order Cancelled (#${orderId})` : `New Order Received (#${orderId})`;
   const headline = isCancelled ? 'Order cancelled' : 'New order received';
   const intro = isCancelled
@@ -603,6 +700,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
     `Customer: ${order.customerName || 'Unknown'}`,
     `Phone: ${order.customerPhone || 'Not provided'}`,
     `Email: ${order.userEmail || order.customerEmail || order.email || 'Not provided'}`,
+    `Order type: ${orderTypeLabel}`,
     previousStatus ? `Previous Status: ${previousStatus}` : null,
     `Current Status: ${status}`,
     `Total: GHS ${total}`,
@@ -615,6 +713,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
     { label: 'Customer', value: order.customerName || 'Unknown' },
     { label: 'Phone', value: order.customerPhone || 'Not provided' },
     { label: 'Email', value: order.userEmail || order.customerEmail || order.email || 'Not provided' },
+    { label: 'Order type', value: orderTypeLabel },
     previousStatus ? { label: 'Previous status', value: previousStatus } : null,
     { label: 'Current status', value: status },
   ].filter(Boolean));
@@ -1255,11 +1354,25 @@ exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
     const beforeData = event.data?.before?.data() || {};
     const afterData = event.data?.after?.data() || {};
 
-    const oldStatus = beforeData.status || 'pending';
-    const newStatus = afterData.status || 'pending';
+    const oldStatus = String(beforeData.status || 'pending').toLowerCase();
+    const newStatus = String(afterData.status || 'pending').toLowerCase();
 
     // Only send SMS if status actually changed
     if (oldStatus === newStatus) {
+      return;
+    }
+
+    if (newStatus === 'cancelled') {
+      try {
+        await sendRestaurantOrderCancelledSms(orderId, afterData, oldStatus);
+      } catch (err) {
+        logger.error('Failed to send restaurant SMS via Arkesel on order cancellation', {
+          orderId,
+          newStatus,
+          error: err?.message || err,
+          response: err?.response?.data,
+        });
+      }
       return;
     }
 

@@ -8,6 +8,7 @@ const browserGlobals = {
   escapeHtml: 'readonly',
   fetchAdminApi: 'readonly',
   formatCurrency: 'readonly',
+  formatGhanaPhone: 'readonly',
   getFirestoreDate: 'readonly',
   html2canvas: 'readonly',
   initLubanFirebase: 'readonly',

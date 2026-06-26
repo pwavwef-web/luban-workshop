@@ -69,7 +69,7 @@
         .field textarea { resize: vertical; min-height: 100px; }
         .field .char-count { font-size: 0.73rem; color: #a8a29e; text-align: right; margin-top: 0.2rem; }
 
-        .photo-upload { border: 2px dashed #fca5a5; border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: #fff9f9; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+        .photo-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 10rem; box-sizing: border-box; border: 2px dashed #fca5a5; border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: #fff9f9; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
         .photo-upload:hover, .photo-upload.drag-over { border-color: #b91c1c; background: #fef2f2; }
         .photo-upload input[type="file"] { display: none; }
         .photo-upload p { font-size: 0.82rem; color: #78716c; margin-top: 0.5rem; }

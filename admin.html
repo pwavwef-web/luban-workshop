@@ -1190,6 +1190,147 @@
                         <p class="text-sm">Your SMS account balance loads automatically when you open this tab</p>
                     </div>
                 </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="serif text-2xl font-bold text-stone-900">SMS Campaigns</h3>
+                        <p class="text-sm text-stone-500 mt-1">Send or schedule customer campaign messages.</p>
+                    </div>
+                    <button type="button" id="sms-campaign-refresh-btn"
+                        class="inline-flex items-center gap-2 rounded-md border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50">
+                        <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+                        Refresh
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    <section class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6 lg:col-span-2">
+                        <div class="flex items-start justify-between gap-3 mb-5">
+                            <div>
+                                <h4 class="text-base font-bold text-stone-900">New Campaign</h4>
+                                <p id="sms-campaign-send-summary" class="text-xs text-stone-500 mt-1">Loading audience...</p>
+                            </div>
+                            <span id="sms-campaign-mode-pill" class="px-2 py-1 text-xs font-bold rounded-full bg-green-50 text-green-700 border border-green-100">Now</span>
+                        </div>
+
+                        <form id="sms-campaign-form" class="space-y-4">
+                            <div>
+                                <label for="sms-campaign-title" class="block text-sm font-medium text-stone-700 mb-1">Campaign Name</label>
+                                <input type="text" id="sms-campaign-title" required maxlength="96"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                    placeholder="Friday lunch push">
+                            </div>
+
+                            <div>
+                                <label for="sms-campaign-audience" class="block text-sm font-medium text-stone-700 mb-1">Audience</label>
+                                <select id="sms-campaign-audience"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm bg-white">
+                                    <option value="verified_users">Verified users</option>
+                                    <option value="all_users">All users with phones</option>
+                                    <option value="manual">Manual numbers</option>
+                                </select>
+                            </div>
+
+                            <div id="sms-campaign-manual-wrap" class="hidden">
+                                <label for="sms-campaign-manual" class="block text-sm font-medium text-stone-700 mb-1">Manual Numbers</label>
+                                <textarea id="sms-campaign-manual" rows="4"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm resize-y"
+                                    placeholder="0240000000, +233550000000"></textarea>
+                            </div>
+
+                            <div>
+                                <label for="sms-campaign-message" class="block text-sm font-medium text-stone-700 mb-1">Message</label>
+                                <textarea id="sms-campaign-message" required rows="7" maxlength="612"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm resize-y"
+                                    placeholder="Hi {firstName}, lunch is ready at Luban Workshop today."></textarea>
+                                <div class="flex justify-between mt-1 text-xs text-stone-500">
+                                    <span>{firstName} and {name} are supported.</span>
+                                    <span id="sms-campaign-message-count">0 / 612</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-3">
+                                <div class="admin-segmented" role="group" aria-label="Campaign timing">
+                                    <button type="button" data-sms-schedule-mode="now" class="admin-segmented-active">Send Now</button>
+                                    <button type="button" data-sms-schedule-mode="scheduled">Schedule</button>
+                                </div>
+                                <div id="sms-campaign-schedule-wrap" class="hidden">
+                                    <label for="sms-campaign-schedule-at" class="block text-sm font-medium text-stone-700 mb-1">Schedule Time</label>
+                                    <input type="datetime-local" id="sms-campaign-schedule-at"
+                                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm">
+                                </div>
+                            </div>
+
+                            <label class="flex items-start gap-3 rounded-md border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700">
+                                <input id="sms-campaign-sync-contacts" type="checkbox"
+                                    class="mt-0.5 h-4 w-4 rounded border-stone-300 text-red-700 focus:ring-red-700">
+                                <span class="min-w-0">
+                                    <span class="block font-semibold text-stone-900">Sync to Arkesel phone book</span>
+                                    <span class="block text-xs text-stone-500">Optional contact insert before sending.</span>
+                                </span>
+                            </label>
+
+                            <div id="sms-campaign-phonebook-wrap" class="hidden">
+                                <label for="sms-campaign-phonebook" class="block text-sm font-medium text-stone-700 mb-1">Phone Book</label>
+                                <input type="text" id="sms-campaign-phonebook" maxlength="60"
+                                    class="w-full px-4 py-2 border border-stone-300 rounded-md focus:ring-2 focus:ring-red-700 focus:outline-none text-sm"
+                                    placeholder="Luban Customers">
+                            </div>
+
+                            <div id="sms-campaign-feedback" class="hidden text-sm p-3 rounded-md"></div>
+
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <button type="submit" id="sms-campaign-submit-btn"
+                                    class="flex-1 inline-flex items-center justify-center gap-2 bg-red-700 text-white px-5 py-2 rounded-md hover:bg-red-800 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="send" class="h-4 w-4"></i>
+                                    <span>Send Campaign</span>
+                                </button>
+                                <button type="button" id="sms-campaign-reset-btn"
+                                    class="border border-stone-300 text-stone-600 px-5 py-2 rounded-md hover:bg-stone-50 transition-colors text-sm font-medium">
+                                    Clear
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <div class="lg:col-span-3 space-y-6">
+                        <section class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                <div>
+                                    <h4 class="text-base font-bold text-stone-900">Audience</h4>
+                                    <p id="sms-campaign-audience-summary" class="text-xs text-stone-500 mt-1">Loading recipients...</p>
+                                </div>
+                                <span id="sms-campaign-limit" class="text-xs font-semibold text-stone-500">Limit: 500 recipients</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div class="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                                    <p class="text-xs font-bold uppercase text-stone-500">Verified</p>
+                                    <p id="sms-count-verified" class="mt-1 text-2xl font-black text-stone-900">0</p>
+                                </div>
+                                <div class="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                                    <p class="text-xs font-bold uppercase text-stone-500">With Phone</p>
+                                    <p id="sms-count-all" class="mt-1 text-2xl font-black text-stone-900">0</p>
+                                </div>
+                                <div class="rounded-lg border border-stone-200 bg-stone-50 p-4">
+                                    <p class="text-xs font-bold uppercase text-stone-500">Manual Valid</p>
+                                    <p id="sms-count-manual" class="mt-1 text-2xl font-black text-stone-900">0</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border-b border-stone-200 bg-white">
+                                <div>
+                                    <h4 class="text-base font-bold text-stone-900">Recent Campaigns</h4>
+                                    <p id="sms-campaign-history-count" class="text-xs text-stone-500 mt-1">Loading history...</p>
+                                </div>
+                            </div>
+                            <div id="sms-campaign-history" class="divide-y divide-stone-100">
+                                <p class="p-6 text-sm text-stone-500 italic">Loading campaigns...</p>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -1202,6 +1343,7 @@
     <script src="assets/js/admin-promotions.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-special-menus.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-users.bundle.js?v=20260603-adminfix2" defer></script>
+    <script src="assets/js/admin-campaigns.bundle.js?v=20260626-smscampaigns" defer></script>
     <script src="assets/js/admin-messages.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-fraud.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-chatbot.bundle.js?v=20260603-adminfix2" defer></script>

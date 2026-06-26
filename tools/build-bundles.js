@@ -21,6 +21,7 @@ const groups = {
     ['admin-promotions.js', 'admin-promotions.bundle.js'],
     ['admin-special-menus.js', 'admin-special-menus.bundle.js'],
     ['admin-users.js', 'admin-users.bundle.js'],
+    ['admin-campaigns.js', 'admin-campaigns.bundle.js'],
     ['admin-messages.js', 'admin-messages.bundle.js'],
     ['admin-fraud.js', 'admin-fraud.bundle.js'],
     ['admin-chatbot.js', 'admin-chatbot.bundle.js'],

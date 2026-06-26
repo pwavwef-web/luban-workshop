@@ -105,6 +105,22 @@
     <script src="assets/js/firebase-modular.bundle.js"></script>
     <script src="assets/js/cookie-consent.js" defer></script>
     <script>
+        function getReturnTarget() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('returnTo') === 'checkout'
+                ? { href: 'checkout.html', label: 'Back to checkout' }
+                : null;
+        }
+
+        const returnTarget = getReturnTarget();
+        if (returnTarget) {
+            const header = document.querySelector('[data-luban-header]');
+            if (header) {
+                header.setAttribute('data-luban-header-back-href', returnTarget.href);
+                header.setAttribute('data-luban-header-back-label', returnTarget.label);
+            }
+        }
+
         initLubanFirebase(firebase);
 
         const auth = firebase.auth();
@@ -210,7 +226,13 @@
         function renderPhoneActions(isVerified) {
             const container = document.getElementById('phone-action-area');
             if (isVerified) {
-                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Ghana phone already verified</div>';
+                const returnAction = returnTarget
+                    ? `<a href="${returnTarget.href}" class="rounded-md bg-red-700 px-5 py-3 text-center font-semibold text-white hover:bg-red-800">${returnTarget.label}</a>`
+                    : '';
+                container.innerHTML = `
+                    <div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Ghana phone already verified</div>
+                    ${returnAction}
+                `;
                 return;
             }
 
@@ -325,7 +347,9 @@
                 document.getElementById('otp-code').value = '';
                 await loadStatus();
                 if (result.account.phoneVerified) {
-                    showFeedback('Ghana phone number verified successfully. The verification form has been hidden.', false);
+                    showFeedback(returnTarget
+                        ? 'Ghana phone number verified successfully. Return to checkout to place your order.'
+                        : 'Ghana phone number verified successfully. The verification form has been hidden.', false);
                 } else {
                     showFeedback('Verification status updated.', false);
                 }
