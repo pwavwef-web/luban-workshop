@@ -24,7 +24,7 @@
     if (window.__lubanAiChatbotLoading) return;
 
     window.__lubanAiChatbotLoading = true;
-    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260616-bao-default-prompts')).catch((error) => {
+    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260628-minimal-bao')).catch((error) => {
       window.__lubanAiChatbotLoading = false;
       console.warn('Could not load Luban assistant button:', error);
     });
@@ -95,75 +95,197 @@
     return '<svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1.25" fill="currentColor" stroke="none"></circle></svg>';
   }
 
+  function contactIcon(name, cls) {
+    const klass = cls || 'h-4 w-4';
+    const open = `<svg class="${klass}" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">`;
+
+    if (name === 'map-pin') {
+      return `${open}<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+    }
+    if (name === 'phone') {
+      return `${open}<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`;
+    }
+    if (name === 'mail') {
+      return `${open}<rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>`;
+    }
+
+    return `${open}<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>`;
+  }
+
   function footerHtml(chinese) {
     const labels = chinese
       ? {
-          rights: '\u7248\u6743\u6240\u6709\u3002',
-          reservations: '\u9884\u8ba2\u7535\u8bdd',
-          terms: '\u4f7f\u7528\u6761\u6b3e',
-          privacy: '\u9690\u79c1\u653f\u7b56',
-          about: '\u5173\u4e8e\u6211\u4eec',
-          contact: '\u8054\u7cfb\u6211\u4eec',
-          faq: '\u5e38\u89c1\u95ee\u9898',
-          facebook: 'Luban Workshop \u7684 Facebook',
-          instagram: 'Luban Workshop \u7684 Instagram',
+          rights: '版权所有。',
+          terms: '使用条款',
+          privacy: '隐私政策',
+          menu: '菜单',
+          about: '关于我们',
+          reservationsCatering: '预订与宴会',
+          faq: '常见问题',
+          contact: '联系我们',
+          facebook: 'Luban Workshop 的 Facebook',
+          instagram: 'Luban Workshop 的 Instagram',
+          tagline: '位于海岸角大学（UCC）的正宗中式料理。',
+          explore: '探索',
+          visit: '到访我们',
+          hoursHeading: '营业时间',
+          directions: '获取路线',
+          hoursWeekdays: '周一至周五：11:00 – 17:30',
+          hoursWeekend: '周六至周日：休息',
+          reserveCta: '预订餐桌',
+          secondaryCta: '查看菜单',
+          addressAria: '在 Google 地图中查看 Luban Workshop 的位置',
+          phoneAria: '致电 Luban Workshop',
+          emailAria: '给 Luban Workshop 发送邮件',
         }
       : {
           rights: 'All rights reserved.',
-          reservations: 'For reservations',
           terms: 'Terms of Use',
           privacy: 'Privacy Policy',
+          menu: 'Menu',
           meetBao: 'Meet Bao',
           about: 'About Us',
-          contact: 'Contact Us',
+          reservationsCatering: 'Reservations & Catering',
           faq: 'FAQ',
+          contact: 'Contact Us',
           facebook: 'Luban Workshop on Facebook',
           instagram: 'Luban Workshop on Instagram',
+          tagline: 'Authentic Chinese cuisine at the University of Cape Coast.',
+          explore: 'Explore',
+          visit: 'Visit Us',
+          hoursHeading: 'Opening Hours',
+          directions: 'Get directions',
+          hoursWeekdays: 'Mon – Fri: 11:00 – 17:30',
+          hoursWeekend: 'Sat – Sun: Closed',
+          reserveCta: 'Reserve a Table',
+          secondaryCta: 'Order Online',
+          addressAria: 'View Luban Workshop on Google Maps',
+          phoneAria: 'Call Luban Workshop',
+          emailAria: 'Email Luban Workshop',
         };
 
-    const links = chinese
+    const exploreLinks = chinese
+      ? [
+          ['chinese/menu.html', labels.menu],
+          ['chinese/about-us.html', labels.about],
+          ['chinese/events-and-catering.html', labels.reservationsCatering],
+          ['chinese/faq.html', labels.faq],
+          ['chinese/contact-us.html', labels.contact],
+        ]
+      : [
+          ['menu.html', labels.menu],
+          ['meet-bao.html', labels.meetBao],
+          ['about-us/', labels.about],
+          ['events-and-catering.html', labels.reservationsCatering],
+          ['faq.html', labels.faq],
+          ['contact-us.html', labels.contact],
+        ];
+
+    const legalLinks = chinese
       ? [
           ['terms-of-use.html', labels.terms],
           ['chinese/privacy-policy.html', labels.privacy],
-          ['chinese/about-us.html', labels.about],
-          ['chinese/contact-us.html', labels.contact],
-          ['chinese/faq.html', labels.faq],
         ]
       : [
           ['terms-of-use.html', labels.terms],
           ['privacy-policy.html', labels.privacy],
-          ['meet-bao.html', labels.meetBao],
-          ['about-us/', labels.about],
-          ['contact-us.html', labels.contact],
-          ['faq.html', labels.faq],
         ];
 
-      const creditLine = chinese
-        ? `由 ${leadDeveloperDisplayName()} 与 ${coDeveloper.name} 共同开发。`
-        : `Developed by ${leadDeveloperDisplayName()} and ${coDeveloper.name}.`;
+    const reserveHref = chinese
+      ? siteUrl('chinese/events-and-catering.html')
+      : siteUrl('events-and-catering.html#reservation');
+    const secondaryHref = chinese
+      ? siteUrl('chinese/menu.html')
+      : siteUrl('index.html#menu');
 
-    const navLinks = links
-      .map(([href, label]) => `<a href="${siteUrl(href)}" class="hover:text-white transition-colors">${label}</a>`)
+    const mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=5.117627511674501,-1.2856029509704792&destination_place_id=ChIJj-h4NwD_3Q8RDh9AYUqkSLI';
+    const addressLine1 = 'Cafe Roof Top, Casford Street';
+    const addressLine2 = chinese ? '海岸角大学（UCC），加纳' : 'UCC, Cape Coast, Ghana';
+    const phoneDisplay = '020 543 8455';
+    const phoneHref = 'tel:+233205438455';
+    const email = 'reservations@lubanrestaurant.com';
+
+    const creditLine = chinese
+      ? `由 ${leadDeveloperDisplayName()} 与 ${coDeveloper.name} 共同开发。`
+      : `Developed by ${leadDeveloperDisplayName()} and ${coDeveloper.name}.`;
+
+    const navLinks = exploreLinks
+      .map(([href, label]) => `<a href="${siteUrl(href)}" class="w-fit text-stone-400 hover:text-white transition-colors">${label}</a>`)
+      .join('');
+
+    const legalLinksHtml = legalLinks
+      .map(([href, label]) => `<a href="${siteUrl(href)}" class="hover:text-stone-300 transition-colors">${label}</a>`)
       .join('');
 
     return `
-      <footer class="bg-stone-900 text-stone-400 py-12">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div class="flex justify-center items-center gap-3 mb-6">
-            <img src="${siteUrl('logo.png')}" alt="Luban Workshop" class="h-10 w-10 rounded-full object-contain bg-white">
-            <img src="${siteUrl('assets/ucc-logo.png')}" alt="UCC" class="h-9 w-9 object-contain">
-            <span class="serif font-bold text-2xl text-white">Luban Workshop</span>
+      <footer class="bg-stone-900 text-stone-400">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <div class="grid gap-y-10 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
+
+            <div>
+              <div class="flex items-center gap-3">
+                <img src="${siteUrl('logo.png')}" alt="Luban Workshop" class="h-11 w-11 rounded-full object-contain bg-white">
+                <img src="${siteUrl('assets/ucc-logo.png')}" alt="UCC" class="h-9 w-9 object-contain">
+              </div>
+              <p class="mt-4 serif text-2xl font-bold text-white">Luban Workshop</p>
+              <p class="mt-3 max-w-xs text-sm leading-relaxed">${labels.tagline}</p>
+              <div class="mt-5 flex gap-3">
+                <a href="https://www.facebook.com/profile.php/?id=61583678376642" aria-label="${labels.facebook}" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-stone-300 hover:bg-white/10 hover:text-white transition-colors">${socialIcon('facebook')}</a>
+                <a href="https://www.instagram.com/lubanworkshoprestaurant/" aria-label="${labels.instagram}" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-stone-300 hover:bg-white/10 hover:text-white transition-colors">${socialIcon('instagram')}</a>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-red-300">${labels.explore}</h3>
+              <nav aria-label="${labels.explore}" class="mt-4 flex flex-col gap-2.5 text-sm">
+                ${navLinks}
+              </nav>
+            </div>
+
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-red-300">${labels.visit}</h3>
+              <address class="mt-4 space-y-3 text-sm not-italic">
+                <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="${labels.addressAria}" class="group flex items-start gap-3 hover:text-white transition-colors">
+                  ${contactIcon('map-pin', 'h-4 w-4 mt-0.5 flex-shrink-0 text-red-300')}
+                  <span>${addressLine1}<br>${addressLine2}<br><span class="text-xs font-semibold text-red-300 group-hover:text-white">${labels.directions} &rarr;</span></span>
+                </a>
+                <a href="${phoneHref}" aria-label="${labels.phoneAria}" class="flex items-center gap-3 hover:text-white transition-colors">
+                  ${contactIcon('phone', 'h-4 w-4 flex-shrink-0 text-red-300')}
+                  <span>${phoneDisplay}</span>
+                </a>
+                <a href="mailto:${email}" aria-label="${labels.emailAria}" class="flex items-center gap-3 hover:text-white transition-colors">
+                  ${contactIcon('mail', 'h-4 w-4 flex-shrink-0 text-red-300')}
+                  <span class="break-all">${email}</span>
+                </a>
+              </address>
+            </div>
+
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-widest text-red-300">${labels.hoursHeading}</h3>
+              <div class="mt-4 flex items-start gap-3 text-sm">
+                ${contactIcon('clock', 'h-4 w-4 mt-0.5 flex-shrink-0 text-red-300')}
+                <div class="space-y-1">
+                  <p>${labels.hoursWeekdays}</p>
+                  <p>${labels.hoursWeekend}</p>
+                </div>
+              </div>
+              <div class="mt-5 flex flex-col gap-2.5">
+                <a href="${reserveHref}" class="inline-flex items-center justify-center rounded-md bg-red-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-800 transition-colors">${labels.reserveCta}</a>
+                <a href="${secondaryHref}" class="inline-flex items-center justify-center rounded-md border border-white/15 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">${labels.secondaryCta}</a>
+              </div>
+            </div>
+
           </div>
-          <p class="mb-6">&copy; <span data-luban-footer-year></span> Luban Workshop Restaurant. ${labels.rights}</p>
-          <p class="mb-6 text-sm">${labels.reservations}: 020 543 8455</p>
-          <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm mb-6">
-            ${navLinks}
+
+          <div class="mt-12 pt-8 border-t border-stone-800 flex flex-col gap-4 text-xs text-stone-500 md:flex-row md:items-center md:justify-between">
+            <div class="flex flex-col gap-x-4 gap-y-2 sm:flex-row sm:items-center">
+              <p>&copy; <span data-luban-footer-year></span> Luban Workshop Restaurant. ${labels.rights}</p>
+              <div class="flex items-center gap-4">
+                ${legalLinksHtml}
+              </div>
+            </div>
+            <p>${creditLine}</p>
           </div>
-          <div class="flex justify-center space-x-6">
-            <a href="https://www.facebook.com/profile.php/?id=61583678376642" aria-label="${labels.facebook}" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors">${socialIcon('facebook')}</a>
-            <a href="https://www.instagram.com/lubanworkshoprestaurant/" aria-label="${labels.instagram}" target="_blank" rel="noopener noreferrer" class="text-stone-400 hover:text-white transition-colors">${socialIcon('instagram')}</a>
-          </div>
-          <p class="mt-6 text-xs text-stone-500">${creditLine}</p>
         </div>
       </footer>
     `;

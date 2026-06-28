@@ -41,7 +41,12 @@ const CHATBOT_CONFIG = {
   ...DEFAULT_CHATBOT_CONFIG,
   ...(window.LUBAN_CHATBOT_CONFIG || {})
 };
-const SUPPORT_CHAT_ICON_URL = new URL('../icons/mascot/support-chat.svg', import.meta.url).href;
+const BAO_CHAT_AVATAR_URL = new URL('../mascots/bao-chat-avatar.png', import.meta.url).href;
+
+if (typeof window !== 'undefined' && typeof Image === 'function') {
+  window.__lubanBaoChatAvatarPreload = window.__lubanBaoChatAvatarPreload || new Image();
+  window.__lubanBaoChatAvatarPreload.src = BAO_CHAT_AVATAR_URL;
+}
 
 const CONTACT = {
   restaurant: 'Luban Workshop Restaurant',
@@ -94,15 +99,6 @@ const ELECTION_WEEK_KNOWLEDGE = [
   `For reservations, direct guests to ${CONTACT.reservationPage}, explain that the restaurant follows up manually, and remind them that Reservation Status links use a one-time SMS code before showing details or accepting change/cancellation requests.`,
   `Verified QR details: the corrected QR code is ${CONTACT.qrImage} and it points to ${CONTACT.siteUrl}. Retired QR images were removed because they were not reliable for current campaign materials.`,
   `For QR guidance, tell guests and campaign helpers to use only the verified QR, keep the quiet zone, print at high contrast, avoid stretching or cropping it, and use a platform link sticker to ${CONTACT.siteUrl} when possible.`
-];
-
-const DEFAULT_CHAT_SUGGESTIONS = [
-  'What should I order?',
-  'How do I place an order?',
-  "Why can't I check out?",
-  'How do I verify my phone?',
-  'Track my order',
-  'Make a reservation'
 ];
 
 const MENU = [
@@ -439,50 +435,63 @@ function injectStyles() {
   const style = document.createElement('style');
   style.id = 'luban-ai-chatbot-styles';
   style.textContent = `
-    .luban-chatbot { position: fixed; right: 18px; bottom: calc(18px + var(--luban-chatbot-cookie-offset, 0px)); z-index: 55; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c1917; pointer-events: none; }
+    .luban-chatbot { position: fixed; right: 18px; bottom: calc(18px + var(--luban-chatbot-cookie-offset, 0px)); z-index: 55; font-family: Lato, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #f8fafc; pointer-events: none; }
     .luban-chatbot * { box-sizing: border-box; }
-    .luban-chatbot__button { min-width: 62px; height: 62px; border: 0; border-radius: 999px; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 18px 0 16px; box-shadow: 0 14px 32px rgba(28,25,23,.28); cursor: pointer; transition: transform .2s ease, background .2s ease, opacity .18s ease; pointer-events: auto; }
-    .luban-chatbot__button:hover { background: #991b1b; transform: translateY(-2px); }
-    .luban-chatbot__button:focus-visible, .luban-chatbot button:focus-visible, .luban-chatbot textarea:focus-visible { outline: 3px solid rgba(185,28,28,.25); outline-offset: 3px; }
-    .luban-chatbot__button svg, .luban-chatbot__button img { width: 30px; height: 30px; display: block; flex: 0 0 auto; }
-    .luban-chatbot__button-label { font-size: 14px; font-weight: 800; line-height: 1; white-space: nowrap; }
-    .luban-chatbot__panel { position: absolute; right: 0; bottom: 78px; width: min(390px, calc(100vw - 28px)); height: min(680px, calc(100dvh - 118px)); max-height: min(680px, calc(100vh - 118px)); background: #fff; border: 1px solid #e7e5e4; border-radius: 8px; box-shadow: 0 24px 70px rgba(28,25,23,.32); overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform-origin: bottom right; opacity: 0; pointer-events: none; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease; overscroll-behavior: contain; }
+    .luban-chatbot__button { min-width: 0; height: 54px; border: 1px solid rgba(248,250,252,.18); border-radius: 999px; background: rgba(8,10,14,.9); color: #f8fafc; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 6px 8px 6px 14px; box-shadow: 0 18px 50px rgba(8,10,14,.35), 0 0 0 1px rgba(239,68,68,.14), inset 0 1px 0 rgba(255,255,255,.12); cursor: pointer; transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease, opacity .18s ease, box-shadow .2s ease; pointer-events: auto; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .luban-chatbot__button:hover { background: rgba(15,23,42,.94); border-color: rgba(125,211,252,.34); transform: translateY(-2px); box-shadow: 0 22px 58px rgba(8,10,14,.42), 0 0 0 1px rgba(248,113,113,.22), inset 0 1px 0 rgba(255,255,255,.16); }
+    .luban-chatbot__button--open { min-width: 58px; padding: 0 16px; color: #fff; background: #09090b; border-color: rgba(248,250,252,.2); }
+    .luban-chatbot__button--open:hover { background: #111827; border-color: rgba(125,211,252,.4); }
+    .luban-chatbot__button:focus-visible, .luban-chatbot button:focus-visible, .luban-chatbot textarea:focus-visible { outline: 3px solid rgba(125,211,252,.34); outline-offset: 3px; }
+    .luban-chatbot__button svg { width: 22px; height: 22px; display: block; flex: 0 0 auto; }
+    .luban-chatbot__button .luban-chatbot__bao-face { width: 40px; height: 40px; display: block; flex: 0 0 auto; border-radius: 50%; box-shadow: 0 0 0 1px rgba(248,250,252,.18), 0 0 20px rgba(125,211,252,.18); }
+    .luban-chatbot__button-label { font-size: 13px; font-weight: 800; line-height: 1; white-space: nowrap; letter-spacing: .01em; }
+    .luban-chatbot__panel { position: absolute; right: 0; bottom: 78px; width: min(404px, calc(100vw - 28px)); height: min(642px, calc(100dvh - 118px)); max-height: min(642px, calc(100vh - 118px)); background: linear-gradient(180deg, #09090b 0%, #0f1117 48%, #08090c 100%); border: 1px solid rgba(248,250,252,.12); border-radius: 8px; box-shadow: 0 30px 90px rgba(8,10,14,.58), 0 0 0 1px rgba(239,68,68,.08); overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform-origin: bottom right; opacity: 0; pointer-events: none; transform: translateY(12px) scale(.98); transition: opacity .18s ease, transform .18s ease; overscroll-behavior: contain; backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
     .luban-chatbot__panel[hidden] { display: none; }
     .luban-chatbot--open { pointer-events: auto; }
     .luban-chatbot--open .luban-chatbot__panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-    .luban-chatbot__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 14px 12px; background: #1c1917; color: #fff; flex-shrink: 0; }
+    .luban-chatbot--open .luban-chatbot__button { opacity: 0; pointer-events: none; transform: translateY(6px) scale(.96); }
+    .luban-chatbot__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; background: rgba(9,9,11,.76); color: #fff; border-bottom: 1px solid rgba(248,250,252,.09); flex-shrink: 0; box-shadow: inset 0 -1px 0 rgba(239,68,68,.1); }
     .luban-chatbot__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .luban-chatbot__mark { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: #b91c1c; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .luban-chatbot__mark svg, .luban-chatbot__mark img { width: 19px; height: 19px; display: block; }
-    .luban-chatbot__name { font-weight: 800; font-size: 15px; line-height: 1.2; }
-    .luban-chatbot__status { color: #d6d3d1; font-size: 12px; line-height: 1.2; margin-top: 2px; max-width: 260px; }
-    .luban-chatbot__icon-btn { border: 0; width: 34px; height: 34px; border-radius: 6px; background: rgba(255,255,255,.08); color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-    .luban-chatbot__icon-btn:hover { background: rgba(255,255,255,.16); }
+    .luban-chatbot__mark { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.04); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(248,250,252,.16), 0 0 22px rgba(125,211,252,.13); }
+    .luban-chatbot__mark .luban-chatbot__bao-face { width: 36px; height: 36px; display: block; border-radius: 50%; }
+    .luban-chatbot__name { font-weight: 900; font-size: 15px; line-height: 1.1; letter-spacing: .01em; }
+    .luban-chatbot__status { position: relative; color: #a8b3c2; font-size: 11px; line-height: 1.2; margin-top: 4px; max-width: 250px; padding-left: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .luban-chatbot__status::before { content: ""; position: absolute; left: 0; top: 50%; width: 5px; height: 5px; border-radius: 50%; background: #7dd3fc; box-shadow: 0 0 10px rgba(125,211,252,.85); transform: translateY(-50%); }
+    .luban-chatbot__icon-btn { border: 1px solid rgba(248,250,252,.1); width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.04); color: #f8fafc; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .18s ease, border-color .18s ease, color .18s ease; }
+    .luban-chatbot__icon-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(125,211,252,.26); color: #fff; }
     .luban-chatbot__icon-btn svg { width: 18px; height: 18px; }
-    .luban-chatbot__messages { min-height: 0; overflow-y: auto; padding: 16px 14px; background: #fafaf9; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
-    .luban-chatbot__message { max-width: 88%; border-radius: 8px; padding: 10px 12px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
-    .luban-chatbot__message--bot { align-self: flex-start; background: #fff; border: 1px solid #e7e5e4; color: #292524; }
-    .luban-chatbot__message--user { align-self: flex-end; background: #b91c1c; color: #fff; }
-    .luban-chatbot__link { color: #b91c1c; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
-    .luban-chatbot__link:hover { color: #7f1d1d; }
-    .luban-chatbot__typing { align-self: flex-start; color: #78716c; font-size: 13px; padding: 4px 2px; }
-    .luban-chatbot__suggestions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
-    .luban-chatbot__suggestion { border: 1px solid #e7e5e4; background: #fff; color: #57534e; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 7px 10px; cursor: pointer; }
-    .luban-chatbot__suggestion:hover { border-color: #b91c1c; color: #b91c1c; }
-    .luban-chatbot__form { padding: 12px; border-top: 1px solid #e7e5e4; background: #fff; display: grid; grid-template-columns: 1fr 44px; gap: 9px; align-items: end; flex-shrink: 0; }
-    .luban-chatbot__input { min-height: 44px; max-height: 112px; resize: none; border: 1px solid #d6d3d1; border-radius: 8px; padding: 11px 12px; font: inherit; font-size: 14px; color: #1c1917; }
-    .luban-chatbot__send { width: 44px; height: 44px; border: 0; border-radius: 8px; background: #b91c1c; color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .luban-chatbot__messages { min-height: 0; overflow-y: auto; padding: 16px 14px; background: repeating-linear-gradient(90deg, rgba(248,250,252,.04) 0 1px, transparent 1px 42px), repeating-linear-gradient(0deg, rgba(248,250,252,.025) 0 1px, transparent 1px 42px), linear-gradient(180deg, rgba(15,17,23,.92), rgba(8,9,12,.98)); display: flex; flex-direction: column; gap: 11px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; scrollbar-color: rgba(248,250,252,.22) transparent; }
+    .luban-chatbot__message-row { max-width: 100%; display: flex; align-items: flex-end; gap: 8px; }
+    .luban-chatbot__message-row--bot { align-self: flex-start; max-width: 94%; }
+    .luban-chatbot__message-row--user { align-self: flex-end; justify-content: flex-end; max-width: 88%; }
+    .luban-chatbot__avatar { width: 31px; height: 31px; flex: 0 0 31px; border-radius: 50%; align-self: flex-end; margin-bottom: 2px; box-shadow: 0 0 0 1px rgba(248,250,252,.16), 0 0 18px rgba(125,211,252,.12); }
+    .luban-chatbot__avatar .luban-chatbot__bao-face { width: 100%; height: 100%; display: block; border-radius: 50%; }
+    .luban-chatbot__message { min-width: 0; max-width: 100%; border-radius: 8px; padding: 10px 12px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; }
+    .luban-chatbot__message--bot { background: rgba(255,255,255,.07); border: 1px solid rgba(248,250,252,.12); color: #eef2f7; border-bottom-left-radius: 3px; box-shadow: 0 10px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06); }
+    .luban-chatbot__message--user { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; border-bottom-right-radius: 3px; box-shadow: 0 10px 26px rgba(153,27,27,.24); }
+    .luban-chatbot__link { color: #fca5a5; font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+    .luban-chatbot__link:hover { color: #7dd3fc; }
+    .luban-chatbot__typing-row { align-self: flex-start; max-width: 94%; display: flex; align-items: flex-end; gap: 8px; }
+    .luban-chatbot__typing { color: #a8b3c2; font-size: 13px; padding: 8px 10px; border: 1px solid rgba(248,250,252,.1); border-radius: 8px; border-bottom-left-radius: 3px; background: rgba(255,255,255,.06); }
+    .luban-chatbot__form { padding: 12px; border-top: 1px solid rgba(248,250,252,.1); background: rgba(9,9,11,.88); display: grid; grid-template-columns: 1fr 44px; gap: 9px; align-items: end; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(239,68,68,.08); }
+    .luban-chatbot__input { min-height: 44px; max-height: 112px; resize: none; border: 1px solid rgba(248,250,252,.14); border-radius: 8px; padding: 11px 12px; font: inherit; font-size: 14px; color: #f8fafc; background: rgba(255,255,255,.05); caret-color: #7dd3fc; transition: border-color .18s ease, background .18s ease, box-shadow .18s ease; }
+    .luban-chatbot__input::placeholder { color: #8b95a5; }
+    .luban-chatbot__input:focus { border-color: rgba(125,211,252,.45); background: rgba(255,255,255,.07); box-shadow: 0 0 0 1px rgba(125,211,252,.16); }
+    .luban-chatbot__send { width: 44px; height: 44px; border: 1px solid rgba(248,250,252,.12); border-radius: 8px; background: #ef4444; color: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 22px rgba(239,68,68,.22); transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+    .luban-chatbot__send:hover:not(:disabled) { background: #f87171; border-color: rgba(248,250,252,.22); transform: translateY(-1px); }
     .luban-chatbot__send:disabled { opacity: .55; cursor: not-allowed; }
     .luban-chatbot__send svg { width: 19px; height: 19px; }
     @media (max-width: 520px) {
       .luban-chatbot { top: auto; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px) + var(--luban-chatbot-cookie-offset, 0px)); left: auto; width: 58px; height: 58px; display: block; padding: 0; background: transparent; transition: background .18s ease; }
-      .luban-chatbot--open { top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; display: flex; align-items: flex-end; justify-content: center; padding: 72px 10px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(28,25,23,.42); }
+      .luban-chatbot--open { top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; display: flex; align-items: flex-end; justify-content: center; padding: 72px 10px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(2,6,23,.62); }
       .luban-chatbot__panel { position: relative; right: auto; bottom: auto; width: 100%; height: min(620px, calc(100dvh - 96px)); max-height: calc(100vh - 96px); border-radius: 8px; transform-origin: bottom center; }
-      .luban-chatbot__button { position: static; width: 58px; min-width: 58px; height: 58px; padding: 0; border-radius: 50%; }
+      .luban-chatbot__button { position: static; width: 58px; min-width: 58px; height: 58px; padding: 6px; border-radius: 50%; }
+      .luban-chatbot__button .luban-chatbot__bao-face { width: 44px; height: 44px; }
+      .luban-chatbot__button--open { padding: 0; }
       .luban-chatbot__button-label { display: none; }
       .luban-chatbot--open .luban-chatbot__button { position: absolute; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
       .luban-chatbot--open .luban-chatbot__button { opacity: 0; pointer-events: none; transform: scale(.96); }
-      .luban-chatbot__status { max-width: 210px; }
+      .luban-chatbot__status { max-width: 190px; }
     }
     @supports (height: 100svh) {
       @media (max-width: 520px) {
@@ -495,9 +504,8 @@ function injectStyles() {
 
 function createIcon(name) {
   const icons = {
-    supportChat: `<img src="${SUPPORT_CHAT_ICON_URL}" alt="" aria-hidden="true">`,
+    baoFace: `<img class="luban-chatbot__bao-face" src="${BAO_CHAT_AVATAR_URL}" alt="" aria-hidden="true">`,
     message: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>',
-    chatLauncher: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5H8l-5 2 1.4-4.2A8.5 8.5 0 1 1 21 12Z"></path><path d="M8.2 12h.1"></path><path d="M12 12h.1"></path><path d="M15.8 12h.1"></path></svg>',
     x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg>',
     sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"></path><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z"></path></svg>'
@@ -579,21 +587,21 @@ function mountChatbot() {
     <section class="luban-chatbot__panel" role="dialog" aria-modal="false" aria-labelledby="luban-chatbot-title" hidden>
       <div class="luban-chatbot__header">
         <div class="luban-chatbot__title">
-          <span class="luban-chatbot__mark">${createIcon('supportChat')}</span>
+          <span class="luban-chatbot__mark">${createIcon('baoFace')}</span>
           <div>
             <div id="luban-chatbot-title" class="luban-chatbot__name">Bao</div>
-            <div class="luban-chatbot__status">Menu, bookings, QR, reports and account help</div>
+            <div class="luban-chatbot__status">Restaurant concierge</div>
           </div>
         </div>
         <button type="button" class="luban-chatbot__icon-btn" data-luban-close aria-label="Close chat">${createIcon('x')}</button>
       </div>
       <div class="luban-chatbot__messages" data-luban-messages></div>
       <form class="luban-chatbot__form" data-luban-form>
-        <textarea class="luban-chatbot__input" data-luban-input rows="1" placeholder="Ask Bao about the restaurant..." aria-label="Ask Bao about the restaurant"></textarea>
+        <textarea class="luban-chatbot__input" data-luban-input rows="1" placeholder="Message Bao..." aria-label="Ask Bao about the restaurant"></textarea>
         <button type="submit" class="luban-chatbot__send" data-luban-send aria-label="Send message">${createIcon('send')}</button>
       </form>
     </section>
-    <button type="button" class="luban-chatbot__button" data-luban-toggle aria-label="Open Bao chat" aria-expanded="false" title="Open Bao chat">${createIcon('chatLauncher')}<span class="luban-chatbot__button-label">Chat with Bao</span></button>
+    <button type="button" class="luban-chatbot__button" data-luban-toggle aria-label="Open Bao chat" aria-expanded="false" title="Open Bao chat"><span class="luban-chatbot__button-label">Ask Bao</span>${createIcon('baoFace')}</button>
   `;
 
   document.body.appendChild(root);
@@ -609,7 +617,10 @@ function mountChatbot() {
   const input = root.querySelector('[data-luban-input]');
 
   function renderToggle(open) {
-    toggle.innerHTML = `${createIcon(open ? 'x' : 'chatLauncher')}<span class="luban-chatbot__button-label">${open ? 'Close chat' : 'Chat with Bao'}</span>`;
+    toggle.classList.toggle('luban-chatbot__button--open', open);
+    toggle.innerHTML = open
+      ? `${createIcon('x')}<span class="luban-chatbot__button-label">Close chat</span>`
+      : `<span class="luban-chatbot__button-label">Ask Bao</span>${createIcon('baoFace')}`;
     toggle.setAttribute('aria-label', open ? 'Close Bao chat' : 'Open Bao chat');
     toggle.setAttribute('title', open ? 'Close Bao chat' : 'Open Bao chat');
   }
@@ -641,9 +652,6 @@ function mountChatbot() {
       return;
     }
 
-    const suggestion = event.target.closest('[data-luban-suggestion]');
-    if (!suggestion || state.busy) return;
-    handleUserMessage(suggestion.getAttribute('data-luban-suggestion'));
   });
 
   document.addEventListener('keydown', (event) => {
@@ -686,8 +694,7 @@ async function ensureGreeting() {
   const messages = getMessagesEl();
   if (!messages || messages.children.length > 0) return;
 
-  appendMessage('bot', `Hi, I'm Bao! I can help with Luban Workshop's menu scans, group meals, reservations, order tracking, account checks, verified QR, ordering, and reports.`);
-  appendSuggestions(DEFAULT_CHAT_SUGGESTIONS);
+  appendMessage('bot', `Hi, I'm Bao. Ask me about Luban Workshop's menu, orders, reservations, QR, or account help.`);
 }
 
 function autoSizeInput(input) {
@@ -699,18 +706,33 @@ function getMessagesEl() {
   return document.querySelector('[data-luban-messages]');
 }
 
+function createBaoAvatar(extraClass = '') {
+  const avatar = document.createElement('span');
+  avatar.className = `luban-chatbot__avatar${extraClass ? ` ${extraClass}` : ''}`;
+  avatar.innerHTML = createIcon('baoFace');
+  return avatar;
+}
+
 function appendMessage(role, text) {
   const messages = getMessagesEl();
   if (!messages) return;
 
-  const node = document.createElement('div');
-  node.className = `luban-chatbot__message luban-chatbot__message--${role === 'user' ? 'user' : 'bot'}`;
-  if (role === 'bot') {
-    renderFormattedMessage(node, text);
+  const isUser = role === 'user';
+  const row = document.createElement('div');
+  row.className = `luban-chatbot__message-row luban-chatbot__message-row--${isUser ? 'user' : 'bot'}`;
+
+  const bubble = document.createElement('div');
+  bubble.className = `luban-chatbot__message luban-chatbot__message--${isUser ? 'user' : 'bot'}`;
+
+  if (isUser) {
+    bubble.textContent = text;
   } else {
-    node.textContent = text;
+    row.appendChild(createBaoAvatar());
+    renderFormattedMessage(bubble, text);
   }
-  messages.appendChild(node);
+
+  row.appendChild(bubble);
+  messages.appendChild(row);
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -799,24 +821,6 @@ function normalizeSafeHref(href) {
   return '';
 }
 
-function appendSuggestions(suggestions) {
-  const messages = getMessagesEl();
-  if (!messages) return;
-
-  const wrap = document.createElement('div');
-  wrap.className = 'luban-chatbot__suggestions';
-  suggestions.forEach((text) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'luban-chatbot__suggestion';
-    button.textContent = text;
-    button.setAttribute('data-luban-suggestion', text);
-    wrap.appendChild(button);
-  });
-  messages.appendChild(wrap);
-  messages.scrollTop = messages.scrollHeight;
-}
-
 function setBusy(busy) {
   state.busy = busy;
   const input = document.querySelector('[data-luban-input]');
@@ -829,12 +833,18 @@ function showTyping() {
   const messages = getMessagesEl();
   if (!messages) return null;
 
+  const row = document.createElement('div');
+  row.className = 'luban-chatbot__typing-row';
+  row.appendChild(createBaoAvatar('luban-chatbot__avatar--typing'));
+
   const node = document.createElement('div');
   node.className = 'luban-chatbot__typing';
   node.textContent = 'Checking the restaurant information...';
-  messages.appendChild(node);
+  row.appendChild(node);
+
+  messages.appendChild(row);
   messages.scrollTop = messages.scrollHeight;
-  return node;
+  return row;
 }
 
 function isReportIntent(text) {
