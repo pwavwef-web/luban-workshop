@@ -24,7 +24,7 @@
     if (window.__lubanAiChatbotLoading) return;
 
     window.__lubanAiChatbotLoading = true;
-    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260628-minimal-bao')).catch((error) => {
+    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260628-white-working-bao')).catch((error) => {
       window.__lubanAiChatbotLoading = false;
       console.warn('Could not load Luban assistant button:', error);
     });
