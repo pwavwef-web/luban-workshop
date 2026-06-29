@@ -93,6 +93,15 @@ html[lang^="zh"] .serif {
   display: contents;
 }
 
+.luban-site-footer nav {
+  position: static;
+  top: auto;
+  width: auto;
+  background: transparent;
+  box-shadow: none;
+  z-index: auto;
+}
+
 .toast-container {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));

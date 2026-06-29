@@ -218,7 +218,7 @@
       .join('');
 
     return `
-      <footer class="bg-stone-900 text-stone-400">
+      <footer class="luban-site-footer bg-stone-900 text-stone-400">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div class="grid gap-y-10 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
 
