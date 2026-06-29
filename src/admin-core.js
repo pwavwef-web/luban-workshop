@@ -122,6 +122,50 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('admin-sw.js').catch(() => {});
 }
 
+// --- Boot splash control ---
+// The splash overlay (#splash-screen) covers the async login-state check so the
+// login screen never flashes. It is dismissed once auth resolves (in every branch),
+// with a minimum on-screen time for polish and a safety net so it can never strand.
+const SPLASH_MIN_MS = 700;
+const splashStartedAt = Date.now();
+let splashDismissed = false;
+
+function hideSplash() {
+    if (splashDismissed) return;
+    splashDismissed = true;
+    const splash = document.getElementById('splash-screen');
+    if (!splash) return;
+    const wait = Math.max(0, SPLASH_MIN_MS - (Date.now() - splashStartedAt));
+    setTimeout(() => {
+        splash.classList.add('admin-splash--hide');
+        setTimeout(() => { splash.style.display = 'none'; }, 600);
+    }, wait);
+}
+
+// Safety net: never strand the splash even if auth/init stalls.
+setTimeout(hideSplash, 9000);
+
+function setOverviewGreeting() {
+    const el = document.getElementById('overview-greeting');
+    if (!el) return;
+    const hour = new Date().getHours();
+    el.textContent = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+}
+
+function publishBaoAdminContext(user, verified) {
+    const context = {
+        isAdmin: verified === true,
+        uid: verified && user ? user.uid || '' : '',
+        email: verified && user ? user.email || '' : '',
+        displayName: verified && user ? user.displayName || '' : '',
+        panel: 'admin',
+        verifiedAt: verified ? new Date().toISOString() : ''
+    };
+
+    window.LUBAN_BAO_ADMIN_CONTEXT = context;
+    window.dispatchEvent(new CustomEvent('luban:bao-admin-context', { detail: context }));
+}
+
 // --- Navigation Logic ---
 const MOBILE_BREAKPOINT = 768;
 let isMobileSidebarOpen = false;
@@ -220,7 +264,7 @@ function switchTab(tabName) {
         toggleMobileSidebar();
     }
 
-    ['menu', 'reservations', 'orders', 'promotions', 'special-menus', 'admin-users', 'messages', 'fraud-review', 'chatbot-knowledge', 'account'].forEach(tab => {
+    ['overview', 'menu', 'reservations', 'orders', 'promotions', 'special-menus', 'admin-users', 'messages', 'fraud-review', 'chatbot-knowledge', 'account'].forEach(tab => {
         document.getElementById('view-' + tab).classList.add('hidden');
         const btn = document.getElementById('tab-btn-' + tab);
         btn.classList.remove('bg-red-50', 'text-red-700', 'admin-nav-active');
@@ -334,7 +378,8 @@ async function initializeAdminDashboard(user) {
     window.listenToChatbotKnowledge();
 
     requestNotificationPermission();
-    switchTab('menu');
+    setOverviewGreeting();
+    switchTab('overview');
 
     if (!mobileSidebarEventsBound) {
         const menuToggle = document.getElementById('mobile-menu-toggle');
@@ -402,12 +447,16 @@ auth.onAuthStateChanged(async user => {
         }
 
         if (!adminVerified) {
+            publishBaoAdminContext(user, false);
             await auth.signOut();
             const errDiv = document.getElementById('login-error');
             errDiv.textContent = 'Access denied. You do not have admin privileges.';
             errDiv.classList.remove('hidden');
+            hideSplash();
             return;
         }
+
+        publishBaoAdminContext(user, true);
 
         try {
             const profileDoc = await db.collection('users').doc(user.uid).get();
@@ -431,6 +480,7 @@ auth.onAuthStateChanged(async user => {
 
         try {
             await initializeAdminDashboard(user);
+            hideSplash();
         } catch (error) {
             console.error('Failed to initialize admin dashboard:', error);
             const errDiv = document.getElementById('login-error');
@@ -438,10 +488,13 @@ auth.onAuthStateChanged(async user => {
             errDiv.classList.remove('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
+            hideSplash();
         }
     } else {
+        publishBaoAdminContext(null, false);
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('admin-dashboard').classList.add('hidden');
+        hideSplash();
     }
 });
 

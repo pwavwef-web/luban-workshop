@@ -18,6 +18,10 @@ const ARKESEL_BALANCE_URL = defineString('ARKESEL_BALANCE_URL', { default: 'http
 const TEAM_PROFILE_STORAGE_BUCKET = defineString('TEAM_PROFILE_STORAGE_BUCKET', {
   default: 'luban-workshop-restaurant.firebasestorage.app',
 });
+const PUBLIC_SITE_URL = 'https://lubanrestaurant.com';
+const BAO_EMAIL_ANIMATION_URL = `${PUBLIC_SITE_URL}/assets/bao-campaign/gifs/bao-wave-loop.gif`;
+const VITAFORGE_URL = 'https://cv-build.web.app';
+const VITAFORGE_ICON_URL = `${PUBLIC_SITE_URL}/assets/partners/vitaforge/vitaforge-icon-512.png`;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -408,6 +412,49 @@ async function sendNotificationMail({ to, subject, html, text, replyTo }) {
   await transporter.sendMail(mailOptions);
 }
 
+function getVitaForgeAdText() {
+  return `Ad: VitaForge AI helps students build polished CVs, cover letters, and ATS-ready applications. Start at ${VITAFORGE_URL}`;
+}
+
+function buildEmailAnimationHtml({ altText = 'Animated Bao mascot waving from Luban Workshop Restaurant' } = {}) {
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:24px;">
+      <tr>
+        <td align="center" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:18px;padding:16px;">
+          <img src="${BAO_EMAIL_ANIMATION_URL}" width="120" alt="${escapeHtml(altText)}" style="display:block;width:120px;max-width:100%;height:auto;border:0;margin:0 auto 10px;">
+          <p style="margin:0;color:#7c2d12;font-size:13px;line-height:1.55;font-weight:700;">A warm wave from the Luban Workshop team.</p>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function buildVitaForgeAdHtml() {
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:20px;border:1px solid #dbeafe;background:#f8fbff;border-radius:18px;overflow:hidden;">
+      <tr>
+        <td style="padding:18px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="58" style="vertical-align:middle;padding-right:14px;">
+                <img src="${VITAFORGE_ICON_URL}" width="52" height="52" alt="VitaForge AI" style="display:block;width:52px;height:52px;border-radius:14px;border:0;">
+              </td>
+              <td style="vertical-align:middle;">
+                <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;font-weight:800;">Sponsored</p>
+                <p style="margin:0;color:#0f1830;font-size:17px;line-height:1.25;font-weight:900;">Build a stronger CV with VitaForge AI</p>
+                <p style="margin:6px 0 0;color:#475569;font-size:13px;line-height:1.55;">Create polished CVs, cover letters, and ATS-ready applications with guided AI support.</p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:14px 0 0;">
+            <a href="${VITAFORGE_URL}" style="display:inline-block;background:#0f1830;color:#ffffff;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:800;">Open VitaForge AI</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
 function normalizeEmail(email) {
   const value = String(email || '').trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '';
@@ -501,6 +548,8 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     '',
     nextStep,
     '',
+    getVitaForgeAdText(),
+    '',
     'Luban Workshop Restaurant',
     'Cape Coast, Ghana',
   ].join('\n');
@@ -565,6 +614,13 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
                       <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
                       <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">${nextStep}</p>
                     </div>
+
+                    ${buildEmailAnimationHtml({
+                      altText: isCompleted
+                        ? 'Animated Bao mascot celebrating a completed Luban Workshop order'
+                        : 'Animated Bao mascot waving for a received Luban Workshop order',
+                    })}
+                    ${buildVitaForgeAdHtml()}
 
                     <p style="margin:24px 0 0;color:#78716c;font-size:13px;line-height:1.7;text-align:center;">
                       Luban Workshop Restaurant<br>
@@ -664,6 +720,11 @@ function buildRestaurantEmailShell({ badge, eyebrow, headline, intro, cards, mai
                       <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">${escapeHtml(actionText)}</p>
                     </div>
 
+                    ${buildEmailAnimationHtml({
+                      altText: 'Animated Bao mascot waving in a Luban Workshop operations email',
+                    })}
+                    ${buildVitaForgeAdHtml()}
+
                     <p style="margin:24px 0 0;color:#78716c;font-size:13px;line-height:1.7;text-align:center;">
                       Luban Workshop Restaurant Operations<br>
                       Cape Coast, Ghana
@@ -707,6 +768,8 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
     '',
     'Items:',
     formatCustomerOrderTextItems(order.items),
+    '',
+    getVitaForgeAdText(),
   ].filter(Boolean).join('\n');
 
   const detailRows = buildRestaurantDetailRows([
@@ -778,6 +841,8 @@ function buildRestaurantReservationEmail({ reservationId, reservation }) {
     `Guests: ${guests}`,
     `Status: ${status}`,
     `Special requests: ${reservation.notes || 'None'}`,
+    '',
+    getVitaForgeAdText(),
   ].join('\n');
 
   const detailRows = buildRestaurantDetailRows([
@@ -881,6 +946,8 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
     '',
     nextStep,
     '',
+    getVitaForgeAdText(),
+    '',
     'Luban Workshop Restaurant',
     'Cape Coast, Ghana',
   ].filter(Boolean).join('\n');
@@ -945,6 +1012,13 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
                       <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
                       <p style="margin:0;color:#57534e;line-height:1.65;font-size:14px;">${escapeHtml(nextStep)}</p>
                     </div>
+
+                    ${buildEmailAnimationHtml({
+                      altText: isConfirmed
+                        ? 'Animated Bao mascot waving for a confirmed Luban Workshop reservation'
+                        : 'Animated Bao mascot waving for a Luban Workshop reservation update',
+                    })}
+                    ${buildVitaForgeAdHtml()}
 
                     <p style="margin:24px 0 0;color:#78716c;font-size:13px;line-height:1.7;text-align:center;">
                       Luban Workshop Restaurant<br>
@@ -1073,6 +1147,8 @@ function buildRestaurantContactMessageEmail({ messageId, contactMessage }) {
     '',
     'Message:',
     body,
+    '',
+    getVitaForgeAdText(),
   ].filter(Boolean).join('\n');
 
   const detailRows = buildRestaurantDetailRows([

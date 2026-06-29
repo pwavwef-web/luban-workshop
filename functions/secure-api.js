@@ -38,6 +38,7 @@ const RESERVATION_ACCESS_TTL_MS = 1000 * 60 * 15;
 const ORDER_CANCEL_WINDOW_MS = 1000 * 60 * 5;
 const DUPLICATE_ORDER_WINDOW_MS = 1000 * 60 * 3;
 const TAKEOUT_PACKAGING_FEE_PER_DISH = 5;
+const VITAFORGE_URL = 'https://cv-build.web.app';
 const SMS_CAMPAIGN_COLLECTION = 'smsCampaigns';
 const SMS_CAMPAIGN_HISTORY_LIMIT = 20;
 const SMS_CAMPAIGN_MAX_RECIPIENTS = 500;
@@ -212,6 +213,55 @@ function createTransporter() {
 async function sendMail(mailOptions) {
   const transporter = createTransporter();
   await transporter.sendMail(mailOptions);
+}
+
+function getPublicAssetBaseUrl() {
+  return String(PUBLIC_SITE_URL.value() || 'https://lubanrestaurant.com').replace(/\/+$/, '');
+}
+
+function getVitaForgeAdText() {
+  return `Ad: VitaForge AI helps students build polished CVs, cover letters, and ATS-ready applications. Start at ${VITAFORGE_URL}`;
+}
+
+function buildEmailAnimationHtml({ altText = 'Animated Bao mascot waving from Luban Workshop Restaurant' } = {}) {
+  const assetBaseUrl = getPublicAssetBaseUrl();
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:20px;">
+      <tr>
+        <td align="center" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:18px;padding:16px;">
+          <img src="${assetBaseUrl}/assets/bao-campaign/gifs/bao-wave-loop.gif" width="120" alt="${escapeHtml(altText)}" style="display:block;width:120px;max-width:100%;height:auto;border:0;margin:0 auto 10px;">
+          <p style="margin:0;color:#7c2d12;font-size:13px;line-height:1.55;font-weight:700;">A warm wave from the Luban Workshop team.</p>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function buildVitaForgeAdHtml() {
+  const assetBaseUrl = getPublicAssetBaseUrl();
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:20px;border:1px solid #dbeafe;background:#f8fbff;border-radius:18px;overflow:hidden;">
+      <tr>
+        <td style="padding:18px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+              <td width="58" style="vertical-align:middle;padding-right:14px;">
+                <img src="${assetBaseUrl}/assets/partners/vitaforge/vitaforge-icon-512.png" width="52" height="52" alt="VitaForge AI" style="display:block;width:52px;height:52px;border-radius:14px;border:0;">
+              </td>
+              <td style="vertical-align:middle;">
+                <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;font-weight:800;">Sponsored</p>
+                <p style="margin:0;color:#0f1830;font-size:17px;line-height:1.25;font-weight:900;">Build a stronger CV with VitaForge AI</p>
+                <p style="margin:6px 0 0;color:#475569;font-size:13px;line-height:1.55;">Create polished CVs, cover letters, and ATS-ready applications with guided AI support.</p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:14px 0 0;">
+            <a href="${VITAFORGE_URL}" style="display:inline-block;background:#0f1830;color:#ffffff;text-decoration:none;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:800;">Open VitaForge AI</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  `;
 }
 
 async function sendArkeselPlainSms({ to, message, senderId, schedule }) {
@@ -960,6 +1010,10 @@ async function sendReservationAccessAcknowledgements(reservationId, reservation,
       <p>You can review its status and send change or cancellation requests here:</p>
       <p><a href="${escapeHtml(link)}">${escapeHtml(link)}</a></p>
       <p>If you need help, call 020 543 8455.</p>
+      ${buildEmailAnimationHtml({
+        altText: 'Animated Bao mascot waving for a received Luban Workshop reservation request'
+      })}
+      ${buildVitaForgeAdHtml()}
     </div>
   `;
   if (email) {
@@ -968,7 +1022,11 @@ async function sendReservationAccessAcknowledgements(reservationId, reservation,
       to: email,
       subject,
       html,
-      text: `We received your reservation request. Track it here: ${link}`
+      text: [
+        `We received your reservation request. Track it here: ${link}`,
+        '',
+        getVitaForgeAdText()
+      ].join('\n')
     }).catch((error) => logger.error('Failed to send reservation acknowledgement email', {
       reservationId,
       error: error?.message || error
@@ -1785,6 +1843,207 @@ async function handleAdminFraudReview(req, res) {
   });
 }
 
+function normalizeAdminOrderStatus(status) {
+  const normalized = cleanPlainText(status || '').toLowerCase();
+  return normalized || 'pending';
+}
+
+function isActiveAdminOrder(status) {
+  return ['pending', 'preparing', ''].includes(cleanPlainText(status || '').toLowerCase());
+}
+
+function normalizeAdminReservationStatus(status) {
+  const normalized = cleanPlainText(status || '').toLowerCase();
+  if (normalized === 'completed') return 'confirmed';
+  if (['confirmed', 'rejected', 'pending'].includes(normalized)) return normalized;
+  return 'pending';
+}
+
+function summarizeAdminOrderItems(items) {
+  if (!Array.isArray(items) || !items.length) return [];
+  return items.slice(0, 6).map((item) => ({
+    name: cleanLimitedText(item.name || item.id || 'Item', 80),
+    quantity: Number(item.quantity || 0),
+    price: Number(item.price || 0)
+  }));
+}
+
+function serializeAdminAssistantOrder(doc) {
+  const data = doc.data() || {};
+  const status = normalizeAdminOrderStatus(data.status);
+  const createdAt = serializeTimestamp(data.createdAt);
+  return {
+    id: doc.id,
+    orderNumber: `#${doc.id.slice(-6).toUpperCase()}`,
+    status,
+    active: isActiveAdminOrder(status),
+    customerName: cleanLimitedText(data.customerName || 'Guest', 80),
+    customerPhoneMasked: maskPhone(data.customerPhone || ''),
+    orderType: cleanLimitedText(data.orderTypeLabel || data.orderType || 'takeout', 40),
+    total: Number(data.total || 0),
+    createdAt,
+    items: summarizeAdminOrderItems(data.items)
+  };
+}
+
+function serializeAdminAssistantReservation(doc) {
+  const data = doc.data() || {};
+  const status = normalizeAdminReservationStatus(data.status);
+  return {
+    id: doc.id,
+    status,
+    pending: status === 'pending',
+    name: cleanLimitedText(data.name || 'Guest', 80),
+    phoneMasked: maskPhone(data.phone || ''),
+    email: normalizeEmail(data.email || ''),
+    date: cleanLimitedText(data.date || '', 40),
+    time: cleanLimitedText(data.time || '', 40),
+    guests: cleanLimitedText(data.guests || data.guestCount || '?', 20),
+    notesPreview: cleanLimitedText(data.notes || data.specialRequests || '', 180),
+    createdAt: serializeTimestamp(data.createdAt),
+    decisionBy: cleanLimitedText(data.decisionBy || '', 100),
+    decisionReason: cleanLimitedText(data.decisionReason || '', 220)
+  };
+}
+
+function serializeAdminAssistantMessage(doc) {
+  const data = doc.data() || {};
+  return {
+    id: doc.id,
+    read: data.read === true,
+    source: cleanLimitedText(data.source || 'contact', 40),
+    name: cleanLimitedText(data.name || 'Unknown', 80),
+    email: normalizeEmail(data.email || ''),
+    subject: cleanSubjectLine(data.subject || 'Message', 'Message'),
+    category: cleanLimitedText(data.reportCategory || '', 40),
+    urgency: cleanLimitedText(data.reportUrgency || '', 20),
+    preview: cleanLimitedText(data.message || data.originalMessage || '', 220),
+    createdAt: serializeTimestamp(data.createdAt)
+  };
+}
+
+function serializeAdminAssistantSecurityEvent(doc) {
+  const data = doc.data() || {};
+  return {
+    id: doc.id,
+    kind: cleanLimitedText(data.kind || 'event', 80),
+    scope: cleanLimitedText(data.scope || '', 80),
+    orderId: cleanLimitedText(data.orderId || '', 80),
+    reservationId: cleanLimitedText(data.reservationId || '', 80),
+    userId: cleanLimitedText(data.userId || '', 120),
+    createdAt: serializeTimestamp(data.createdAt)
+  };
+}
+
+function serializeAdminAssistantKnowledge(doc) {
+  const data = doc.data() || {};
+  const status = String(data.status || '').toLowerCase();
+  const archived = status === 'archived' || data.active === false || data.archived === true;
+  return {
+    id: doc.id,
+    title: cleanLimitedText(data.title || data.name || data.question || doc.id, 140),
+    active: !archived,
+    updatedAt: serializeTimestamp(data.updatedAt || data.createdAt || data.archivedAt)
+  };
+}
+
+function countSecurityEventsByKind(events) {
+  return events.reduce((counts, event) => {
+    counts[event.kind] = (counts[event.kind] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+async function handleAdminAssistantContext(req, res) {
+  const decoded = await requireAdmin(req);
+  const [
+    orderSnap,
+    reservationSnap,
+    messageSnap,
+    eventSnap,
+    knowledgeSnap,
+    smsCampaignSnap
+  ] = await Promise.all([
+    db().collection('orders').orderBy('createdAt', 'desc').limit(120).get(),
+    db().collection('reservations').orderBy('createdAt', 'desc').limit(120).get(),
+    db().collection('contact_messages').orderBy('createdAt', 'desc').limit(120).get(),
+    db().collection('securityEvents').orderBy('createdAt', 'desc').limit(80).get(),
+    db().collection('chatbotKnowledge').get(),
+    db().collection(SMS_CAMPAIGN_COLLECTION).orderBy('createdAt', 'desc').limit(8).get()
+  ]);
+
+  const orders = orderSnap.docs.map(serializeAdminAssistantOrder);
+  const reservations = reservationSnap.docs.map(serializeAdminAssistantReservation);
+  const messages = messageSnap.docs.map(serializeAdminAssistantMessage);
+  const securityEvents = eventSnap.docs.map(serializeAdminAssistantSecurityEvent);
+  const knowledge = knowledgeSnap.docs.map(serializeAdminAssistantKnowledge);
+  const campaigns = smsCampaignSnap.docs.map(serializeSmsCampaignDoc);
+
+  const activeOrders = orders.filter((order) => order.active);
+  const pendingReservations = reservations.filter((reservation) => reservation.pending);
+  const unreadMessages = messages.filter((message) => !message.read);
+  const assistantReports = messages.filter((message) => String(message.source || '').toLowerCase() === 'assistant');
+  const activeFacts = knowledge.filter((fact) => fact.active);
+  const securityEventKinds = countSecurityEventsByKind(securityEvents);
+  const reviewEvents = securityEvents.filter((event) => (
+    event.kind === 'order_total_mismatch' ||
+    event.kind === 'rate_limit_exceeded' ||
+    event.kind === 'otp_verify_failed' ||
+    event.kind === 'reservation_access_otp_failed' ||
+    event.kind === 'duplicate_order_blocked'
+  ));
+
+  sendJson(res, 200, {
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    admin: {
+      uid: decoded.uid || '',
+      email: normalizeEmail(decoded.email || '')
+    },
+    counts: {
+      recentOrders: orders.length,
+      activeOrders: activeOrders.length,
+      recentReservations: reservations.length,
+      pendingReservations: pendingReservations.length,
+      recentMessages: messages.length,
+      unreadMessages: unreadMessages.length,
+      assistantReports: assistantReports.length,
+      activeChatbotFacts: activeFacts.length,
+      archivedChatbotFacts: knowledge.length - activeFacts.length,
+      recentSecurityEvents: securityEvents.length,
+      reviewSecurityEvents: reviewEvents.length,
+      recentSmsCampaigns: campaigns.length
+    },
+    orders: {
+      active: activeOrders.slice(0, 10),
+      recent: orders.slice(0, 10)
+    },
+    reservations: {
+      pending: pendingReservations.slice(0, 10),
+      recent: reservations.slice(0, 10)
+    },
+    messages: {
+      unread: unreadMessages.slice(0, 10),
+      assistantReports: assistantReports.slice(0, 10),
+      recent: messages.slice(0, 10)
+    },
+    security: {
+      eventKinds: securityEventKinds,
+      reviewEvents: reviewEvents.slice(0, 12),
+      recent: securityEvents.slice(0, 12)
+    },
+    chatbotKnowledge: {
+      recent: knowledge
+        .slice()
+        .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))
+        .slice(0, 10)
+    },
+    smsCampaigns: {
+      recent: campaigns.slice(0, 8)
+    }
+  });
+}
+
 async function handleBootstrapChatbotKnowledge(req, res) {
   const decoded = await requireAdmin(req);
   const defaults = [
@@ -1881,6 +2140,7 @@ async function router(req, res) {
     if (path === 'admin/sms/audience' && req.method === 'GET') return await handleAdminSmsAudience(req, res);
     if (path === 'admin/sms/send' && req.method === 'POST') return await handleAdminSendSmsCampaign(req, res);
     if (path === 'admin/fraud-review' && req.method === 'GET') return await handleAdminFraudReview(req, res);
+    if (path === 'admin/assistant-context' && req.method === 'GET') return await handleAdminAssistantContext(req, res);
     if (path === 'admin/bootstrap-chatbot-knowledge' && req.method === 'POST') return await handleBootstrapChatbotKnowledge(req, res);
     sendJson(res, 404, { error: 'Endpoint not found.' });
   } catch (error) {

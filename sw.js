@@ -1,5 +1,5 @@
 // Luban Workshop Restaurant - Main Page Service Worker
-const CACHE_NAME = 'luban-main-v9';
+const CACHE_NAME = 'luban-main-v10';
 const MENU_CACHE_NAME = 'luban-menu-v2';
 const STATIC_ASSETS = [
     '/',
@@ -17,7 +17,7 @@ const STATIC_ASSETS = [
     '/assets/css/site.css',
     '/script.js',
     '/assets/js/site-header.js',
-    '/assets/js/site-footer.js?v=20260628-footer-upgrade',
+    '/assets/js/site-footer.js?v=20260629-footer-glow',
     '/assets/js/site-config.js',
     '/assets/js/luban-client.js',
     '/assets/js/customer-experience.js',

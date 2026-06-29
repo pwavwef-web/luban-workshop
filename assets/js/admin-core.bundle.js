@@ -111,6 +111,41 @@
     navigator.serviceWorker.register("admin-sw.js").catch(() => {
     });
   }
+  var SPLASH_MIN_MS = 700;
+  var splashStartedAt = Date.now();
+  var splashDismissed = false;
+  function hideSplash() {
+    if (splashDismissed) return;
+    splashDismissed = true;
+    const splash = document.getElementById("splash-screen");
+    if (!splash) return;
+    const wait = Math.max(0, SPLASH_MIN_MS - (Date.now() - splashStartedAt));
+    setTimeout(() => {
+      splash.classList.add("admin-splash--hide");
+      setTimeout(() => {
+        splash.style.display = "none";
+      }, 600);
+    }, wait);
+  }
+  setTimeout(hideSplash, 9e3);
+  function setOverviewGreeting() {
+    const el = document.getElementById("overview-greeting");
+    if (!el) return;
+    const hour = (/* @__PURE__ */ new Date()).getHours();
+    el.textContent = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  }
+  function publishBaoAdminContext(user, verified) {
+    const context = {
+      isAdmin: verified === true,
+      uid: verified && user ? user.uid || "" : "",
+      email: verified && user ? user.email || "" : "",
+      displayName: verified && user ? user.displayName || "" : "",
+      panel: "admin",
+      verifiedAt: verified ? (/* @__PURE__ */ new Date()).toISOString() : ""
+    };
+    window.LUBAN_BAO_ADMIN_CONTEXT = context;
+    window.dispatchEvent(new CustomEvent("luban:bao-admin-context", { detail: context }));
+  }
   var MOBILE_BREAKPOINT = 768;
   var isMobileSidebarOpen = false;
   var mobileSidebarEventsBound = false;
@@ -192,7 +227,7 @@
     if (window.innerWidth < MOBILE_BREAKPOINT && isMobileSidebarOpen) {
       toggleMobileSidebar();
     }
-    ["menu", "reservations", "orders", "promotions", "special-menus", "admin-users", "messages", "fraud-review", "chatbot-knowledge", "account"].forEach((tab) => {
+    ["overview", "menu", "reservations", "orders", "promotions", "special-menus", "admin-users", "messages", "fraud-review", "chatbot-knowledge", "account"].forEach((tab) => {
       document.getElementById("view-" + tab).classList.add("hidden");
       const btn = document.getElementById("tab-btn-" + tab);
       btn.classList.remove("bg-red-50", "text-red-700", "admin-nav-active");
@@ -285,7 +320,8 @@
     window.loadFraudReview();
     window.listenToChatbotKnowledge();
     requestNotificationPermission();
-    switchTab("menu");
+    setOverviewGreeting();
+    switchTab("overview");
     if (!mobileSidebarEventsBound) {
       const menuToggle = document.getElementById("mobile-menu-toggle");
       const sidebarCloseBtn = document.getElementById("sidebar-close-btn");
@@ -344,12 +380,15 @@
         }
       }
       if (!adminVerified) {
+        publishBaoAdminContext(user, false);
         await auth.signOut();
         const errDiv = document.getElementById("login-error");
         errDiv.textContent = "Access denied. You do not have admin privileges.";
         errDiv.classList.remove("hidden");
+        hideSplash();
         return;
       }
+      publishBaoAdminContext(user, true);
       try {
         const profileDoc = await db.collection("users").doc(user.uid).get();
         const profileData = profileDoc.exists ? profileDoc.data() : null;
@@ -373,6 +412,7 @@
       }
       try {
         await initializeAdminDashboard(user);
+        hideSplash();
       } catch (error) {
         console.error("Failed to initialize admin dashboard:", error);
         const errDiv = document.getElementById("login-error");
@@ -380,10 +420,13 @@
         errDiv.classList.remove("hidden");
         document.getElementById("login-screen").classList.remove("hidden");
         document.getElementById("admin-dashboard").classList.add("hidden");
+        hideSplash();
       }
     } else {
+      publishBaoAdminContext(null, false);
       document.getElementById("login-screen").classList.remove("hidden");
       document.getElementById("admin-dashboard").classList.add("hidden");
+      hideSplash();
     }
   });
   document.addEventListener("keydown", (e) => {

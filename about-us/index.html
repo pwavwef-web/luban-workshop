@@ -115,15 +115,17 @@
         .serif { font-family: 'Playfair Display', serif; }
 
         /* ── Injected nav (site-header.js "about" variant) ── */
-        nav { position: fixed; top: 0; width: 100%; background: rgba(252,250,248,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(28,25,23,.06), 0 10px 30px rgba(28,25,23,.06); z-index: 50; }
-        nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
-        nav a.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
-        nav .brand span { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
-        nav .brand span em { color: var(--red); font-style: normal; }
-        nav .nav-links { display: flex; gap: 1rem; align-items: center; }
-        nav .nav-links a { color: var(--muted); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
-        nav .nav-links a:hover { color: var(--red); }
-        nav .nav-links a.active { color: var(--red); font-weight: 600; border-bottom: 2px solid #dc2626; padding-bottom: 2px; }
+        /* Scoped to the top-level header nav (a direct child of body) so it never hits
+           the footer's nested <nav> — e.g. the Explore links injected by site-footer.js. */
+        body > nav { position: fixed; top: 0; width: 100%; background: rgba(252,250,248,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(28,25,23,.06), 0 10px 30px rgba(28,25,23,.06); z-index: 50; }
+        body > nav > div { max-width: 72rem; margin: 0 auto; padding: 0 1rem; display: flex; justify-content: space-between; align-items: center; height: 4rem; }
+        body > nav a.brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        body > nav .brand span { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+        body > nav .brand span em { color: var(--red); font-style: normal; }
+        body > nav .nav-links { display: flex; gap: 1rem; align-items: center; }
+        body > nav .nav-links a { color: var(--muted); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        body > nav .nav-links a:hover { color: var(--red); }
+        body > nav .nav-links a.active { color: var(--red); font-weight: 600; border-bottom: 2px solid #dc2626; padding-bottom: 2px; }
 
         /* ──────────────────────────────────────────────
            HERO — cinematic, animated
@@ -869,7 +871,7 @@
 
     <!-- Footer -->
     <div data-luban-footer></div>
-    <script src="../assets/js/site-footer.js?v=20260628-footer-upgrade"></script>
+    <script src="../assets/js/site-footer.js?v=20260629-footer-glow"></script>
 
     <script>
         lucide.createIcons();
@@ -1169,7 +1171,7 @@
         })();
     </script>
 
-    <script type="module" src="../assets/js/firebase-ai-chatbot.js?v=20260628-white-working-bao"></script>
+    <script type="module" src="../assets/js/firebase-ai-chatbot.js?v=20260629-bao-glow"></script>
     <script src="../assets/js/cookie-consent.js" defer></script>
 </body>
 </html>

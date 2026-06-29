@@ -1,9 +1,13 @@
 // Luban Workshop Restaurant - Admin Dashboard Service Worker
-const CACHE_NAME = 'luban-admin-v3';
+const CACHE_NAME = 'luban-admin-v4';
 const STATIC_ASSETS = [
     '/admin.html',
     '/admin-manifest.json',
     '/logo.png',
+    '/assets/bao-campaign/gifs/bao-wave-loop.gif',
+    '/assets/mascots/extra/bao-extra-pose-29-welcome-host.png',
+    '/assets/mascots/extra/bao-extra-pose-46-tablet-dashboard.png',
+    '/assets/mascots/bao-chat-avatar.png',
     '/assets/js/admin-bao-icons.js',
     '/assets/icons/admin-bao/admin-users.svg',
     '/assets/icons/admin-bao/approve.svg',

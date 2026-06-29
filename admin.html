@@ -363,23 +363,471 @@
             }
         }
         /* (Removed metric buttons and Actions column via markup changes) */
+
+        /* ============================================================
+           LIGHT PREMIUM GLASS UPGRADE — splash · aurora · glass · motion
+           ============================================================ */
+        :root {
+            --admin-gold: #c58b2b;
+            --admin-jade: #0f766e;
+            --admin-glass-bg: rgba(255, 255, 255, 0.72);
+            --admin-glass-brd: rgba(255, 255, 255, 0.66);
+            --admin-glass-shadow: 0 22px 60px -28px rgba(28, 25, 23, 0.45);
+            --admin-glow-red: rgba(185, 28, 28, 0.20);
+            --admin-ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* --- Animated aurora wash (shared) --- */
+        .admin-splash__aurora,
+        .admin-login-aurora {
+            position: absolute;
+            inset: -25% -12% -12% -12%;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(38% 44% at 18% 22%, rgba(185, 28, 28, 0.18), transparent 70%),
+                radial-gradient(34% 40% at 82% 16%, rgba(197, 139, 43, 0.20), transparent 70%),
+                radial-gradient(46% 52% at 72% 88%, rgba(15, 118, 110, 0.14), transparent 72%),
+                radial-gradient(40% 46% at 28% 82%, rgba(185, 28, 28, 0.12), transparent 72%);
+            filter: blur(10px) saturate(118%);
+            animation: admin-aurora-drift 19s ease-in-out infinite alternate;
+        }
+
+        @keyframes admin-aurora-drift {
+            0%   { transform: translate3d(0, 0, 0) scale(1);          opacity: .9; }
+            50%  { transform: translate3d(2%, -1.6%, 0) scale(1.06);  opacity: 1; }
+            100% { transform: translate3d(-2%, 1.6%, 0) scale(1.04);  opacity: .92; }
+        }
+
+        /* Content area picks up a soft aurora tint */
+        .admin-main {
+            position: relative;
+            background:
+                radial-gradient(60% 60% at 100% 0%, rgba(197, 139, 43, 0.08), transparent 60%),
+                radial-gradient(55% 55% at 0% 100%, rgba(185, 28, 28, 0.06), transparent 60%),
+                linear-gradient(180deg, #fbfaf8 0%, #f4f0ea 100%);
+        }
+
+        /* ===================== SPLASH ===================== */
+        .admin-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: radial-gradient(120% 120% at 50% 0%, #fffdfa 0%, #f7f3ef 55%, #f1e9e0 100%);
+            transition: opacity .55s var(--admin-ease), visibility .55s;
+        }
+
+        .admin-splash::before {
+            content: "";
+            position: absolute;
+            inset: -25% -12%;
+            background:
+                radial-gradient(36% 42% at 20% 24%, rgba(185, 28, 28, 0.16), transparent 70%),
+                radial-gradient(34% 40% at 80% 18%, rgba(197, 139, 43, 0.18), transparent 70%),
+                radial-gradient(46% 52% at 70% 86%, rgba(15, 118, 110, 0.12), transparent 72%);
+            filter: blur(10px);
+            animation: admin-aurora-drift 19s ease-in-out infinite alternate;
+        }
+
+        .admin-splash--hide { opacity: 0; visibility: hidden; }
+
+        .admin-splash__inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            animation: admin-rise .7s var(--admin-ease) both;
+        }
+
+        @keyframes admin-rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-splash__bao {
+            position: relative;
+            width: 168px;
+            height: 168px;
+            display: grid;
+            place-items: center;
+        }
+
+        .admin-splash__bao-img {
+            width: 132px;
+            height: 132px;
+            object-fit: contain;
+            filter: drop-shadow(0 16px 28px rgba(127, 29, 29, 0.24));
+            animation: admin-bob 2.6s ease-in-out infinite;
+        }
+
+        @keyframes admin-bob {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
+        }
+
+        .admin-splash__ring {
+            position: absolute;
+            inset: 6px;
+            border-radius: 999px;
+            border: 2px solid rgba(185, 28, 28, 0.16);
+            border-top-color: var(--admin-red);
+            animation: admin-spin 1.1s linear infinite;
+        }
+
+        @keyframes admin-spin { to { transform: rotate(360deg); } }
+
+        .admin-splash__brand {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1c1917;
+            margin-top: 1.25rem;
+            letter-spacing: -.01em;
+        }
+
+        .admin-splash__brand span { color: var(--admin-red); }
+
+        .admin-splash__tag {
+            margin-top: .4rem;
+            font-size: .74rem;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: #a8a29e;
+        }
+
+        .admin-splash__bar {
+            margin-top: 1.4rem;
+            width: 190px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(28, 25, 23, 0.08);
+            overflow: hidden;
+        }
+
+        .admin-splash__bar > span {
+            display: block;
+            height: 100%;
+            width: 40%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--admin-gold), var(--admin-red));
+            animation: admin-load 1.3s var(--admin-ease) infinite;
+        }
+
+        @keyframes admin-load {
+            0%   { transform: translateX(-130%); }
+            100% { transform: translateX(360%); }
+        }
+
+        .admin-splash__status { margin-top: .85rem; font-size: .82rem; color: #78716c; }
+
+        /* ===================== LOGIN (glass) ===================== */
+        .admin-login-shell {
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(120% 120% at 50% 0%, #fffdfa 0%, #f7f3ef 60%, #f1e9e0 100%) !important;
+        }
+
+        .admin-login-card {
+            position: relative;
+            z-index: 1;
+            background: var(--admin-glass-bg) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(135%);
+            backdrop-filter: blur(18px) saturate(135%);
+            border: 1px solid var(--admin-glass-brd) !important;
+            border-radius: 20px !important;
+            box-shadow: var(--admin-glass-shadow), 0 18px 50px -24px var(--admin-glow-red) !important;
+            animation: admin-rise .6s var(--admin-ease) both;
+        }
+
+        .admin-login-bao {
+            width: 104px;
+            height: 104px;
+            margin: 0 auto .85rem;
+            display: grid;
+            place-items: center;
+            border-radius: 999px;
+            background: radial-gradient(circle at 50% 32%, #fff, #fff1f1 76%);
+            border: 1px solid rgba(254, 202, 202, 0.85);
+            box-shadow: 0 16px 32px -14px var(--admin-glow-red);
+            animation: admin-bob 3.2s ease-in-out infinite;
+        }
+
+        .admin-login-bao img { width: 86px; height: 86px; object-fit: contain; }
+
+        /* ===================== GLASS CHROME ===================== */
+        .admin-sidebar {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 248, 246, 0.88) 100%) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            backdrop-filter: blur(14px) saturate(130%);
+            border-right: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 14px 0 44px -26px rgba(28, 25, 23, 0.30) !important;
+        }
+
+        .admin-topbar {
+            background: var(--admin-glass-bg) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            backdrop-filter: blur(16px) saturate(140%);
+            border: 1px solid var(--admin-glass-brd) !important;
+            border-radius: 18px !important;
+            box-shadow: var(--admin-glass-shadow) !important;
+        }
+
+        /* Elevated frosted data panels (kept crisp & opaque for table legibility) */
+        .admin-panel,
+        .admin-main .bg-white.rounded-xl {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 253, 250, 0.95)) !important;
+            border: 1px solid rgba(255, 255, 255, 0.7) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 20px 46px -26px rgba(28, 25, 23, 0.34), 0 0 0 1px rgba(231, 229, 228, 0.55) !important;
+        }
+
+        /* Sidebar nav: smooth motion + richer active state */
+        .admin-nav-button,
+        .admin-nav-link { transition: transform .25s var(--admin-ease), background-color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+        .admin-nav-button:hover,
+        .admin-nav-link:hover { transform: translateX(3px); }
+
+        .admin-nav-active {
+            background: linear-gradient(90deg, #fff1f1, #fff7f7) !important;
+            border-color: #fecaca !important;
+            color: var(--admin-red-dark) !important;
+            box-shadow: inset 3px 0 0 var(--admin-red), 0 12px 26px -12px var(--admin-glow-red) !important;
+        }
+
+        /* Smooth view transitions on tab switch */
+        .view-shell:not(.hidden) { animation: admin-view-in .42s var(--admin-ease) both; }
+
+        @keyframes admin-view-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===================== OVERVIEW ===================== */
+        .admin-overview-hero {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.85rem 2rem;
+            border-radius: 22px;
+            background:
+                radial-gradient(80% 150% at 100% 0%, rgba(197, 139, 43, 0.22), transparent 58%),
+                linear-gradient(125deg, #7f1d1d 0%, #b91c1c 48%, #c2410c 100%);
+            color: #fff7ed;
+            box-shadow: 0 30px 64px -32px rgba(127, 29, 29, 0.70);
+        }
+
+        .admin-overview-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(60% 80% at 16% 130%, rgba(255, 255, 255, 0.16), transparent 60%);
+            pointer-events: none;
+        }
+
+        .admin-overview-hero__text { position: relative; z-index: 1; }
+        .admin-overview-eyebrow { font-size: .72rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 237, 213, 0.88); }
+        .admin-overview-title { font-size: clamp(1.6rem, 2.4vw, 2.3rem); font-weight: 700; margin: .35rem 0 .45rem; color: #fff; }
+        .admin-overview-sub { font-size: .95rem; color: rgba(255, 241, 225, 0.92); max-width: 46ch; }
+        .admin-overview-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.15rem; }
+
+        .admin-overview-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .6rem 1.15rem;
+            border-radius: 999px;
+            font-size: .85rem;
+            font-weight: 800;
+            background: #fff;
+            color: #9f1239;
+            border: 0;
+            cursor: pointer;
+            box-shadow: 0 14px 28px -14px rgba(0, 0, 0, 0.45);
+            transition: transform .2s var(--admin-ease), box-shadow .2s var(--admin-ease);
+        }
+
+        .admin-overview-cta--ghost { background: rgba(255, 255, 255, 0.14); color: #fff; box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.40); }
+        .admin-overview-cta:hover { transform: translateY(-2px); box-shadow: 0 18px 32px -14px rgba(0, 0, 0, 0.5); }
+        .admin-overview-cta .bao-icon { width: 16px; height: 16px; }
+
+        .admin-overview-hero__bao { position: relative; z-index: 1; flex-shrink: 0; }
+        .admin-overview-hero__bao img {
+            width: clamp(120px, 16vw, 196px);
+            height: auto;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.38));
+            animation: admin-bob 4.2s ease-in-out infinite;
+        }
+
+        .admin-overview-stats { display: grid; gap: .9rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        @media (min-width: 768px) {
+            .admin-overview-stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
+
+        .admin-stat-tile {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: .35rem;
+            padding: 1.1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 16px;
+            border: 1px solid var(--admin-glass-brd);
+            background: var(--admin-glass-bg);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+            backdrop-filter: blur(14px) saturate(130%);
+            box-shadow: var(--admin-glass-shadow);
+            transition: transform .25s var(--admin-ease), box-shadow .25s var(--admin-ease), border-color .25s var(--admin-ease);
+        }
+
+        .admin-stat-tile:hover { transform: translateY(-4px); border-color: #fecaca; box-shadow: 0 26px 52px -26px var(--admin-glow-red); }
+
+        .admin-stat-tile::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--admin-red), var(--admin-gold));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .3s var(--admin-ease);
+        }
+
+        .admin-stat-tile:hover::after { transform: scaleX(1); }
+
+        .admin-stat-tile__icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(circle at 50% 30%, #fff, #fff4ee);
+            border: 1px solid rgba(231, 229, 228, 0.9);
+            box-shadow: 0 8px 18px -10px rgba(28, 25, 23, 0.25);
+        }
+
+        .admin-stat-tile[data-accent="gold"] .admin-stat-tile__icon { background: radial-gradient(circle at 50% 30%, #fff, #fdf3da); }
+        .admin-stat-tile[data-accent="jade"] .admin-stat-tile__icon { background: radial-gradient(circle at 50% 30%, #fff, #e7f6f3); }
+        .admin-stat-tile__icon .bao-icon { width: 26px; height: 26px; }
+        .admin-stat-tile__value { font-size: 1.9rem; line-height: 1; font-weight: 900; color: #1c1917; }
+        .admin-stat-tile__label { font-size: .8rem; font-weight: 800; color: #57534e; }
+        .admin-stat-tile__sub { font-size: .72rem; color: #a8a29e; }
+
+        .admin-overview-quick__title { font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #a8a29e; margin-bottom: .8rem; }
+        .admin-overview-quick__grid { display: grid; gap: .75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+        @media (min-width: 640px) { .admin-overview-quick__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (min-width: 1024px) { .admin-overview-quick__grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+        .admin-quick-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .55rem;
+            text-decoration: none;
+            padding: 1rem .75rem;
+            border-radius: 14px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid var(--admin-glass-brd);
+            color: #44403c;
+            font-size: .8rem;
+            font-weight: 800;
+            text-align: center;
+            box-shadow: 0 14px 32px -22px rgba(28, 25, 23, 0.5);
+            transition: transform .22s var(--admin-ease), box-shadow .22s var(--admin-ease), border-color .22s ease, color .22s ease;
+        }
+
+        .admin-quick-tile:hover { transform: translateY(-3px); border-color: #fecaca; box-shadow: 0 20px 40px -22px var(--admin-glow-red); color: var(--admin-red-dark); }
+        .admin-quick-tile .bao-icon { width: 30px; height: 30px; }
+
+        @media (max-width: 640px) {
+            .admin-overview-hero { flex-direction: column; text-align: center; align-items: center; }
+            .admin-overview-hero__bao { order: -1; }
+            .admin-overview-sub { margin-inline: auto; }
+            .admin-overview-actions { justify-content: center; }
+        }
+
+        /* ===================== ACCESSIBILITY ===================== */
+        @media (prefers-reduced-motion: reduce) {
+            .admin-splash,
+            .admin-splash::before,
+            .admin-splash__aurora,
+            .admin-login-aurora,
+            .admin-splash__inner,
+            .admin-splash__bao-img,
+            .admin-splash__ring,
+            .admin-splash__bar > span,
+            .admin-login-card,
+            .admin-login-bao,
+            .admin-overview-hero__bao img,
+            .view-shell:not(.hidden) {
+                animation: none !important;
+            }
+            .view-shell:not(.hidden) { opacity: 1 !important; transform: none !important; }
+        }
     </style>
     <script src="assets/js/cookie-consent.js" defer></script>
 </head>
 
 <body class="bg-stone-50 text-stone-800 antialiased h-screen overflow-hidden">
 
+    <!-- Boot splash: covers the async login-state check so the login screen never flashes -->
+    <div id="splash-screen" class="admin-splash" role="status" aria-live="polite" aria-label="Loading Luban Workshop admin">
+        <div class="admin-splash__aurora" aria-hidden="true"></div>
+        <div class="admin-splash__inner">
+            <div class="admin-splash__bao">
+                <span class="admin-splash__ring" aria-hidden="true"></span>
+                <img class="admin-splash__bao-img" src="assets/bao-campaign/gifs/bao-wave-loop.gif" alt="" width="160" height="160">
+            </div>
+            <h1 class="admin-splash__brand serif">Luban <span>Workshop</span></h1>
+            <p class="admin-splash__tag">Admin Control Center</p>
+            <div class="admin-splash__bar" aria-hidden="true"><span></span></div>
+            <p class="admin-splash__status">Checking access&hellip;</p>
+        </div>
+    </div>
+    <script>
+        // Last-resort fallback so the splash can never strand the screen if bundles fail to load.
+        window.__lubanHideSplash = function () {
+            var s = document.getElementById('splash-screen');
+            if (!s || s.classList.contains('admin-splash--hide')) return;
+            s.classList.add('admin-splash--hide');
+            setTimeout(function () { s.style.display = 'none'; }, 600);
+        };
+        setTimeout(function () { window.__lubanHideSplash(); }, 12000);
+    </script>
+
+
     <div id="login-screen" class="admin-login-shell min-h-screen flex items-center justify-center px-4 bg-stone-50">
+        <div class="admin-login-aurora" aria-hidden="true"></div>
         <div class="admin-login-card max-w-md w-full bg-white rounded-lg shadow-xl p-8">
             <div class="text-center mb-8">
-                <div class="flex items-center justify-center mb-4">
+                <div class="admin-login-bao">
+                    <img src="assets/mascots/extra/bao-extra-pose-29-welcome-host.png" alt="Bao welcomes you to the Luban admin" width="104" height="104" loading="eager">
+                </div>
+                <div class="flex items-center justify-center mb-3">
                     <span class="admin-brand-mark mr-3">
                         <i data-lucide="utensils-crossed" class="h-5 w-5"></i>
                     </span>
                     <h1 class="serif text-3xl font-bold text-stone-900">Luban <span class="text-red-700">Workshop</span>
                     </h1>
                 </div>
-                <p class="text-stone-600">Admin Dashboard</p>
+                <p class="text-stone-600">Admin Control Center</p>
             </div>
             <form id="login-form" class="space-y-6">
                 <div>
@@ -440,6 +888,12 @@
             </div>
 
             <nav class="flex-1 px-4 py-6 space-y-2">
+                <button onclick="switchTab('overview')" id="tab-btn-overview"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="layout-dashboard" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Overview</span>
+                </button>
+
                 <button onclick="switchTab('menu')" id="tab-btn-menu"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="book-open" class="h-5 w-5 mr-3"></i>
@@ -563,9 +1017,82 @@
                 </div>
             </div>
 
-            <!-- Metric buttons removed as requested -->
+            <!-- Overview / command center -->
+            <div id="view-overview" class="view-shell space-y-6">
+                <div class="admin-overview-hero">
+                    <div class="admin-overview-hero__text">
+                        <p class="admin-overview-eyebrow">Luban Workshop</p>
+                        <h2 class="admin-overview-title serif"><span id="overview-greeting">Welcome back</span>, Chef</h2>
+                        <p class="admin-overview-sub">Here's everything happening across your restaurant, right now.</p>
+                        <div class="admin-overview-actions">
+                            <button type="button" onclick="switchTab('reservations')" class="admin-overview-cta">
+                                <i data-lucide="calendar-clock" class="h-4 w-4"></i> View reservations
+                            </button>
+                            <button type="button" onclick="switchTab('menu')" class="admin-overview-cta admin-overview-cta--ghost">
+                                <i data-lucide="book-open" class="h-4 w-4"></i> Manage menu
+                            </button>
+                        </div>
+                    </div>
+                    <div class="admin-overview-hero__bao">
+                        <img src="assets/mascots/extra/bao-extra-pose-46-tablet-dashboard.png" alt="Bao reviewing the dashboard" width="200" height="200" loading="eager">
+                    </div>
+                </div>
 
-            <div id="view-menu" class="view-shell space-y-6">
+                <div class="admin-overview-stats">
+                    <button type="button" onclick="switchTab('reservations')" class="admin-stat-tile" data-accent="red">
+                        <span class="admin-stat-tile__icon"><i data-lucide="calendar-clock"></i></span>
+                        <span class="admin-stat-tile__value" id="metric-pending-reservations">0</span>
+                        <span class="admin-stat-tile__label">Pending reservations</span>
+                    </button>
+                    <button type="button" onclick="switchTab('orders')" class="admin-stat-tile" data-accent="gold">
+                        <span class="admin-stat-tile__icon"><i data-lucide="shopping-bag"></i></span>
+                        <span class="admin-stat-tile__value" id="metric-active-orders">0</span>
+                        <span class="admin-stat-tile__label">Active orders</span>
+                        <span class="admin-stat-tile__sub" id="metric-orders-subtext"></span>
+                    </button>
+                    <button type="button" onclick="switchTab('messages')" class="admin-stat-tile" data-accent="jade">
+                        <span class="admin-stat-tile__icon"><i data-lucide="mail"></i></span>
+                        <span class="admin-stat-tile__value" id="metric-unread-messages">0</span>
+                        <span class="admin-stat-tile__label">Unread messages</span>
+                    </button>
+                    <button type="button" onclick="switchTab('fraud-review')" class="admin-stat-tile" data-accent="red">
+                        <span class="admin-stat-tile__icon"><i data-lucide="shield-alert"></i></span>
+                        <span class="admin-stat-tile__value" id="metric-ai-reports">0</span>
+                        <span class="admin-stat-tile__label">AI fraud reports</span>
+                    </button>
+                    <button type="button" onclick="switchTab('chatbot-knowledge')" class="admin-stat-tile" data-accent="jade">
+                        <span class="admin-stat-tile__icon"><i data-lucide="sparkles"></i></span>
+                        <span class="admin-stat-tile__value" id="metric-active-facts">0</span>
+                        <span class="admin-stat-tile__label">Bao knowledge facts</span>
+                    </button>
+                </div>
+
+                <div class="admin-overview-quick">
+                    <h3 class="admin-overview-quick__title">Quick actions</h3>
+                    <div class="admin-overview-quick__grid">
+                        <button type="button" onclick="switchTab('menu')" class="admin-quick-tile">
+                            <i data-lucide="book-open"></i><span>Menu Manager</span>
+                        </button>
+                        <button type="button" onclick="switchTab('promotions')" class="admin-quick-tile">
+                            <i data-lucide="badge-percent"></i><span>Promotions</span>
+                        </button>
+                        <button type="button" onclick="switchTab('special-menus')" class="admin-quick-tile">
+                            <i data-lucide="qr-code"></i><span>Special Menus</span>
+                        </button>
+                        <button type="button" onclick="switchTab('admin-users')" class="admin-quick-tile">
+                            <i data-lucide="shield"></i><span>Admin Users</span>
+                        </button>
+                        <button type="button" onclick="switchTab('account')" class="admin-quick-tile">
+                            <i data-lucide="settings"></i><span>SMS &amp; Account</span>
+                        </button>
+                        <a href="about-us/review.html" class="admin-quick-tile">
+                            <i data-lucide="user-check"></i><span>Profile Review</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-menu" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Menu Manager</h2>
                     <p class="text-sm text-stone-500">Toggle dish visibility and update prices on the main website.</p>
@@ -1336,7 +1863,7 @@
         </main>
     </div>
 
-    <script src="assets/js/admin-core.bundle.js?v=20260603-adminfix2"></script>
+    <script src="assets/js/admin-core.bundle.js?v=20260628-admin-ui"></script>
     <script src="assets/js/admin-menu.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-reservations.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-orders.bundle.js?v=20260603-adminfix2" defer></script>
@@ -1506,6 +2033,9 @@
             z-index: 51;
         }
     </style>
+
+    <!-- Bao — live AI assistant (self-contained module: its own Firebase app, no conflict with admin) -->
+    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260629-admin-bao-glow"></script>
 </body>
 
 </html>
