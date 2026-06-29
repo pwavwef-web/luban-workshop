@@ -23,14 +23,16 @@
     }
   ],
   "scripts": {
-    "build": "npm run build:css && npm run build:js && npm run build:admin",
+    "build": "npm run build:css && npm run build:js && npm run build:admin && npm run build:dist",
     "build:css": "tailwindcss -i src/tailwind.css -o tailwind.css --minify",
     "build:images": "powershell -ExecutionPolicy Bypass -File tools/generate-responsive-images.ps1",
     "build:js": "node tools/build-bundles.js site",
     "build:admin": "node tools/build-bundles.js admin",
+    "build:dist": "node tools/build-cloudflare-assets.js",
     "check": "npm run lint && npm run check:launch && npm run check:functions",
     "check:functions": "node --check functions/index.js && node --check functions/secure-api.js",
     "check:launch": "node tools/check-launch-readiness.js",
+    "deploy": "wrangler deploy",
     "format": "prettier --write package.json README.md eslint.config.js playwright.config.js tools/build-bundles.js tools/serve-static.js \"tests/**/*.js\"",
     "format:check": "prettier --check package.json README.md eslint.config.js playwright.config.js tools/build-bundles.js tools/serve-static.js \"tests/**/*.js\"",
     "lint": "eslint .",
@@ -51,6 +53,7 @@
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "prettier": "^3.8.3",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^3.4.19",
+    "wrangler": "^4.105.0"
   }
 }
