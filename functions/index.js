@@ -1574,8 +1574,20 @@ exports.checkSmsBalance = onRequest(
     secrets: [ARKESEL_API_KEY],
   },
   async (req, res) => {
-    // Enable CORS
-    res.set('Access-Control-Allow-Origin', '*');
+    // Enable CORS — reflect only known origins (endpoint also requires an admin ID token).
+    const allowedOrigins = [
+      'https://lubanrestaurant.com',
+      'https://www.lubanrestaurant.com',
+      'https://luban-workshop-restaurant.web.app',
+      'https://luban-workshop-restaurant.firebaseapp.com'
+    ];
+    const requestOrigin = String(req.get('origin') || '');
+    const isLocalOrigin = /^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/.test(requestOrigin);
+    res.set(
+      'Access-Control-Allow-Origin',
+      allowedOrigins.includes(requestOrigin) || isLocalOrigin ? requestOrigin : allowedOrigins[0]
+    );
+    res.set('Vary', 'Origin');
     res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 

@@ -50,6 +50,70 @@
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength - 1).trim() + "...";
   }
+  var adminPhoneUser = null;
+  function openAdminPhoneModal(user) {
+    adminPhoneUser = user || null;
+    const modal = document.getElementById("admin-phone-modal");
+    if (!modal) return;
+    const input = document.getElementById("admin-phone-input");
+    const error = document.getElementById("admin-phone-error");
+    if (error) {
+      error.textContent = "";
+      error.classList.add("hidden");
+    }
+    if (input) input.value = "";
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+      if (input) input.focus();
+    }, 50);
+  }
+  function closeAdminPhoneModal() {
+    adminPhoneUser = null;
+    const modal = document.getElementById("admin-phone-modal");
+    if (modal) modal.classList.add("hidden");
+  }
+  async function submitAdminPhone() {
+    const input = document.getElementById("admin-phone-input");
+    const error = document.getElementById("admin-phone-error");
+    const saveBtn = document.getElementById("admin-phone-save");
+    const showError = (msg) => {
+      if (!error) return;
+      error.textContent = msg;
+      error.classList.remove("hidden");
+    };
+    if (!adminPhoneUser) {
+      closeAdminPhoneModal();
+      return;
+    }
+    const phone = formatGhanaPhone(input ? input.value : "");
+    if (!phone) {
+      showError("Please enter a valid Ghana number (+233 and 9 digits, e.g., +233501234567).");
+      if (input) input.focus();
+      return;
+    }
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+    }
+    try {
+      await db.collection("users").doc(adminPhoneUser.uid).set(
+        { phone, name: adminPhoneUser.displayName || "", email: adminPhoneUser.email || "" },
+        { merge: true }
+      );
+      closeAdminPhoneModal();
+    } catch (e) {
+      console.error("Failed to save admin phone number:", e);
+      showError("Could not save your number. Please try again.");
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save number";
+      }
+    }
+  }
+  window.openAdminPhoneModal = openAdminPhoneModal;
+  window.closeAdminPhoneModal = closeAdminPhoneModal;
+  window.submitAdminPhone = submitAdminPhone;
   function formatCurrency(value) {
     const amount = Number(value);
     if (!Number.isFinite(amount)) return "";
@@ -393,19 +457,7 @@
         const profileDoc = await db.collection("users").doc(user.uid).get();
         const profileData = profileDoc.exists ? profileDoc.data() : null;
         if (!profileData || !profileData.phone || typeof profileData.phone === "string" && profileData.phone.trim() === "") {
-          let phone = null;
-          let valid = false;
-          while (!valid) {
-            const rawPhone = window.prompt("Please enter your Ghana phone number (+233 and 9 digits, e.g., +233501234567):", "");
-            if (!rawPhone) break;
-            phone = formatGhanaPhone(rawPhone);
-            if (phone) {
-              valid = true;
-              await db.collection("users").doc(user.uid).set({ phone, name: user.displayName || "", email: user.email || "" }, { merge: true });
-            } else {
-              alert("Invalid phone number. Please enter a valid Ghana number.");
-            }
-          }
+          openAdminPhoneModal(user);
         }
       } catch (e) {
         console.error("Failed to ensure admin phone number:", e);

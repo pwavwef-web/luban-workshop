@@ -6,6 +6,7 @@ const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/
 const { defineSecret, defineString } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
 const menuCatalog = require('./menu-catalog');
+const { PACKAGING_FEE_PER_DISH: TAKEOUT_PACKAGING_FEE_PER_DISH, calculatePackagingFee } = require('./order-pricing');
 
 const SMTP_HOST = defineString('SMTP_HOST', { default: 'smtp.gmail.com' });
 const SMTP_PORT = defineString('SMTP_PORT', { default: '587' });
@@ -37,7 +38,6 @@ const RESERVATION_LINK_TTL_MS = 1000 * 60 * 60 * 24 * 45;
 const RESERVATION_ACCESS_TTL_MS = 1000 * 60 * 15;
 const ORDER_CANCEL_WINDOW_MS = 1000 * 60 * 5;
 const DUPLICATE_ORDER_WINDOW_MS = 1000 * 60 * 3;
-const TAKEOUT_PACKAGING_FEE_PER_DISH = 5;
 const VITAFORGE_URL = 'https://cv-build.web.app';
 const SMS_CAMPAIGN_COLLECTION = 'smsCampaigns';
 const SMS_CAMPAIGN_HISTORY_LIMIT = 20;
@@ -173,8 +173,22 @@ function canUseLocalTurnstileSecret(req) {
     host.includes('127.0.0.1');
 }
 
+// Secrets fall back to a known local default only inside the Functions emulator.
+// In a deployed (production) runtime a missing secret throws instead of silently
+// signing tokens / hashing PII with a guessable value — mirrors how the Turnstile
+// test secret is gated to local requests only.
+function requireConfiguredSecret(name, paramValue, localDefault) {
+  const value = paramValue || process.env[name] || '';
+  if (value) return value;
+  if (process.env.FUNCTIONS_EMULATOR === 'true') return localDefault;
+  throw new Error(
+    `Missing required secret ${name}. Refusing to use the insecure local default in ` +
+    'production; configure it in Secret Manager before deploying.'
+  );
+}
+
 function hashValue(value) {
-  const salt = EVENT_HASH_SALT.value() || process.env.EVENT_HASH_SALT || 'luban-local-hash-salt';
+  const salt = requireConfiguredSecret('EVENT_HASH_SALT', EVENT_HASH_SALT.value(), 'luban-local-hash-salt');
   return crypto.createHash('sha256').update(`${salt}:${String(value || '')}`).digest('hex');
 }
 
@@ -415,8 +429,30 @@ function sendJson(res, status, payload) {
   res.status(status).json(payload);
 }
 
-function setCors(res) {
-  res.set('Access-Control-Allow-Origin', '*');
+const ALLOWED_ORIGINS = [
+  'https://lubanrestaurant.com',
+  'https://www.lubanrestaurant.com',
+  'https://luban-workshop-restaurant.web.app',
+  'https://luban-workshop-restaurant.firebaseapp.com'
+];
+
+// Endpoints already require Firebase ID tokens, so CORS is defence-in-depth, not
+// the primary control. Still, reflect only the production origins and local dev
+// hosts instead of '*' so the browser will not surface responses to other sites.
+function resolveAllowedOrigin(req) {
+  const origin = String(req.get('origin') || '');
+  const configured = String(PUBLIC_SITE_URL.value() || '').replace(/\/+$/, '');
+  const allowlist = configured && !ALLOWED_ORIGINS.includes(configured)
+    ? [configured, ...ALLOWED_ORIGINS]
+    : ALLOWED_ORIGINS;
+  if (allowlist.includes(origin)) return origin;
+  if (/^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/.test(origin)) return origin;
+  return configured || ALLOWED_ORIGINS[0];
+}
+
+function setCors(res, req) {
+  res.set('Access-Control-Allow-Origin', resolveAllowedOrigin(req));
+  res.set('Vary', 'Origin');
   res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 }
@@ -490,7 +526,7 @@ async function enforceRateLimit(scope, key, limit, windowSeconds, context) {
 }
 
 function buildSignedToken(payload, purpose, ttlMs) {
-  const secret = RESERVATION_LINK_SECRET.value() || process.env.RESERVATION_LINK_SECRET || 'luban-local-link-secret';
+  const secret = requireConfiguredSecret('RESERVATION_LINK_SECRET', RESERVATION_LINK_SECRET.value(), 'luban-local-link-secret');
   const data = Object.assign({}, payload, {
     purpose,
     exp: nowMs() + ttlMs,
@@ -502,7 +538,7 @@ function buildSignedToken(payload, purpose, ttlMs) {
 }
 
 function verifySignedToken(token, expectedPurpose) {
-  const secret = RESERVATION_LINK_SECRET.value() || process.env.RESERVATION_LINK_SECRET || 'luban-local-link-secret';
+  const secret = requireConfiguredSecret('RESERVATION_LINK_SECRET', RESERVATION_LINK_SECRET.value(), 'luban-local-link-secret');
   const parts = String(token || '').split('.');
   if (parts.length !== 2) throw createHttpError(400, 'Invalid access token.');
   const [encoded, signature] = parts;
@@ -676,27 +712,6 @@ function getOrderTypeLabel(orderType) {
   if (orderType === 'dine_in') return 'Dining in';
   if (orderType === 'takeout') return 'Take out';
   return '';
-}
-
-function isDrinkItem(item) {
-  const id = cleanPlainText(item && item.id).toUpperCase();
-  const category = cleanPlainText(item && item.category).toLowerCase();
-  return category === 'drinks' || /^DR\d+$/.test(id);
-}
-
-function calculatePackagingFee(items, orderType) {
-  if (orderType !== 'takeout') {
-    return { packagingFee: 0, packagingItemCount: 0 };
-  }
-
-  const packagingItemCount = (Array.isArray(items) ? items : []).reduce((sum, item) => {
-    return isDrinkItem(item) ? sum : sum + Number(item.quantity || 0);
-  }, 0);
-
-  return {
-    packagingFee: packagingItemCount * TAKEOUT_PACKAGING_FEE_PER_DISH,
-    packagingItemCount
-  };
 }
 
 async function enforceNoRecentDuplicateOrder(decoded, phoneE164, basketFingerprint, orderType) {
@@ -2111,7 +2126,7 @@ async function handleBootstrapChatbotKnowledge(req, res) {
 }
 
 async function router(req, res) {
-  setCors(res);
+  setCors(res, req);
   if (req.method === 'OPTIONS') {
     res.status(204).send('');
     return;

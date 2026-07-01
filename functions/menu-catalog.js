@@ -1,3 +1,5 @@
+// AUTO-GENERATED from data/menu-catalog.json by tools/build-menu-catalog.js.
+// Do not edit by hand; run `npm run build:menu` after changing the catalog.
 module.exports = [
   { id: 'SP1', name: 'Chicken & Sweet Corn Soup', price: 40 },
   { id: 'SP2', name: 'Hot & Sour Soup', price: 40 },
