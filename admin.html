@@ -1090,6 +1090,103 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Reports & Exports hub -->
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                        <div class="flex items-center gap-3">
+                            <span class="admin-metric-icon" style="background:#fff1f1;border:1px solid #fecaca;">
+                                <i data-lucide="download" class="h-5 w-5 text-red-700"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-lg font-bold text-stone-900">Reports &amp; Exports</h3>
+                                <p class="text-xs text-stone-500 mt-0.5">Download live business data as Excel, PDF, or CSV. Reports pull the complete dataset every time.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label for="report-range" class="text-xs font-bold uppercase tracking-wider text-stone-500">Date range</label>
+                            <select id="report-range" class="px-3 py-2 border border-stone-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-red-700 focus:outline-none">
+                                <option value="all">All time</option>
+                                <option value="today">Today</option>
+                                <option value="7d">Last 7 days</option>
+                                <option value="30d">Last 30 days</option>
+                                <option value="month">This month</option>
+                                <option value="custom">Custom range</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="report-custom" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                        <div>
+                            <label for="report-from" class="block text-xs font-medium text-stone-600 mb-1">From</label>
+                            <input type="date" id="report-from" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="report-to" class="block text-xs font-medium text-stone-600 mb-1">To</label>
+                            <input type="date" id="report-to" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="admin-report-actions">
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Sales / Orders</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="orders" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="orders" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="orders" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Reservations</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="reservations" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="reservations" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="reservations" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Customers</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="customers" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="customers" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="customers" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Menu</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="menu" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="menu" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="menu" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Messages</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="messages" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="messages" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="messages" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Promotions</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="promotions" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="promotions" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="promotions" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-stone-200">
+                        <p class="text-xs text-stone-500 max-w-md">The full backup bundles every dataset into a single multi-sheet Excel workbook. The date range applies to time-stamped datasets (orders, reservations, messages, customers).</p>
+                        <button type="button" data-report-workbook
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-red-700 text-white px-5 py-2.5 text-sm font-bold hover:bg-red-800 transition-colors whitespace-nowrap">
+                            <i data-lucide="archive" class="h-4 w-4"></i>
+                            Full data backup (Excel)
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div id="view-menu" class="view-shell hidden space-y-6">
@@ -1103,6 +1200,7 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         <input type="text" id="menu-search" placeholder="Search dishes..." oninput="filterMenuTable(this.value)" class="w-full pl-10 pr-4 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
                     </div>
+                    <div class="admin-export-slot ml-auto" data-export-key="menu"></div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                 <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -1141,6 +1239,7 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         <input type="text" id="reservations-search" placeholder="Search reservations..." oninput="filterReservationsTable(this.value)" class="w-full pl-10 pr-4 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
                     </div>
+                    <div class="admin-export-slot ml-auto" data-export-key="reservations"></div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -1198,6 +1297,7 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         <input type="text" id="admin-users-search" placeholder="Search admins..." oninput="filterAdminUsersTable(this.value)" class="w-full pl-10 pr-4 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
                     </div>
+                    <div class="admin-export-slot ml-auto" data-export-key="admins"></div>
                 </div>
                 <!-- Current admins list -->
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
@@ -1227,6 +1327,7 @@
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                         <input type="text" id="orders-search" placeholder="Search orders..." oninput="filterOrdersTable(this.value)" class="w-full pl-10 pr-4 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
                     </div>
+                    <div class="admin-export-slot ml-auto" data-export-key="orders"></div>
                 </div>
                 <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="admin-table min-w-full divide-y divide-stone-200">
@@ -1268,6 +1369,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Promotions &amp; Deals</h2>
                     <p class="text-sm text-stone-500">Create customer-facing offers and control what appears on the public pages.</p>
+                    <div class="admin-export-slot sm:ml-auto" data-export-key="promotions"></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -1417,6 +1519,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Special Menus</h2>
                     <p class="text-sm text-stone-500">Create event menus and hand staff a guest link, QR download, or print sheet right away.</p>
+                    <div class="admin-export-slot sm:ml-auto" data-export-key="specialMenus"></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -1532,6 +1635,7 @@
                         <button type="button" data-message-filter="unread">Unread <span id="message-count-unread">0</span></button>
                         <button type="button" data-message-filter="assistant">AI <span id="message-count-assistant">0</span></button>
                     </div>
+                    <div class="admin-export-slot" data-export-key="messages"></div>
                 </div>
                 <div id="messages-container" class="space-y-4">
                     <p class="text-stone-500 italic text-sm">Loading messages...</p>
@@ -1566,6 +1670,7 @@
                             <i data-lucide="sparkles" class="h-4 w-4"></i>
                             Seed Secure Facts
                         </button>
+                        <div class="admin-export-slot" data-export-key="chatbot"></div>
                     </div>
                 </div>
 
@@ -1874,6 +1979,7 @@
     <script src="assets/js/admin-messages.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-fraud.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-chatbot.bundle.js?v=20260603-adminfix2" defer></script>
+    <script src="assets/js/admin-export.bundle.js?v=20260706-exports" defer></script>
     <script src="assets/js/admin-tour.bundle.js?v=20260603-adminfix2" defer></script>
 
     <!-- Price Edit Modal -->
