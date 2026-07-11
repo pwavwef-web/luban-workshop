@@ -9,6 +9,104 @@ function getAdminDb() {
     return window.db;
 }
 
+function getOrderStatusMeta(status) {
+    const normalized = String(status || 'pending').toLowerCase();
+    if (normalized === 'requested') return { label: 'REQUESTED', className: 'bg-amber-100 text-amber-800' };
+    if (normalized === 'accepted') return { label: 'ACCEPTED', className: 'bg-green-100 text-green-800' };
+    if (normalized === 'rejected') return { label: 'REJECTED', className: 'bg-red-100 text-red-800' };
+    if (normalized === 'completed') return { label: 'COMPLETED', className: 'bg-green-100 text-green-800' };
+    if (normalized === 'pending') return { label: 'PENDING', className: 'bg-yellow-100 text-yellow-800' };
+    if (normalized === 'preparing') return { label: 'PREPARING', className: 'bg-blue-100 text-blue-800' };
+    if (normalized === 'cancelled') return { label: 'CANCELLED', className: 'bg-red-100 text-red-800' };
+    return { label: normalized.toUpperCase(), className: 'bg-stone-100 text-stone-800' };
+}
+
+function normalizeOrderStatus(status) {
+    return String(status || 'pending').toLowerCase() || 'pending';
+}
+
+function getAllowedOrderStatusTransitions(status) {
+    const normalized = normalizeOrderStatus(status);
+    const transitions = {
+        requested: ['accepted', 'rejected'],
+        accepted: ['preparing', 'cancelled'],
+        pending: ['preparing', 'cancelled'],
+        preparing: ['completed', 'cancelled'],
+        completed: ['pending'],
+        cancelled: ['pending'],
+        rejected: []
+    };
+    return transitions[normalized] || [];
+}
+
+function canTransitionOrderStatus(fromStatus, toStatus) {
+    return getAllowedOrderStatusTransitions(fromStatus).includes(normalizeOrderStatus(toStatus));
+}
+
+function getRequestedForText(order) {
+    if (!order) return '';
+    if (order.requestedForLabel) return order.requestedForLabel;
+    if (order.requestedFor && order.requestedFor.toDate) {
+        return order.requestedFor.toDate().toLocaleString('en-GH', {
+            timeZone: 'Africa/Accra',
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
+        });
+    }
+    return '';
+}
+
+function getAdminActor() {
+    const user = window.auth && window.auth.currentUser;
+    return user ? user.email || user.uid || 'admin' : 'admin';
+}
+
+function getServerTimestamp() {
+    return firebase.firestore.FieldValue.serverTimestamp();
+}
+
+function buildOrderStatusUpdate(previousStatus, nextStatus) {
+    const normalizedPrevious = normalizeOrderStatus(previousStatus);
+    const normalizedNext = normalizeOrderStatus(nextStatus);
+    const actor = getAdminActor();
+    const update = {
+        status: normalizedNext,
+        updatedAt: getServerTimestamp(),
+        updatedBy: actor
+    };
+
+    if (normalizedNext === 'accepted' && normalizedPrevious === 'requested') {
+        update.acceptedAt = getServerTimestamp();
+        update.acceptedBy = actor;
+    }
+    if (normalizedNext === 'rejected' && normalizedPrevious === 'requested') {
+        update.rejectedAt = getServerTimestamp();
+        update.rejectedBy = actor;
+    }
+    if (normalizedNext === 'preparing') {
+        update.preparingAt = getServerTimestamp();
+        update.preparingBy = actor;
+    }
+    if (normalizedNext === 'completed') {
+        update.completedAt = getServerTimestamp();
+        update.completedBy = actor;
+    }
+    if (normalizedNext === 'cancelled') {
+        update.cancelledAt = getServerTimestamp();
+        update.cancelledBy = actor;
+    }
+    if (normalizedNext === 'pending' && ['completed', 'cancelled'].includes(normalizedPrevious)) {
+        update.reopenedAt = getServerTimestamp();
+        update.reopenedBy = actor;
+    }
+
+    return update;
+}
+
 function listenToOrders() {
     ordersPageIndex = 0;
     ordersCache = [];
@@ -18,9 +116,10 @@ function listenToOrders() {
         if (knownOrderIds !== null) {
             snapshot.forEach(doc => {
                 const order = doc.data();
-                if (!knownOrderIds.has(doc.id) && (order.status === 'pending' || !order.status)) {
+                if (!knownOrderIds.has(doc.id) && (order.status === 'pending' || order.status === 'requested' || !order.status)) {
+                    const isRequest = order.status === 'requested';
                     showAdminNotification(
-                        'New Order Received! \uD83D\uDED2',
+                        isRequest ? 'New Pre-order Request' : 'New Order Received! \uD83D\uDED2',
                         `Order #${doc.id.slice(-6).toUpperCase()} \u2013 \u20b5${(order.total || 0).toFixed(2)}`
                     );
                 }
@@ -43,15 +142,30 @@ function listenToOrders() {
 
 async function updateOrderStatus(id, status) {
     try {
-        if (status === 'cancelled' && !confirm("Are you sure you want to cancel this order?")) return;
+        const nextStatus = normalizeOrderStatus(status);
+        const entry = ordersCache.find(orderEntry => orderEntry.id === id);
+        const previousStatus = entry ? normalizeOrderStatus(entry.data.status) : 'pending';
+        if (!canTransitionOrderStatus(previousStatus, nextStatus)) {
+            alert(`Cannot move an order from ${previousStatus.toUpperCase()} to ${nextStatus.toUpperCase()}. Refresh orders and try the current action.`);
+            return;
+        }
+        if (nextStatus === 'cancelled' && !confirm("Are you sure you want to cancel this order?")) return;
+        if (nextStatus === 'rejected' && !confirm("Reject this pre-order request? The customer will be notified.")) return;
 
-        await getAdminDb().collection('orders').doc(id).update({
-            status: status
+        const orderRef = getAdminDb().collection('orders').doc(id);
+        await getAdminDb().runTransaction(async transaction => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists) throw new Error('Order not found.');
+            const latestStatus = normalizeOrderStatus((orderSnap.data() || {}).status);
+            if (!canTransitionOrderStatus(latestStatus, nextStatus)) {
+                throw new Error(`Order is now ${latestStatus.toUpperCase()} and cannot move to ${nextStatus.toUpperCase()}.`);
+            }
+            transaction.update(orderRef, buildOrderStatusUpdate(latestStatus, nextStatus));
         });
-        console.log(`Order ${id} updated to ${status}`);
+        console.log(`Order ${id} updated to ${nextStatus}`);
     } catch (error) {
         console.error("Error updating order:", error);
-        alert("Could not update order.");
+        alert(error.message || "Could not update order.");
     }
 }
 
@@ -96,7 +210,7 @@ function loadOrdersPage(pageIndex) {
         const badge = document.getElementById('badge-orders');
         badge.classList.add('hidden');
         setMetricValue('metric-active-orders', 0);
-        setMetricText('metric-orders-subtext', 'No open kitchen tickets');
+        setMetricText('metric-orders-subtext', 'No open orders or requests');
         return;
     }
 
@@ -106,38 +220,44 @@ function loadOrdersPage(pageIndex) {
 
     let pendingCount = 0;
     ordersCache.forEach(entry => {
-        const s = entry.data.status;
-        if (s === 'pending' || s === 'preparing' || !s) pendingCount++;
+        const s = normalizeOrderStatus(entry.data.status);
+        if (s === 'requested' || s === 'accepted' || s === 'pending' || s === 'preparing' || !s) pendingCount++;
     });
     setMetricValue('metric-active-orders', pendingCount);
-    setMetricText('metric-orders-subtext', pendingCount === 1 ? '1 open kitchen ticket' : `${pendingCount} open kitchen tickets`);
+    setMetricText('metric-orders-subtext', pendingCount === 1 ? '1 open order or request' : `${pendingCount} open orders and requests`);
 
     pageOrders.forEach(entry => {
         const order = entry.data;
         const id = entry.id;
-
-            let statusClass = 'bg-stone-100 text-stone-800';
-            if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
-            if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
-            if (order.status === 'preparing') statusClass = 'bg-blue-100 text-blue-800';
-            if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
+        const status = normalizeOrderStatus(order.status);
+        const statusMeta = getOrderStatusMeta(status);
+        const requestedForText = getRequestedForText(order);
 
             const itemsSummary = order.items ? order.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : 'No items';
             const itemsDetail = order.items
                 ? order.items.map(i => `<div class="py-0.5"><span class="font-bold text-stone-600">${i.quantity}&times;</span> ${i.name}</div>`).join('')
                 : '<div class="text-stone-600 italic">No items</div>';
 
-            let actions = '';
-            if (order.status === 'pending' || !order.status) {
+            let actions;
+            if (status === 'requested') {
                 actions = `
-                            <button onclick="updateOrderStatus('${id}', 'preparing')" aria-label="Mark order as preparing" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors" title="Mark as Preparing">
+                            <button onclick="updateOrderStatus('${id}', 'accepted')" aria-label="Accept pre-order request" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-2 transition-colors" title="Accept Request">
+                                <i data-lucide="check" class="h-4 w-4"></i>
+                            </button>
+                            <button onclick="updateOrderStatus('${id}', 'rejected')" aria-label="Reject pre-order request" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Reject Request">
+                                <i data-lucide="x" class="h-4 w-4"></i>
+                            </button>
+                        `;
+            } else if (status === 'accepted' || status === 'pending' || !status) {
+                actions = `
+                            <button onclick="updateOrderStatus('${id}', 'preparing')" aria-label="${status === 'accepted' ? 'Start accepted pre-order preparation' : 'Mark order as preparing'}" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors" title="${status === 'accepted' ? 'Start Preparing' : 'Mark as Preparing'}">
                                 <i data-lucide="chef-hat" class="h-4 w-4"></i>
                             </button>
                             <button onclick="updateOrderStatus('${id}', 'cancelled')" aria-label="Cancel order" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors" title="Cancel Order">
                                 <i data-lucide="x" class="h-4 w-4"></i>
                             </button>
                         `;
-            } else if (order.status === 'preparing') {
+            } else if (status === 'preparing') {
                 actions = `
                             <button onclick="updateOrderStatus('${id}', 'completed')" aria-label="Mark order as completed" class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-full mr-2 transition-colors" title="Mark Completed">
                                 <i data-lucide="check" class="h-4 w-4"></i>
@@ -146,17 +266,23 @@ function loadOrdersPage(pageIndex) {
                                 <i data-lucide="x" class="h-4 w-4"></i>
                             </button>
                         `;
-            } else {
+            } else if (status === 'completed' || status === 'cancelled') {
                 actions = `
                             <button onclick="updateOrderStatus('${id}', 'pending')" aria-label="Move order back to pending" class="text-stone-600 hover:text-stone-700 p-2 rounded-full transition-colors" title="Move back to Pending">
                                 <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
                             </button>
                         `;
+            } else {
+                actions = '<span class="text-xs text-stone-400">No actions</span>';
             }
 
             const placedDate = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : null;
             const placedDateStr = placedDate ? placedDate.toLocaleDateString() : '\u2014';
             const placedTimeStr = placedDate ? placedDate.toLocaleTimeString() : '\u2014';
+            const timingTone = status === 'requested' ? 'text-amber-700' : status === 'rejected' ? 'text-red-700' : 'text-green-700';
+            const timingNote = ['requested', 'accepted', 'rejected'].includes(status) && requestedForText
+                ? `<div class="mt-1 text-xs font-semibold ${timingTone}">Requested for ${escapeHtml(requestedForText)}</div>`
+                : '';
 
             const row = `
                         <tr class="hover:bg-stone-50 transition-colors border-b border-stone-100" data-order-id="${id}" onclick="selectOrder('${id}')">
@@ -172,10 +298,11 @@ function loadOrdersPage(pageIndex) {
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-500">
                                 <div class="font-medium">${placedDateStr}</div>
                                 <div class="text-xs">${placedTimeStr}</div>
+                                ${timingNote}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-stone-900">\u20b5${(order.total || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${order.status ? order.status.toUpperCase() : 'PENDING'}</span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusMeta.className}">${statusMeta.label}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 ${actions}
@@ -234,7 +361,10 @@ document.addEventListener('keydown', e => {
                 e.preventDefault();
                 if (selectedOrderId) {
                     const entry = ordersCache.find(o => o.id === selectedOrderId);
-                    if (entry && (entry.data.status === 'pending' || !entry.data.status)) {
+                    const status = entry ? normalizeOrderStatus(entry.data.status) : '';
+                    if (entry && status === 'requested') {
+                        updateOrderStatus(selectedOrderId, 'accepted');
+                    } else if (entry && (status === 'accepted' || status === 'pending' || !status)) {
                         updateOrderStatus(selectedOrderId, 'preparing');
                     }
                 }
@@ -243,7 +373,7 @@ document.addEventListener('keydown', e => {
                 e.preventDefault();
                 if (selectedOrderId) {
                     const entry = ordersCache.find(o => o.id === selectedOrderId);
-                    if (entry && entry.data.status === 'preparing') {
+                    if (entry && normalizeOrderStatus(entry.data.status) === 'preparing') {
                         updateOrderStatus(selectedOrderId, 'completed');
                     }
                 }
@@ -251,7 +381,9 @@ document.addEventListener('keydown', e => {
             case 'x':
                 e.preventDefault();
                 if (selectedOrderId) {
-                    updateOrderStatus(selectedOrderId, 'cancelled');
+                    const entry = ordersCache.find(o => o.id === selectedOrderId);
+                    const status = entry ? normalizeOrderStatus(entry.data.status) : '';
+                    updateOrderStatus(selectedOrderId, status === 'requested' ? 'rejected' : 'cancelled');
                 }
                 break;
         }

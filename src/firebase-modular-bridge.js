@@ -13,6 +13,7 @@ import {
 } from 'firebase/auth';
 import {
   getFirestore,
+  runTransaction,
   collection,
   doc,
   query,
@@ -82,8 +83,14 @@ function createQueryApi(queryRef) {
   };
 }
 
+const docRefRegistry = new WeakMap();
+
+function resolveDocRef(docApiOrRef) {
+  return docRefRegistry.get(docApiOrRef) || docApiOrRef;
+}
+
 function createDocApi(docRef) {
-  return {
+  const api = {
     id: docRef.id,
     async set(data, options) {
       await setDoc(docRef, data, options);
@@ -99,6 +106,8 @@ function createDocApi(docRef) {
       return wrapDocSnapshot(snapshot);
     }
   };
+  docRefRegistry.set(api, docRef);
+  return api;
 }
 
 function createCollectionApi(collectionRef) {
@@ -130,11 +139,41 @@ function getAuthApi() {
   };
 }
 
+function createTransactionApi(transaction) {
+  return {
+    async get(docApi) {
+      const snapshot = await transaction.get(resolveDocRef(docApi));
+      return wrapDocSnapshot(snapshot);
+    },
+    set(docApi, data, options) {
+      if (options === undefined) {
+        transaction.set(resolveDocRef(docApi), data);
+      } else {
+        transaction.set(resolveDocRef(docApi), data, options);
+      }
+      return this;
+    },
+    update(docApi, data) {
+      transaction.update(resolveDocRef(docApi), data);
+      return this;
+    },
+    delete(docApi) {
+      transaction.delete(resolveDocRef(docApi));
+      return this;
+    }
+  };
+}
+
 function getFirestoreApi() {
   const db = getFirestore(ensureApp());
   return {
     collection(path) {
       return createCollectionApi(collection(db, path));
+    },
+    runTransaction(updateFunction) {
+      return runTransaction(db, (transaction) =>
+        updateFunction(createTransactionApi(transaction))
+      );
     }
   };
 }

@@ -31,7 +31,6 @@ module.exports = [
       'dist/**',
       'build/**',
       'assets/js/*.bundle.js',
-      'admin-inline.js',
       'tailwind.css'
     ]
   },
@@ -73,7 +72,8 @@ module.exports = [
       'functions/**/*.js',
       'luabn/**/*.js',
       'tests/**/*.js',
-      'tools/**/*.js'
+      'tools/**/*.js',
+      'src/export-core.js'
     ],
     languageOptions: {
       sourceType: 'commonjs',

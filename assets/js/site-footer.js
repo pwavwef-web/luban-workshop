@@ -24,7 +24,7 @@
     if (window.__lubanAiChatbotLoading) return;
 
     window.__lubanAiChatbotLoading = true;
-    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260629-bao-glow')).catch((error) => {
+    import(siteUrl('assets/js/firebase-ai-chatbot.js?v=20260707-agent-platform')).catch((error) => {
       window.__lubanAiChatbotLoading = false;
       console.warn('Could not load Luban assistant button:', error);
     });

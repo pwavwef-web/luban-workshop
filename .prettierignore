@@ -6,7 +6,6 @@ dist/
 build/
 
 *.html
-admin-inline.js
 tailwind.css
 assets/js/*.bundle.js
 
