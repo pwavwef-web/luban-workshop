@@ -1,0 +1,35 @@
+{
+  "name": "luban-admin-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "deploy": "npm run build && firebase deploy --only hosting:luban-admin"
+  },
+  "dependencies": {
+    "firebase": "^12.13.0",
+    "lucide-react": "^0.468.0",
+    "next": "^15.4.2",
+    "qrcode-generator": "^2.0.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "es-abstract": "^1.24.2",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "^15.4.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
+  }
+}

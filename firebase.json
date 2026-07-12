@@ -1,93 +1,140 @@
 {
-  "hosting": {
-    "site": "luban-workshop-restaurant",
-    "public": ".",
-    "headers": [
-      {
-        "source": "/",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-      },
-      {
-        "source": "**/*.html",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-      },
-      {
-        "source": "/sw.js",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-      }
-    ],
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "function": {
-          "functionId": "api",
-          "region": "us-central1"
+  "hosting": [
+    {
+      "site": "luban-workshop-restaurant",
+      "public": ".",
+      "headers": [
+        {
+          "source": "/",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        },
+        {
+          "source": "/sw.js",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
         }
-      }
-    ],
-    "ignore": [
-      "firebase.json",
-      ".firebaserc",
-      ".firebase",
-      ".firebase/**",
-      ".git",
-      ".git/**",
-      ".github",
-      ".github/**",
-      "**/.*",
-      "**/.*/**",
-      "node_modules",
-      "node_modules/**",
-      "**/node_modules/**",
-      "firebase-debug.log",
-      "firebase-debug.*.log",
-      "*.log",
-      "**/*.log",
-      "*.local",
-      "**/*.local",
-      "*.map",
-      "**/*.map",
-      "*.tmp",
-      "**/*.tmp",
-      "*.bak",
-      "**/*.bak",
-      ".env",
-      ".env*",
-      ".env.*",
-      "**/.env",
-      "**/.env.*",
-      ".cache",
-      ".cache/**",
-      ".vscode",
-      ".vscode/**",
-      ".idea",
-      ".idea/**",
-      ".vercel",
-      ".vercel/**",
-      ".netlify",
-      ".netlify/**",
-      "functions/**",
-      "luabn/**",
-      "src/**",
-      "tools/**",
-      "data/**",
-      "docs/**",
-      "tmp/**",
-      "coverage/**",
-      "dist/**",
-      "build/**",
-      "package.json",
-      "package-lock.json",
-      "tailwind.config.js",
-      "firestore.rules",
-      "firestore.rules.production",
-      "firestore.indexes.json",
-      "storage.rules",
-      "**/*.md",
-      "PRODUCTION_CHECKLIST.md",
-      "restcon.webp"
-    ]
-  },
+      ],
+      "rewrites": [
+        {
+          "source": "/api/**",
+          "function": {
+            "functionId": "api",
+            "region": "us-central1"
+          }
+        }
+      ],
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".firebase",
+        ".firebase/**",
+        ".git",
+        ".git/**",
+        ".github",
+        ".github/**",
+        "**/.*",
+        "**/.*/**",
+        "node_modules",
+        "node_modules/**",
+        "**/node_modules/**",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.log",
+        "**/*.log",
+        "*.local",
+        "**/*.local",
+        "*.map",
+        "**/*.map",
+        "*.tmp",
+        "**/*.tmp",
+        "*.bak",
+        "**/*.bak",
+        ".env",
+        ".env*",
+        ".env.*",
+        "**/.env",
+        "**/.env.*",
+        ".cache",
+        ".cache/**",
+        ".vscode",
+        ".vscode/**",
+        ".idea",
+        ".idea/**",
+        ".vercel",
+        ".vercel/**",
+        ".netlify",
+        ".netlify/**",
+        "admin-app/**",
+        "functions/**",
+        "luabn/**",
+        "src/**",
+        "tools/**",
+        "data/**",
+        "docs/**",
+        "tmp/**",
+        "coverage/**",
+        "dist/**",
+        "build/**",
+        "package.json",
+        "package-lock.json",
+        "tailwind.config.js",
+        "firestore.rules",
+        "firestore.rules.production",
+        "firestore.indexes.json",
+        "storage.rules",
+        "**/*.md",
+        "PRODUCTION_CHECKLIST.md",
+        "restcon.webp"
+      ]
+    },
+    {
+      "site": "luban-admin",
+      "public": "admin-app/out",
+      "headers": [
+        {
+          "source": "**/*.html",
+          "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        },
+        {
+          "source": "**/*.js",
+          "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        },
+        {
+          "source": "**/*.css",
+          "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        }
+      ],
+      "rewrites": [
+        {
+          "source": "/api/**",
+          "function": {
+            "functionId": "api",
+            "region": "us-central1"
+          }
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".firebase",
+        ".firebase/**",
+        "**/.*",
+        "**/node_modules/**",
+        "node_modules/**",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.log",
+        "**/*.map"
+      ]
+    }
+  ],
   "functions": [
     {
       "codebase": "default",
