@@ -1,5 +1,5 @@
 // Luban Workshop Restaurant - Main Page Service Worker
-const CACHE_NAME = 'luban-main-v10';
+const CACHE_NAME = 'luban-main-v11';
 const MENU_CACHE_NAME = 'luban-menu-v2';
 const STATIC_ASSETS = [
     '/',
@@ -12,7 +12,7 @@ const STATIC_ASSETS = [
     '/assets/restcon-1920.jpg',
     '/assets/luban-noodle-spread.jpg',
     '/assets/luban-noodle-spread-480.jpg',
-    '/tailwind.css',
+    '/tailwind.css?v=20260711-menu-sections',
     '/homepage.css',
     '/assets/css/site.css',
     '/script.js',

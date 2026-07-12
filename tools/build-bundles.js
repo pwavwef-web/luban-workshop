@@ -25,6 +25,7 @@ const groups = {
     ['admin-messages.js', 'admin-messages.bundle.js'],
     ['admin-fraud.js', 'admin-fraud.bundle.js'],
     ['admin-chatbot.js', 'admin-chatbot.bundle.js'],
+    ['admin-export.js', 'admin-export.bundle.js'],
     ['admin-tour.js', 'admin-tour.bundle.js']
   ]
 };

@@ -11,6 +11,11 @@ playwright-report/
 test-results/
 dist/
 build/
+admin-app/.next/
+admin-app/out/
+admin-app/tsconfig.tsbuildinfo
+admin-app/admin-dev.*.log
+!admin-app/.env.example
 .cache/
 .vscode/
 .idea/

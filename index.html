@@ -259,7 +259,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="tailwind.css">
+    <link rel="stylesheet" href="tailwind.css?v=20260711-menu-sections">
     <link rel="stylesheet" href="assets/css/site.css">
     <link rel="stylesheet" href="homepage.css">
 
@@ -268,6 +268,92 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
+
+    <!-- Dish detail modal (self-contained; not dependent on purged Tailwind height utilities) -->
+    <style>
+        .dish-modal-panel {
+            background: #fff;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 32rem;
+            max-height: calc(100dvh - 2rem);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalPop 0.25s ease-out;
+        }
+        .dish-modal-media { position: relative; flex-shrink: 0; }
+        .dish-modal-img {
+            display: block;
+            width: 100%;
+            height: 14rem;
+            object-fit: cover;
+            background: #e7e5e4;
+        }
+        @media (min-width: 640px) { .dish-modal-img { height: 16rem; } }
+        .dish-modal-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            height: 2.25rem;
+            width: 2.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #44403c;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            transition: color 0.2s ease, background 0.2s ease;
+        }
+        .dish-modal-close:hover { color: #b91c1c; background: #fff; }
+        .dish-modal-close svg { width: 1.25rem; height: 1.25rem; }
+        .dish-modal-body {
+            padding: 1.25rem 1.5rem 1.5rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        .dish-modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+        .dish-modal-title { font-size: 1.5rem; font-weight: 700; color: #1c1917; line-height: 1.2; }
+        .dish-modal-price {
+            flex-shrink: 0;
+            background: #1c1917;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 0.5rem;
+            white-space: nowrap;
+        }
+        .dish-modal-desc { margin-top: 0.75rem; color: #57534e; font-size: 0.95rem; line-height: 1.6; }
+        .dish-modal-order {
+            margin-top: 1.5rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.6rem;
+            background: #1c1917;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s ease;
+        }
+        .dish-modal-order:hover { background: #292524; }
+        .dish-modal-order svg { width: 1.1rem; height: 1.1rem; }
+    </style>
 
 </head>
 
@@ -368,7 +454,7 @@
                     class="category-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 text-stone-700 hover:bg-red-700 hover:text-white border border-stone-200 whitespace-nowrap">Drinks</button>
             </div>
 
-            <div class="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
+            <div class="grid grid-cols-2 gap-y-6 gap-x-3 sm:grid-cols-2 sm:gap-y-10 sm:gap-x-6 lg:grid-cols-3 xl:gap-x-8" id="menu-container">
             </div>
         </div>
     </section>
@@ -1375,29 +1461,64 @@
             setTimeout(() => screen.remove(), 520);
         }
 
+        const MENU_SECTION_ORDER = ['soups', 'starters', 'beef-lamb', 'pork', 'chicken', 'seafood', 'rice', 'noodles', 'dumplings', 'veg', 'drinks'];
+        const MENU_SECTION_LABELS = {
+            'soups': 'Soups', 'starters': 'Starters', 'beef-lamb': 'Beef & Lamb', 'pork': 'Pork',
+            'chicken': 'Chicken', 'seafood': 'Seafood', 'rice': 'Rice', 'noodles': 'Noodles',
+            'dumplings': 'Dumplings', 'veg': 'Vegetable', 'drinks': 'Drinks'
+        };
+
+        function createMenuCard(item) {
+            const card = document.createElement('div');
+            card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full cursor-pointer';
+            card.setAttribute('data-dish-id', item.id);
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-label', `View details for ${item.name}`);
+            card.innerHTML = `
+                <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
+                    <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" width="600" height="400" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 50vw" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'" class="w-full h-40 sm:h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-xs sm:text-sm font-bold text-stone-900 shadow-sm">₵${item.price.toFixed(2)}</div>
+                </div>
+                <div class="p-3 sm:p-6 flex flex-col flex-1">
+                    <h3 class="text-base sm:text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
+                    <p class="mt-2 text-xs sm:text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
+                    <div class="mt-4 sm:mt-6">
+                        <button onclick="addToCart('${item.id}', this)" class="w-full flex justify-center items-center px-2 sm:px-4 py-2 border border-transparent rounded-lg shadow-sm text-xs sm:text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
+                        </button>
+                    </div>
+                </div>`;
+            return card;
+        }
+
+        function createSectionHeader(label) {
+            const header = document.createElement('div');
+            header.className = 'col-span-full sm:hidden pt-4 first:pt-0';
+            header.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <h3 class="text-xl font-bold text-stone-900 serif whitespace-nowrap">${label}</h3>
+                    <span class="flex-1 h-px bg-stone-200"></span>
+                </div>`;
+            return header;
+        }
+
         function renderMenu(filter = 'all') {
             const container = document.getElementById('menu-container');
             container.innerHTML = '';
             const items = filter === 'all' ? menuItems : menuItems.filter(item => item.category === filter);
 
+            // Group items by category, in menu order (unknown categories appended last)
+            const categories = MENU_SECTION_ORDER.slice();
             items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'group relative bg-white border border-stone-100 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 fade-in flex flex-col h-full';
-                card.innerHTML = `
-                <div class="aspect-w-4 aspect-h-3 bg-stone-200 overflow-hidden relative">
-                    <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" width="600" height="400" sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'" class="w-full h-60 object-cover transform group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-sm font-bold text-stone-900 shadow-sm">₵${item.price.toFixed(2)}</div>
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="text-lg font-bold text-stone-900 serif group-hover:text-red-700 transition-colors">${item.name}</h3>
-                    <p class="mt-2 text-sm text-stone-500 line-clamp-2 flex-1">${item.description}</p>
-                    <div class="mt-6">
-                        <button onclick="addToCart('${item.id}', this)" class="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-stone-900 hover:bg-stone-800 transition-colors">
-                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add to Order
-                        </button>
-                    </div>
-                </div>`;
-                container.appendChild(card);
+                if (!categories.includes(item.category)) categories.push(item.category);
+            });
+
+            categories.forEach(category => {
+                const group = items.filter(item => item.category === category);
+                if (!group.length) return;
+                container.appendChild(createSectionHeader(MENU_SECTION_LABELS[category] || category));
+                group.forEach(item => container.appendChild(createMenuCard(item)));
             });
             lucide.createIcons();
             hideMenuLoadingScreen();
@@ -1661,6 +1782,53 @@
 
         let previousStatusMap = {}; // To track changes so we don't alert twice
 
+        function getCustomerOrderStatusMeta(status) {
+            const normalized = String(status || 'pending').toLowerCase();
+            if (normalized === 'requested') {
+                return {
+                    label: 'PRE-ORDER REQUEST',
+                    className: 'bg-amber-100 text-amber-800',
+                    note: 'Staff will accept or reject this request when service opens.'
+                };
+            }
+            if (normalized === 'accepted') {
+                return {
+                    label: 'ACCEPTED',
+                    className: 'bg-green-100 text-green-800',
+                    note: 'Staff accepted this pre-order request and will update it when preparation starts.'
+                };
+            }
+            if (normalized === 'rejected') {
+                return {
+                    label: 'NOT ACCEPTED',
+                    className: 'bg-red-100 text-red-800',
+                    note: 'This pre-order request was not accepted.'
+                };
+            }
+            if (normalized === 'completed') return { label: 'COMPLETED', className: 'bg-green-100 text-green-800', note: '' };
+            if (normalized === 'pending') return { label: 'PENDING', className: 'bg-yellow-100 text-yellow-800', note: '' };
+            if (normalized === 'preparing') return { label: 'PREPARING', className: 'bg-blue-100 text-blue-800', note: '' };
+            if (normalized === 'cancelled') return { label: 'CANCELLED', className: 'bg-red-100 text-red-800', note: '' };
+            return { label: normalized.toUpperCase(), className: 'bg-stone-100 text-stone-800', note: '' };
+        }
+
+        function getCustomerRequestedForText(order) {
+            if (!order) return '';
+            if (order.requestedForLabel) return order.requestedForLabel;
+            if (order.requestedFor && order.requestedFor.toDate) {
+                return order.requestedFor.toDate().toLocaleString('en-GH', {
+                    timeZone: 'Africa/Accra',
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hourCycle: 'h23'
+                });
+            }
+            return '';
+        }
+
         function listenToMyOrders(user) {
             if (!user) return;
 
@@ -1675,8 +1843,28 @@
                         const orderId = doc.id;
                         const prev = previousStatusMap[orderId];
 
+                        if (prev === 'requested' && order.status === 'accepted') {
+                            const requestedForText = getCustomerRequestedForText(order);
+                            showCustomerNotification(
+                                'Pre-order Accepted',
+                                requestedForText
+                                    ? `Your request #${orderId.slice(-6).toUpperCase()} for ${requestedForText} was accepted.`
+                                    : `Your request #${orderId.slice(-6).toUpperCase()} was accepted.`
+                            );
+                        }
+
+                        if (prev === 'requested' && order.status === 'rejected') {
+                            const requestedForText = getCustomerRequestedForText(order);
+                            showCustomerNotification(
+                                'Pre-order Not Accepted',
+                                requestedForText
+                                    ? `Your request #${orderId.slice(-6).toUpperCase()} for ${requestedForText} was not accepted.`
+                                    : `Your request #${orderId.slice(-6).toUpperCase()} was not accepted.`
+                            );
+                        }
+
                         // Notify when order moves to preparing
-                        if (prev === 'pending' && order.status === 'preparing') {
+                        if ((prev === 'pending' || prev === 'accepted') && order.status === 'preparing') {
                             showCustomerNotification(
                                 'Order Being Prepared 🍳',
                                 `Your order #${orderId.slice(-6).toUpperCase()} is now being prepared!`
@@ -1684,7 +1872,7 @@
                         }
 
                         // Notify when order is completed
-                        if ((prev === 'preparing' || prev === 'pending') && order.status === 'completed') {
+                        if ((prev === 'preparing' || prev === 'pending' || prev === 'accepted') && order.status === 'completed') {
                             showCustomerNotification(
                                 'Order Ready for Pickup! ✅',
                                 `Your order #${orderId.slice(-6).toUpperCase()} is ready for pickup!`
@@ -1722,16 +1910,12 @@
                     snapshot.forEach(doc => {
                         const order = doc.data();
                         const orderId = doc.id;
+                        const status = String(order.status || 'pending').toLowerCase();
+                        const statusMeta = getCustomerOrderStatusMeta(status);
+                        const requestedForText = getCustomerRequestedForText(order);
                         
                         // Calculate time elapsed since order creation
                         const canCancel = canCancelOrder(order.createdAt);
-                        
-                        // Determine status colors
-                        let statusClass = 'bg-stone-100 text-stone-800';
-                        if (order.status === 'completed') statusClass = 'bg-green-100 text-green-800';
-                        if (order.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
-                        if (order.status === 'preparing') statusClass = 'bg-blue-100 text-blue-800';
-                        if (order.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
                         
                         // Format items
                         const itemsList = order.items ? order.items.map(item => 
@@ -1747,9 +1931,16 @@
                         
                         // Cancel button (only show if order can be cancelled)
                         let cancelButton = '';
-                        if (canCancel && order.status === 'pending') {
+                        if (status === 'requested') {
                             cancelButton = `
-                                <button onclick="cancelOrder('${orderId}')" 
+                                <button onclick="cancelOrder('${orderId}', true)"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                                    Withdraw Request
+                                </button>
+                            `;
+                        } else if (canCancel && status === 'pending') {
+                            cancelButton = `
+                                <button onclick="cancelOrder('${orderId}', false)"
                                     class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
                                     Cancel Order
                                 </button>
@@ -1758,7 +1949,7 @@
 
                         // Delete button for old orders (completed or cancelled)
                         let deleteButton = '';
-                        if (order.status === 'completed' || order.status === 'cancelled') {
+                        if (status === 'completed' || status === 'cancelled' || status === 'rejected') {
                             deleteButton = `
                                 <button onclick="deleteMyOrder('${orderId}')" 
                                     class="px-4 py-2 bg-stone-200 text-stone-800 rounded-md hover:bg-stone-300 transition-colors text-sm ml-2">
@@ -1766,6 +1957,9 @@
                                 </button>
                             `;
                         }
+                        const statusNote = ['requested', 'accepted', 'rejected'].includes(status) && requestedForText
+                            ? `Requested for ${publicEscapeHtml(requestedForText)}. ${statusMeta.note}`
+                            : statusMeta.note;
                         
                         const orderCard = `
                             <div class="bg-white rounded-lg shadow-md p-6 border border-stone-200">
@@ -1775,11 +1969,12 @@
                                         <p class="text-sm text-stone-500">${timestamp}</p>
                                     </div>
                                     <div class="flex items-center gap-3 mt-3 md:mt-0">
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusClass}">
-                                            ${order.status ? order.status.toUpperCase() : 'PENDING'}
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusMeta.className}">
+                                            ${statusMeta.label}
                                         </span>
                                     </div>
                                 </div>
+                                ${statusNote ? `<p class="mb-4 rounded-md bg-stone-50 px-4 py-3 text-sm text-stone-600">${statusNote}</p>` : ''}
                                 
                                 <div class="mb-4">
                                     <h4 class="font-semibold text-stone-900 mb-2">Items:</h4>
@@ -1821,8 +2016,11 @@
         }
 
         // Cancel order function
-        async function cancelOrder(orderId) {
-            const confirmed = await showConfirmModal('Cancel Order', 'Are you sure you want to cancel this order? This cannot be undone.');
+        async function cancelOrder(orderId, isRequest) {
+            const confirmed = await showConfirmModal(
+                isRequest ? 'Withdraw Request' : 'Cancel Order',
+                isRequest ? 'Withdraw this pre-order request before staff accepts it?' : 'Are you sure you want to cancel this order? This cannot be undone.'
+            );
             if (!confirmed) return;
             
             try {
@@ -1831,10 +2029,10 @@
                     user: auth.currentUser,
                     body: { orderId }
                 });
-                showToast('Order cancelled successfully!', 'success');
+                showToast(isRequest ? 'Pre-order request withdrawn.' : 'Order cancelled successfully!', 'success');
             } catch (error) {
                 console.error('Error cancelling order:', error);
-                showToast(error.message || 'Failed to cancel order. Please try again.', 'error');
+                showToast(error.message || (isRequest ? 'Failed to withdraw request. Please try again.' : 'Failed to cancel order. Please try again.'), 'error');
             }
         }
 
@@ -2036,6 +2234,99 @@
             });
         }
 
+        // --- Dish Detail Modal ---
+        let _dishModalEl = null;
+        let _dishModalKeyHandler = null;
+        let _dishScrollY = 0;
+
+        function _lockBodyScroll() {
+            _dishScrollY = window.scrollY || window.pageYOffset || 0;
+            const b = document.body;
+            b.style.position = 'fixed';
+            b.style.top = `-${_dishScrollY}px`;
+            b.style.left = '0';
+            b.style.right = '0';
+            b.style.width = '100%';
+        }
+
+        function _unlockBodyScroll() {
+            const b = document.body;
+            b.style.position = '';
+            b.style.top = '';
+            b.style.left = '';
+            b.style.right = '';
+            b.style.width = '';
+            window.scrollTo(0, _dishScrollY);
+        }
+
+        function openDishModal(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+            closeDishModal();
+            const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            const backdrop = document.createElement('div');
+            backdrop.className = 'confirm-modal-backdrop';
+            backdrop.setAttribute('role', 'dialog');
+            backdrop.setAttribute('aria-modal', 'true');
+            backdrop.setAttribute('aria-label', item.name);
+            backdrop.innerHTML = `
+                <div class="dish-modal-panel">
+                    <div class="dish-modal-media">
+                        <img class="dish-modal-img" src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/600x400/e5e5e5/a3a3a3?text=No+Image'">
+                        <button type="button" class="dish-modal-close" aria-label="Close">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="dish-modal-body">
+                        <div class="dish-modal-head">
+                            <h3 class="dish-modal-title serif">${item.name}</h3>
+                            <span class="dish-modal-price">₵${item.price.toFixed(2)}</span>
+                        </div>
+                        <p class="dish-modal-desc">${item.description}</p>
+                        <button type="button" class="dish-modal-order">
+                            <i data-lucide="shopping-bag"></i> Order Now
+                        </button>
+                    </div>
+                </div>`;
+            document.body.appendChild(backdrop);
+            _dishModalEl = backdrop;
+            _lockBodyScroll();
+            lucide.createIcons({ nodes: [backdrop] });
+
+            backdrop.querySelector('.dish-modal-close').addEventListener('click', closeDishModal);
+            backdrop.querySelector('.dish-modal-order').addEventListener('click', () => {
+                addToCart(item.id);
+                showToast(`${item.name} added to your order`, 'success');
+                closeDishModal();
+            });
+            backdrop.addEventListener('click', e => { if (e.target === backdrop) closeDishModal(); });
+            _dishModalKeyHandler = e => { if (e.key === 'Escape') closeDishModal(); };
+            document.addEventListener('keydown', _dishModalKeyHandler);
+            _trapFocus(backdrop, opener);
+        }
+
+        function closeDishModal() {
+            if (_dishModalKeyHandler) { document.removeEventListener('keydown', _dishModalKeyHandler); _dishModalKeyHandler = null; }
+            if (_dishModalEl) { _dishModalEl.remove(); _dishModalEl = null; _unlockBodyScroll(); _releaseTrap(); }
+        }
+
+        // Open dish detail modal when a card body (not the "Add to Order" button) is activated
+        (function initDishCardModal() {
+            const container = document.getElementById('menu-container');
+            if (!container) return;
+            container.addEventListener('click', e => {
+                if (e.target.closest('button')) return; // let "Add to Order" run its own handler
+                const card = e.target.closest('[data-dish-id]');
+                if (card) openDishModal(card.dataset.dishId);
+            });
+            container.addEventListener('keydown', e => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                if (e.target.closest('button')) return;
+                const card = e.target.closest('[data-dish-id]');
+                if (card) { e.preventDefault(); openDishModal(card.dataset.dishId); }
+            });
+        })();
+
         // --- Scroll to Top Button ---
         (function initScrollToTop() {
             const btn = document.getElementById('scroll-top-btn');
@@ -2124,7 +2415,7 @@
         }, { once: true });
 
     </script>
-    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260629-bao-glow"></script>
+    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260711-vv-keyboard"></script>
     <script src="assets/js/cookie-consent.js" defer></script>
 </body>
 

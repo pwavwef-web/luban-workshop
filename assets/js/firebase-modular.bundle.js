@@ -14463,6 +14463,23 @@
       fields: n.value.mapValue.fields
     };
   }
+  function __PRIVATE_fromBatchGetDocumentsResponse(e, t) {
+    return "found" in t ? (function __PRIVATE_fromFound(e2, t2) {
+      __PRIVATE_hardAssert(!!t2.found, 43571), t2.found.name, t2.found.updateTime;
+      const n = fromName(e2, t2.found.name), r = __PRIVATE_fromVersion(t2.found.updateTime), i = t2.found.createTime ? __PRIVATE_fromVersion(t2.found.createTime) : SnapshotVersion.min(), s = new ObjectValue({
+        mapValue: {
+          fields: t2.found.fields
+        }
+      });
+      return MutableDocument.newFoundDocument(n, r, i, s);
+    })(e, t) : "missing" in t ? (function __PRIVATE_fromMissing(e2, t2) {
+      __PRIVATE_hardAssert(!!t2.missing, 3894), __PRIVATE_hardAssert(!!t2.readTime, 22933);
+      const n = fromName(e2, t2.missing), r = __PRIVATE_fromVersion(t2.readTime);
+      return MutableDocument.newNoDocument(n, r);
+    })(e, t) : fail(7234, {
+      result: t
+    });
+  }
   function __PRIVATE_fromWatchChange(e, t) {
     let n;
     if ("targetChange" in t) {
@@ -18884,6 +18901,158 @@ This typically indicates that your device does not have a healthy Internet conne
       }), 0);
     }
   };
+  var Transaction = class {
+    constructor(e) {
+      this.datastore = e, // The version of each document that was read during this transaction.
+      this.readVersions = /* @__PURE__ */ new Map(), this.mutations = [], this.committed = false, /**
+       * A deferred usage error that occurred previously in this transaction that
+       * will cause the transaction to fail once it actually commits.
+       */
+      this.lastTransactionError = null, /**
+       * Set of documents that have been written in the transaction.
+       *
+       * When there's more than one write to the same key in a transaction, any
+       * writes after the first are handled differently.
+       */
+      this.writtenDocs = /* @__PURE__ */ new Set();
+    }
+    async lookup(e) {
+      if (this.ensureCommitNotCalled(), this.mutations.length > 0) throw this.lastTransactionError = new FirestoreError(D.INVALID_ARGUMENT, "Firestore transactions require all reads to be executed before all writes."), this.lastTransactionError;
+      const t = await (async function __PRIVATE_invokeBatchGetDocumentsRpc(e2, t2) {
+        const n = __PRIVATE_debugCast(e2), r = {
+          documents: t2.map(((e3) => __PRIVATE_toName(n.serializer, e3)))
+        }, i = await n.jo("BatchGetDocuments", n.serializer.databaseId, ResourcePath.emptyPath(), r, t2.length), s = /* @__PURE__ */ new Map();
+        i.forEach(((e3) => {
+          const t3 = __PRIVATE_fromBatchGetDocumentsResponse(n.serializer, e3);
+          s.set(t3.key.toString(), t3);
+        }));
+        const o = [];
+        return t2.forEach(((e3) => {
+          const t3 = s.get(e3.toString());
+          __PRIVATE_hardAssert(!!t3, 55234, {
+            key: e3
+          }), o.push(t3);
+        })), o;
+      })(this.datastore, e);
+      return t.forEach(((e2) => this.recordVersion(e2))), t;
+    }
+    set(e, t) {
+      this.write(t.toMutation(e, this.precondition(e))), this.writtenDocs.add(e.toString());
+    }
+    update(e, t) {
+      try {
+        this.write(t.toMutation(e, this.preconditionForUpdate(e)));
+      } catch (e2) {
+        this.lastTransactionError = e2;
+      }
+      this.writtenDocs.add(e.toString());
+    }
+    delete(e) {
+      this.write(new __PRIVATE_DeleteMutation(e, this.precondition(e))), this.writtenDocs.add(e.toString());
+    }
+    async commit() {
+      if (this.ensureCommitNotCalled(), this.lastTransactionError) throw this.lastTransactionError;
+      const e = this.readVersions;
+      this.mutations.forEach(((t) => {
+        e.delete(t.key.toString());
+      })), // For each document that was read but not written to, we want to perform
+      // a `verify` operation.
+      e.forEach(((e2, t) => {
+        const n = DocumentKey.fromPath(t);
+        this.mutations.push(new __PRIVATE_VerifyMutation(n, this.precondition(n)));
+      })), await (async function __PRIVATE_invokeCommitRpc(e2, t) {
+        const n = __PRIVATE_debugCast(e2), r = {
+          writes: t.map(((e3) => toMutation(n.serializer, e3)))
+        };
+        await n.Wo("Commit", n.serializer.databaseId, ResourcePath.emptyPath(), r);
+      })(this.datastore, this.mutations), this.committed = true;
+    }
+    recordVersion(e) {
+      let t;
+      if (e.isFoundDocument()) t = e.version;
+      else {
+        if (!e.isNoDocument()) throw fail(50498, {
+          Hu: e.constructor.name
+        });
+        t = SnapshotVersion.min();
+      }
+      const n = this.readVersions.get(e.key.toString());
+      if (n) {
+        if (!t.isEqual(n))
+          throw new FirestoreError(D.ABORTED, "Document version changed between two reads.");
+      } else this.readVersions.set(e.key.toString(), t);
+    }
+    /**
+     * Returns the version of this document when it was read in this transaction,
+     * as a precondition, or no precondition if it was not read.
+     */
+    precondition(e) {
+      const t = this.readVersions.get(e.toString());
+      return !this.writtenDocs.has(e.toString()) && t ? t.isEqual(SnapshotVersion.min()) ? Precondition.exists(false) : Precondition.updateTime(t) : Precondition.none();
+    }
+    /**
+     * Returns the precondition for a document if the operation is an update.
+     */
+    preconditionForUpdate(e) {
+      const t = this.readVersions.get(e.toString());
+      if (!this.writtenDocs.has(e.toString()) && t) {
+        if (t.isEqual(SnapshotVersion.min()))
+          throw new FirestoreError(D.INVALID_ARGUMENT, "Can't update a document that doesn't exist.");
+        return Precondition.updateTime(t);
+      }
+      return Precondition.exists(true);
+    }
+    write(e) {
+      this.ensureCommitNotCalled(), this.mutations.push(e);
+    }
+    ensureCommitNotCalled() {
+    }
+  };
+  var __PRIVATE_TransactionRunner = class {
+    constructor(e, t, n, r, i) {
+      this.asyncQueue = e, this.datastore = t, this.options = n, this.updateFunction = r, this.deferred = i, this.Zu = n.maxAttempts, this.M_ = new __PRIVATE_ExponentialBackoff(
+        this.asyncQueue,
+        "transaction_retry"
+        /* TimerId.TransactionRetry */
+      );
+    }
+    /** Runs the transaction and sets the result on deferred. */
+    Xu() {
+      this.Zu -= 1, this.Yu();
+    }
+    Yu() {
+      this.M_.p_((async () => {
+        const e = new Transaction(this.datastore), t = this.ec(e);
+        t && t.then(((t2) => {
+          this.asyncQueue.enqueueAndForget((() => e.commit().then((() => {
+            this.deferred.resolve(t2);
+          })).catch(((e2) => {
+            this.tc(e2);
+          }))));
+        })).catch(((e2) => {
+          this.tc(e2);
+        }));
+      }));
+    }
+    ec(e) {
+      try {
+        const t = this.updateFunction(e);
+        return !__PRIVATE_isNullOrUndefined(t) && t.catch && t.then ? t : (this.deferred.reject(Error("Transaction callback must return a Promise")), null);
+      } catch (e2) {
+        return this.deferred.reject(e2), null;
+      }
+    }
+    tc(e) {
+      this.Zu > 0 && this.nc(e) ? (this.Zu -= 1, this.asyncQueue.enqueueAndForget((() => (this.Yu(), Promise.resolve())))) : this.deferred.reject(e);
+    }
+    nc(e) {
+      if ("FirebaseError" === (e == null ? void 0 : e.name)) {
+        const t = e.code;
+        return "aborted" === t || "failed-precondition" === t || "already-exists" === t || !__PRIVATE_isPermanentError(t);
+      }
+      return false;
+    }
+  };
   var Xt = "FirestoreClient";
   var FirestoreClient = class {
     constructor(e, t, n, r, i) {
@@ -18968,6 +19137,9 @@ This typically indicates that your device does not have a healthy Internet conne
   function __PRIVATE_getSyncEngine(e) {
     return __PRIVATE_ensureOnlineComponents(e).then(((e2) => e2.syncEngine));
   }
+  function __PRIVATE_getDatastore$1(e) {
+    return __PRIVATE_ensureOnlineComponents(e).then(((e2) => e2.datastore));
+  }
   async function __PRIVATE_getEventManager(e) {
     const t = await __PRIVATE_ensureOnlineComponents(e), n = t.eventManager;
     return n.onListen = __PRIVATE_syncEngineListen.bind(null, t.syncEngine), n.onUnlisten = __PRIVATE_syncEngineUnlisten.bind(null, t.syncEngine), n.onFirstRemoteStoreListen = __PRIVATE_triggerRemoteStoreListen.bind(null, t.syncEngine), n.onLastRemoteStoreUnlisten = __PRIVATE_triggerRemoteStoreUnlisten.bind(null, t.syncEngine), n;
@@ -19022,6 +19194,13 @@ This typically indicates that your device does not have a healthy Internet conne
   function __PRIVATE_firestoreClientWrite(e, t) {
     const n = new __PRIVATE_Deferred();
     return e.asyncQueue.enqueueAndForget((async () => __PRIVATE_syncEngineWrite(await __PRIVATE_getSyncEngine(e), t, n))), n.promise;
+  }
+  function __PRIVATE_firestoreClientTransaction(e, t, n) {
+    const r = new __PRIVATE_Deferred();
+    return e.asyncQueue.enqueueAndForget((async () => {
+      const i = await __PRIVATE_getDatastore$1(e);
+      new __PRIVATE_TransactionRunner(e.asyncQueue, i, n, t, r).Xu();
+    })), r.promise;
   }
   function __PRIVATE_cloneLongPollingOptions(e) {
     const t = {};
@@ -20494,6 +20673,23 @@ This typically indicates that your device does not have a healthy Internet conne
     let r;
     return r = t ? n && (n.merge || n.mergeFields) ? t.toFirestore(e, n) : t.toFirestore(e) : e, r;
   }
+  var __PRIVATE_LiteUserDataWriter = class extends AbstractUserDataWriter {
+    constructor(t) {
+      super(), this.firestore = t;
+    }
+    convertBytes(t) {
+      return new Bytes(t);
+    }
+    convertReference(t) {
+      const e = this.convertDocumentKey(t, this.firestore._databaseId);
+      return new DocumentReference(
+        this.firestore,
+        /* converter= */
+        null,
+        e
+      );
+    }
+  };
   var SnapshotMetadata = class {
     /** @hideconstructor */
     constructor(t, e) {
@@ -20721,6 +20917,91 @@ This typically indicates that your device does not have a healthy Internet conne
     bundleName: property("string"),
     bundle: property("string")
   };
+  var Yt2 = {
+    maxAttempts: 5
+  };
+  function __PRIVATE_validateReference(t, e) {
+    if ((t = getModularInstance(t)).firestore !== e) throw new FirestoreError(D.INVALID_ARGUMENT, "Provided document reference is from a different Firestore instance.");
+    return t;
+  }
+  var Transaction$1 = class {
+    /** @hideconstructor */
+    constructor(t, e) {
+      this._firestore = t, this._transaction = e, this._dataReader = __PRIVATE_newUserDataReader(t);
+    }
+    /**
+     * Reads the document referenced by the provided {@link DocumentReference}.
+     *
+     * @param documentRef - A reference to the document to be read.
+     * @returns A `DocumentSnapshot` with the read data.
+     */
+    get(t) {
+      const e = __PRIVATE_validateReference(t, this._firestore), n = new __PRIVATE_LiteUserDataWriter(this._firestore);
+      return this._transaction.lookup([e._key]).then(((t2) => {
+        if (!t2 || 1 !== t2.length) return fail(24041);
+        const r = t2[0];
+        if (r.isFoundDocument()) return new DocumentSnapshot$1(this._firestore, n, r.key, r, e.converter);
+        if (r.isNoDocument()) return new DocumentSnapshot$1(this._firestore, n, e._key, null, e.converter);
+        throw fail(18433, {
+          doc: r
+        });
+      }));
+    }
+    set(t, e, n) {
+      const r = __PRIVATE_validateReference(t, this._firestore), s = __PRIVATE_applyFirestoreDataConverter(r.converter, e, n), a = __PRIVATE_parseSetData(this._dataReader, "Transaction.set", r._key, s, null !== r.converter, n);
+      return this._transaction.set(r._key, a), this;
+    }
+    update(t, e, n, ...r) {
+      const s = __PRIVATE_validateReference(t, this._firestore);
+      let a;
+      return a = "string" == typeof (e = getModularInstance(e)) || e instanceof FieldPath ? __PRIVATE_parseUpdateVarargs(this._dataReader, "Transaction.update", s._key, e, n, r) : __PRIVATE_parseUpdateData(this._dataReader, "Transaction.update", s._key, e), this._transaction.update(s._key, a), this;
+    }
+    /**
+     * Deletes the document referred to by the provided {@link DocumentReference}.
+     *
+     * @param documentRef - A reference to the document to be deleted.
+     * @returns This `Transaction` instance. Used for chaining method calls.
+     */
+    delete(t) {
+      const e = __PRIVATE_validateReference(t, this._firestore);
+      return this._transaction.delete(e._key), this;
+    }
+  };
+  var Transaction2 = class extends Transaction$1 {
+    // This class implements the same logic as the Transaction API in the Lite SDK
+    // but is subclassed in order to return its own DocumentSnapshot types.
+    /** @hideconstructor */
+    constructor(t, e) {
+      super(t, e), this._firestore = t;
+    }
+    /**
+     * Reads the document referenced by the provided {@link DocumentReference}.
+     *
+     * @param documentRef - A reference to the document to be read.
+     * @returns A `DocumentSnapshot` with the read data.
+     */
+    get(t) {
+      const e = __PRIVATE_validateReference(t, this._firestore), n = new __PRIVATE_ExpUserDataWriter(this._firestore);
+      return super.get(t).then(((t2) => new DocumentSnapshot(this._firestore, n, e._key, t2._document, new SnapshotMetadata(
+        /* hasPendingWrites= */
+        false,
+        /* fromCache= */
+        false
+      ), e.converter)));
+    }
+  };
+  function runTransaction(t, e, n) {
+    t = __PRIVATE_cast(t, Firestore);
+    const r = {
+      ...Yt2,
+      ...n
+    };
+    !(function __PRIVATE_validateTransactionOptions(t2) {
+      if (t2.maxAttempts < 1) throw new FirestoreError(D.INVALID_ARGUMENT, "Max attempts must be at least 1");
+    })(r);
+    const s = ensureFirestoreConfigured(t);
+    return __PRIVATE_firestoreClientTransaction(s, ((n2) => e(new Transaction2(t, n2))), r);
+  }
   function getDoc(t) {
     t = __PRIVATE_cast(t, DocumentReference);
     const e = __PRIVATE_cast(t.firestore, Firestore), n = ensureFirestoreConfigured(e);
@@ -22413,8 +22694,12 @@ ${this.customData.serverResponse}`;
       }
     };
   }
+  var docRefRegistry = /* @__PURE__ */ new WeakMap();
+  function resolveDocRef(docApiOrRef) {
+    return docRefRegistry.get(docApiOrRef) || docApiOrRef;
+  }
   function createDocApi(docRef) {
-    return {
+    const api = {
       id: docRef.id,
       async set(data, options) {
         await setDoc(docRef, data, options);
@@ -22430,6 +22715,8 @@ ${this.customData.serverResponse}`;
         return wrapDocSnapshot(snapshot);
       }
     };
+    docRefRegistry.set(api, docRef);
+    return api;
   }
   function createCollectionApi(collectionRef) {
     return {
@@ -22458,11 +22745,41 @@ ${this.customData.serverResponse}`;
       }
     };
   }
+  function createTransactionApi(transaction) {
+    return {
+      async get(docApi) {
+        const snapshot = await transaction.get(resolveDocRef(docApi));
+        return wrapDocSnapshot(snapshot);
+      },
+      set(docApi, data, options) {
+        if (options === void 0) {
+          transaction.set(resolveDocRef(docApi), data);
+        } else {
+          transaction.set(resolveDocRef(docApi), data, options);
+        }
+        return this;
+      },
+      update(docApi, data) {
+        transaction.update(resolveDocRef(docApi), data);
+        return this;
+      },
+      delete(docApi) {
+        transaction.delete(resolveDocRef(docApi));
+        return this;
+      }
+    };
+  }
   function getFirestoreApi() {
     const db = getFirestore(ensureApp());
     return {
       collection(path) {
         return createCollectionApi(collection(db, path));
+      },
+      runTransaction(updateFunction) {
+        return runTransaction(
+          db,
+          (transaction) => updateFunction(createTransactionApi(transaction))
+        );
       }
     };
   }
@@ -22525,8 +22842,6 @@ ${this.customData.serverResponse}`;
 @firebase/util/dist/index.esm.js:
 @firebase/util/dist/index.esm.js:
 @firebase/logger/dist/esm/index.esm.js:
-@firebase/firestore/dist/common-7a7519be.esm.js:
-@firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
@@ -22624,7 +22939,6 @@ ${this.customData.serverResponse}`;
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/index.esm.js:
 @firebase/firestore/dist/index.esm.js:
-@firebase/firestore/dist/index.esm.js:
   (**
    * @license
    * Copyright 2022 Google LLC
@@ -22648,7 +22962,6 @@ ${this.customData.serverResponse}`;
 @firebase/app/dist/esm/index.esm.js:
 @firebase/auth/dist/esm/index-907e9a1a.js:
 @firebase/auth/dist/esm/index-907e9a1a.js:
-@firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
@@ -22708,9 +23021,6 @@ firebase/app/dist/esm/index.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
-@firebase/firestore/dist/index.esm.js:
-@firebase/firestore/dist/index.esm.js:
-@firebase/firestore/dist/index.esm.js:
 @firebase/firestore/dist/index.esm.js:
 @firebase/firestore/dist/index.esm.js:
   (**
@@ -23900,6 +24210,40 @@ firebase/app/dist/esm/index.esm.js:
 @firebase/firestore/dist/common-7a7519be.esm.js:
   (**
    * @license
+   * Copyright 2017 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+  (**
+   * @license
+   * Copyright 2019 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+
+@firebase/firestore/dist/common-7a7519be.esm.js:
+  (**
+   * @license
    * Copyright 2023 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24019,6 +24363,40 @@ firebase/app/dist/esm/index.esm.js:
   (**
    * @license
    * Copyright 2025 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+  (**
+   * @license
+   * Copyright 2020 Google LLC
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *   http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *)
+
+@firebase/firestore/dist/index.esm.js:
+  (**
+   * @license
+   * Copyright 2022 Google LLC
    *
    * Licensed under the Apache License, Version 2.0 (the "License");
    * you may not use this file except in compliance with the License.

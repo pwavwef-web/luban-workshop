@@ -29,7 +29,7 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
     <script src="assets/js/admin-bao-icons.js?v=20260527-bao-admin"></script>
-    <script src="assets/js/firebase-modular.bundle.js?v=20260523-reservationfix2"></script>
+    <script src="assets/js/firebase-modular.bundle.js?v=20260706-runtransaction"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/admin-qr.bundle.js?v=20260523-reservationfix2"></script>
 
@@ -123,6 +123,19 @@
             border-color: #fecaca !important;
             color: var(--admin-red-dark) !important;
             box-shadow: inset 3px 0 0 var(--admin-red), 0 10px 24px rgba(127, 29, 29, 0.08);
+        }
+
+        .admin-nav-section {
+            padding: 0.75rem 1rem 0.25rem;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a8a29e;
+        }
+
+        .admin-nav-section:first-child {
+            padding-top: 0.25rem;
         }
 
         .admin-main {
@@ -887,17 +900,23 @@
                 </button>
             </div>
 
-            <nav class="flex-1 px-4 py-6 space-y-2">
+            <nav class="flex-1 px-4 py-6 space-y-1">
+                <p class="admin-nav-section">Operations</p>
+
                 <button onclick="switchTab('overview')" id="tab-btn-overview"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="layout-dashboard" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Overview</span>
                 </button>
 
-                <button onclick="switchTab('menu')" id="tab-btn-menu"
-                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
-                    <i data-lucide="book-open" class="h-5 w-5 mr-3"></i>
-                    <span class="font-medium">Menu Manager</span>
+                <button onclick="switchTab('orders')" id="tab-btn-orders"
+                    class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <div class="flex items-center">
+                        <i data-lucide="shopping-bag" class="h-5 w-5 mr-3"></i>
+                        <span class="font-medium">Orders</span>
+                    </div>
+                    <span id="badge-orders"
+                        class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
 
                 <button onclick="switchTab('reservations')" id="tab-btn-reservations"
@@ -910,15 +929,13 @@
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
 
-                <button onclick="switchTab('orders')" id="tab-btn-orders"
-                    class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
-                    <div class="flex items-center">
-                        <i data-lucide="shopping-bag" class="h-5 w-5 mr-3"></i>
-                        <span class="font-medium">Orders</span>
-                    </div>
-                    <span id="badge-orders"
-                        class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
+                <button onclick="switchTab('menu')" id="tab-btn-menu"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="book-open" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Menu Manager</span>
                 </button>
+
+                <p class="admin-nav-section">Growth &amp; settings</p>
 
                 <button onclick="switchTab('promotions')" id="tab-btn-promotions"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
@@ -932,12 +949,6 @@
                     <span class="font-medium">Special Menus</span>
                 </button>
 
-                <button onclick="switchTab('admin-users')" id="tab-btn-admin-users"
-                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
-                    <i data-lucide="shield" class="h-5 w-5 mr-3"></i>
-                    <span class="font-medium">Admin Users</span>
-                </button>
-
                 <button onclick="switchTab('messages')" id="tab-btn-messages"
                     class="admin-nav-button w-full flex items-center justify-between px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <div class="flex items-center">
@@ -948,22 +959,28 @@
                         class="hidden h-2.5 w-2.5 bg-red-600 rounded-full ring-2 ring-white animate-pulse"></span>
                 </button>
 
-                <button onclick="switchTab('fraud-review')" id="tab-btn-fraud-review"
-                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
-                    <i data-lucide="shield-alert" class="h-5 w-5 mr-3"></i>
-                    <span class="font-medium">Fraud Review</span>
-                </button>
-
                 <button onclick="switchTab('chatbot-knowledge')" id="tab-btn-chatbot-knowledge"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="bot" class="h-5 w-5 mr-3"></i>
                     <span class="font-medium">Chatbot Facts</span>
                 </button>
 
+                <button onclick="switchTab('fraud-review')" id="tab-btn-fraud-review"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="shield-alert" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Fraud Review</span>
+                </button>
+
+                <button onclick="switchTab('admin-users')" id="tab-btn-admin-users"
+                    class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
+                    <i data-lucide="shield" class="h-5 w-5 mr-3"></i>
+                    <span class="font-medium">Admin Users</span>
+                </button>
+
                 <button onclick="switchTab('account')" id="tab-btn-account"
                     class="admin-nav-button w-full flex items-center px-4 py-3 text-stone-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors group">
                     <i data-lucide="settings" class="h-5 w-5 mr-3"></i>
-                    <span class="font-medium">Account Settings</span>
+                    <span class="font-medium">SMS &amp; Account</span>
                 </button>
 
                 <a href="about-us/review.html"
@@ -1009,11 +1026,6 @@
                         <span class="admin-status-dot"></span>
                         <span id="admin-date">Today</span>
                     </span>
-                    <button onclick="logout()"
-                        class="inline-flex items-center justify-center gap-2 border border-stone-200 bg-white px-4 py-2 text-sm font-bold text-stone-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors">
-                        <i data-lucide="log-out" class="h-4 w-4"></i>
-                        Sign out
-                    </button>
                 </div>
             </div>
 
@@ -1067,27 +1079,100 @@
                     </button>
                 </div>
 
-                <div class="admin-overview-quick">
-                    <h3 class="admin-overview-quick__title">Quick actions</h3>
-                    <div class="admin-overview-quick__grid">
-                        <button type="button" onclick="switchTab('menu')" class="admin-quick-tile">
-                            <i data-lucide="book-open"></i><span>Menu Manager</span>
+                <!-- Reports & Exports hub -->
+                <div class="admin-panel bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                        <div class="flex items-center gap-3">
+                            <span class="admin-metric-icon" style="background:#fff1f1;border:1px solid #fecaca;">
+                                <i data-lucide="download" class="h-5 w-5 text-red-700"></i>
+                            </span>
+                            <div>
+                                <h3 class="text-lg font-bold text-stone-900">Reports &amp; Exports</h3>
+                                <p class="text-xs text-stone-500 mt-0.5">Download live business data as Excel, PDF, or CSV. Reports pull the complete dataset every time.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <label for="report-range" class="text-xs font-bold uppercase tracking-wider text-stone-500">Date range</label>
+                            <select id="report-range" class="px-3 py-2 border border-stone-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-red-700 focus:outline-none">
+                                <option value="all">All time</option>
+                                <option value="today">Today</option>
+                                <option value="7d">Last 7 days</option>
+                                <option value="30d">Last 30 days</option>
+                                <option value="month">This month</option>
+                                <option value="custom">Custom range</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="report-custom" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                        <div>
+                            <label for="report-from" class="block text-xs font-medium text-stone-600 mb-1">From</label>
+                            <input type="date" id="report-from" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="report-to" class="block text-xs font-medium text-stone-600 mb-1">To</label>
+                            <input type="date" id="report-to" class="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:ring-2 focus:ring-red-700 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="admin-report-actions">
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Sales / Orders</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="orders" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="orders" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="orders" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Reservations</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="reservations" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="reservations" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="reservations" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Customers</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="customers" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="customers" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="customers" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Menu</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="menu" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="menu" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="menu" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Messages</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="messages" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="messages" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="messages" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                        <div class="admin-report-tile">
+                            <span class="admin-report-tile__name">Promotions</span>
+                            <span class="admin-report-tile__btns">
+                                <button type="button" data-report-key="promotions" data-report-fmt="xlsx">Excel</button>
+                                <button type="button" data-report-key="promotions" data-report-fmt="pdf">PDF</button>
+                                <button type="button" data-report-key="promotions" data-report-fmt="csv">CSV</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-stone-200">
+                        <p class="text-xs text-stone-500 max-w-md">The full backup bundles every dataset into a single multi-sheet Excel workbook. The date range applies to time-stamped datasets (orders, reservations, messages, customers).</p>
+                        <button type="button" data-report-workbook
+                            class="inline-flex items-center justify-center gap-2 rounded-md bg-red-700 text-white px-5 py-2.5 text-sm font-bold hover:bg-red-800 transition-colors whitespace-nowrap">
+                            <i data-lucide="archive" class="h-4 w-4"></i>
+                            Full data backup (Excel)
                         </button>
-                        <button type="button" onclick="switchTab('promotions')" class="admin-quick-tile">
-                            <i data-lucide="badge-percent"></i><span>Promotions</span>
-                        </button>
-                        <button type="button" onclick="switchTab('special-menus')" class="admin-quick-tile">
-                            <i data-lucide="qr-code"></i><span>Special Menus</span>
-                        </button>
-                        <button type="button" onclick="switchTab('admin-users')" class="admin-quick-tile">
-                            <i data-lucide="shield"></i><span>Admin Users</span>
-                        </button>
-                        <button type="button" onclick="switchTab('account')" class="admin-quick-tile">
-                            <i data-lucide="settings"></i><span>SMS &amp; Account</span>
-                        </button>
-                        <a href="about-us/review.html" class="admin-quick-tile">
-                            <i data-lucide="user-check"></i><span>Profile Review</span>
-                        </a>
                     </div>
                 </div>
             </div>
@@ -1658,10 +1743,10 @@
                 </div>
             </div>
 
-            <!-- Account Settings View -->
+            <!-- SMS & Account View -->
             <div id="view-account" class="view-shell hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">Account Settings</h2>
+                    <h2 class="serif text-2xl sm:text-3xl font-bold text-stone-900">SMS &amp; Account</h2>
                     <p class="text-sm text-stone-500">Manage your account and monitor SMS credits.</p>
                 </div>
 
@@ -1874,6 +1959,7 @@
     <script src="assets/js/admin-messages.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-fraud.bundle.js?v=20260603-adminfix2" defer></script>
     <script src="assets/js/admin-chatbot.bundle.js?v=20260603-adminfix2" defer></script>
+    <script src="assets/js/admin-export.bundle.js?v=20260706-exports" defer></script>
     <script src="assets/js/admin-tour.bundle.js?v=20260603-adminfix2" defer></script>
 
     <!-- Price Edit Modal -->
@@ -2060,7 +2146,7 @@
     </style>
 
     <!-- Bao — live AI assistant (self-contained module: its own Firebase app, no conflict with admin) -->
-    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260629-admin-bao-glow"></script>
+    <script type="module" src="assets/js/firebase-ai-chatbot.js?v=20260711-vv-keyboard-admin"></script>
 </body>
 
 </html>

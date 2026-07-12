@@ -47,6 +47,12 @@
     </header>
 
     <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 pb-safe-16">
+        <section id="business-hours-notice" class="hidden panel bg-amber-50 border border-amber-200 p-5 sm:p-6 mb-6">
+            <p class="text-xs font-bold uppercase tracking-widest text-amber-800">Outside working hours</p>
+            <h2 class="serif mt-2 text-2xl font-bold text-stone-900">Send a pre-order request</h2>
+            <p id="business-hours-copy" class="mt-2 text-sm text-amber-950">The restaurant is closed right now. You can send a request for the next service day and staff will accept or reject it when service opens.</p>
+        </section>
+
         <section id="auth-gate" class="panel bg-white p-5 sm:p-8 lg:p-10">
             <div class="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
                 <div>
@@ -205,6 +211,14 @@
         let currentAccount = null;
         const VERIFY_CONTACT_URL = 'verify-contact.html?returnTo=checkout';
         const TAKEOUT_PACKAGING_FEE_PER_DISH = 5;
+        const BUSINESS_HOURS = {
+            timeZone: 'Africa/Accra',
+            openDays: [1, 2, 3, 4, 5],
+            openMinutes: 11 * 60,
+            closeMinutes: 17 * 60 + 30
+        };
+        const WEEKDAY_INDEX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+        let currentBusinessHours = getBusinessHoursState();
         const drinkSuggestions = [
             { id: 'DR1', name: 'Coca-Cola 300ml', price: 15, description: 'Refreshing classic cola.' },
             { id: 'DR2', name: 'Fanta 300ml', price: 15, description: 'Bright citrus soda.' },
@@ -222,6 +236,99 @@
             document.dispatchEvent(new CustomEvent('luban:confetti', {
                 detail: options || {}
             }));
+        }
+
+        function getAccraParts(date) {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: BUSINESS_HOURS.timeZone,
+                weekday: 'short',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hourCycle: 'h23'
+            }).formatToParts(date).reduce((map, part) => {
+                map[part.type] = part.value;
+                return map;
+            }, {});
+
+            return {
+                year: Number(parts.year),
+                month: Number(parts.month),
+                day: Number(parts.day),
+                weekdayIndex: WEEKDAY_INDEX[parts.weekday],
+                hour: Number(parts.hour),
+                minute: Number(parts.minute)
+            };
+        }
+
+        function getLocalOpenDate(parts, dayOffset) {
+            return new Date(Date.UTC(
+                parts.year,
+                parts.month - 1,
+                parts.day + dayOffset,
+                Math.floor(BUSINESS_HOURS.openMinutes / 60),
+                BUSINESS_HOURS.openMinutes % 60
+            ));
+        }
+
+        function getNextServiceOpening(date) {
+            const parts = getAccraParts(date);
+            const currentMinutes = parts.hour * 60 + parts.minute;
+            for (let dayOffset = 0; dayOffset <= 8; dayOffset += 1) {
+                const candidate = getLocalOpenDate(parts, dayOffset);
+                const candidateParts = getAccraParts(candidate);
+                if (!BUSINESS_HOURS.openDays.includes(candidateParts.weekdayIndex)) continue;
+                if (dayOffset === 0 && currentMinutes >= BUSINESS_HOURS.closeMinutes) continue;
+                return candidate;
+            }
+            return getLocalOpenDate(parts, 1);
+        }
+
+        function formatServiceTime(date) {
+            return new Intl.DateTimeFormat('en-GH', {
+                timeZone: BUSINESS_HOURS.timeZone,
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hourCycle: 'h23'
+            }).format(date);
+        }
+
+        function getBusinessHoursState() {
+            const now = new Date();
+            const parts = getAccraParts(now);
+            const minutes = parts.hour * 60 + parts.minute;
+            const isOpen = BUSINESS_HOURS.openDays.includes(parts.weekdayIndex) &&
+                minutes >= BUSINESS_HOURS.openMinutes &&
+                minutes < BUSINESS_HOURS.closeMinutes;
+            const nextOpening = isOpen ? null : getNextServiceOpening(now);
+            return {
+                isOpen,
+                nextOpening,
+                nextOpeningLabel: nextOpening ? formatServiceTime(nextOpening) : ''
+            };
+        }
+
+        function getPlaceOrderLabel() {
+            return currentBusinessHours.isOpen ? 'Place Order' : 'Send Pre-order Request';
+        }
+
+        function refreshBusinessHoursNotice() {
+            currentBusinessHours = getBusinessHoursState();
+            const notice = document.getElementById('business-hours-notice');
+            const copy = document.getElementById('business-hours-copy');
+            notice.classList.toggle('hidden', currentBusinessHours.isOpen);
+            copy.textContent = currentBusinessHours.isOpen
+                ? ''
+                : `The restaurant is closed right now. Send a pre-order request for ${currentBusinessHours.nextOpeningLabel}. Staff will accept or reject it when service opens.`;
+            const button = document.getElementById('place-order-btn');
+            if (button && button.getAttribute('aria-busy') !== 'true') {
+                button.textContent = getPlaceOrderLabel();
+            }
         }
 
         function escapeHtml(value) {
@@ -330,8 +437,8 @@
             button.disabled = isBusy;
             button.setAttribute('aria-busy', isBusy ? 'true' : 'false');
             button.innerHTML = isBusy
-                ? '<span class="inline-flex items-center justify-center gap-2"><span class="checkout-spinner" aria-hidden="true"></span>Placing order...</span>'
-                : 'Place Order';
+                ? '<span class="inline-flex items-center justify-center gap-2"><span class="checkout-spinner" aria-hidden="true"></span>Submitting...</span>'
+                : getPlaceOrderLabel();
         }
 
         function renderCart() {
@@ -428,13 +535,20 @@
             document.getElementById('phone-ready').className = account.phoneVerified ? 'font-semibold text-green-700' : 'font-semibold text-amber-700';
             const placeBtn = document.getElementById('place-order-btn');
             placeBtn.disabled = !ready || lubanClient.readCart().length === 0;
+            if (placeBtn.getAttribute('aria-busy') !== 'true') {
+                placeBtn.textContent = getPlaceOrderLabel();
+            }
             warning.innerHTML = ready
-                ? `${escapeHtml(getOrderTypeLabel(orderType))} selected. Your order will be priced again on the server before it is saved.`
+                ? currentBusinessHours.isOpen
+                    ? `${escapeHtml(getOrderTypeLabel(orderType))} selected. Your order will be priced again on the server before it is saved.`
+                    : `${escapeHtml(getOrderTypeLabel(orderType))} selected. This will be sent as a pre-order request for ${escapeHtml(currentBusinessHours.nextOpeningLabel)} and staff will confirm it when service opens.`
                 : account.phoneVerified
                     ? 'Choose whether this order is for dining in or take out before placing it.'
                     : `Verify your Ghana phone number before placing an order. Email verification is optional. <a href="${VERIFY_CONTACT_URL}" class="font-semibold text-amber-950 underline underline-offset-4">Open phone verification</a>.`;
             warning.className = ready
-                ? 'mt-5 rounded-md bg-green-50 p-4 text-sm text-green-800'
+                ? currentBusinessHours.isOpen
+                    ? 'mt-5 rounded-md bg-green-50 p-4 text-sm text-green-800'
+                    : 'mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900'
                 : 'mt-5 rounded-md bg-amber-50 p-4 text-sm text-amber-900';
         }
 
@@ -549,6 +663,11 @@
             if (currentAccount) renderVerificationStatus(currentAccount);
         });
 
+        window.setInterval(() => {
+            refreshBusinessHoursNotice();
+            if (currentAccount) renderVerificationStatus(currentAccount);
+        }, 60000);
+
         document.getElementById('place-order-btn').addEventListener('click', async () => {
             const cartState = renderCart();
             if (!currentUser || !cartState.items.length) return;
@@ -572,10 +691,12 @@
                     }
                 });
                 lubanClient.clearCart();
+                const isPreOrderRequest = result.order && result.order.status === 'requested';
                 try {
                     window.sessionStorage.setItem('luban:order-success', result.orderId);
+                    window.sessionStorage.setItem('luban:order-success-kind', isPreOrderRequest ? 'request' : 'order');
                 } catch (storageError) {}
-                showUxToast('Order placed. Opening your status page...', 'success', 1800);
+                showUxToast(isPreOrderRequest ? 'Pre-order request sent. Opening your status page...' : 'Order placed. Opening your status page...', 'success', 1800);
                 spawnUxConfetti({ count: 48 });
                 window.setTimeout(() => {
                     window.location.href = `order-status.html?order=${encodeURIComponent(result.orderId)}`;
@@ -592,6 +713,7 @@
             }
         });
 
+        refreshBusinessHoursNotice();
         renderCart();
     </script>
     <script src="assets/js/site-header.js"></script>

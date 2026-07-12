@@ -1,7 +1,9 @@
+const crypto = require('crypto');
 const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineString, defineSecret } = require('firebase-functions/params');
 const logger = require('firebase-functions/logger');
+const { formatBusinessHoursDateTime } = require('./business-hours');
 
 const SMTP_HOST = defineString('SMTP_HOST', { default: 'smtp.gmail.com' });
 const SMTP_PORT = defineString('SMTP_PORT', { default: '587' });
@@ -10,6 +12,8 @@ const SMTP_USER = defineSecret('SMTP_USER');
 const SMTP_PASS = defineSecret('SMTP_PASS');
 const SMTP_FROM = defineSecret('SMTP_FROM');
 const NOTIFICATION_RECIPIENT = defineSecret('NOTIFICATION_RECIPIENT');
+const RESERVATION_LINK_SECRET = defineSecret('RESERVATION_LINK_SECRET');
+const EVENT_HASH_SALT = defineSecret('EVENT_HASH_SALT');
 const ARKESEL_API_KEY = defineSecret('ARKESEL_API_KEY');
 const ARKESEL_SENDER = defineString('ARKESEL_SENDER', { default: 'Workshop ws' });
 const RESTAURANT_SMS_NUMBER = defineString('RESTAURANT_SMS_NUMBER', { default: '020 543 8455' });
@@ -22,6 +26,7 @@ const PUBLIC_SITE_URL = 'https://lubanrestaurant.com';
 const BAO_EMAIL_ANIMATION_URL = `${PUBLIC_SITE_URL}/assets/bao-campaign/gifs/bao-wave-loop.gif`;
 const VITAFORGE_URL = 'https://cv-build.web.app';
 const VITAFORGE_ICON_URL = `${PUBLIC_SITE_URL}/assets/partners/vitaforge/vitaforge-icon-512.png`;
+const RESERVATION_LINK_TTL_MS = 1000 * 60 * 60 * 24 * 45;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -39,17 +44,52 @@ function cleanPlainText(value) {
     .trim();
 }
 
-function formatItems(items = []) {
-  if (!Array.isArray(items) || items.length === 0) return '<li>No items found</li>';
-  return items
-    .map((item) => {
-      const name = escapeHtml(item.name || item.id || 'Unknown item');
-      const qty = Number(item.quantity || 0);
-      const price = Number(item.price || 0);
-      const lineTotal = (qty * price).toFixed(2);
-      return `<li>${name} - Qty: ${qty}, Unit: ${price.toFixed(2)}, Line total: ${lineTotal}</li>`;
-    })
-    .join('');
+function nowMs() {
+  return Date.now();
+}
+
+function getPublicSiteUrl() {
+  return String(PUBLIC_SITE_URL || 'https://lubanrestaurant.com').replace(/\/+$/, '');
+}
+
+function requireConfiguredSecret(name, paramValue, localDefault) {
+  const value = paramValue || process.env[name] || '';
+  if (value) return value;
+  if (process.env.FUNCTIONS_EMULATOR === 'true') return localDefault;
+  throw new Error(`Missing required secret ${name}.`);
+}
+
+function hashValue(value) {
+  const salt = requireConfiguredSecret('EVENT_HASH_SALT', EVENT_HASH_SALT.value(), 'luban-local-hash-salt');
+  return crypto.createHash('sha256').update(`${salt}:${String(value || '')}`).digest('hex');
+}
+
+function buildSignedToken(payload, purpose, ttlMs) {
+  const secret = requireConfiguredSecret('RESERVATION_LINK_SECRET', RESERVATION_LINK_SECRET.value(), 'luban-local-link-secret');
+  const encoded = Buffer.from(JSON.stringify({
+    ...payload,
+    purpose,
+    exp: nowMs() + ttlMs,
+  })).toString('base64url');
+  const signature = crypto.createHmac('sha256', secret).update(encoded).digest('base64url');
+  return `${encoded}.${signature}`;
+}
+
+function buildOrderStatusLink(orderId) {
+  return `${getPublicSiteUrl()}/order-status.html?order=${encodeURIComponent(orderId)}`;
+}
+
+function buildReservationStatusLink(token) {
+  return `${getPublicSiteUrl()}/reservation-status.html?token=${encodeURIComponent(token)}`;
+}
+
+function buildFreshReservationStatusAccessLink(reservationId) {
+  const token = buildSignedToken({ reservationId }, 'reservation-link', RESERVATION_LINK_TTL_MS);
+  return {
+    url: buildReservationStatusLink(token),
+    tokenHash: hashValue(token),
+    expiresAt: new Date(nowMs() + RESERVATION_LINK_TTL_MS),
+  };
 }
 
 function createTransporter() {
@@ -103,6 +143,30 @@ function getOrderTypeLabel(order = {}) {
   if (['dine_in', 'dinein', 'dining_in', 'dining'].includes(orderType)) return 'Dining in';
   if (['takeout', 'take_out', 'takeaway', 'take_away', 'pickup', 'collection'].includes(orderType)) return 'Take out';
   return 'Take out';
+}
+
+function getOrderStatus(order = {}) {
+  return cleanPlainText(order.status || 'pending').toLowerCase() || 'pending';
+}
+
+function isPreOrderRequest(order = {}) {
+  return getOrderStatus(order) === 'requested' || order.orderTiming === 'pre_order_request';
+}
+
+function resolveDateValue(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  if (typeof value.toDate === 'function') return value.toDate();
+  if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getRequestedForLabel(order = {}) {
+  const explicit = cleanPlainText(order.requestedForLabel || '');
+  if (explicit) return explicit;
+  const requestedFor = resolveDateValue(order.requestedFor);
+  return requestedFor ? formatBusinessHoursDateTime(requestedFor) : 'the next service day';
 }
 
 function isDineInOrder(order = {}) {
@@ -243,7 +307,26 @@ async function sendCustomerOrderPlacedSms(orderId, order) {
         .join(', ')
     : 'Your order';
 
-  const message = `Hi ${customerName},
+  const serviceWindow = getRequestedForLabel(order);
+  const message = isPreOrderRequest(order)
+    ? `Hi ${customerName},
+
+Thank you for sending a Luban Workshop pre-order request.
+
+Your request:
+${itemsList}
+
+Total: GHS ${total}
+
+Requested for: ${serviceWindow}
+
+Our team will accept or reject this request when service opens. Please do not come for collection until it is accepted.
+
+Questions? Call us: 020 543 8455
+Hours: Mon-Fri 11:00-17:30
+
+- Luban Restaurant`
+    : `Hi ${customerName},
 
 Thank you for ordering from Luban Workshop!
 
@@ -278,6 +361,7 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
   const customerName = cleanPlainText(order.customerName || 'Customer');
   const customerPhone = cleanPlainText(order.customerPhone || 'Not provided');
   const orderTypeLabel = getOrderTypeLabel(order);
+  const serviceWindow = getRequestedForLabel(order);
 
   const itemsList = Array.isArray(order.items)
     ? order.items
@@ -285,7 +369,21 @@ async function sendRestaurantOrderPlacedSms(orderId, order) {
         .join(', ')
     : 'Your order';
 
-  const message = `New order received at Luban Workshop.
+  const message = isPreOrderRequest(order)
+    ? `New pre-order request at Luban Workshop.
+
+Customer: ${customerName}
+Customer phone: ${customerPhone}
+Order type: ${orderTypeLabel}
+Requested for: ${serviceWindow}
+
+Request:
+${itemsList}
+
+Total: GHS ${total}
+
+Review this request in the admin dashboard and accept or reject it before preparation.`
+    : `New order received at Luban Workshop.
 
 Customer: ${customerName}
 Customer phone: ${customerPhone}
@@ -335,6 +433,7 @@ async function sendRestaurantOrderCancelledSms(orderId, order, previousStatus) {
         .join(', ')
     : 'No items listed';
 
+  const wasRequest = String(previousStatus || '').toLowerCase() === 'requested';
   const message = `ORDER CANCELLED at Luban Workshop.
 
 Order #${String(orderId).slice(-6).toUpperCase()}
@@ -346,7 +445,7 @@ Previous status: ${cleanPlainText(previousStatus || 'pending')}
 Items: ${truncateForSms(itemsList, 220)}
 Total: GHS ${total}
 
-Stop preparation if already started.`;
+${wasRequest ? 'The customer withdrew a pre-order request before acceptance.' : 'Stop preparation if already started.'}`;
 
   const results = await Promise.allSettled(recipients.map(to => sendArkeselSms({
     to,
@@ -367,23 +466,35 @@ Stop preparation if already started.`;
   });
 }
 
-async function sendCustomerOrderStatusSms(orderId, order, newStatus) {
+function buildCustomerOrderStatusSmsMessage(order, newStatus, previousStatus) {
+  const serviceWindow = getRequestedForLabel(order);
+  if (previousStatus === 'requested' && newStatus === 'accepted') {
+    return `Hi ${cleanPlainText(order.customerName || 'Customer')}, your Luban Workshop pre-order request for ${serviceWindow} has been accepted. We will update you when preparation starts. - Luban Restaurant`;
+  }
+  if (previousStatus === 'requested' && newStatus === 'rejected') {
+    return `Hi ${cleanPlainText(order.customerName || 'Customer')}, we are sorry but your Luban Workshop pre-order request for ${serviceWindow} could not be accepted. Please call 020 543 8455 if you need help. - Luban Restaurant`;
+  }
+  if (newStatus === 'preparing') {
+    return `Hi ${cleanPlainText(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
+  }
+  if (newStatus === 'completed') {
+    const nextStep = isDineInOrder(order)
+      ? 'your dine-in order is ready. Please check in with the team at the counter'
+      : 'your order is ready for pickup. Please pay at the counter when you collect it';
+    return `Hi ${cleanPlainText(order.customerName || 'Customer')}, ${nextStep}. - Luban Restaurant`;
+  }
+
+  return '';
+}
+
+async function sendCustomerOrderStatusSms(orderId, order, newStatus, previousStatus) {
   const to = normalizePhoneNumber(order.customerPhone);
   if (!to) {
     logger.info('Order has no customer phone; skipping status SMS', { orderId, newStatus });
     return;
   }
 
-  let message = '';
-  if (newStatus === 'preparing') {
-    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, we've started preparing your order. We'll notify you when it's ready! - Luban Restaurant`;
-  } else if (newStatus === 'completed') {
-    const nextStep = isDineInOrder(order)
-      ? 'your dine-in order is ready. Please check in with the team at the counter'
-      : 'your order is ready for pickup. Please pay at the counter when you collect it';
-    message = `Hi ${cleanPlainText(order.customerName || 'Customer')}, ${nextStep}. - Luban Restaurant`;
-  }
-
+  const message = buildCustomerOrderStatusSmsMessage(order, newStatus, previousStatus);
   if (!message) return;
 
   await sendArkeselSms({
@@ -470,6 +581,56 @@ function formatMoney(value) {
   return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
 }
 
+function getFiniteMoneyValue(value) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : null;
+}
+
+function calculateItemSubtotal(items = []) {
+  if (!Array.isArray(items)) return 0;
+  return items.reduce((sum, item) => {
+    const quantity = Number(item?.quantity || 0);
+    const price = Number(item?.price || 0);
+    if (!Number.isFinite(quantity) || !Number.isFinite(price)) return sum;
+    return sum + (quantity * price);
+  }, 0);
+}
+
+function getOrderMoneySummary(order = {}) {
+  const subtotal = getFiniteMoneyValue(order.subtotal);
+  const packagingFee = getFiniteMoneyValue(order.packagingFee);
+  const total = getFiniteMoneyValue(order.total);
+  const resolvedSubtotal = subtotal !== null ? subtotal : calculateItemSubtotal(order.items);
+  const resolvedPackagingFee = packagingFee !== null ? packagingFee : 0;
+
+  return {
+    subtotal: resolvedSubtotal,
+    packagingFee: resolvedPackagingFee,
+    total: total !== null ? total : resolvedSubtotal + resolvedPackagingFee,
+    packagingItemCount: Number(order.packagingItemCount || 0),
+    packagingFeePerDish: getFiniteMoneyValue(order.packagingFeePerDish),
+  };
+}
+
+function getPackagingSummaryLabel(order = {}, summary = getOrderMoneySummary(order)) {
+  const count = Number(summary.packagingItemCount || 0);
+  const perDishFee = getFiniteMoneyValue(summary.packagingFeePerDish);
+
+  if (summary.packagingFee > 0 && count > 0 && perDishFee !== null) {
+    return `Packaging (${count} non-drink dish${count === 1 ? '' : 'es'} x GHS ${formatMoney(perDishFee)})`;
+  }
+
+  return isDineInOrder(order) ? 'Packaging (dine-in)' : 'Packaging';
+}
+
+function formatCustomerOrderSummaryText(order = {}, summary = getOrderMoneySummary(order)) {
+  return [
+    `Subtotal: GHS ${formatMoney(summary.subtotal)}`,
+    `${getPackagingSummaryLabel(order, summary)}: GHS ${formatMoney(summary.packagingFee)}`,
+    `Total: GHS ${formatMoney(summary.total)}`,
+  ].join('\n');
+}
+
 function formatCustomerOrderTextItems(items = []) {
   if (!Array.isArray(items) || items.length === 0) return 'No items found';
 
@@ -512,26 +673,100 @@ function formatCustomerOrderRows(items = []) {
     .join('');
 }
 
+function buildCustomerOrderSummaryHtml(order = {}, summary = getOrderMoneySummary(order)) {
+  const rows = [
+    { label: 'Subtotal', value: `GHS ${formatMoney(summary.subtotal)}` },
+    { label: getPackagingSummaryLabel(order, summary), value: `GHS ${formatMoney(summary.packagingFee)}` },
+    { label: 'Total', value: `GHS ${formatMoney(summary.total)}`, total: true },
+  ];
+
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid #f5f5f4;border-radius:16px;overflow:hidden;margin-top:18px;">
+      <tbody>
+        ${rows.map(({ label, value, total }) => `
+          <tr>
+            <td style="padding:13px 14px;border-bottom:1px solid #f5f5f4;color:${total ? '#1c1917' : '#57534e'};font-size:${total ? '16px' : '14px'};font-weight:${total ? '900' : '700'};">${escapeHtml(label)}</td>
+            <td align="right" style="padding:13px 14px;border-bottom:1px solid #f5f5f4;color:${total ? '#b91c1c' : '#1c1917'};font-size:${total ? '18px' : '14px'};font-weight:900;">${escapeHtml(value)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
 function buildCustomerOrderEmail({ orderId, order, type }) {
   const isCompleted = type === 'completed';
+  const isAccepted = type === 'accepted';
+  const isRejected = type === 'rejected';
+  const isRequest = isPreOrderRequest(order);
   const customerName = order.customerName || 'there';
   const escapedName = escapeHtml(customerName);
-  const total = formatMoney(order.total);
+  const moneySummary = getOrderMoneySummary(order);
+  const total = formatMoney(moneySummary.total);
+  const orderStatusUrl = cleanPlainText(order.orderStatusUrl || buildOrderStatusLink(orderId));
   const orderTypeLabel = getOrderTypeLabel(order);
+  const serviceWindow = getRequestedForLabel(order);
   const subject = isCompleted
     ? `Your Luban Workshop order is complete (#${orderId})`
-    : `We received your Luban Workshop order (#${orderId})`;
-  const headline = isCompleted ? 'Your order is ready' : 'Order received';
-  const eyebrow = isCompleted ? 'Completed order' : 'Order confirmation';
-  const badge = isCompleted ? 'READY' : 'CONFIRMED';
+    : isRejected
+      ? `Your Luban Workshop pre-order request was not accepted (#${orderId})`
+      : isAccepted
+        ? `Your Luban Workshop pre-order request was accepted (#${orderId})`
+        : isRequest
+          ? `We received your Luban Workshop pre-order request (#${orderId})`
+          : `We received your Luban Workshop order (#${orderId})`;
+  const headline = isCompleted
+    ? 'Your order is ready'
+    : isRejected
+      ? 'Pre-order request not accepted'
+      : isAccepted
+        ? 'Pre-order request accepted'
+        : isRequest
+          ? 'Pre-order request received'
+          : 'Order received';
+  const eyebrow = isCompleted
+    ? 'Completed order'
+    : isRejected || isAccepted || isRequest
+      ? 'Pre-order request'
+      : 'Order confirmation';
+  const badge = isCompleted
+    ? 'READY'
+    : isRejected
+      ? 'NOT ACCEPTED'
+      : isAccepted
+        ? 'ACCEPTED'
+        : isRequest
+          ? 'REQUESTED'
+          : 'CONFIRMED';
   const intro = isCompleted
     ? 'Your meal has been marked complete. Thank you for choosing Luban Workshop Restaurant.'
-    : 'Thank you for ordering from Luban Workshop Restaurant. Our team has received your order and will prepare it with care.';
+    : isRejected
+      ? 'We are sorry, but the team could not accept this pre-order request.'
+      : isAccepted
+        ? 'Your pre-order request has been accepted and is now in the order queue.'
+        : isRequest
+          ? `Thank you for sending a pre-order request to Luban Workshop Restaurant for ${serviceWindow}.`
+          : 'Thank you for ordering from Luban Workshop Restaurant. Our team has received your order and will prepare it with care.';
   const nextStep = isCompleted
     ? (isDineInOrder(order)
       ? 'Your dine-in order is ready. Please check in with the team at the counter when you arrive.'
       : 'Please collect your order at the counter. Payment is completed at pickup unless our team has arranged otherwise with you directly.')
-    : 'We will let you know when your order moves forward. For quick help, call 020 543 8455.';
+    : isRejected
+      ? 'Please call 020 543 8455 if you would like help choosing another time or placing a fresh order.'
+      : isAccepted
+        ? 'We will let you know when preparation starts. Please wait for the next update before collection.'
+        : isRequest
+          ? 'Our team will accept or reject this request when service opens. Please do not come for collection until it is accepted.'
+          : 'We will let you know when your order moves forward. For quick help, call 020 543 8455.';
+  const statusForText = isCompleted
+    ? 'completed'
+    : isRejected
+      ? 'rejected'
+      : isAccepted
+        ? 'accepted'
+        : isRequest
+          ? 'requested'
+          : 'pending';
 
   const text = [
     `Hi ${customerName},`,
@@ -539,9 +774,13 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     intro,
     '',
     `Order ID: ${orderId}`,
-    `Status: ${isCompleted ? 'completed' : 'pending'}`,
+    `Status: ${statusForText}`,
     `Order type: ${orderTypeLabel}`,
-    `Total: GHS ${total}`,
+    isRequest || isAccepted || isRejected ? `Requested for: ${serviceWindow}` : null,
+    `View order status: ${orderStatusUrl}`,
+    '',
+    'Payment summary:',
+    formatCustomerOrderSummaryText(order, moneySummary),
     '',
     'Items:',
     formatCustomerOrderTextItems(order.items),
@@ -552,7 +791,7 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
     '',
     'Luban Workshop Restaurant',
     'Cape Coast, Ghana',
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const html = `
     <!doctype html>
@@ -595,6 +834,15 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
                       </tr>
                     </table>
 
+                    <div style="margin-bottom:22px;background:#fef2f2;border:1px solid #fecaca;border-radius:16px;padding:18px;">
+                      <p style="margin:0 0 10px;color:#7f1d1d;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:800;">Track this order</p>
+                      <p style="margin:0 0 14px;color:#44403c;line-height:1.65;font-size:14px;">Use this direct status link to review the latest order details and updates.</p>
+                      <p style="margin:0;">
+                        <a href="${escapeHtml(orderStatusUrl)}" style="display:inline-block;background:#b91c1c;color:#ffffff;text-decoration:none;border-radius:999px;padding:11px 16px;font-size:14px;font-weight:900;">View order status</a>
+                      </p>
+                      <p style="margin:12px 0 0;color:#78716c;font-size:12px;line-height:1.55;word-break:break-all;">${escapeHtml(orderStatusUrl)}</p>
+                    </div>
+
                     <h2 style="font-family:Georgia,'Times New Roman',serif;margin:0 0 12px;font-size:22px;color:#1c1917;">Your order</h2>
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid #f5f5f4;border-radius:16px;overflow:hidden;">
                       <thead>
@@ -609,6 +857,9 @@ function buildCustomerOrderEmail({ orderId, order, type }) {
                         ${formatCustomerOrderRows(order.items)}
                       </tbody>
                     </table>
+
+                    <h2 style="font-family:Georgia,'Times New Roman',serif;margin:22px 0 12px;font-size:22px;color:#1c1917;">Payment summary</h2>
+                    ${buildCustomerOrderSummaryHtml(order, moneySummary)}
 
                     <div style="margin-top:22px;background:#fef2f2;border-left:4px solid #b91c1c;border-radius:14px;padding:18px;">
                       <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
@@ -742,29 +993,52 @@ function buildRestaurantEmailShell({ badge, eyebrow, headline, intro, cards, mai
 
 function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
   const isCancelled = type === 'cancelled';
+  const isRequest = isPreOrderRequest(order);
+  const wasRequest = String(previousStatus || '').toLowerCase() === 'requested';
   const total = formatMoney(order.total);
   const status = order.status || (isCancelled ? 'cancelled' : 'pending');
   const orderTypeLabel = getOrderTypeLabel(order);
-  const subject = isCancelled ? `Order Cancelled (#${orderId})` : `New Order Received (#${orderId})`;
-  const headline = isCancelled ? 'Order cancelled' : 'New order received';
+  const serviceWindow = getRequestedForLabel(order);
+  const subject = isCancelled
+    ? `Order Cancelled (#${orderId})`
+    : isRequest
+      ? `New Pre-order Request (#${orderId})`
+      : `New Order Received (#${orderId})`;
+  const headline = isCancelled
+    ? 'Order cancelled'
+    : isRequest
+      ? 'New pre-order request'
+      : 'New order received';
   const intro = isCancelled
-    ? 'An order has been cancelled. Review the details below and update kitchen or service planning as needed.'
-    : 'A new customer order just arrived. The details below are arranged for quick kitchen and front-of-house review.';
-  const actionTitle = isCancelled ? 'Operational note' : 'Next step';
+    ? (wasRequest
+      ? 'A customer withdrew a pre-order request before it was accepted.'
+      : 'An order has been cancelled. Review the details below and update kitchen or service planning as needed.')
+    : isRequest
+      ? 'A customer submitted a pre-order request outside working hours. It is not a live kitchen ticket until accepted.'
+      : 'A new customer order just arrived. The details below are arranged for quick kitchen and front-of-house review.';
+  const actionTitle = isCancelled ? 'Operational note' : isRequest ? 'Review required' : 'Next step';
   const actionText = isCancelled
-    ? 'If preparation had already started, notify the kitchen team immediately and confirm any customer follow-up.'
-    : 'Confirm the order in the admin panel, begin preparation, and update the status when the kitchen starts work.';
+    ? (wasRequest
+      ? 'No preparation should have started. Remove this request from review and follow up only if needed.'
+      : 'If preparation had already started, notify the kitchen team immediately and confirm any customer follow-up.')
+    : isRequest
+      ? 'Open the admin orders table and accept or reject this request before service preparation begins.'
+      : 'Confirm the order in the admin panel, begin preparation, and update the status when the kitchen starts work.';
 
   const text = [
-    isCancelled ? 'An order was cancelled.' : 'A new order was placed.',
+    isCancelled ? 'An order was cancelled.' : isRequest ? 'A new pre-order request was submitted.' : 'A new order was placed.',
+    intro,
     `Order ID: ${orderId}`,
     `Customer: ${order.customerName || 'Unknown'}`,
     `Phone: ${order.customerPhone || 'Not provided'}`,
     `Email: ${order.userEmail || order.customerEmail || order.email || 'Not provided'}`,
     `Order type: ${orderTypeLabel}`,
+    isRequest ? `Requested for: ${serviceWindow}` : null,
     previousStatus ? `Previous Status: ${previousStatus}` : null,
     `Current Status: ${status}`,
     `Total: GHS ${total}`,
+    '',
+    `${actionTitle}: ${actionText}`,
     '',
     'Items:',
     formatCustomerOrderTextItems(order.items),
@@ -777,6 +1051,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
     { label: 'Phone', value: order.customerPhone || 'Not provided' },
     { label: 'Email', value: order.userEmail || order.customerEmail || order.email || 'Not provided' },
     { label: 'Order type', value: orderTypeLabel },
+    isRequest ? { label: 'Requested for', value: serviceWindow } : null,
     previousStatus ? { label: 'Previous status', value: previousStatus } : null,
     { label: 'Current status', value: status },
   ].filter(Boolean));
@@ -806,7 +1081,7 @@ function buildRestaurantOrderEmail({ orderId, order, type, previousStatus }) {
   `;
 
   const html = buildRestaurantEmailShell({
-    badge: isCancelled ? 'CANCELLED' : 'NEW ORDER',
+    badge: isCancelled ? 'CANCELLED' : isRequest ? 'REQUEST' : 'NEW ORDER',
     eyebrow: 'Restaurant operations',
     headline,
     intro,
@@ -919,6 +1194,8 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
   const time = cleanPlainText(reservation.time || 'Not provided');
   const guests = cleanPlainText(reservation.guests || 'Not provided');
   const reason = getReservationDecisionReason(reservation);
+  const reservationStatusUrl = cleanPlainText(reservation.reservationStatusUrl || reservation.statusUrl || '');
+  const hasReservationStatusUrl = isConfirmed && /^https?:\/\//i.test(reservationStatusUrl);
   const subject = isConfirmed
     ? `Your Luban Workshop reservation is confirmed (#${reservationId})`
     : `Update on your Luban Workshop reservation request (#${reservationId})`;
@@ -929,7 +1206,9 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
     ? 'We are happy to confirm your table request. We look forward to welcoming you to Luban Workshop Restaurant.'
     : 'Thank you for your reservation request. Unfortunately, we are not able to accommodate it as requested.';
   const nextStep = isConfirmed
-    ? 'If your plans change, please call 020 543 8455 as early as possible so we can help.'
+    ? (hasReservationStatusUrl
+      ? 'Use the secure reservation status link to view this reservation, request a change, or request cancellation. If you need urgent help, call 020 543 8455.'
+      : 'If your plans change, please call 020 543 8455 as early as possible so we can help.')
     : `Reason: ${reason || 'The requested slot is unavailable.'} Please call 020 543 8455 if you would like to try another time or date.`;
 
   const text = [
@@ -942,6 +1221,7 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
     `Time: ${time}`,
     `Guests: ${guests}`,
     `Status: ${isConfirmed ? 'confirmed' : 'rejected'}`,
+    hasReservationStatusUrl ? `Secure reservation status link: ${reservationStatusUrl}` : null,
     !isConfirmed ? `Reason: ${reason || 'The requested slot is unavailable.'}` : null,
     '',
     nextStep,
@@ -965,6 +1245,18 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
       <div style="margin-top:18px;background:#fff1f2;border:1px solid #fecdd3;border-radius:16px;padding:18px;">
         <p style="margin:0 0 8px;color:#9f1239;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:800;">Reason provided</p>
         <p style="margin:0;color:#1c1917;font-size:15px;line-height:1.7;">${escapeHtml(reason || 'The requested slot is unavailable.')}</p>
+      </div>
+    `
+    : '';
+  const reservationStatusLinkBlock = hasReservationStatusUrl
+    ? `
+      <div style="margin-top:18px;background:#fef2f2;border:1px solid #fecaca;border-radius:16px;padding:18px;">
+        <p style="margin:0 0 8px;color:#7f1d1d;font-size:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:800;">Secure reservation status</p>
+        <p style="margin:0 0 14px;color:#44403c;font-size:15px;line-height:1.7;">Guests can use this link to view the confirmed reservation, request a change, or request cancellation.</p>
+        <p style="margin:0;">
+          <a href="${escapeHtml(reservationStatusUrl)}" style="display:inline-block;background:#b91c1c;color:#ffffff;text-decoration:none;border-radius:999px;padding:11px 16px;font-size:14px;font-weight:900;">View, change, or cancel reservation</a>
+        </p>
+        <p style="margin:12px 0 0;color:#78716c;font-size:12px;line-height:1.55;word-break:break-all;">${escapeHtml(reservationStatusUrl)}</p>
       </div>
     `
     : '';
@@ -1007,6 +1299,7 @@ function buildCustomerReservationEmail({ reservationId, reservation, type }) {
                     </table>
 
                     ${reasonBlock}
+                    ${reservationStatusLinkBlock}
 
                     <div style="margin-top:22px;background:#fef2f2;border-left:4px solid #b91c1c;border-radius:14px;padding:18px;">
                       <p style="margin:0 0 6px;color:#1c1917;font-weight:800;">What happens next</p>
@@ -1331,6 +1624,39 @@ exports.notifyCustomerOnNewOrder = onDocumentCreated(
   }
 );
 
+exports.notifyCustomerOnPreOrderDecision = onDocumentUpdated(
+  {
+    document: 'orders/{orderId}',
+    region: 'us-central1',
+    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM],
+  },
+  async (event) => {
+    const orderId = event.params.orderId;
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    const oldStatus = getOrderStatus(beforeData);
+    const newStatus = getOrderStatus(afterData);
+    if (oldStatus !== 'requested' || !['accepted', 'rejected'].includes(newStatus)) {
+      return;
+    }
+
+    try {
+      await sendCustomerOrderEmail({
+        orderId,
+        order: afterData,
+        type: newStatus === 'accepted' ? 'accepted' : 'rejected',
+      });
+    } catch (error) {
+      logger.error('Failed to send pre-order decision customer email', {
+        orderId,
+        newStatus,
+        error: error?.message || error,
+      });
+    }
+  }
+);
+
 exports.notifyCustomerOnOrderCompleted = onDocumentUpdated(
   {
     document: 'orders/{orderId}',
@@ -1364,7 +1690,7 @@ exports.notifyCustomerOnReservationDecision = onDocumentUpdated(
   {
     document: 'reservations/{reservationId}',
     region: 'us-central1',
-    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM],
+    secrets: [SMTP_USER, SMTP_PASS, SMTP_FROM, RESERVATION_LINK_SECRET, EVENT_HASH_SALT],
   },
   async (event) => {
     const reservationId = event.params.reservationId;
@@ -1379,7 +1705,30 @@ exports.notifyCustomerOnReservationDecision = onDocumentUpdated(
     }
 
     try {
-      await sendCustomerReservationEmail({ reservationId, reservation: afterData, type: newStatus });
+      let reservationForEmail = afterData;
+
+      if (newStatus === 'confirmed') {
+        const statusLink = buildFreshReservationStatusAccessLink(reservationId);
+        const fieldValue = getAdmin().firestore.FieldValue;
+        const accessLinkUpdates = {
+          accessLinkHashes: fieldValue.arrayUnion(statusLink.tokenHash),
+          accessLinkExpiresAt: statusLink.expiresAt,
+          lastConfirmationStatusLinkIssuedAt: fieldValue.serverTimestamp(),
+        };
+
+        if (!afterData.accessLinkHash) {
+          accessLinkUpdates.accessLinkHash = statusLink.tokenHash;
+        }
+
+        await event.data.after.ref.set(accessLinkUpdates, { merge: true });
+        reservationForEmail = {
+          ...afterData,
+          accessLinkExpiresAt: statusLink.expiresAt,
+          reservationStatusUrl: statusLink.url,
+        };
+      }
+
+      await sendCustomerReservationEmail({ reservationId, reservation: reservationForEmail, type: newStatus });
     } catch (error) {
       logger.error('Failed to send customer reservation status email', {
         reservationId,
@@ -1452,14 +1801,16 @@ exports.sendSmsOnOrderStatusUpdate = onDocumentUpdated(
       return;
     }
 
+    const isRequestDecision = oldStatus === 'requested' && ['accepted', 'rejected'].includes(newStatus);
+
     // Send SMS only for specific status transitions
     const statusesToNotify = ['preparing', 'completed'];
-    if (!statusesToNotify.includes(newStatus)) {
+    if (!statusesToNotify.includes(newStatus) && !isRequestDecision) {
       return;
     }
 
     try {
-      await sendCustomerOrderStatusSms(orderId, afterData, newStatus);
+      await sendCustomerOrderStatusSms(orderId, afterData, newStatus, oldStatus);
     } catch (err) {
       logger.error('Failed to send SMS via Arkesel on order update', {
         orderId,
