@@ -1589,6 +1589,31 @@
     </script>
 
     <script src="/assets/js/site-header.js"></script>
+    <script src="/assets/js/menu-zh.js"></script>
+    <script>
+        // Localize the static menu cards to Chinese by item id (the red badge).
+        // Unknown ids keep their English text.
+        (function () {
+            function localizeCards() {
+                if (!window.MENU_ZH) return;
+                document.querySelectorAll('.menu-card').forEach(function (card) {
+                    var badge = card.querySelector('span.rounded-full');
+                    var id = badge ? badge.textContent.trim() : '';
+                    var zh = window.MENU_ZH[id];
+                    if (!zh) return;
+                    var name = card.querySelector('h3');
+                    if (name && zh.name) name.textContent = zh.name;
+                    var desc = name ? name.nextElementSibling : null;
+                    if (desc && desc.tagName === 'P' && zh.description) desc.textContent = zh.description;
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', localizeCards);
+            } else {
+                localizeCards();
+            }
+        }());
+    </script>
     <script type="module" src="/assets/js/firebase-ai-chatbot.js?v=20260711-vv-keyboard"></script>
 </body>
 

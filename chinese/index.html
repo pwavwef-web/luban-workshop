@@ -872,6 +872,7 @@
 
     <script src="/assets/js/site-header.js"></script>
     <script src="/assets/js/lucide.bundle.js"></script>
+    <script src="/assets/js/menu-zh.js"></script>
     <script src="/assets/js/site-config.js"></script>
     <script src="/assets/js/luban-client.js"></script>
     <script src="/assets/js/firebase-config.js"></script>
@@ -957,6 +958,19 @@
             { id: 'DR3', name: 'Sprite 300ml', category: 'drinks', price: 15, description: 'Refreshing Sprite 300ml bottle', image: '/assets/drinks/sprite-300ml.webp' },
             { id: 'DR4', name: 'Water 300ml', category: 'drinks', price: 5, description: 'Still mineral water 300ml bottle', image: '/assets/drinks/water-300ml.webp' },
         ];
+
+        // Localize the built-in catalog to Chinese (names + descriptions) so cards,
+        // the dish modal, the cart and checkout all show Chinese. Firestore only
+        // overrides price/availability/images, so this covers the live menu too.
+        if (window.MENU_ZH) {
+            HARDCODED_MENU.forEach(function (it) {
+                var zh = window.MENU_ZH[it.id];
+                if (zh) {
+                    if (zh.name) it.name = zh.name;
+                    if (zh.description) it.description = zh.description;
+                }
+            });
+        }
 
         // Global variables
         let menuItems = [];
@@ -1146,7 +1160,9 @@
             // Load cached menu data immediately for offline/first-load performance
             MenuCache.load().then(cached => {
                 if (cached && cached.menuItems && !firstSnapshotReceived) {
-                    menuItems = cached.menuItems;
+                    menuItems = (cached.menuItems || []).map(function (it) {
+                        return window.localizeMenuItemZh ? window.localizeMenuItemZh(Object.assign({}, it)) : it;
+                    });
                     menuHiddenIds = new Set(cached.menuHiddenIds || []);
                     menuPriceOverrides = cached.menuPriceOverrides || {};
                     menuImageOverrides = cached.menuImageOverrides || {};

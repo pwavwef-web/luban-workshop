@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '..');
 const failures = [];
 const retiredAdminEmail = ['admin', 'luban.com'].join('@');
 
-const ignoredDirs = new Set(['.git', '.firebase', 'node_modules']);
+const ignoredDirs = new Set(['.git', '.firebase', '.next', 'node_modules', 'out']);
 const runtimeExtensions = new Set(['.html', '.js', '.rules']);
 const trackedTextExtensions = new Set([
   '.css',
@@ -142,7 +142,6 @@ function assertSearchResultSignals() {
     'about-us/index.html',
     'privacy-policy.html',
     'terms-of-use.html',
-    'flyers.html',
     'chinese/index.html',
     'chinese/menu.html',
     'chinese/faq.html',
@@ -301,6 +300,17 @@ function assertEnglishLocalLinks(files) {
   for (const file of htmlFiles) {
     const html = read(file);
     const baseDir = path.dirname(file);
+    const relativeFile = rel(file);
+    let siteRoot = root;
+
+    if (relativeFile.startsWith('campaigns/')) {
+      siteRoot = path.join(root, 'campaigns');
+    } else if (relativeFile.startsWith('dist/campaigns/')) {
+      siteRoot = path.join(root, 'dist', 'campaigns');
+    } else if (relativeFile.startsWith('dist/')) {
+      siteRoot = path.join(root, 'dist');
+    }
+
     const attrPattern = /\b(?:href|src)=["']([^"']+)["']/gi;
     let match;
 
@@ -313,7 +323,9 @@ function assertEnglishLocalLinks(files) {
       const targetPath = raw.split('#')[0].split('?')[0];
       if (!targetPath) continue;
 
-      const target = path.resolve(baseDir, targetPath);
+      const target = targetPath.startsWith('/')
+        ? path.join(siteRoot, targetPath.slice(1))
+        : path.resolve(baseDir, targetPath);
       if (!fs.existsSync(target)) {
         fail(`${rel(file)} references missing local asset/page: ${raw}`);
       }

@@ -2,7 +2,7 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 
-const root = path.resolve(__dirname, '..');
+const workspaceRoot = path.resolve(__dirname, '..');
 const defaultPort = 4173;
 
 const mimeTypes = {
@@ -32,7 +32,7 @@ function send(res, statusCode, body, contentType = 'text/plain; charset=utf-8') 
 function resolveRequestPath(req) {
   const url = new URL(req.url, 'http://localhost');
   const pathname = decodeURIComponent(url.pathname);
-  const requestedPath = pathname === '/' ? '/index.html' : pathname;
+  const requestedPath = pathname.endsWith('/') ? `${pathname}index.html` : pathname;
   const filePath = path.resolve(root, `.${requestedPath}`);
 
   if (!filePath.startsWith(root)) {
@@ -78,6 +78,14 @@ const server = http.createServer((req, res) => {
 });
 
 const port = Number(readArg('--port') || process.env.PORT || defaultPort);
+const rootArg = readArg('--root');
+const root = rootArg ? path.resolve(workspaceRoot, rootArg) : workspaceRoot;
+
+if (!root.startsWith(workspaceRoot) || !fs.existsSync(root) || !fs.statSync(root).isDirectory()) {
+  console.error(`Invalid static root: ${rootArg}`);
+  process.exit(1);
+}
+
 server.listen(port, '127.0.0.1', () => {
   console.log(`Serving ${root} at http://127.0.0.1:${port}`);
 });

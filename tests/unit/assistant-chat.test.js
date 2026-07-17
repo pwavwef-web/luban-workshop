@@ -101,7 +101,7 @@ function loadSecureApiInternals({ agentPlatform, logger = { info() {}, warn() {}
     },
     URL
   };
-  const exportSource = '\nmodule.exports.__test__ = { generateAssistantText };\n';
+  const exportSource = '\nmodule.exports.__test__ = { generateAssistantText, buildGuestAssistantPrompt, ASSISTANT_LANGUAGE_GUIDANCE };\n';
   vm.runInNewContext(source + exportSource, sandbox, { filename: filePath });
   return module.exports.__test__;
 }
@@ -133,9 +133,30 @@ test('assistant generation calls Agent Platform through the server helper', asyn
   assert.equal(capturedOptions.labels.app, 'luban_assistant');
   assert.equal(capturedOptions.labels.mode, 'guest');
   assert.equal(capturedOptions.responseMimeType, 'application/json');
+  assert.match(capturedOptions.systemInstruction, /Match the language/);
+  assert.match(capturedOptions.systemInstruction, /romanized Chinese, or pinyin/);
+  assert.match(capturedOptions.systemInstruction, /Never say Bao is English-only/);
   assert.equal(result.answer, '\u20b540\n\nReady.');
   assert.equal(result.modelVersion, 'test-model');
   assert.deepEqual(result.usageMetadata, { totalTokenCount: 12 });
+});
+
+test('guest assistant prompt tells Bao to answer pinyin Chinese requests in Chinese', () => {
+  const { buildGuestAssistantPrompt, ASSISTANT_LANGUAGE_GUIDANCE } = loadSecureApiInternals();
+
+  const prompt = buildGuestAssistantPrompt({
+    question: 'ni bu shou hanyu ma?',
+    history: [],
+    account: null,
+    knowledge: 'Core restaurant facts:\n- Luban Workshop Restaurant serves authentic Chinese cuisine.',
+    pageUrl: 'https://lubanrestaurant.com/',
+    pagePath: '/'
+  });
+
+  assert.match(prompt, /Guest question:\nni bu shou hanyu ma\?/);
+  assert.match(prompt, /answer in natural Chinese by default/);
+  assert.match(prompt, /Never say Bao is English-only/);
+  assert.match(ASSISTANT_LANGUAGE_GUIDANCE, /If the user asks whether Bao speaks Chinese/);
 });
 
 test('assistant generation hides Agent Platform failure details from clients', async () => {

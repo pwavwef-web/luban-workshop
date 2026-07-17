@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '..');
 const dist = path.join(root, 'dist');
 const maxCloudflareAssetBytes = 25 * 1024 * 1024;
 
-const productionDirectories = ['assets', 'about-us', 'chinese'];
+const productionDirectories = ['assets', 'about-us', 'campaigns', 'chinese'];
 const rootFileExtensions = new Set(['.html', '.css', '.png', '.jpg', '.jpeg', '.xml', '.txt']);
 const rootFileNames = new Set([
   'CNAME',

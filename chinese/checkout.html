@@ -41,7 +41,7 @@
             <div class="max-w-2xl">
                 <p class="text-red-200 text-xs font-bold uppercase tracking-widest">安全下单流程</p>
                 <h1 class="serif text-4xl font-bold mt-3 sm:text-5xl">结账</h1>
-                <p class="mt-4 max-w-2xl text-stone-200">Review your cart, explore a few drink pairings, and place the order once your Ghana phone number is verified by SMS. Email verification is optional.</p>
+                <p class="mt-4 max-w-2xl text-stone-200">查看您的购物车，挑选几款饮品搭配，待加纳手机号码通过短信验证后即可下单。邮箱验证为可选项。</p>
             </div>
         </div>
     </header>
@@ -50,7 +50,7 @@
         <section id="business-hours-notice" class="hidden panel bg-amber-50 border border-amber-200 p-5 sm:p-6 mb-6">
             <p class="text-xs font-bold uppercase tracking-widest text-amber-800">非营业时间</p>
             <h2 class="serif mt-2 text-2xl font-bold text-stone-900">提交预订申请</h2>
-            <p id="business-hours-copy" class="mt-2 text-sm text-amber-950">The restaurant is closed right now. You can send a request for the next service day and staff will accept or reject it when service opens.</p>
+            <p id="business-hours-copy" class="mt-2 text-sm text-amber-950">餐厅当前已打烊。您可以为下一个营业日提交申请，门店营业后工作人员会接受或拒绝。</p>
         </section>
 
         <section id="auth-gate" class="panel bg-white p-5 sm:p-8 lg:p-10">
@@ -58,7 +58,7 @@
                 <div>
                     <p class="text-xs font-bold uppercase tracking-widest text-red-700">需要登录账户</p>
                     <h2 class="serif mt-2 text-3xl font-bold text-stone-900">在结账页登录</h2>
-                    <p class="mt-3 text-stone-600">Your cart is saved on this device. Sign in here to continue checkout, or create an account with your Ghana phone number and verify it before placing the order.</p>
+                    <p class="mt-3 text-stone-600">您的购物车已保存在本设备。请在此登录以继续结账，或使用加纳手机号码创建账户并在下单前完成验证。</p>
                 </div>
                 <div class="rounded-lg border border-stone-200 bg-stone-50 p-5">
                     <div class="flex border-b border-stone-200" role="tablist" aria-label="Checkout account options">
@@ -87,7 +87,7 @@
                         <div>
                             <label for="checkout-signup-phone" class="mb-1 block text-sm font-semibold text-stone-700">电话号码（加纳）</label>
                             <input id="checkout-signup-phone" type="tel" class="form-input" placeholder="+233501234567" autocomplete="tel" inputmode="tel" required>
-                            <p class="mt-1 text-xs text-stone-500">Required for order confirmation calls and SMS verification.</p>
+                            <p class="mt-1 text-xs text-stone-500">用于订单确认来电与短信验证，必填。</p>
                         </div>
                         <div>
                             <label for="checkout-signup-email" class="mb-1 block text-sm font-semibold text-stone-700">邮箱</label>
@@ -131,7 +131,7 @@
                             <div>
                                 <p class="text-xs font-bold uppercase tracking-widest text-red-700">加一杯饮品</p>
                                 <h3 class="serif mt-2 text-2xl font-bold text-stone-900">想搭配点什么吗？</h3>
-                                <p class="mt-2 text-sm text-stone-600">A quick drink can round out the order before you place it.</p>
+                                <p class="mt-2 text-sm text-stone-600">下单前，加一杯饮品让餐点更完整。</p>
                             </div>
                             <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-stone-600">Suggested</span>
                         </div>
@@ -220,10 +220,10 @@
         const WEEKDAY_INDEX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
         let currentBusinessHours = getBusinessHoursState();
         const drinkSuggestions = [
-            { id: 'DR1', name: 'Coca-Cola 300ml', price: 15, description: 'Refreshing classic cola.' },
-            { id: 'DR2', name: 'Fanta 300ml', price: 15, description: 'Bright citrus soda.' },
-            { id: 'DR3', name: 'Sprite 300ml', price: 15, description: 'Light lemon-lime fizz.' },
-            { id: 'DR4', name: 'Water 300ml', price: 5, description: 'Simple still mineral water.' }
+            { id: 'DR1', name: '可口可乐 (300毫升)', price: 15, description: '清爽经典可乐。' },
+            { id: 'DR2', name: '芬达 (300毫升)', price: 15, description: '明亮柑橘汽水。' },
+            { id: 'DR3', name: '雪碧 (300毫升)', price: 15, description: '清爽柠檬青柠气泡。' },
+            { id: 'DR4', name: '瓶装水 (300毫升)', price: 5, description: '天然瓶装矿泉水。' }
         ];
 
         function showUxToast(message, type, duration) {

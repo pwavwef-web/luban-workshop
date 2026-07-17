@@ -143,7 +143,7 @@
           terms: 'Terms of Use',
           privacy: 'Privacy Policy',
           menu: 'Menu',
-          meetBao: 'Meet Bao',
+          campaigns: 'Campaigns',
           about: 'About Us',
           reservationsCatering: 'Reservations & Catering',
           faq: 'FAQ',
@@ -174,8 +174,8 @@
         ]
       : [
           ['menu.html', labels.menu],
-          ['meet-bao.html', labels.meetBao],
           ['about-us/', labels.about],
+          ['https://campaigns.lubanrestaurant.com/', labels.campaigns],
           ['events-and-catering.html', labels.reservationsCatering],
           ['faq.html', labels.faq],
           ['contact-us.html', labels.contact],
