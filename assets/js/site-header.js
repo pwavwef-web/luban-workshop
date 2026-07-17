@@ -69,37 +69,43 @@
     `;
   }
 
-  function renderAccountHeader(mount) {
-    const backHref = mount.getAttribute('data-luban-header-back-href') || siteUrl('customer-profile.html');
-    const backLabel = mount.getAttribute('data-luban-header-back-label') || 'Back to profile';
+  function renderAccountHeader(mount, chinese) {
+    const home = chinese ? siteUrl('chinese/index.html') : siteUrl('index.html');
+    const profile = chinese ? siteUrl('chinese/customer-profile.html') : siteUrl('customer-profile.html');
+    const backHref = mount.getAttribute('data-luban-header-back-href') || profile;
+    const backLabel = mount.getAttribute('data-luban-header-back-label') || (chinese ? '返回账户' : 'Back to profile');
     return `
       <nav class="fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          ${brandHtml({ href: siteUrl('index.html'), ucc: false, textClass: 'serif font-bold text-lg' })}
+          ${brandHtml({ href: home, ucc: false, textClass: 'serif font-bold text-lg', logoAlt: chinese ? '鲁班工坊标志' : 'Luban Workshop Restaurant' })}
           <a href="${backHref}" class="text-sm font-semibold text-stone-700 hover:text-red-700">${attr(backLabel)}</a>
         </div>
       </nav>
     `;
   }
 
-  function renderProfileHeader() {
+  function renderProfileHeader(chinese) {
+    const home = chinese ? siteUrl('chinese/index.html') : siteUrl('index.html');
+    const t = chinese
+      ? { menu: '菜单', orders: '订单', signOut: '退出登录', brandAlt: '鲁班工坊标志' }
+      : { menu: 'Menu', orders: 'Orders', signOut: 'Sign out', brandAlt: 'Luban Workshop Restaurant' };
     return `
       <nav class="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="h-16 flex items-center justify-between gap-4">
-            ${brandHtml({ href: siteUrl('index.html'), ucc: false, textClass: 'serif font-bold text-lg' })}
+            ${brandHtml({ href: home, ucc: false, textClass: 'serif font-bold text-lg', logoAlt: t.brandAlt })}
             <div class="flex items-center gap-2">
-              <a href="${siteUrl('index.html#menu')}" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
+              <a href="${home}#menu" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
                 <i data-lucide="utensils" class="h-4 w-4"></i>
-                Menu
+                ${t.menu}
               </a>
-              <a href="${siteUrl('index.html#my-orders')}" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
+              <a href="${home}#my-orders" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-stone-700 hover:text-red-700">
                 <i data-lucide="package" class="h-4 w-4"></i>
-                Orders
+                ${t.orders}
               </a>
               <button id="profile-logout-btn" type="button" class="hidden items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-stone-900 hover:bg-stone-800 rounded-md">
                 <i data-lucide="log-out" class="h-4 w-4"></i>
-                Sign out
+                ${t.signOut}
               </button>
             </div>
           </div>
@@ -137,36 +143,43 @@
     `;
   }
 
-  function renderShopHeader() {
+  function renderShopHeader(chinese) {
+    const events = chinese ? siteUrl('chinese/events-and-catering.html') : siteUrl('events-and-catering.html');
+    const contact = chinese ? siteUrl('chinese/contact-us.html') : siteUrl('contact-us.html');
+    const faq = chinese ? siteUrl('chinese/faq.html') : siteUrl('faq.html');
+    const profile = chinese ? siteUrl('chinese/customer-profile.html') : siteUrl('customer-profile.html');
+    const t = chinese
+      ? { menu: '菜单', reservations: '预订', contact: '联系', faq: '常见问题', admin: '管理', myOrders: '我的订单', openCart: '打开购物车', signIn: '登录 / 注册', openNav: '打开导航菜单', closeNav: '关闭菜单', ourMenu: '我们的菜单', reserveTable: '预订餐位', locateUs: '查看位置', contactUs: '联系我们', adminDash: '管理后台', viewCart: '查看购物车', primaryNav: '主导航', brandAlt: '鲁班工坊标志', manage: '管理账户', signOut: '退出登录', menuWord: '菜单' }
+      : { menu: 'Menu', reservations: 'Reservations', contact: 'Contact', faq: 'FAQ', admin: 'Admin', myOrders: 'My Orders', openCart: 'Open cart', signIn: 'Sign Up / Login', openNav: 'Open navigation menu', closeNav: 'Close menu', ourMenu: 'Our Menu', reserveTable: 'Reserve a Table', locateUs: 'Locate Us', contactUs: 'Contact Us', adminDash: 'Admin Dashboard', viewCart: 'View Cart', primaryNav: 'Primary navigation', brandAlt: 'Luban Workshop Logo', manage: 'Manage profile', signOut: 'Sign out', menuWord: 'Menu' };
+
     return `
       <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
             <div class="min-w-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-              <img src="${siteUrl('logo.png')}" alt="Luban Workshop Logo" class="h-10 w-10 rounded-full object-contain bg-white">
+              <img src="${siteUrl('logo.png')}" alt="${attr(t.brandAlt)}" class="h-10 w-10 rounded-full object-contain bg-white">
               <img src="${siteUrl('assets/ucc-logo.png')}" alt="UCC Logo" class="hidden sm:block h-9 w-9 object-contain">
               <span class="serif font-bold text-xl tracking-tight text-stone-900 truncate">Luban <span class="text-red-700">Workshop</span></span>
             </div>
-            <div class="hidden md:flex items-center gap-5 text-sm font-medium text-stone-600" aria-label="Primary navigation">
-              <a href="${siteUrl('meet-bao.html')}" class="hover:text-red-700 transition-colors">Meet Bao</a>
-              <a href="#menu" class="hover:text-red-700 transition-colors">Menu</a>
-              <a href="${siteUrl('events-and-catering.html')}" class="hover:text-red-700 transition-colors">Reservations</a>
-              <a href="${siteUrl('contact-us.html')}" class="hover:text-red-700 transition-colors">Contact</a>
-              <a href="${siteUrl('faq.html')}" class="hover:text-red-700 transition-colors">FAQ</a>
-              <a id="admin-btn-desktop" href="${siteUrl('admin.html')}" class="hidden items-center rounded-md bg-stone-900 px-3 py-1.5 text-white hover:bg-stone-800 transition-colors">Admin</a>
+            <div class="hidden md:flex items-center gap-5 text-sm font-medium text-stone-600" aria-label="${attr(t.primaryNav)}">
+              <a href="#menu" class="hover:text-red-700 transition-colors">${t.menu}</a>
+              <a href="${events}" class="hover:text-red-700 transition-colors">${t.reservations}</a>
+              <a href="${contact}" class="hover:text-red-700 transition-colors">${t.contact}</a>
+              <a href="${faq}" class="hover:text-red-700 transition-colors">${t.faq}</a>
+              <a id="admin-btn-desktop" href="${siteUrl('admin.html')}" class="hidden items-center rounded-md bg-stone-900 px-3 py-1.5 text-white hover:bg-stone-800 transition-colors">${t.admin}</a>
             </div>
             <div class="flex items-center gap-2">
-              <a href="#my-orders" id="my-orders-link-desktop" class="hidden md:inline-flex p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="My Orders">
+              <a href="#my-orders" id="my-orders-link-desktop" class="hidden md:inline-flex p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="${attr(t.myOrders)}">
                 <i data-lucide="package" class="h-6 w-6"></i>
               </a>
-              <button onclick="toggleCart()" aria-label="Open cart" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
+              <button onclick="toggleCart()" aria-label="${attr(t.openCart)}" class="relative p-2 text-stone-600 hover:text-red-700 transition-colors">
                 <i data-lucide="shopping-bag" class="h-6 w-6"></i>
                 <span id="cart-badge-desktop" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-700 rounded-full hidden">0</span>
               </button>
               <button id="auth-btn-desktop" onclick="toggleAuthModal()" class="hidden md:inline-flex px-3 py-1.5 text-sm font-medium text-white bg-red-700 rounded-md hover:bg-red-800 transition-colors">
-                Sign Up / Login
+                ${t.signIn}
               </button>
-              <button onclick="toggleNavDrawer()" class="md:hidden shrink-0 p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Open navigation menu">
+              <button onclick="toggleNavDrawer()" class="md:hidden shrink-0 p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="${attr(t.openNav)}">
                 <i data-lucide="menu" class="h-6 w-6"></i>
               </button>
             </div>
@@ -179,58 +192,55 @@
           <div class="flex items-center gap-2">
             <img src="${siteUrl('logo.png')}" alt="Luban" class="h-8 w-8 rounded-full object-contain bg-white">
             <img src="${siteUrl('assets/ucc-logo.png')}" alt="UCC" class="h-7 w-7 object-contain">
-            <span class="serif font-bold text-stone-900 text-sm">Menu</span>
+            <span class="serif font-bold text-stone-900 text-sm">${t.menuWord}</span>
           </div>
-          <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="Close menu">
+          <button onclick="toggleNavDrawer()" class="p-2 text-stone-600 hover:text-red-700 transition-colors" aria-label="${attr(t.closeNav)}">
             <i data-lucide="x" class="h-6 w-6"></i>
           </button>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-1">
-          <a href="${siteUrl('meet-bao.html')}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="sparkles" class="h-5 w-5 flex-shrink-0"></i> Meet Bao
-          </a>
           <a href="#menu" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="utensils" class="h-5 w-5 flex-shrink-0"></i> Our Menu
+            <i data-lucide="utensils" class="h-5 w-5 flex-shrink-0"></i> ${t.ourMenu}
           </a>
           <a href="#my-orders" id="my-orders-link-mobile" onclick="toggleNavDrawer()" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="package" class="h-5 w-5 flex-shrink-0"></i> My Orders
+            <i data-lucide="package" class="h-5 w-5 flex-shrink-0"></i> ${t.myOrders}
           </a>
-          <a href="${siteUrl('events-and-catering.html')}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="calendar" class="h-5 w-5 flex-shrink-0"></i> Reserve a Table
+          <a href="${events}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+            <i data-lucide="calendar" class="h-5 w-5 flex-shrink-0"></i> ${t.reserveTable}
           </a>
           <a href="#location" onclick="toggleNavDrawer()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="map-pin" class="h-5 w-5 flex-shrink-0"></i> Locate Us
+            <i data-lucide="map-pin" class="h-5 w-5 flex-shrink-0"></i> ${t.locateUs}
           </a>
-          <a href="${siteUrl('faq.html')}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="help-circle" class="h-5 w-5 flex-shrink-0"></i> FAQ
+          <a href="${faq}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+            <i data-lucide="help-circle" class="h-5 w-5 flex-shrink-0"></i> ${t.faq}
           </a>
-          <a href="${siteUrl('contact-us.html')}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
-            <i data-lucide="phone" class="h-5 w-5 flex-shrink-0"></i> Contact Us
+          <a href="${contact}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
+            <i data-lucide="phone" class="h-5 w-5 flex-shrink-0"></i> ${t.contactUs}
           </a>
           <a id="admin-btn-mobile" href="${siteUrl('admin.html')}" class="hidden items-center gap-3 px-3 py-2.5 rounded-lg text-white bg-stone-800 hover:bg-stone-900 font-medium transition-colors">
-            <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> Admin Dashboard
+            <i data-lucide="shield" class="h-5 w-5 flex-shrink-0"></i> ${t.adminDash}
           </a>
         </div>
         <div class="px-4 pb-2">
           <button onclick="toggleNavDrawer(); toggleCart();" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-stone-700 hover:text-red-700 hover:bg-red-50 font-medium transition-colors">
             <span class="flex items-center gap-3">
-              <i data-lucide="shopping-bag" class="h-5 w-5 flex-shrink-0"></i> View Cart
+              <i data-lucide="shopping-bag" class="h-5 w-5 flex-shrink-0"></i> ${t.viewCart}
             </span>
             <span id="cart-badge-mobile" class="hidden items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-700 rounded-full">0</span>
           </button>
         </div>
         <div class="border-t border-stone-100 p-4 pb-safe-6">
-          <button id="auth-btn-sidebar" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">Sign Up / Login</button>
+          <button id="auth-btn-sidebar" onclick="toggleAuthModal(); toggleNavDrawer();" class="w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-red-700 hover:bg-red-800 transition-colors">${t.signIn}</button>
           <div id="user-info-sidebar" class="hidden w-full text-left px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-red-700 flex items-center justify-between">
             <div class="home-user-info-row">
               <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
               <span id="user-email-sidebar"></span>
             </div>
             <div class="home-user-actions">
-              <a id="manage-account-btn" href="${siteUrl('customer-profile.html')}" aria-label="Manage account" class="p-1 text-stone-600 hover:text-red-700" title="Manage profile">
+              <a id="manage-account-btn" href="${profile}" aria-label="${attr(t.manage)}" class="p-1 text-stone-600 hover:text-red-700" title="${attr(t.manage)}">
                 <i data-lucide="settings" class="h-4 w-4"></i>
               </a>
-              <button id="logout-sidebar-btn" aria-label="Sign out" class="p-1 text-stone-600 hover:text-red-700" onclick="logout()">
+              <button id="logout-sidebar-btn" aria-label="${attr(t.signOut)}" class="p-1 text-stone-600 hover:text-red-700" onclick="logout()">
                 <i data-lucide="log-out" class="h-4 w-4"></i>
               </button>
             </div>
@@ -312,9 +322,12 @@
 
   function renderHeader(mount) {
     const variant = mount.getAttribute('data-luban-header') || 'back';
-    if (variant === 'shop') return renderShopHeader();
-    if (variant === 'profile') return renderProfileHeader();
-    if (variant === 'account') return renderAccountHeader(mount);
+    if (variant === 'shop') return renderShopHeader(false);
+    if (variant === 'shop-zh') return renderShopHeader(true);
+    if (variant === 'profile') return renderProfileHeader(false);
+    if (variant === 'profile-zh') return renderProfileHeader(true);
+    if (variant === 'account') return renderAccountHeader(mount, false);
+    if (variant === 'account-zh') return renderAccountHeader(mount, true);
     if (variant === 'menu') return renderMenuHeader(false);
     if (variant === 'menu-zh') return renderMenuHeader(true);
     if (variant === 'home-zh') return renderChineseHomeHeader();

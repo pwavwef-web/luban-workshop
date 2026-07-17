@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>验证联系方式 | 鲁班工坊餐厅</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+    <link rel="stylesheet" href="/tailwind.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background: #f7f3ef; color: #1c1917; }
+        .action-disabled { opacity: 0.45; cursor: not-allowed; }
+        .state-muted { opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div data-luban-header="account-zh" data-luban-header-back-href="customer-profile.html" data-luban-header-back-label="返回账户"></div>
+
+    <header class="pt-28 pb-12 bg-stone-900 text-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-red-200 text-xs font-bold uppercase tracking-widest">Secure Ordering</p>
+            <h1 class="serif text-4xl font-bold mt-3">验证联系方式</h1>
+            <p class="mt-4 text-stone-200 max-w-2xl">Orders require a verified Ghana phone number. Email verification is optional, so checkout still works if the verification email is delayed or filtered.</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16">
+        <section id="auth-gate" class="panel bg-white p-6 sm:p-8">
+            <h2 class="serif text-3xl font-bold text-stone-900">登录以继续</h2>
+            <p class="mt-3 text-stone-600">Use your Luban Workshop account to verify your contact details.</p>
+            <form id="login-form" class="mt-6 grid gap-4 sm:grid-cols-2">
+                <label for="login-email" class="sr-only">Email</label>
+                <input id="login-email" type="email" class="field" placeholder="Email" required>
+                <label for="login-password" class="sr-only">Password</label>
+                <input id="login-password" type="password" class="field" placeholder="Password" required>
+                <div class="sm:col-span-2 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Sign in</button>
+                    <button id="google-btn" type="button" class="inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Continue with Google</button>
+                </div>
+                <div id="login-error" class="hidden sm:col-span-2 rounded-md bg-red-50 p-3 text-sm text-red-800"></div>
+            </form>
+        </section>
+
+        <section id="verify-content" class="hidden space-y-6">
+            <div class="grid gap-6 lg:grid-cols-[0.95fr_1.25fr]">
+                <aside class="panel bg-white p-6">
+                    <p class="text-xs font-bold uppercase tracking-widest text-red-700">Current Status</p>
+                    <h2 class="serif text-3xl font-bold text-stone-900 mt-2">账户检查</h2>
+                    <div class="mt-6 space-y-4 text-sm">
+                        <div class="rounded-lg border border-stone-200 p-4">
+                            <p class="font-semibold text-stone-900">Email</p>
+                            <p id="email-mask" class="mt-1 text-stone-600"></p>
+                            <p id="email-status" class="mt-2 font-semibold text-amber-700">Pending</p>
+                        </div>
+                        <div class="rounded-lg border border-stone-200 p-4">
+                            <p class="font-semibold text-stone-900">Phone</p>
+                            <p id="phone-mask" class="mt-1 text-stone-600"></p>
+                            <p id="phone-status" class="mt-2 font-semibold text-amber-700">Pending</p>
+                        </div>
+                        <div id="overall-status" class="rounded-lg bg-stone-50 p-4 text-stone-700">Checking account status...</div>
+                    </div>
+                </aside>
+
+                <section class="space-y-6">
+                    <div class="panel bg-white p-6 sm:p-8">
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Optional</p>
+                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">验证您的邮箱</h2>
+                        <p class="mt-3 text-stone-600">Use the button below if you want to verify your email address. It is not required for checkout.</p>
+                        <div id="email-action-area" class="mt-6 flex flex-col sm:flex-row gap-3"></div>
+                    </div>
+
+                    <div class="panel bg-white p-6 sm:p-8">
+                        <p class="text-xs font-bold uppercase tracking-widest text-red-700">Required for orders</p>
+                        <h2 class="serif mt-2 text-3xl font-bold text-stone-900">验证您的加纳手机号</h2>
+                        <p class="mt-3 text-stone-600">We will send a 6-digit code to the Ghana phone number saved on your profile.</p>
+                        <div id="phone-otp-area" class="mt-5 space-y-4">
+                            <div id="phone-action-area" class="flex flex-col sm:flex-row gap-3"></div>
+                            <p id="phone-otp-status" class="text-sm text-stone-600"></p>
+                            <form id="otp-form" class="space-y-4">
+                                <label for="otp-code" class="block text-sm font-semibold text-stone-700">Enter 6-digit code</label>
+                                <input id="otp-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" class="field" placeholder="123456">
+                                <button type="submit" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Verify code</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="page-feedback" class="hidden rounded-md p-4 text-sm"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div data-luban-footer></div>
+    <script src="/assets/js/site-footer.js?v=20260629-footer-glow"></script>
+    <script src="/assets/js/lucide.bundle.js"></script>
+    <script src="/assets/js/site-config.js"></script>
+    <script src="/assets/js/luban-client.js"></script>
+    <script src="/assets/js/customer-experience.js?v=20260603-cx"></script>
+    <script src="/assets/js/firebase-config.js"></script>
+    <script src="/assets/js/firebase-modular.bundle.js"></script>
+    <script src="/assets/js/cookie-consent.js" defer></script>
+    <script>
+        function getReturnTarget() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('returnTo') === 'checkout'
+                ? { href: 'checkout.html', label: 'Back to checkout' }
+                : null;
+        }
+
+        const returnTarget = getReturnTarget();
+        if (returnTarget) {
+            const header = document.querySelector('[data-luban-header]');
+            if (header) {
+                header.setAttribute('data-luban-header-back-href', returnTarget.href);
+                header.setAttribute('data-luban-header-back-label', returnTarget.label);
+            }
+        }
+
+        initLubanFirebase(firebase);
+
+        const auth = firebase.auth();
+        let currentUser = null;
+        const PHONE_OTP_COOLDOWN_MS = 5 * 60 * 1000;
+        let phoneOtpCooldownTimer = null;
+
+        function showUxToast(message, type, duration) {
+            document.dispatchEvent(new CustomEvent('luban:toast', {
+                detail: { message, type, duration }
+            }));
+        }
+
+        function showFeedback(message, isError) {
+            showUxToast(message, isError ? 'error' : 'success');
+        }
+
+        function getPhoneOtpCooldownKey() {
+            return currentUser ? `verify-contact-phone-otp-cooldown:${currentUser.uid}` : null;
+        }
+
+        function getPhoneOtpCooldownUntil() {
+            const key = getPhoneOtpCooldownKey();
+            if (!key) return 0;
+            const stored = Number(window.localStorage.getItem(key) || 0);
+            return Number.isFinite(stored) ? stored : 0;
+        }
+
+        function setPhoneOtpCooldown(until) {
+            const key = getPhoneOtpCooldownKey();
+            if (!key) return;
+            if (until > Date.now()) {
+                window.localStorage.setItem(key, String(until));
+            } else {
+                window.localStorage.removeItem(key);
+            }
+        }
+
+        function formatCooldownText(remainingMs) {
+            const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            return `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function stopPhoneOtpCooldownTimer() {
+            if (phoneOtpCooldownTimer) {
+                window.clearInterval(phoneOtpCooldownTimer);
+                phoneOtpCooldownTimer = null;
+            }
+        }
+
+        function updatePhoneOtpCooldownUi() {
+            const sendBtn = document.getElementById('otp-send-btn');
+            const status = document.getElementById('phone-otp-status');
+            const until = getPhoneOtpCooldownUntil();
+            const remainingMs = until - Date.now();
+
+            if (!sendBtn || !status) return;
+
+            if (remainingMs > 0) {
+                sendBtn.disabled = true;
+                sendBtn.classList.add('action-disabled');
+                sendBtn.textContent = `Wait ${formatCooldownText(remainingMs)} to resend`;
+                status.textContent = 'We have sent your code. It should arrive shortly. Keep this page open and enter the code within 5 minutes.';
+                stopPhoneOtpCooldownTimer();
+                phoneOtpCooldownTimer = window.setInterval(updatePhoneOtpCooldownUi, 1000);
+                return;
+            }
+
+            stopPhoneOtpCooldownTimer();
+            sendBtn.disabled = false;
+            sendBtn.classList.remove('action-disabled');
+            sendBtn.textContent = 'Send SMS code';
+            status.textContent = 'Request a new code when you are ready. The latest code expires after 5 minutes.';
+            setPhoneOtpCooldown(0);
+        }
+
+        function setPhoneVerifiedState(isVerified) {
+            const phoneOtpArea = document.getElementById('phone-otp-area');
+            if (!phoneOtpArea) return;
+            phoneOtpArea.classList.toggle('hidden', isVerified);
+            phoneOtpArea.classList.toggle('state-muted', false);
+            if (isVerified) {
+                stopPhoneOtpCooldownTimer();
+                setPhoneOtpCooldown(0);
+            }
+        }
+
+        function renderEmailActions(isVerified) {
+            const container = document.getElementById('email-action-area');
+            if (isVerified) {
+                container.innerHTML = '<div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Email already verified</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <button id="email-send-btn" type="button" class="rounded-md bg-stone-900 px-5 py-3 font-semibold text-white hover:bg-stone-800">Send verification email</button>
+                <button id="email-refresh-btn" type="button" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50">Refresh email status</button>
+            `;
+        }
+
+        function renderPhoneActions(isVerified) {
+            const container = document.getElementById('phone-action-area');
+            if (isVerified) {
+                const returnAction = returnTarget
+                    ? `<a href="${returnTarget.href}" class="rounded-md bg-red-700 px-5 py-3 text-center font-semibold text-white hover:bg-red-800">${returnTarget.label}</a>`
+                    : '';
+                container.innerHTML = `
+                    <div class="inline-flex items-center rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 border border-green-200">Ghana phone already verified</div>
+                    ${returnAction}
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <button id="otp-send-btn" type="button" class="rounded-md bg-red-700 px-5 py-3 font-semibold text-white hover:bg-red-800">Send SMS code</button>
+                <a href="customer-profile.html" class="rounded-md border border-stone-300 px-5 py-3 font-semibold text-stone-800 hover:bg-stone-50 text-center">Update phone number</a>
+            `;
+            updatePhoneOtpCooldownUi();
+        }
+
+        async function loadStatus() {
+            if (!currentUser) return;
+            const result = await lubanClient.api('/accountStatus', { method: 'GET', user: currentUser });
+            const account = result.account;
+            const emailMaskEl = document.getElementById('email-mask');
+            const phoneMaskEl = document.getElementById('phone-mask');
+            emailMaskEl.textContent = account.emailMasked || account.email;
+            phoneMaskEl.textContent = account.phoneMasked || 'No phone saved';
+            renderEmailActions(Boolean(account.emailVerified));
+            renderPhoneActions(Boolean(account.phoneVerified));
+            document.getElementById('email-status').textContent = account.emailVerified ? `Verified${account.emailVerifiedAt ? ' on ' + new Date(account.emailVerifiedAt).toLocaleString() : ''}` : 'Optional, not required for orders';
+            document.getElementById('email-status').className = account.emailVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-stone-500';
+            document.getElementById('phone-status').textContent = account.phoneVerified ? `Verified${account.phoneVerifiedAt ? ' on ' + new Date(account.phoneVerifiedAt).toLocaleString() : ''}` : 'Verification pending';
+            document.getElementById('phone-status').className = account.phoneVerified ? 'mt-2 font-semibold text-green-700' : 'mt-2 font-semibold text-amber-700';
+            setPhoneVerifiedState(Boolean(account.phoneVerified));
+            document.getElementById('overall-status').textContent = account.phoneVerified
+                ? 'Your account is ready for secure online orders.'
+                : 'Verify your Ghana phone number above before placing an order. Email verification is optional.';
+            document.getElementById('overall-status').className = account.phoneVerified
+                ? 'rounded-lg bg-green-50 p-4 text-green-800'
+                : 'rounded-lg bg-amber-50 p-4 text-amber-900';
+        }
+
+        async function sendVerificationEmail() {
+            if (!currentUser) return;
+            await auth.sendEmailVerification(currentUser);
+            showFeedback('Verification email sent. Open your inbox, verify the address, then refresh the email status here.', false);
+        }
+
+        async function refreshEmailStatus() {
+            if (!currentUser) return;
+            await auth.reload(currentUser);
+            await loadStatus();
+            showFeedback('Email status refreshed.', false);
+        }
+
+        async function sendSmsCode() {
+            if (!currentUser) return;
+            await lubanClient.api('/requestPhoneOtp', {
+                method: 'POST',
+                user: currentUser
+            });
+            setPhoneOtpCooldown(Date.now() + PHONE_OTP_COOLDOWN_MS);
+            updatePhoneOtpCooldownUi();
+            showFeedback('SMS verification code sent. It can take a moment to arrive. Enter the 6-digit code within 5 minutes.', false);
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            document.getElementById('auth-gate').classList.toggle('hidden', Boolean(user));
+            document.getElementById('verify-content').classList.toggle('hidden', !user);
+            if (!user) return;
+            await loadStatus();
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const error = document.getElementById('login-error');
+            error.classList.add('hidden');
+            try {
+                await auth.signInWithEmailAndPassword(
+                    document.getElementById('login-email').value.trim(),
+                    document.getElementById('login-password').value
+                );
+                event.target.reset();
+            } catch (err) {
+                error.textContent = err.message || 'Sign in failed.';
+                error.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('google-btn').addEventListener('click', async () => {
+            const error = document.getElementById('login-error');
+            error.classList.add('hidden');
+            try {
+                await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+            } catch (err) {
+                if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+                    error.textContent = err.message || 'Google sign-in failed.';
+                    error.classList.remove('hidden');
+                }
+            }
+        });
+
+        document.addEventListener('click', async (event) => {
+            const target = event.target.closest('button');
+            if (!target) return;
+            if (target.id === 'email-send-btn') await sendVerificationEmail();
+            if (target.id === 'email-refresh-btn') await refreshEmailStatus();
+            if (target.id === 'otp-send-btn') await sendSmsCode();
+        });
+
+        document.getElementById('otp-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!currentUser) return;
+            try {
+                const result = await lubanClient.api('/verifyPhoneOtp', {
+                    method: 'POST',
+                    user: currentUser,
+                    body: { code: document.getElementById('otp-code').value.trim() }
+                });
+                document.getElementById('otp-code').value = '';
+                await loadStatus();
+                if (result.account.phoneVerified) {
+                    showFeedback(returnTarget
+                        ? 'Ghana phone number verified successfully. Return to checkout to place your order.'
+                        : 'Ghana phone number verified successfully. The verification form has been hidden.', false);
+                } else {
+                    showFeedback('Verification status updated.', false);
+                }
+            } catch (error) {
+                showFeedback(error.message || 'Could not verify that code.', true);
+            }
+        });
+
+        const existingPhoneOtpCooldown = getPhoneOtpCooldownUntil();
+        if (existingPhoneOtpCooldown > Date.now()) {
+            updatePhoneOtpCooldownUi();
+        }
+    </script>
+    <script src="/assets/js/site-header.js"></script>
+</body>
+</html>
